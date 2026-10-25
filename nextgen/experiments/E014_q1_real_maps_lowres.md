@@ -158,6 +158,22 @@ about 15 percent only. A tuned round (proposals 1.2e-4 / 9e-4, about 2.4 sd, 100
 other three modes are kept because the comparison in E005 used one proposal width for all modes.
 Reduced chi-square 14994 (Galactic plane, outside the index mask).
 
+**Exact grid targets on the same data (`nextgen/scripts/q1_grid_check.py`, 17 bands, 38165 kept
+pixels, Commander4's own reader, smoothing, mask and SEDs, no MH code; coarse 41 x 41 grid over
+the prior box then shrinking 41 x 41 grids to a step of 0.3 sd):**
+
+| target | beta_s | beta_d |
+|---|---|---|
+| ridge (profile, flat amplitude priors) | -3.34244 +- 0.00036 | 1.36539 +- 0.000043 |
+| flat-prior marginal (ridge minus 1/2 sum ln det A_p) | -3.32314 +- 0.00033 | 1.36562 +- 0.000043 |
+
+The ridge chain agrees with its exact target: shift -0.03 +- 0.10 sd in beta_s and -0.17 +- 0.18
+sd in beta_d, width ratios 1.01 and 1.18 (the dust ESS is 44, so the width is uncertain at the 15
+percent level). F2 therefore holds on real data at nside 64. The volume term of the flat amplitude
+prior moves the exact beta_s target by +0.019, which is 54 ridge sd, and beta_d by +0.0002 (5 sd):
+on these maps the prior choice (Q2, F3) matters far more than the sampler width. The `conditional`
+and `marginal` chains should land on the marginal row; `resolve_chisq` has no target.
+
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
 

@@ -84,7 +84,7 @@ def main():
     hi = np.array([sp.spectral_index_bounds[1], dp.spectral_index_bounds[1]])
     pm, pr = float(dp.spectral_index_prior.mean), float(dp.spectral_index_prior.rms)
     print(f"{d.shape[0]} bands, {d.shape[1]} pixels kept, comps "
-          f"{[type(c).__name__ for c in comps]}")
+          f"{[type(c).__name__ for c in comps]}", flush=True)
 
     def logpost(bs, bd):
         for c in sync: c.beta = bs
@@ -107,17 +107,24 @@ def main():
         return out
 
     res = {"coarse": moments(lo, hi, 41)}
-    print("coarse", json.dumps(res["coarse"], indent=1))
+    print("coarse", json.dumps(res["coarse"], indent=1), flush=True)
     final = {}
     for key in ["ridge", "marginal"]:
         m = res["coarse"][key]
         c = np.array([m["mean_sync"], m["mean_dust"]])
-        half = np.maximum(5 * np.array([m["sd_sync"], m["sd_dust"]]), 2 * np.array(m["step"]))
-        for it in range(3):
-            r = moments(np.maximum(lo, c - half), np.minimum(hi, c + half), 61)[key]
+        step = np.array(m["step"])
+        half = np.maximum(5 * np.array([m["sd_sync"], m["sd_dust"]]), 2 * step)
+        # Shrink around the mode until the grid resolves the posterior (sd above 4 steps per axis);
+        # the floor of 3 steps keeps a zero sd (posterior inside one cell) from collapsing the box.
+        for it in range(8):
+            r = moments(np.maximum(lo, c - half), np.minimum(hi, c + half), 41)[key]
+            r = {k: (float(v) if not isinstance(v, list) else [float(x) for x in v]) for k, v in r.items()}
             c = np.array([r["mean_sync"], r["mean_dust"]])
-            half = 6 * np.array([r["sd_sync"], r["sd_dust"]])
-            print(key, "refine", it, {k: (round(v, 6) if isinstance(v, float) else v) for k, v in r.items()})
+            sd = np.array([r["sd_sync"], r["sd_dust"]]); step = np.array(r["step"])
+            print(key, "refine", it, r, flush=True)
+            if np.all(sd > 4 * step):
+                break
+            half = np.maximum(6 * sd, 3 * step)
         final[key] = r
     res["final"] = final
     out = os.path.join(params.output.dir if "dir" in params.output else ".", "grid_check.json")
