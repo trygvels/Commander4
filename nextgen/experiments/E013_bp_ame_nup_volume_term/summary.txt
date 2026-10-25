@@ -1,0 +1,25 @@
+E013: 1204 pixels in the BP nu_p mask at nside 16, 8 bands (28.4, 44.1, 70.1, 33, 40.6, 40.6, 60.8, 60.8 GHz)
+
+variant        mean nu_p  med sd          shift vs ridge [ridge sd]    vs BP nu_p map [own sd] MAP at bound
+chisq              25.81    0.21 med  -0.09 (p16  -1.28, p84  +1.24) med  -0.44 ( 77% >2sd)         0.0%
+ridge              25.53    0.62 med  +0.00 (p16  +0.00, p84  +0.00) med  +0.23 ( 37% >2sd)         0.0%
+marginal           25.46    0.63 med  -0.05 (p16  -0.09, p84  -0.02) med  +0.19 ( 37% >2sd)         0.0%
+code_marginal      25.59    0.62 med  +0.04 (p16  +0.02, p84  +0.09) med  +0.29 ( 36% >2sd)         0.0%
+
+By AME peak S/N (max over bands of a_BP f / sigma): median shift from ridge in ridge sd, and median ridge sd
+  S/N [3, 10):     2 px  code_marginal +0.14  marginal -0.16  chisq +3.48  ridge sd 1.92 GHz
+  S/N [10, 30):   173 px  code_marginal +0.11  marginal -0.12  chisq +0.43  ridge sd 1.42 GHz
+  S/N [30, 100):   778 px  code_marginal +0.05  marginal -0.05  chisq -0.06  ridge sd 0.65 GHz
+  S/N [100, 1e+09):   242 px  code_marginal +0.02  marginal -0.02  chisq -1.10  ridge sd 0.23 GHz
+
+Full-sky single nu_p over the 1204 mask pixels (what BP10 sampled; BP posterior mean 25.60 GHz):
+  chisq          mean  26.31 GHz  sd  0.00  MAP  26.31
+  ridge          mean  26.66 GHz  sd  0.00  MAP  26.66
+  marginal       mean  26.66 GHz  sd  0.00  MAP  26.66
+  code_marginal  mean  26.66 GHz  sd  0.00  MAP  26.66
+  fine grid (4001 points over +-0.5 GHz around the ridge peak):
+    chisq          mean  26.311 GHz  sd 0.0037  shift vs ridge  -35.31 ridge sd  (vs BP 25.60:   +190.8 own sd)
+    ridge          mean  26.658 GHz  sd 0.0098  shift vs ridge   +0.00 ridge sd  (vs BP 25.60:   +107.6 own sd)
+    marginal       mean  26.650 GHz  sd 0.0096  shift vs ridge   -0.76 ridge sd  (vs BP 25.60:   +109.2 own sd)
+    code_marginal  mean  26.665 GHz  sd 0.0099  shift vs ridge   +0.78 ridge sd  (vs BP 25.60:   +107.7 own sd)
+  volume term range over grid: 1/2 sum ln A varies by 3873.2 in log density; ridge chi2 range 6819539.3

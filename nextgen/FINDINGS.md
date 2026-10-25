@@ -41,9 +41,12 @@ amplitudes was slightly better at the true beta.
 
 **F4. Ridge is the principled default.** Ridge is the profile ("spectral") likelihood of parametric
 component separation (Stompor et al. 2009). As an MH target it equals the flat-prior marginal times
-det(A)^(1/2), which is the contribution of a joint Jeffreys prior on (a, beta) (literature agent's
-derivation; Eriksen et al. 2008 and Planck 2015 X used Jeffreys priors to remove prior-volume bias of
-more than 4 sigma). `auto` now resolves to ridge where available. Conditional Gibbs (Commander3
+det(A)^(1/2), i.e. the marginal under the Jeffreys prior of the amplitude block conditional on beta,
+p(a | beta) proportional to det A(beta)^(1/2), with a flat prior on beta. (Corrected 2026-10-25 after
+the E012 review: it is NOT the full joint Jeffreys prior sqrt(det I(a, beta)), which carries an
+a-dependent factor and gives a different beta posterior; quadrature check in
+`experiments/E009_c3_nonlin_review/check_a_e.py`.) Eriksen et al. 2008 and Planck 2015 X used
+Jeffreys priors to remove prior-volume bias of more than 4 sigma. `auto` now resolves to ridge where available. Conditional Gibbs (Commander3
 'chisq' default) targets the flat-prior posterior and therefore carries the same volume pull, only
 hidden by slow mixing. This needs a proper coverage study (Q2).
 
@@ -94,6 +97,29 @@ toy the sign is irrelevant at high S/N and flips a 2 to 27 sd volume bias at low
 The BeyondPlanck polarized-index (alm / pixel-region) and bandpass samplers are valid conditional
 steps in the BP10 configuration (E010); their main approximations are prior-drawn frozen regions
 and a diagonal spurious-map chi^2 for relative bandpass shifts.
+Independent review (two stats-reviewer agents per item, 2026-10-25, reports in
+`experiments/E009_c3_nonlin_review/`) confirmed all of the above and added: BP10 sampled nu_p as
+ONE full-sky value with the band monopoles profiled inside each proposal; the BP10 Jeffreys prior
+was hard-disabled in the code (`comm_param_mod.f90:933`), so the dust beta_pol target was
+likelihood times N(1.56, 0.1^2) (E009's earlier statement is corrected); the alm / region sampler's
+low-resolution chi^2 weights nside-16 pixels by N_sub mean(1/sigma^2) instead of N_sub/mean(sigma^2)
+(1.56x for a 2x variance contrast); the 2024 MH module also ignores all priors and bounds, perturbs
+only pixel region 1, and `sample_template_mh` uses a multiplicative proposal without the Hastings
+term. **Impact of the sign error on BeyondPlanck's nu_p is negligible (E013):** the AME pixels in
+the sampling mask have median S/N above 30 and nu_p was a single parameter; the flipped volume term
+moved the full-sky conditional posterior by 0.8 of its 0.01 GHz sd (0.008 GHz), the correct
+marginal would move it equally the other way; per pixel the median shift is 0.04 ridge sd, 0.14 sd
+at S/N 3 to 10. Cosmoglobe DR1 did not use the `marginal` path at all.
+
+**F11. BeyondPlanck's absolute bandpass shift was accepted on rank 0's chi^2 only** (E015, code
+reading confirmed line by line). In the absolute-shift branch `compute_chisq_abs_bp` accumulates the
+TOD chi^2 per MPI rank and `finalize_binned_map` is called without `chisq_S`, so the only reduce never
+runs; `sample_bp` sums on rank 0. The 30 GHz absolute shift posterior is the conditional given rank
+0's scans (wider by about sqrt(N_ranks), centred on those scans). Present at BP10 and HEAD, and in
+the WMAP, DIRBE, SPIDER, LiteBIRD and QUIET TOD modules. Also: no Gaussian prior enters the
+bandpass acceptance (flat prior; the `bp_init` "PROP MEAN" is a proposal width), and after an
+accepted shift the frequency map handed to component separation still carries the old correction
+while the mixing matrices use the new one.
 
 ## 5. Commander4 versus Commander3 coverage
 

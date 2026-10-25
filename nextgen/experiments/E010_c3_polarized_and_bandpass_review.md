@@ -53,3 +53,25 @@ the current bandpass and shared by current and proposed chi^2.
 Both methods are valid MCMC steps for their stated conditional targets in the BeyondPlanck
 configuration. Open items: an independent re-derivation (stats-reviewer), and a check of how much
 the diagonal spurious-map chi^2 misstates the relative bandpass uncertainty.
+
+## Independent review outcome (2026-10-25, two stats-reviewer agents, code paths and stated targets only)
+Full reports: `E009_c3_nonlin_review/independent_reviews_2026-10-25.md`.
+Polarized index sampler: confirmed valid conditional MH for its low-resolution surrogate
+likelihood; see the E009 addendum for the new facts (Jeffreys prior hard-disabled, Jensen-biased
+low-resolution weights, frozen regions as prior draws make the joint chain a cut-type sampler).
+Bandpass sampler, confirmed: single symmetric proposal per iteration is a valid MH step for a
+FLAT-prior conditional (no Gaussian prior enters the acceptance, `comm_tod_bandpass_mod.f90:46-58`;
+the "PROP MEAN" entry in `bp_init_*.dat` is a proposal width, not a prior); multi-proposal mode is
+not invariant (exact 5-state enumeration and Gaussian MC: variance off by 10 to 40 percent); the
+relative-shift statistic uses only the diagonal of the spurious-map covariance (toy: 8.6 vs exact
+17.1), and is a per-pixel profile over I, Q, U with flat priors, not the conditional given the sky
+model.
+NEW, verified by reading the code myself after the review (E015): in the ABSOLUTE-shift branch
+(30 GHz, odd iterations) `compute_chisq_abs_bp` accumulates `chisq_S` per MPI rank from that
+rank's scans and `finalize_binned_map` is called without `chisq_S`, so the only reduce
+(`comm_tod_mapmaking_mod.f90:565-570`) never runs; `sample_bp` then sums `chisq_S` on rank 0 only
+(`comm_tod_lfi_smod.f90:796, 846-855` at BP10; `:837, 900-919` at HEAD f760333, same structure
+in the WMAP, DIRBE, SPIDER, LiteBIRD and QUIET TOD modules). The 30 GHz absolute bandpass shift was
+therefore sampled from the conditional given only rank 0's scans. Also noted: on acceptance the
+frequency map handed to component separation still carries the old bandpass correction while the
+mixing matrices switch to the new shifts (one TOD iteration out of sync).

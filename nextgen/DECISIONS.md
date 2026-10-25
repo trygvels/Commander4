@@ -36,3 +36,17 @@ upstream pull requests unless Cosmoglobe wants it.
 ## D007 (2026-10-25): long-running research happens on the Mac mini, heavy runs on a cluster
 The cloud workspace (2 vCPU, 7.8 GB, jobs stopped after each reply) cannot hold research runs. The
 Mac handles T0 to T2 (COMPUTE.md); T3/T4 go to ITA or Sigma2 via Slurm.
+
+## D008 (2026-10-25): sampler correctness is tested with a proper Gaussian amplitude prior; prior choices are a coverage study
+Neither the flat amplitude prior (marginal, w = 1) nor the profile likelihood (ridge, w = 0) has a
+proper generative distribution, so an SBC run with them cannot distinguish a sampler error from a
+prior-volume effect (E012 review). The index-field prototype and every later sampler therefore pass
+L1/L2 with the exact marginal under a proper Gaussian amplitude prior N(m, T) (a two-line change to
+the collapsed kernel), and ridge / marginal / Jeffreys are compared in a separate frequentist
+coverage study reported as bias and coverage versus S/N (principle 4). D003 (ridge default) stands.
+
+## D009 (2026-10-25): index-field prior conventions
+The hierarchical field drops the constant mode (the field mean is mu, sigma is the sd of
+fluctuations about it), uses radians for the correlation length in both the GMRF and the alm family
+with the graph-Laplacian eigenvalues rescaled by 1/(3 h^2), and samples the bounded log-uniform
+correlation length through a logit transform with its Jacobian. Reasons in E012 v2.

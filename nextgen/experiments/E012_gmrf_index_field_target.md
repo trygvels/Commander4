@@ -1,9 +1,13 @@
 # E012: Hierarchical index-field prototype (M2.1): exact target, then exact-target checks and SBC
 
 - **Date started / finished:** 2026-10-25 /
-- **Branch and commit:** nextgen, 0c0c612 (target written before any prototype code)
+- **Branch and commit:** nextgen, 0c0c612 (target v1); v2 after the independent review, 2026-10-25
 - **Open question addressed:** Q3 (optimal spatially varying index model), Q4 (sampler), Q2 (prior)
 - **Validation level:** L1 (exact target) and L2 (simulation-based calibration)
+
+Version 2. Two stats-reviewer agents reviewed v1 (mathematics; validation design). Their reports are
+in `E009_c3_nonlin_review/independent_reviews_2026-10-25.md` (items e012-math and
+e012-validation-design). Every change from v1 is marked **[v2]** with the reason.
 
 ## Question
 Can a spectral-index field with an inferred smoothness prior (mean, amplitude and correlation length
@@ -23,121 +27,182 @@ each p:
 with a_p in R^C the component amplitudes (C = 3: CMB, synchrotron, thermal dust), M_p the B x C
 mixing matrix in uK_RJ (CMB column fixed; synchrotron column (nu/nu_0s)^beta; dust column a
 modified black body with fixed beta_d and T_d in the first prototype), and r(p) the index pixel
-that contains data pixel p (nested ordering, nside_beta <= nside_d, so each data pixel has exactly
-one index pixel and each index pixel has (nside_d/nside_beta)^2 data pixels). beta in R^{N_beta} is
-the synchrotron index field. No beams, no smoothing, white noise: the per-pixel likelihood is exact
-for this model (F7 and F8 do not enter by construction).
+that contains data pixel p (nested ordering, nside_beta <= nside_d). beta in R^{N_beta} is the
+synchrotron index field. No beams, no smoothing, white noise: the per-pixel likelihood is exact for
+this model (F7 and F8 do not enter by construction).
 
-### Amplitude treatment: collapsed
-The amplitudes are integrated or profiled out per pixel. With A_p = M_p^T N_p^-1 M_p (C x C),
-b_p = M_p^T N_p^-1 d_p and chi2min_p = d_p^T N_p^-1 d_p - b_p^T A_p^-1 b_p:
+### Amplitude treatment: collapsed, three variants
+With A_p = M_p^T N_p^-1 M_p (C x C), b_p = M_p^T N_p^-1 d_p:
 
-    log L_w(beta) = sum_p [ -1/2 chi2min_p(beta) - (w/2) log det A_p(beta) ] + const
+- **Proper Gaussian amplitude prior (sampler-correctness target) [v2]:** a_p ~ N(m_p, T_p) with
+  known m_p, T_p (diagonal, physically wide: T_p^(1/2) = 10 x template amplitude per component,
+  floor 100 uK_RJ). Exact marginal
 
-- w = 1: flat (improper uniform) prior on every a_p, exact marginal.
-- w = 0: profile ("ridge") likelihood, equal to the marginal under the joint Jeffreys prior on
-  (a_p, beta) for fixed p (F4). **Default w = 0 (D003).** Both are run in the SBC (Q2); the SBC
-  for w = 1 draws a_p from a proper prior that is wide enough that the flat-prior approximation is
-  the stated target (see Setup); any failure of w = 1 there is a finding about the volume term.
+      log L_G(beta) = sum_p [ 1/2 b'_p^T (A_p + T_p^-1)^-1 b'_p - 1/2 log det (A_p + T_p^-1) ] + const,
+      b'_p = b_p + T_p^-1 m_p,
+
+  constant terms independent of beta dropped. This is the ONLY target for which the SBC is a test
+  of the sampler, because the simulations can be drawn from exactly this prior (review finding:
+  neither the flat prior nor the profile corresponds to a proper generative amplitude prior).
+- **w-family (frequentist coverage study, principle 4):** log L_w(beta) = sum_p [ -1/2 chi2min_p
+  - (w/2) log det A_p ], chi2min_p = d_p^T N_p^-1 d_p - b_p^T A_p^-1 b_p. w = 1 is the flat-prior
+  marginal; w = 0 is the profile ("ridge") likelihood, **[v2]** which equals the marginal under
+  the Jeffreys prior of the amplitude block CONDITIONAL on beta, p(a_p | beta) proportional to
+  det A_p(beta)^(1/2), with a flat prior on beta. (v1 said "joint Jeffreys prior on (a_p, beta)";
+  the review showed by quadrature that the full joint Jeffreys prior sqrt(det I(a, beta)) carries
+  an a-dependent factor and gives a different beta posterior, dlogL +0.052 vs +0.006 in its toy.
+  FINDINGS F4 is corrected accordingly.) Default for science runs stays w = 0 (D003). The w-family
+  runs are reported as bias and coverage versus S/N with template amplitudes, never as a pass/fail
+  test of the sampler.
 
 ### Index-field prior (hierarchical Gaussian field, non-centred)
-Hyperparameters theta = (mu, log sigma, log rho). The field is
+Hyperparameters theta = (mu, log sigma, u), with u the unconstrained rho coordinate below. Field:
 
-    beta = mu 1 + sigma * S(rho) z,    z ~ N(0, I_{N_beta}),
+    beta = mu 1 + sigma S(rho) z,   z ~ N(0, I_K),
 
-so that beta | theta ~ N(mu 1, sigma^2 S S^T) with Cov = sigma^2 K(rho), K = S S^T, K_ii = 1 on
-average over pixels (K is normalized so that the pixel-averaged marginal variance is 1 and sigma is
-the field standard deviation).
+with K the number of basis modes (see below), so beta | theta ~ N(mu 1, sigma^2 S S^T).
 
-Two covariance families, both through one fixed orthonormal basis V (eigenvectors of a fixed
-operator on the index pixels) and a spectrum s_i(rho) >= 0:
+Two covariance families, both through a fixed orthonormal basis V (N_beta x K) and a spectrum
+s_i(rho) >= 0:
 
-    S(rho) = V diag( s_i(rho) ) / c(rho),  c(rho)^2 = (1/N_beta) sum_i s_i(rho)^2
+    S(rho) = V diag( s_i(rho) ) / c(rho),   c(rho)^2 = (1/N_beta) sum_i s_i(rho)^2,
 
-- **GMRF / SPDE (leading candidate):** V from the eigendecomposition of the HEALPix neighbour-graph
-  Laplacian G at nside_beta (G = D - W, W_ij = 1 for the 7 or 8 HEALPix neighbours), and
-  s_i(rho) = (kappa(rho)^2 + lambda_i)^(-alpha/2) with alpha = 2 (Matern nu = 1 on the sphere
-  surface in the SPDE correspondence of Lindgren et al. 2011), where lambda_i are the eigenvalues
-  of G and kappa is tied to the correlation length rho by kappa = sqrt(8 nu) / rho in units of the
-  pixel spacing. The precision is Q = c^2 sigma^-2 V diag((kappa^2 + lambda_i)^alpha) V^T, a
-  polynomial in G, hence sparse for integer alpha. The eigendecomposition is done once per run
-  (N_beta <= 12288 at nside_beta 32); hyperparameter changes cost O(N_beta^2).
+so that the pixel-averaged marginal variance of beta - mu 1 is exactly sigma^2.
+
+**[v2] The constant mode is removed from both families** (s_0 = 0, i.e. the lambda_0 = 0
+eigenvector of the graph Laplacian and the l = 0 harmonic are dropped and c is normalized over the
+remaining modes). Reason: with it in, 85 to 94 percent of the unit variance sat in the constant
+mode at rho = 180 deg, exactly degenerate with mu; mu now carries the field mean and sigma the sd
+of fluctuations about it, which is the quantity Q3 asks for.
+
+**[v2] One unit system for both families.** rho and kappa are in radians; the practical range
+of a Matern field with alpha = 2 (nu = 1 in the SPDE correspondence of Lindgren et al. 2011) is
+rho with kappa = sqrt(8 nu) / rho = sqrt(8) / rho.
+
+- **GMRF / SPDE (leading candidate):** V from the eigendecomposition of the HEALPix 8-neighbour
+  graph Laplacian G at nside_beta (G = D - W). **[v2]** The eigenvalues are rescaled to the
+  continuum Laplace-Beltrami operator, lambda_i -> lambda_i / (3 h^2) with h the mean pixel
+  spacing in radians (the review measured lambda / (h^2 l(l+1)) = 2.97 at l = 1 and 2.65 at l = 8
+  at nside 8 for the unweighted graph Laplacian; the residual 10 percent departure at l ~ nside is
+  recorded as a property of the GMRF family, not corrected further). Spectrum s_i = (kappa^2 +
+  lambda_i / (3 h^2))^(-1), alpha = 2. Precision Q = c^2 sigma^-2 V diag(s_i^-2) V^T.
 - **alm Gaussian random field (Commander3-style baseline, hyperparameters inferred):** V = real
-  spherical harmonics on the index pixels up to lmax = 3 nside_beta - 1 (not exactly orthonormal
-  on pixels; orthonormalized once by QR), s_l(rho) = (kappa^2 + l(l+1))^(-alpha/2), the same
-  Matern spectrum. Differences from the GMRF are then only the basis and the band limit.
+  spherical harmonics on the index pixels for 1 <= l <= lmax = 2 nside_beta (**[v2]** reduced from
+  3 nside - 1 so that the pixel-evaluated harmonics are close to orthogonal; the matrix is
+  orthonormalized by QR and K = (lmax + 1)^2 - 1 < N_beta is stated explicitly), s_l = (kappa^2 +
+  l(l+1))^(-1). The two families differ in basis, band limit and the discrete-Laplacian spectrum.
 
 Hyperpriors (all proper):
 - mu ~ N(mu_0, s_mu^2), mu_0 = -3.0, s_mu = 0.5 (synchrotron; dust would use 1.55, 0.3).
-- sigma ~ half-Normal(0, 0.3) on the standard deviation (density 2 phi(sigma/0.3)/0.3, sigma > 0),
-  written in log sigma with the Jacobian sigma.
-- rho ~ log-Uniform on [rho_min, rho_max] with rho_min = 1 pixel spacing and rho_max = 180 deg;
-  as the second option the joint PC prior of Fuglstad et al. 2019 on (rho, sigma) with
-  P(rho < rho_0) = 0.05 at rho_0 = 2 pixels and P(sigma > 0.5) = 0.05. Both are run; the SBC must
-  pass for whichever is used.
-- Hard bounds on beta are not imposed in the prototype (the Gaussian field prior replaces them). If
-  the SED needs them for numerical reasons, they are logged as a change of target.
+- sigma ~ half-Normal(0, 0.3) on the sd, sampled as log sigma with the Jacobian + log sigma.
+- rho: log-Uniform on [rho_min, rho_max], rho_min = h (one pixel spacing), rho_max = pi
+  (180 deg). **[v2]** Sampled as the unconstrained u = logit((log rho - log rho_min) / (log rho_max
+  - log rho_min)) with Jacobian + log[(log rho_max - log rho_min) s(u)(1 - s(u))], so the target is
+  smooth and NUTS never meets a hard wall. The second option is the joint PC prior of Fuglstad et
+  al. 2019 on (rho, sigma) with P(rho < rho_0) = 0.05 at rho_0 = 2 h and P(sigma > 0.5) = 0.05,
+  on the same u coordinate (rho then has a soft prior inside the same bounds).
+- No hard bounds on beta (the Gaussian field prior replaces them). The C++ kernel skips pixels
+  whose A_p Cholesky fails; **[v2]** the prototype asserts nskipped == 0 on every evaluation, so a
+  skip is an error, not a silent change of target.
 
 ### Full posterior sampled
-Variables x = (z in R^{N_beta}, mu, log sigma, log rho), dimension N_beta + 3:
+Variables x = (z in R^K, mu, log sigma, u), dimension K + 3:
 
-    log pi(x | d) = log L_w(beta(x)) + log N(z; 0, I) + log N(mu; mu_0, s_mu^2)
-                    + log halfN(sigma; 0.3) + log sigma            (Jacobian of log sigma)
-                    + log p(rho) + log rho                          (Jacobian of log rho)
-                    + const.
+    log pi(x | d) = log L(beta(x)) + log N(z; 0, I) + log N(mu; mu_0, s_mu^2)
+                    + log halfN(sigma; 0.3) + log sigma
+                    + log p_rho(rho(u)) + log |d rho / d u|          (log-uniform: constant + logit Jacobian)
+                    + const,
 
-Reported quantities are beta = mu + sigma S(rho) z and theta. The marginal posterior of beta under
-this target is the quantity Q3 is about; its posterior mean is a Wiener-filtered index map with the
-filter inferred from the data.
+with log L one of log L_G (sampler test), log L_0, log L_1. Reported quantities: beta = mu 1 +
+sigma S z, theta, and the field mean and spatial sd.
 
 ### Gradient
-d log L / d beta_r = sum_{p in r} [ -1/2 d chi2min_p / d beta - (w/2) tr(A_p^-1 dA_p/dbeta) ] with
-d chi2min_p / d beta = -2 (d_p - M_p a*_p)^T N_p^-1 (dM_p/dbeta) a*_p at a*_p = A_p^-1 b_p (the
-envelope theorem; the term through a*_p vanishes at the minimum). This is what the existing C++
-kernel `marginal_loglike_regions` returns per region; the prototype first uses a NumPy
-implementation and checks the C++ kernel against it. Chain rule to x: d/dz = sigma S^T g,
-d/dmu = 1^T g, d/dlog sigma = sigma (S z)^T g + prior terms, d/dlog rho = sigma z^T (dS/dlog rho)^T g
-+ prior terms, with g = d log L / d beta and dS/dlog rho = V diag(d(s_i/c)/dlog rho) analytic.
+d log L / d beta_r = sum_{p in r} g_p, with for the w-family g_p = x_c g^T N_p^-1 (d_p - M_p x) -
+w (A_p^-1 M_p^T N_p^-1 g)_c, g = dM_p[:, c]/dbeta, x = A_p^-1 b_p (the envelope theorem for the
+chi2min term; confirmed against finite differences by the review to 2e-7). For log L_G replace
+A_p by A_p + T_p^-1, b_p by b'_p and x by (A_p + T_p^-1)^-1 b'_p, with w = 1. The C++ kernel
+`marginal_loglike_regions` returns the w-family per-region gradient; the prototype uses a NumPy
+implementation and checks the kernel against it. Chain rule to x: d/dz = sigma S^T g, d/dmu =
+1^T g, d/dlog sigma = sigma (S z)^T g + 1 - sigma^2/0.09, d/du = sigma z^T (dS/du)^T g + prior and
+Jacobian terms, with d(s_i/c)/dlog rho = (ds_i - s_i dc/c)/c, ds_i/dlog rho = alpha kappa^2
+s_i^2 (for alpha = 2: 2 kappa^2 s_i^2), dc/dlog rho = (1/(c N_beta)) sum s_i ds_i, and dlog rho/du
+= (log rho_max - log rho_min) s(u)(1 - s(u)). (The review checked this chain rule, including the
+c(rho) term, to 6e-6 on a ring Laplacian.)
 
 ### Sampler
 NUTS (`src/commander4/math_utils/nuts.py`) over x jointly, dual averaging and diagonal mass
 adaptation in warm-up only, samples kept after warm-up. Divergence count and E-BFMI are recorded
-per run (the funnel diagnostic). Second sampler for Q4 later (MAMS); not part of M2.1's pass
-criterion.
+per run (the funnel diagnostic). **[v2]** The centred parameterization (beta, mu, log sigma, u)
+with its log-det and -K log sigma terms is implemented as well, as an efficiency comparison, not a
+negative control: at strong data it is the better geometry. Second sampler for Q4 later (MAMS).
 
 ## Setup
-- nside_d = 16 (3072 data pixels), nside_beta in {2, 4, 8} (48, 192, 768 index pixels).
-- Bands: 23, 30, 33, 41, 44, 61, 70, 94, 100, 143, 217, 353 GHz (WMAP + LFI + HFI centre
-  frequencies), white noise per pixel at levels scaled from E006 (RMS x1 and x5).
-- Amplitudes for simulations: CMB ~ N(0, 70 uK) per pixel, synchrotron and dust log-normal around
-  a plane-brightening template as in `aux/validate_mcmc_likelihood.py`. For the w = 1 SBC the
-  proper amplitude prior is N(0, (10^4 uK)^2) per component, so the implied beta volume term equals
-  the flat-prior one to better than 1e-6 in log density.
+- nside_d = 16 (3072 data pixels), nside_beta in {2, 4, 8}.
+- Bands: 23, 30, 33, 41, 44, 61, 70, 94, 100, 143, 217, 353 GHz, white noise per pixel at levels
+  scaled from E006 (RMS x1 and x5).
+- Amplitudes for simulations: for the sampler-correctness SBC, a_p ~ N(m_p, T_p) with the template
+  means m_p (CMB 0; synchrotron and dust the plane-brightening templates of
+  `aux/validate_mcmc_likelihood.py`) and T_p as above. For the coverage study, a_p = template
+  values times log-normal scatter (not drawn from any prior the sampler uses; that is the point).
 - Code: `nextgen/prototypes/indexfield/` (NumPy + the existing NUTS; numba where needed). No
   Commander4 changes in M2.1.
-- Machine: Mac mini (T0/T1).
+- Machine: Mac mini (T0/T1). **[v2]** Compute plan: the full 300-replicate SBC runs for the default
+  configuration only (log L_G, GMRF family, nside_beta 4, log-uniform rho, non-centred); the other
+  factors (alm family, nside_beta 2 and 8, PC prior, centred) run as 100-replicate smoke tests with
+  the reduced power stated. The review estimated the full factorial at 7200 NUTS runs, several
+  days per configuration, which does not fit T1.
 
 ## Reference
 1. **L1 exact-target checks** (every component of the code, not only the whole):
-   a. Gradient of log pi against central finite differences (relative error < 1e-6) at random x.
-   b. nside_beta = 1 (12 index pixels) and fixed theta: NUTS beta posterior against a dense
-      random-walk MH chain of 10^6 steps on the same log pi (independent code path), means within
-      4 MC standard errors by ESS, sd ratios within 0.9 to 1.1.
-   c. N_beta = 12, theta free: joint NUTS against the same long MH chain, including the
-      hyperparameters.
-   d. Linear-Gaussian control: replace the SED by a linear model (log L exactly Gaussian in beta);
-      then beta | theta, d and theta | d have closed forms (conjugate Gaussian and a 3-D
-      marginal evaluated on a grid). The sampler must reproduce them. This control catches basis,
-      normalization and Jacobian errors with no MC error in the reference.
-   e. Negative control: run the same checks with the log sigma Jacobian dropped and with the
-      centred parameterization at a funnel-prone setting; both must fail c or d visibly.
-2. **L2 SBC**: 300 replicates per configuration. Draw theta from the hyperprior, z ~ N(0, I),
-   amplitudes from their simulation prior, data from the likelihood. Run the sampler with fixed
-   budget, thin to L = 100 effectively independent draws, record ranks of mu, log sigma, log rho,
-   four beta pixels (two bright, two faint), and the joint log likelihood (Modrak et al. 2022).
-   Pass: chi-square test of rank histograms with 20 bins, p > 0.01 for every quantity, and the ECDF
-   difference within the 95% simultaneous band (Sailynoja et al. 2022). Repeat for w = 0 and w = 1
-   and for both covariance families.
+   a. Gradient of log pi against central finite differences at random x, tolerance
+      |g_fd - g| < 1e-6 |g| + 1e-4 (**[v2]** absolute floor from roundoff on a log density of
+      order 1e4 to 1e5; this check protects efficiency, 1b to 1d protect the target).
+   b. **[v2] Exact grids with the real SED:** N_beta = 1 (1-D grid in beta, theta fixed) and
+      N_beta = 2 (2-D grid), for log L_G, log L_0 and log L_1; NUTS means within 4 MC standard
+      errors (ESS-based) and sd ratios within 0.95 to 1.05 of the grid. No MC error in the
+      reference. This is the check that catches a sign or factor error in the chi2min gradient
+      or the log-det term.
+   c. **[v2] Hyperparameters, independent centred Gibbs reference:** nside_beta = 1 (12 index
+      pixels), nside_d = 16. Reference chain written independently of the prototype's log density,
+      in centred coordinates: beta | theta, d by random-walk MH (12-D, near Gaussian); mu | sigma,
+      rho, beta exactly Gaussian (conjugate); (log sigma, log rho) | beta, mu by an exact draw from
+      a fine 2-D grid (the likelihood does not enter this conditional). The review showed this has
+      about 500x the ESS of a non-centred random walk in this geometry (beta pinned to 0.02 by 256
+      data pixels per index pixel while sigma is 0.3). Report ESS of both chains; compare with the
+      combined SE sqrt(SE_ref^2 + SE_nuts^2); require ESS > 800 on log sigma in both chains before
+      the comparison counts.
+   d. **[v2] Linear-Gaussian control with KNOWN fixed amplitudes:** d_p = m_p + F_p beta_r(p) +
+      n_p. Then beta | theta, d ~ N(Sigma (F^T N^-1 (d - m) + Q mu 1), Sigma), Sigma = (F^T N^-1 F
+      + Q)^-1, and theta | d proportional to p(theta) N(d - m; F mu 1, sigma^2 F K F^T + N) on a
+      3-D grid. Zero MC error in the reference; tests the basis, c(rho), the Jacobians and the
+      hyperpriors (it does not exercise the SED or the collapse, which 1b does). v1 claimed a
+      closed form for the collapsed likelihood with a linear SED; the review showed that chi2min
+      and log det A are rational, not quadratic, in beta even then.
+   e. **[v2] Negative controls (wrong targets, must fail 1c or 1d at the stated ESS):** (i) the
+      centred parameterization with the -K log sigma - 1/2 log det K(rho) term omitted (the classic
+      error); (ii) the log rho Jacobian dropped (a 1/rho tilt over the whole prior range, a factor
+      3 at nside_beta 1 and 25 at 8, visible in 1d). The dropped log sigma Jacobian shifts the log
+      sigma posterior by only 0.2 sd at K = 12 and would need ESS > 800 in both chains; it is kept
+      as a third control with that precondition stated. The reference log density is written
+      separately from the prototype's so that a shared error cannot cancel.
+2. **L2 SBC** (log L_G only, matching generator): 300 replicates for the default configuration.
+   Draw theta from the hyperprior, z ~ N(0, I), a_p ~ N(m_p, T_p), data from the likelihood. Run
+   NUTS with a fixed budget; **[v2]** thin by per-replicate ESS to L = 99 draws (100 ranks, 20
+   equal bins) with the precondition ESS > 400 on every test quantity; replicates that miss it or
+   diverge are rerun with a smaller step size or a longer budget, never dropped. Test quantities:
+   mu, log sigma, u, four beta pixels (two bright, two faint), the field mean of beta, z^T z,
+   (beta - mu 1)^T K^-1 (beta - mu 1)/sigma^2, the log prior density of beta given theta, the
+   joint log likelihood (Modrak et al. 2022), and TARP coverage of the full beta field (Lemos et
+   al. 2023) as VALIDATION.md requires. Pass: chi-square on 20 bins with a Bonferroni-corrected
+   level over the test quantities of one configuration, plus the uniformity of the p-value
+   distribution itself, and the ECDF simultaneous 95 percent band (Sailynoja et al. 2022).
+   **[v2] Stated power** (n = 300, 20 bins, alpha 0.01): a posterior sd off by a factor 0.8 is
+   detected with probability 0.84, by 0.9 with 0.09, by 1.2 with 0.36; a bias of 0.25 sd with
+   0.53, 0.5 sd with 1.0. Ten to twenty percent width errors are below the resolution of this
+   SBC and are caught by 1b to 1d instead.
+3. **Coverage study** (w = 0 and w = 1, template amplitudes): coverage and bias of beta pixels and
+   hyperparameters versus S/N, reported as curves, no pass/fail (principle 4). This is where the
+   volume term is quantified for the field model.
 
 ## Command
 ```bash
@@ -148,8 +213,8 @@ criterion.
 (pending)
 
 ## Negative control
-Listed under Reference 1e. Also the legacy `resolve_chisq` structure is not applicable here because
-amplitudes are collapsed; the control for the volume term is w = 1 versus w = 0 at low S/N.
+Listed under Reference 1e. The volume-term control for science is w = 1 versus w = 0 at low S/N in
+the coverage study.
 
 ## Conclusion
 (pending)

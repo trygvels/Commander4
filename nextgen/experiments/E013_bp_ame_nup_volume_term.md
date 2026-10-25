@@ -1,6 +1,6 @@
 # E013: How much did the sign-flipped `marginal` volume term move BeyondPlanck's AME peak frequency? (Q14)
 
-- **Date started / finished:** 2026-10-25 /
+- **Date started / finished:** 2026-10-25 / 2026-10-25
 - **Branch and commit:** nextgen, 0c0c612
 - **Open question addressed:** Q14
 - **Validation level:** L5-type real-data check with an exact (grid) per-pixel reference; depends on
@@ -70,13 +70,60 @@ the same for the BP posterior mean nu_p map (the published product) versus each 
 conditioning on fixed other components is an approximation of the Gibbs step and is stated as such;
 it isolates the effect of the lnL choice at the S/N of the real pixels, which is what Q14 asks.
 
+## What the independent review changed in the setup
+The stats-reviewer pass on the BP10 local sampler (two reviewers, 2026-10-25) established that BP10
+sampled nu_p as ONE full-sky value (one pixel region), with the lnL summed over all unmasked
+nside-16 pixels, and with the band monopoles profiled (refit deterministically per proposal,
+`COMBINED_MONOPOLE_SAMPLING`). The released BP nu_p map is indeed constant (25.60 GHz). The
+analysis therefore reports (i) the per-pixel posteriors as a diagnostic of where the volume term
+matters and (ii) the full-sky single-parameter posterior, which is the production target. The
+production mask (`mask_ame_nup_sampling_temp_bp10_n1024_udgraded_tr75ptc.fits`) is not public;
+`mask_AME_nu_p_BP8_10deg.fits` (1204 of 3072 nside-16 pixels) is used instead.
+
 ## Command
 ```bash
-# filled in when run.py exists
+python -I nextgen/experiments/E013_bp_ame_nup_volume_term/run.py --out nextgen/experiments/E013_bp_ame_nup_volume_term/out
 ```
 
 ## Result
-(pending)
+Summary in `E013_bp_ame_nup_volume_term/summary.txt`, arrays in `out/e013_results.npz`.
+
+Residual check: after subtracting the BP mean sky (without AME) and a per-band monopole/dipole,
+the median |residual minus BP AME model| per noise sigma is 4.0 (30 GHz), 2.1 (Ka), 1.7 (44),
+1.1 to 1.3 (Q, 70), 0.7 (V). The reconstruction is not perfect (delta bandpasses, Gaussian beams,
+BP7 instead of BP10 smoothed rms, refit monopoles), so absolute nu_p values are not comparable with
+BP's 25.60 GHz; the differences BETWEEN lnL variants on identical residuals are what this
+experiment measures.
+
+Per pixel (1204 mask pixels, 8 bands 28 to 70 GHz), posterior means relative to ridge, in ridge sd:
+
+| variant | median shift | p16 to p84 | median sd [GHz] |
+|---|---|---|---|
+| code-marginal (ridge + 1/2 ln A) | +0.04 | +0.02 to +0.09 | 0.62 |
+| marginal (ridge - 1/2 ln A) | -0.05 | -0.09 to -0.02 | 0.63 |
+| chisq (amplitude fixed at BP mean) | -0.09 | -1.28 to +1.24 | 0.21 |
+
+By AME peak S/N (max over bands of a_BP f / sigma): the code-marginal shift is +0.14 (S/N 3 to 10,
+2 pixels), +0.11 (10 to 30, 173 px), +0.05 (30 to 100, 778 px), +0.02 (above 100, 242 px) ridge sd;
+the correct marginal is the mirror image. No pixel posterior sits on a bound. The AME S/N in the BP
+mask is high (median above 30), which is why the volume term is small: E009's toy showed the sign
+only matters once many low-S/N pixels enter the sum.
+
+Full-sky single nu_p (the production target), fine grid of 4001 points:
+
+| variant | mean [GHz] | sd [GHz] | shift vs ridge |
+|---|---|---|---|
+| ridge | 26.658 | 0.0098 | 0 |
+| marginal | 26.650 | 0.0096 | -0.76 sd |
+| code-marginal | 26.665 | 0.0099 | +0.78 sd |
+| chisq | 26.311 | 0.0037 | -35 sd |
+
+The sign error moved the full-sky conditional posterior of nu_p by 0.008 GHz (0.8 of its
+conditional sd of 0.01 GHz); the correct marginal would have moved it by the same amount the other
+way. The conditional sd here is far smaller than any realistic nu_p uncertainty (the model
+reconstruction offset alone is 1 GHz), so the effect on the published value is negligible. The
+chisq variant (amplitude fixed) is 0.35 GHz away, which shows that conditioning on the amplitude
+matters far more than the volume term for this parameter.
 
 ## Negative control
 The code-marginal must reduce to the ridge and marginal results at high S/N (plane pixels); at low
@@ -84,7 +131,14 @@ S/N the three must separate in the direction predicted by E009's toy (code-margi
 the bound where A is largest).
 
 ## Conclusion
-(pending)
+Q14 for BeyondPlanck: the `marginal` sign error (F10) is a real code error but had a negligible
+effect on the BP nu_p because the AME pixels in the sampling mask have high S/N (median above 30)
+and nu_p was a single full-sky parameter: the shift is 0.8 of a 0.01 GHz conditional sd. It is a
+correctness note for Paper A, not a correction to a published number. For DR1 the question does
+not arise (exponential AME model with prior-only index steps). The DR2-era `sample_specind_mh`
+usage remains unverified (no parameter files in the repository use MCMC groups).
+Negative control: at S/N 3 to 10 the shift grows to 0.14 sd and the two signs mirror each other,
+as E009 predicted; chisq separates strongly from the collapsed variants everywhere.
 
 ## Follow-ups
 - If the effect is material, repeat with the amplitude redrawn (partially collapsed Gibbs) on a

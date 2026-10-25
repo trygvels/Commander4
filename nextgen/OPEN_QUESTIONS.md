@@ -23,6 +23,10 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   quantity (Modrak et al. 2022). Then misspecified tests on PySM skies.
 - **Decides:** the default prior for every nonlinear parameter in the new sampler; a central result
   for the methods paper.
+- **Design note (E012 v2, D008):** SBC can only test the sampler when the generative amplitude
+  prior is the one in the sampled target. Sampler correctness is therefore tested with a proper
+  Gaussian amplitude prior and its exact marginal; ridge, flat-prior marginal and Jeffreys are
+  compared as a frequentist coverage study (bias and coverage versus S/N), as principle 4 requires.
 
 ## Q3. What is the optimal spatially varying index model?
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather
@@ -102,11 +106,15 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   of our results should be upstreamed, which published independently, and when to talk to Jonas
   Lunde / Hans Kristian Eriksen? This is Trygve's call.
 
-## Q14. How much did the Commander3 `marginal` sign error and 2024 MH module change published results?
+## Q14. How much did the Commander3 `marginal` sign error and 2024 MH module change published results? (BeyondPlanck part RESOLVED, E013)
 - **Why:** E009/F10. BeyondPlanck final sampled AME nu_p with the sign-flipped `marginal` lnL
   (DR1 did not: it used the exponential AME model with `prior` index steps, see E013); DR2-era runs may have used `sample_specind_mh` with CG updates (F1 structure).
 - **How:** rerun the AME nu_p step on BeyondPlanck / DR1 inputs (or on DR1 chain samples as fixed
   inputs) with the sign corrected and with `ridge`; compare nu_p and the AME amplitude map. For DR2,
   find the production parameter files and check `MCMC_SAMPLING_GROUP_UPDATE_CG_GROUPS`.
 - **Decides:** whether to report this to Cosmoglobe (Trygve decides), and how to frame it in Paper A.
+- **Status (2026-10-25):** BeyondPlanck: negligible (E013: 0.008 GHz, 0.8 conditional sd, because
+  nu_p was one full-sky parameter at high S/N). DR1: not affected (E013 scoping). Open: which
+  DR2-era runs used `sample_specind_mh` with CG updates (no parameter file in the repository does),
+  and the size of the E015 bandpass effect (needs Commander3 on simulated TOD, cluster).
 
