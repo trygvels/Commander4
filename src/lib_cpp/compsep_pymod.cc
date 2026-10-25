@@ -54,6 +54,25 @@ bool solve_cholesky(vmav<double,2> &A, const vmav<double,1> &b, vmav<double,1> &
 }
 
 
+/** Solves L L^T x = b for x, given the Cholesky factor L in the lower triangle of `L` (as left by
+ * solve_cholesky). */
+void cholesky_solve(const vmav<double,2> &L, const vmav<double,1> &b, vmav<double,1> &x){
+    const size_t n = L.shape(0);
+    for (size_t i = 0; i < n; i++){
+        double sum = 0.0;
+        for (size_t j = 0; j < i; j++)
+            sum += L(i, j) * x(j);
+        x(i) = (b(i) - sum) / L(i, i);
+    }
+    for (size_t i = n; i-- > 0;){
+        double sum = 0.0;
+        for (size_t j = i + 1; j < n; j++)
+            sum += L(j, i) * x(j);
+        x(i) = (x(i) - sum) / L(i, i);
+    }
+}
+
+
 /** Draws one sample of the component amplitudes per pixel, independently in each pixel.
  *
  * Solves (M^T N^-1 M) x = M^T (N^-1 d + N^-1/2 eta) per pixel, where N^-1 is diagonal over the
@@ -222,11 +241,165 @@ py::tuple Py_marginal_loglike_perpix(const CNpArr &map_sky_, const CNpArr &map_i
 }
 
 
+/** Per-region marginal (or ridge) log likelihood and its gradient, for a mixing matrix that is
+ * constant within each region but differs between regions (spatially varying spectral indices).
+ *
+ * Pixel p belongs to region r = region[p] (pixels with r < 0 are skipped) and uses mixing matrix
+ * M_reg[r]. The per-pixel term is the one of marginal_loglike_perpix. Each component c carries one
+ * parameter per region, theta_rc, with d M[:, c] / d theta_rc = dM_reg[r, :, c] and no other
+ * column depending on it (for power-law and modified-blackbody SEDs, dM = M * ln(nu / nu_ref)).
+ * With x = A^-1 b and g = dM[:, c], the gradient of one pixel's term is
+ *
+ *     d/dtheta [ b^T A^-1 b / 2 ] = x_c g^T N^-1 (d - M x),
+ *     d/dtheta [ -ln det A / 2 ]  = -(A^-1 M^T N^-1 g)_c,
+ *
+ * summed over the region's pixels. Components without a parameter should pass zero columns in
+ * dM_reg; their gradient entries are then zero.
+ *
+ * Args:
+ *   map_sky, map_inv_var -- (nband, npix) maps.
+ *   region -- (npix,) int64 region index per pixel, -1 to exclude a pixel.
+ *   M_reg, dM_reg -- (nreg, nband, ncomp) mixing matrices and their parameter derivatives.
+ *   nthreads -- number of threads.
+ *   use_logdet -- marginal (true) or ridge (false) likelihood.
+ *   want_grad -- whether to compute the gradient (skipped otherwise).
+ * Returns:
+ *   (loglike (nreg,), grad (nreg, ncomp), nskipped): per-region log likelihood, its gradient, and
+ *   the number of observed, well-determined pixels skipped because A was not positive definite.
+ */
+py::tuple Py_marginal_loglike_regions(const CNpArr &map_sky_, const CNpArr &map_inv_var_,
+                                      const CNpArr &region_, const CNpArr &M_reg_,
+                                      const CNpArr &dM_reg_, size_t nthreads, bool use_logdet,
+                                      bool want_grad){
+    auto map_sky = to_cmav<double,2>(map_sky_, "map_sky");
+    auto map_inv_var = to_cmav<double,2>(map_inv_var_, "map_inv_var");
+    auto region = to_cmav<int64_t,1>(region_, "region");
+    auto M_reg = to_cmav<double,3>(M_reg_, "M_reg");
+    auto dM_reg = to_cmav<double,3>(dM_reg_, "dM_reg");
+    const size_t nband = map_sky.shape(0), npix = map_sky.shape(1);
+    const size_t nreg = M_reg.shape(0), ncomp = M_reg.shape(2);
+    MR_assert(map_inv_var.shape(0)==nband && map_inv_var.shape(1)==npix,
+              "map_inv_var and map_sky shapes differ");
+    MR_assert(region.shape(0)==npix, "region must have one entry per pixel");
+    MR_assert(M_reg.shape(1)==nband, "M_reg must have shape (nreg, nband, ncomp)");
+    MR_assert(dM_reg.shape(0)==nreg && dM_reg.shape(1)==nband && dM_reg.shape(2)==ncomp,
+              "dM_reg must have the shape of M_reg");
+
+    const size_t nthr = std::max<size_t>(1, nthreads);
+    // Per-thread accumulators, so threads never write to the same region entry.
+    std::vector<double> ll_thr(nthr * nreg, 0.0), grad_thr(nthr * nreg * ncomp, 0.0);
+    std::vector<size_t> skipped(nthr, 0);
+    execStatic(npix, nthr, 0, [&](Scheduler &sched){
+        const size_t ithr = sched.thread_num();
+        double *ll = ll_thr.data() + ithr * nreg;
+        double *gr = grad_thr.data() + ithr * nreg * ncomp;
+        vmav<double,2> A({ncomp, ncomp});
+        vmav<double,1> rhs({ncomp}), x({ncomp}), u({ncomp}), y({ncomp});
+        std::vector<double> resid(nband);
+        size_t nskip = 0;
+        while (auto rng = sched.getNext())
+            for (size_t ipix = rng.lo; ipix < rng.hi; ipix++){
+                const int64_t r = region(ipix);
+                if (r < 0) continue;
+                MR_assert(size_t(r) < nreg, "region index out of range");
+                size_t nobs = 0;
+                for (size_t b = 0; b < nband; b++)
+                    if (map_inv_var(b, ipix) > 0.0) nobs++;
+                if (nobs < ncomp) continue;
+                for (size_t c1 = 0; c1 < ncomp; c1++){
+                    rhs(c1) = 0.0;
+                    for (size_t c2 = 0; c2 < ncomp; c2++)
+                        A(c1, c2) = 0.0;
+                }
+                for (size_t b = 0; b < nband; b++){
+                    const double inv_var = map_inv_var(b, ipix);
+                    if (inv_var <= 0.0) continue;
+                    const double weighted_d = inv_var * map_sky(b, ipix);
+                    for (size_t c1 = 0; c1 < ncomp; c1++){
+                        rhs(c1) += M_reg(r, b, c1) * weighted_d;
+                        for (size_t c2 = 0; c2 <= c1; c2++)
+                            A(c1, c2) += M_reg(r, b, c1) * inv_var * M_reg(r, b, c2);
+                    }
+                }
+                for (size_t c1 = 0; c1 < ncomp; c1++)
+                    for (size_t c2 = c1 + 1; c2 < ncomp; c2++)
+                        A(c1, c2) = A(c2, c1);
+                if (!solve_cholesky(A, rhs, x)){
+                    nskip++;
+                    continue;
+                }
+                double quad = 0.0, logdet = 0.0;
+                for (size_t c = 0; c < ncomp; c++){
+                    quad += rhs(c) * x(c);
+                    logdet += 2.0 * std::log(A(c, c));
+                }
+                ll[r] += use_logdet ? 0.5 * quad - 0.5 * logdet : 0.5 * quad;
+                if (!want_grad) continue;
+                for (size_t b = 0; b < nband; b++){
+                    double model = 0.0;
+                    for (size_t c = 0; c < ncomp; c++)
+                        model += M_reg(r, b, c) * x(c);
+                    resid[b] = map_sky(b, ipix) - model;
+                }
+                for (size_t c = 0; c < ncomp; c++){
+                    double g_dot_res = 0.0;
+                    bool any = false;
+                    for (size_t b = 0; b < nband; b++){
+                        const double inv_var = map_inv_var(b, ipix);
+                        if (inv_var <= 0.0 || dM_reg(r, b, c) == 0.0) continue;
+                        any = true;
+                        g_dot_res += dM_reg(r, b, c) * inv_var * resid[b];
+                    }
+                    if (!any) continue;
+                    double grad = x(c) * g_dot_res;
+                    if (use_logdet){
+                        for (size_t c1 = 0; c1 < ncomp; c1++){
+                            u(c1) = 0.0;
+                            for (size_t b = 0; b < nband; b++)
+                                u(c1) += M_reg(r, b, c1) * map_inv_var(b, ipix) * dM_reg(r, b, c);
+                        }
+                        cholesky_solve(A, u, y);
+                        grad -= y(c);
+                    }
+                    gr[r * ncomp + c] += grad;
+                }
+            }
+        skipped[ithr] = nskip;
+    });
+    auto ll_ = make_Pyarr<double>({nreg});
+    auto grad_ = make_Pyarr<double>({nreg, ncomp});
+    auto ll_out = to_vmav<double,1>(ll_);
+    auto grad_out = to_vmav<double,2>(grad_);
+    size_t nskip = 0;
+    for (size_t r = 0; r < nreg; r++){
+        ll_out(r) = 0.0;
+        for (size_t c = 0; c < ncomp; c++) grad_out(r, c) = 0.0;
+    }
+    for (size_t t = 0; t < nthr; t++){
+        nskip += skipped[t];
+        for (size_t r = 0; r < nreg; r++){
+            ll_out(r) += ll_thr[t * nreg + r];
+            for (size_t c = 0; c < ncomp; c++)
+                grad_out(r, c) += grad_thr[(t * nreg + r) * ncomp + c];
+        }
+    }
+    return py::make_tuple(ll_, grad_, nskip);
+}
+
+
 void add_compsep(py::module_ &msup)
   {
   using namespace py::literals;
   auto m = msup.def_submodule("compsep");
   m.doc() = "Compiled component-separation kernels.";
+
+  m.def("marginal_loglike_regions", Py_marginal_loglike_regions,
+        "Per-region marginal (or ridge) log likelihood and its gradient for a mixing matrix that "
+        "is constant within regions: M_reg and dM_reg are (nreg, nband, ncomp), region is the "
+        "(npix,) int64 region index (-1 excludes a pixel). Returns (loglike (nreg,), "
+        "grad (nreg, ncomp), nskipped).",
+        "map_sky"_a, "map_inv_var"_a, "region"_a, "M_reg"_a, "dM_reg"_a, "nthreads"_a=1,
+        "use_logdet"_a=true, "want_grad"_a=true);
 
   m.def("marginal_loglike_perpix", Py_marginal_loglike_perpix,
         "Log marginal likelihood sum_pix [b^T A^-1 b / 2 - ln det A / 2] of the mixing matrix M "
