@@ -21,6 +21,62 @@ import numpy as np
 
 FREQS = ["100", "143", "217", "353", "545", "857"]
 
+DIPOLE_UK, DIPOLE_LB = 3362.08, (264.021, 48.253)      # Planck 2018 solar dipole, uK_CMB
+HFI_MJY_PER_KCMB = {"545": 58.04, "857": 2.27}            # band-integrated, Planck 2013 IX
+DR1 = "/Users/trygvels/data/cosmoglobe_DR1"
+H_K = 6.62607015e-34 / 1.380649e-23 * 1e9                 # h/k in K per GHz
+T_CMB = 2.7255
+
+
+def _cmb_to_rj(nu):
+    x = H_K * nu / T_CMB
+    return x**2 * np.exp(x) / np.expm1(x)**2
+
+
+def solar_dipole(nside: int) -> np.ndarray:
+    vec = hp.ang2vec(*DIPOLE_LB, lonlat=True)
+    return DIPOLE_UK * (hp.pix2vec(nside, np.arange(hp.nside2npix(nside))) * vec[:, None]).sum(0)
+
+
+def dr1_dust_template_uk_cmb(nu: float, nside: int, fwhm_deg: float):
+    """(dust, cmb) from Cosmoglobe DR1 at nu GHz, degraded to nside and smoothed to fwhm_deg, uK_CMB.
+    Dust: per-pixel modified blackbody with the DR1 beta and T maps, amplitude nu_ref 545 GHz, uK_RJ.
+    CMB: DR1 CMB with its dipole fitted and removed. Used only to set zero levels, dust as a
+    template with a free scale (its absolute scale under the stated units is 7 to 10x below the NPIPE
+    maps, see E014; the zero-level fit does not depend on it)."""
+    hd = fits.open(f"{DR1}/CG_dust_IQU_n1024_v1.fits")[1]
+    hc = fits.open(f"{DR1}/CG_cmb_IQU_n1024_v1.fits")[1]
+
+    def col(h, k):
+        v = np.asarray(h.data[k], float).ravel()
+        return hp.reorder(v, n2r=True) if str(h.header.get("ORDERING", "RING")).upper().startswith("NEST") else v
+    a, beta, T = (col(hd, k) for k in ("I_MEAN", "I_BETA_MEAN", "I_T_MEAN"))
+    x0, x = H_K * 545.0 / T, H_K * nu / T
+    dust = hp.smoothing(hp.ud_grade(a * (nu / 545.0)**(beta + 1.0) * np.expm1(x0) / np.expm1(x)
+                                    / _cmb_to_rj(nu), nside), fwhm=np.radians(fwhm_deg))
+    cmb = hp.smoothing(hp.ud_grade(col(hc, "I_MEAN"), nside), fwhm=np.radians(fwhm_deg))
+    cmb = hp.remove_dipole(cmb, fitval=False, verbose=False)
+    return dust, cmb
+
+
+def zero_level(sky_i: np.ndarray, nu: float, method: str, fwhm_deg: float = 2.0, bcut: float = 30.0):
+    """Offset to subtract from the I map (uK_CMB). "highlat": mean over |b| > bcut (as for the DR1
+    WMAP/LFI maps in prep_q1_inputs.py). "dr1": offset of a least-squares fit of (map - DR1 CMB) against the DR1
+    dust template over |b| > bcut after smoothing both to fwhm_deg (zero level where the dust template
+    vanishes, the HI-correlation idea with the DR1 dust model as tracer); the slope is printed."""
+    nside = hp.get_nside(sky_i)
+    lat = 90.0 - np.degrees(hp.pix2ang(nside, np.arange(sky_i.size))[0])
+    high = np.abs(lat) > bcut
+    if method == "highlat":
+        return float(np.mean(sky_i[high])), None
+    sm = hp.smoothing(sky_i, fwhm=np.radians(fwhm_deg))
+    dust, cmb = dr1_dust_template_uk_cmb(nu, nside, fwhm_deg)
+    y = (sm - cmb)[high]
+    A = np.vstack([dust[high], np.ones(y.size)]).T
+    slope, off = np.linalg.lstsq(A, y, rcond=None)[0]
+    return float(off), float(slope)
+
+
 
 def _col(hdu, names):
     for n in names:
@@ -29,7 +85,8 @@ def _col(hdu, names):
     return None
 
 
-def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr4") -> None:
+def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr4",
+            zero_method: str = "") -> None:
     hdu = fits.open(path)[1]
     unit_in = str(hdu.columns["I_STOKES"].unit or "K_CMB").strip()
     # PR3 545/857 are in MJy/sr; keep that unit (Commander4 converts with pysm3 units), otherwise
@@ -66,10 +123,17 @@ def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr
         var_lo = np.divide(var_sum, n_good**2, out=np.zeros_like(frac), where=n_good > 0)
         sky.append(m_lo * scale)
         rms.append(np.sqrt(var_lo) * scale)
+    hdr_extra = []
+    if zero_method:
+        off, slope = zero_level(sky[0], float(freq), zero_method)
+        sky[0] = sky[0] - off * (rms[0] > 0)
+        hdr_extra.append(("MONOSUB", off, f"{unit_out} zero level ({zero_method}) subtracted"))
+        print(f"{freq}: zero level ({zero_method}) {off:.4g} {unit_out} subtracted"
+              + (f"; gain vs DR1 model: {slope:.3f}" if slope is not None else ""))
     tag = f"{freq}_IQU_n{nside:04d}"
     hp.write_map(os.path.join(outdir, f"{tag_prefix}_{tag}.fits"), np.array(sky), overwrite=True,
                  column_names=["I_STOKES", "Q_STOKES", "U_STOKES"], column_units=[unit_out] * 3,
-                 coord="G", dtype=np.float64, extra_header=[("SRC", os.path.basename(path))])
+                 coord="G", dtype=np.float64, extra_header=[("SRC", os.path.basename(path))] + hdr_extra)
     hp.write_map(os.path.join(outdir, f"{tag_prefix}_{freq}_IQU_rms_n{nside:04d}.fits"), np.array(rms),
                  overwrite=True, column_names=["I_RMS", "Q_RMS", "U_RMS"],
                  column_units=[unit_out] * 3, coord="G", dtype=np.float64)
@@ -77,7 +141,7 @@ def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr
           f"unobserved I pixels {np.sum(rms[0] == 0)}")
 
 
-def convert_npipe_uio(indir: str, nside: int, outdir: str, freq: str) -> None:
+def convert_npipe_uio(indir: str, nside: int, outdir: str, freq: str, zero_method: str = "dr1") -> None:
     """BeyondPlanck inputs: npipe6v20A_<freq>_map_uK.fits (I or IQU, nside 2048) and the matching rms
     file (npipe6v20A_<freq>_rms_uK_mcscaled.fits for 353, *_hrscaled.fits for 857). Units and ordering
     are taken from the headers; degrade as in `convert` (variance of the mean over good sub-pixels)."""
@@ -111,10 +175,27 @@ def convert_npipe_uio(indir: str, nside: int, outdir: str, freq: str) -> None:
         n_good = frac * n_in
         var_lo = np.divide(var_sum, n_good**2, out=np.zeros_like(frac), where=n_good > 0)
         sky.append(m_lo * scale); rms.append(np.sqrt(var_lo) * scale)
+    # NPIPE frequency maps keep the solar dipole; remove it, then set the zero level.
+    sky[0] = sky[0] - solar_dipole(nside) * (rms[0] > 0)
+    off, slope = zero_level(sky[0], float(freq), zero_method)
+    sky[0] = sky[0] - off * (rms[0] > 0)
+    print(f"{freq}: dipole removed; zero level ({zero_method}) {off:.4g} uK_CMB subtracted"
+          + (f"; gain vs DR1 model at |b|>30: {slope:.3f}" if slope is not None else ""))
+    # BeyondPlanck converted the 545 and 857 GHz MJy/sr maps to K_CMB with the band-integrated HFI
+    # factors (Planck 2013 IX: 58.04 and 2.27 MJy/sr per K_CMB). Commander4 converts a K_CMB band
+    # back to brightness with the monochromatic dB/dT at the band centre (1.44 MJy/sr per K_CMB at
+    # 857 GHz), which would make 857 GHz 1.6x too faint (E014). Undo BP's conversion and write
+    # MJy/sr, which Commander4 converts to uK_RJ monochromatically as for the PR3 files.
+    if freq in HFI_MJY_PER_KCMB:
+        f = HFI_MJY_PER_KCMB[freq] * 1e-6
+        sky = [m * f for m in sky]; rms = [r * f for r in rms]; off *= f
+        unit_out = "MJy/sr"
     tag = f"{freq}_IQU_n{nside:04d}"
     hp.write_map(os.path.join(outdir, f"npipe_{tag}.fits"), np.array(sky), overwrite=True,
                  column_names=["I_STOKES", "Q_STOKES", "U_STOKES"], column_units=[unit_out] * 3,
-                 coord="G", dtype=np.float64, extra_header=[("SRC", os.path.basename(mp))])
+                 coord="G", dtype=np.float64,
+                 extra_header=[("SRC", os.path.basename(mp)), ("DIPSUB", DIPOLE_UK, "uK_CMB solar dipole removed"),
+                               ("MONOSUB", off, f"{unit_out} zero level ({zero_method}) subtracted")])
     hp.write_map(os.path.join(outdir, f"npipe_{freq}_IQU_rms_n{nside:04d}.fits"), np.array(rms),
                  overwrite=True, column_names=["I_RMS", "Q_RMS", "U_RMS"], column_units=[unit_out] * 3,
                  coord="G", dtype=np.float64)
@@ -129,11 +210,13 @@ def main() -> None:
     ap.add_argument("--nside", type=int, default=512)
     ap.add_argument("--freqs", nargs="*", default=FREQS)
     ap.add_argument("--release", default="pr4", choices=["pr4", "pr3", "npipe_uio"])
+    ap.add_argument("--zero-level", default=None, choices=["", "highlat", "dr1"],
+                    help="zero-level method; default dr1 for npipe_uio, none for pr3/pr4")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     for f in a.freqs:
         if a.release == "npipe_uio":
-            convert_npipe_uio(a.indir, a.nside, a.out, f)
+            convert_npipe_uio(a.indir, a.nside, a.out, f, a.zero_level or "dr1")
             continue
         if a.release == "pr4":
             name = f"HFI_SkyMap_{f}_2048_R4.00_full.fits"
@@ -143,7 +226,7 @@ def main() -> None:
         if not os.path.exists(path):
             print(f"missing {path}")
             continue
-        convert(path, a.nside, a.out, f, a.release)
+        convert(path, a.nside, a.out, f, a.release, a.zero_level or "")
 
 
 if __name__ == "__main__":

@@ -57,12 +57,13 @@ def read_mode(d):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True)
+    ap.add_argument("--suffix", default="", help="mode directory suffix, e.g. _npipemask")
     ap.add_argument("--modes", nargs="*", default=["ridge", "conditional", "marginal", "resolve_chisq"])
     ap.add_argument("--burn", type=int, default=400)
     a = ap.parse_args()
     summary = {}
     for mode in a.modes:
-        d = os.path.join(a.root, mode)
+        d = os.path.join(a.root, mode + a.suffix)
         if not os.path.isdir(d):
             print(f"{mode}: no directory")
             continue
