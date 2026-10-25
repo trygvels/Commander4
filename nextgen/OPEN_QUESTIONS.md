@@ -86,6 +86,13 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   are what breaks synchrotron degeneracies; high-frequency (HFI 545/857, DIRBE) constrains T_d.
 - **How:** verify download locations, formats, beams, calibration uncertainties, masks and transfer
   functions; record in DATA.md.
+- **Status (2026-10-25, lit-scout with fetched URLs, DATA.md "verified" section):** public: QUIJOTE
+  MFI DR1 (LAMBDA, nside 512 IQU with covariance; FDEC declination filtering must be applied to
+  external data), S-PASS DR1 (LAMBDA/INAF, IAU convention, dec < -1 deg), CLASS 40 GHz DR1 (LAMBDA,
+  nside 128 with a C_l-domain transfer matrix only), Haslam 2014 (LAMBDA). NOT public: C-BASS North
+  maps (the research/02 claim was wrong). Open: how to implement the QUIJOTE FDEC and CLASS filters
+  in a joint likelihood (transfer-function problem); PR4 mirrors (NERSC slow, CMB-S4 Globus links
+  dead on 2026-10-25, Hugging Face Parquet copy exists).
 
 ## Q10. How long are Commander4's Gibbs correlation lengths for gain against sky?
 - **Why:** gain/sky and noise/sky degeneracies drive BeyondPlanck's long chains.
