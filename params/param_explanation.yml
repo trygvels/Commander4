@@ -384,24 +384,27 @@ compsep:
                               # Amplitude groups coupled to this one: redrawn after the
                               # steps (and, for likelihood: marginal, integrated out).
       likelihood: auto        # What the MH acceptance is computed from:
-                              #   marginal     the likelihood with the coupled amplitudes
-                              #                integrated out analytically. Exact, and no
+                              #   ridge        the profile ("spectral") likelihood of the
+                              #                per-pixel model: amplitudes maximized out, no
                               #                amplitude solve per proposal, so `numstep` can
-                              #                be large. Needs exactly one per-pixel amplitude
-                              #                group that solves every sampled component.
-                              #   ridge        as marginal but without the ln det term
-                              #                (C3's 'ridge'): equivalent to a Jeffreys-type
-                              #                prior on the indices that cancels the
-                              #                prior-volume pull a flat amplitude prior at
-                              #                the SED reference frequency puts on them.
-                              #                Same requirements as marginal.
+                              #                be large; amplitudes redrawn after the steps.
+                              #                Exact MCMC for flat amplitude priors times a
+                              #                det(A)^1/2 (Jeffreys-type) prior on the indices.
+                              #                Needs exactly one per-pixel amplitude group that
+                              #                solves every sampled component. (C3's 'ridge'.)
+                              #   marginal     as ridge, but keeping the -1/2 ln det A term:
+                              #                the flat-amplitude-prior posterior. Its volume
+                              #                term is summed over all pixels and pulls a
+                              #                full-sky index towards SED degeneracies; with
+                              #                many pixels it can swamp the data and run the
+                              #                chain into the hard bounds.
                               #   conditional  chi^2 with all amplitudes held fixed (C3's
                               #                'chisq'). Exact, works with CG, mixes slower.
                               #   resolve_chisq  the original method: re-solve the amplitudes
                               #                for every proposal and accept on chi^2 at the
                               #                drawn amplitudes. Does NOT sample the posterior
                               #                (too wide and biased); kept for comparison.
-                              #   auto         marginal where available, else conditional.
+                              #   auto         ridge where available, else conditional.
       numstep: 1              # MH steps taken per Gibbs iteration.
       # chisq_bands: [Planck30GHz, WMAPKa, WMAPQ1]
                               # Restrict the accept/reject chi^2 to these bands. Absent or

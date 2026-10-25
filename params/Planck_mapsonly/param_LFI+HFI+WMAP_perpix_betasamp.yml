@@ -1,8 +1,8 @@
 # param_LFI+HFI+WMAP_perpix.yml plus Metropolis-Hastings sampling of the synchrotron and dust
 # spectral indices. Maps-only: `experiments` is empty and every band is read from file, smoothed to
 # `compsep.common_res_fwhm` (60', set by Haslam) and read at nside 512 for the per-pixel solver.
-# Index proposals are accepted on the per-pixel marginal likelihood, and the amplitudes are redrawn
-# once per sweep after an accepted step.
+# Index proposals are accepted on the per-pixel profile (ridge) likelihood, and the amplitudes are
+# redrawn once per sweep after an accepted step.
 
 # ----------------------------------------
 # GIBBS
@@ -74,10 +74,10 @@ compsep:
       # bands: [Planck30GHz, Haslam408MHz, WMAPKa, WMAPQ1, WMAPQ2, WMAPV1, WMAPV2, Planck857GHz, Planck353GHz]
 
   # MCMC sampling groups: Metropolis-Hastings over the spectral indices of the selected
-  # components. With one per-pixel amplitude group, `likelihood: auto` resolves to `marginal`: each
-  # accept/reject uses the likelihood with the per-pixel amplitudes integrated out analytically (no
-  # amplitude solve per proposal), and the amplitudes are redrawn once after the steps if anything was
-  # accepted. Steps are cheap, so `numstep` can be raised to improve mixing per Gibbs sweep.
+  # components. With one per-pixel amplitude group, `likelihood: auto` resolves to `ridge`: each
+  # accept/reject uses the per-pixel profile likelihood (no amplitude solve per proposal), and the
+  # amplitudes are redrawn once after the steps if anything was accepted. Steps are cheap, so
+  # `numstep` can be raised to improve mixing per Gibbs sweep.
   mcmc_sampling_groups:
     sample_spectral_indices:
       enabled: true

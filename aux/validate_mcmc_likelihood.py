@@ -26,12 +26,13 @@ FREQS = [30.0, 44.0, 70.0, 100.0, 143.0, 217.0, 353.0]
 RMS = [60.0, 60.0, 70.0, 24.0, 16.0, 24.0, 80.0]  # uK_RJ per pixel, before smoothing
 TRUTH = {"sync": -3.0, "dust": 1.6}
 START = {"sync": -2.9, "dust": 1.595}      # chains start several sd away from the truth
-PROPOSAL = {"sync": 0.02, "dust": 0.0007}  # about the exact posterior sd of each index
+PROPOSAL = {"sync": 0.08, "dust": 0.06}  # random-walk step lengths, about the ridge target sd
+BOUNDS = {"sync": [-4.0, -2.0], "dust": [1.0, 2.5]}  # hard limits (flat prior inside)
 NSIDE = 16
 FWHM_ARCMIN = 480.0                        # common beam, about two pixels
-MODES = {"marginal": 20, "ridge": 20, "conditional": 20, "resolve_chisq": 20}  # -> numstep
-NITER = 300
-BURN = 100
+MODES = {"ridge": 50, "marginal": 50, "conditional": 50, "resolve_chisq": 50}  # -> numstep
+NITER = 250
+BURN = 80
 
 
 def _components(beta_sync: float, beta_dust: float) -> CompList:
@@ -53,11 +54,19 @@ def _components(beta_sync: float, beta_dust: float) -> CompList:
     return CompList.init_from_params(comps, params)
 
 
+_COMPS = None
+
+
 def mixing(beta_sync: float, beta_dust: float) -> np.ndarray:
     """(nband, 3) mixing matrix from Commander4's own SED implementations."""
-    comps = list(_components(beta_sync, beta_dust).split_for_eval_pol("I"))
+    global _COMPS
     nu = np.array(FREQS)
-    return np.stack([c.get_sed(nu) for c in comps], axis=1)
+    if _COMPS is None:
+        comps = list(_components(TRUTH["sync"], TRUTH["dust"]).split_for_eval_pol("I"))
+        _COMPS = (comps, comps[0].get_sed(nu))  # the CMB column does not depend on beta
+    comps, cmb_sed = _COMPS
+    comps[1].beta, comps[2].beta = beta_sync, beta_dust
+    return np.stack([cmb_sed, comps[1].get_sed(nu), comps[2].get_sed(nu)], axis=1)
 
 
 def make(outdir: str) -> None:
@@ -173,7 +182,7 @@ components:
       spatially_varying_MM: False
       sample_spectral_index: True
       spectral_index_proposal_sigma: {PROPOSAL["sync"]}
-      spectral_index_bounds: [-4.0, -2.0]
+      spectral_index_bounds: {BOUNDS["sync"]}
   ThermalDust:
     enabled: true
     component_class: "ThermalDust"
@@ -188,7 +197,7 @@ components:
       spatially_varying_MM: False
       sample_spectral_index: True
       spectral_index_proposal_sigma: {PROPOSAL["dust"]}
-      spectral_index_bounds: [1.0, 2.5]
+      spectral_index_bounds: {BOUNDS["dust"]}
 experiments: {{}}
 """
 
@@ -210,18 +219,25 @@ def _exact_posterior(outdir: str, use_logdet: bool = True):
         logdet = np.linalg.slogdet(A)[1] if use_logdet else 0.0
         return np.sum(0.5 * quad - 0.5 * logdet)
 
-    centre = np.array([TRUTH["sync"], TRUTH["dust"]])
-    half = np.array([0.4, 0.15])
-    for _ in range(3):  # zoom in twice around the posterior
-        gs = np.linspace(centre[0] - half[0], centre[0] + half[0], 61)
-        gd = np.linspace(centre[1] - half[1], centre[1] + half[1], 61)
-        L = np.array([[logp(s, t) for t in gd] for s in gs])
+    # Flat prior inside the hard bounds of the parameter file. Coarse grid over the whole box, then
+    # two refinements around the mass (a flat-amplitude-prior posterior can pile up at a bound).
+    lo, hi = np.array(BOUNDS["sync"] + BOUNDS["dust"]).reshape(2, 2).T
+
+    def grid_moments(lo_, hi_, n):
+        gs, gd = np.linspace(lo_[0], hi_[0], n), np.linspace(lo_[1], hi_[1], n)
+        L = np.array([[logp(s_, t_) for t_ in gd] for s_ in gs])
         p = np.exp(L - L.max())
         p /= p.sum()
         ps, pd = p.sum(1), p.sum(0)
         mean = np.array([np.sum(ps * gs), np.sum(pd * gd)])
         sd = np.sqrt([np.sum(ps * (gs - mean[0])**2), np.sum(pd * (gd - mean[1])**2)])
-        centre, half = mean, 8 * sd
+        step = np.array([gs[1] - gs[0], gd[1] - gd[0]])
+        return mean, sd, step
+
+    mean, sd, step = grid_moments(lo, hi, 41)
+    for _ in range(2):
+        half = np.maximum(8 * sd, 2 * step)
+        mean, sd, step = grid_moments(np.maximum(lo, mean - half), np.minimum(hi, mean + half), 61)
     return mean, sd
 
 
@@ -237,8 +253,8 @@ def analyze(outdir: str) -> None:
     for mode in MODES:
         mean, sd = targets[mode != "ridge"]
         files = sorted(glob.glob(f"{outdir}/chains_{mode}/chains_compsep/chain01_iter*.h5"))
-        if not files:
-            print(f"{mode:14s} (no chain files)")
+        if len(files) <= BURN:
+            print(f"{mode:14s} (not run yet, {len(files)} chain files)")
             continue
         b = []
         for fn in files[BURN:]:
@@ -249,7 +265,8 @@ def analyze(outdir: str) -> None:
         shift = (b.mean(0) - mean) / sd
         ratio = b.std(0) / sd
         print(f"{mode:14s} {shift[0]:+11.2f} {ratio[0]:14.2f} {shift[1]:+11.2f} {ratio[1]:14.2f}"
-              f"   ({len(b)} samples)")
+              f"   chain: {b[:, 0].mean():.4f} +- {b[:, 0].std():.4f}, "
+              f"{b[:, 1].mean():.5f} +- {b[:, 1].std():.5f} ({len(b)} samples)")
 
 
 if __name__ == "__main__":

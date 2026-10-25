@@ -135,7 +135,7 @@ class MCMCSamplingGroupConfig(SamplingGroupConfig):
     chisq_bands: tuple[str, ...] | None = None
     chisq_mask: str | None = None
     # What the MH acceptance is computed from: "marginal", "ridge", "conditional",
-    # "resolve_chisq", or "auto" (marginal where available, else conditional). See
+    # "resolve_chisq", or "auto" (ridge where available, else conditional). See
     # `MCMCSamplingGroup.run` and `_resolve_mcmc_likelihoods`.
     likelihood: str = "auto"
 
@@ -395,10 +395,16 @@ def _resolve_mcmc_likelihoods(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
                               report: bool) -> dict[str, str]:
     """Resolve each MCMC group's `likelihood` setting to the method it runs with.
 
-    ``auto`` selects ``marginal`` where it is exact and available and ``conditional`` otherwise;
-    both leave the joint posterior invariant. An explicit ``marginal`` that cannot be honoured is an
-    error. ``resolve_chisq`` (the original behaviour) is allowed but reported, because accepting on
-    the chi-squared at freshly drawn amplitudes does not sample the posterior.
+    ``auto`` selects ``ridge`` where the per-pixel marginal is available and ``conditional``
+    otherwise. All of ``marginal``, ``ridge`` and ``conditional`` are exact MCMC moves; they differ
+    in the prior they imply for the spectral parameters. ``marginal`` and ``conditional`` sample the
+    posterior under flat amplitude priors, whose volume term (-1/2 ln det A, summed over every
+    pixel) pulls a full-sky index towards SED degeneracies and, with many pixels, can dominate the
+    data entirely. ``ridge`` removes that term (the "spectral likelihood" of parametric component
+    separation), which is why it is the default where available. An explicit ``marginal`` or
+    ``ridge`` that cannot be honoured is an error. ``resolve_chisq`` (the original behaviour) is
+    allowed but reported, because accepting on the chi-squared at freshly drawn amplitudes does not
+    leave any posterior invariant.
     """
     resolved = {}
     for name, group in mcmc_groups.items():
@@ -408,7 +414,7 @@ def _resolve_mcmc_likelihoods(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
                              f"{group.likelihood}, but that is unavailable because {reason}. Use "
                              "'conditional' instead.")
         if group.likelihood == "auto":
-            resolved[name] = "marginal" if reason is None else "conditional"
+            resolved[name] = "ridge" if reason is None else "conditional"
         else:
             resolved[name] = group.likelihood
         if not report:
@@ -420,7 +426,7 @@ def _resolve_mcmc_likelihoods(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
                 "posterior invariant (the parameter posterior comes out too wide and biased). Use "
                 "'marginal' (per-pixel amplitudes) or 'conditional'.")
         elif group.likelihood == "auto":
-            why = "" if reason is None else f" (marginal unavailable: {reason})"
+            why = "" if reason is None else f" (ridge/marginal unavailable: {reason})"
             logger.info(f"MCMC sampling group {name!r}: likelihood auto -> {resolved[name]}{why}.")
     return resolved
 

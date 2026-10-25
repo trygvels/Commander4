@@ -263,8 +263,9 @@ class MCMCSamplingGroup(ABC):
         instead adds the random term (X' - X), with X ~ chi^2 over the amplitude degrees of
         freedom, and drops the ln det term of the amplitude covariance. In tests on simulated
         per-pixel data this widens the parameter posterior (by a factor that grows with the number
-        of pixels) and shifts it towards the profile likelihood. Use ``likelihood="marginal"`` (per-
-        pixel amplitudes) or ``"conditional"`` instead; this path is kept for comparison.
+        of pixels) and centres it near the profile ("ridge") likelihood. Use ``likelihood="ridge"``
+        or ``"marginal"`` (per-pixel amplitudes) or ``"conditional"`` instead; this path is kept
+        for comparison.
 
         Called collectively by *all* CompSep ranks. ``resolve_amplitudes`` is a collective callback
         that re-solves the amplitude (CG) sampling groups this MCMC group is coupled to (C3's

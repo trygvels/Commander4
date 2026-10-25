@@ -291,10 +291,10 @@ def _resolve(mcmc_cfg, amp_groups, method):
                                      report=False)["m"]
 
 
-def test_auto_picks_marginal_for_one_per_pixel_group_covering_the_sampled_components():
+def test_auto_picks_ridge_for_one_per_pixel_group_covering_the_sampled_components():
     amp = {"pp": PerPixelSamplingGroupConfig(name="pp")}
     cfg = MCMCSamplingGroupConfig(name="m", update_amplitude_groups=("pp",))
-    assert _resolve(cfg, amp, "per_pixel") == "marginal"
+    assert _resolve(cfg, amp, "per_pixel") == "ridge"
 
 
 def test_auto_falls_back_to_conditional():
@@ -320,7 +320,7 @@ def test_explicit_ridge_needs_the_per_pixel_marginal_too():
 
 def test_explicit_settings_are_kept_and_unknown_values_rejected():
     amp = {"pp": PerPixelSamplingGroupConfig(name="pp")}
-    for value in ("ridge", "conditional", "resolve_chisq"):
+    for value in ("marginal", "ridge", "conditional", "resolve_chisq"):
         cfg = MCMCSamplingGroupConfig(name="m", update_amplitude_groups=("pp",), likelihood=value)
         assert _resolve(cfg, amp, "per_pixel") == value
     with pytest.raises(ValueError, match="likelihood"):
@@ -338,9 +338,9 @@ def test_original_resolve_chisq_mode_does_not_sample_the_posterior():
 
 # ---------------------------------------------------------- end to end through process_compsep
 
-def test_process_compsep_runs_a_marginal_mcmc_group(monkeypatch):
+def test_process_compsep_runs_a_per_pixel_mcmc_group(monkeypatch):
     """One band, one component, COMM_SELF: the per-pixel amplitude group, then an MCMC group whose
-    'auto' likelihood resolves to 'marginal', exercised through the real process_compsep wiring."""
+    'auto' likelihood resolves to 'ridge', exercised through the real process_compsep wiring."""
     from commander4.compsep import processing
     from commander4.compsep.processing import CompSepState, process_compsep
 
@@ -360,7 +360,7 @@ def test_process_compsep_runs_a_marginal_mcmc_group(monkeypatch):
     mcmc = {"beta": MCMCSamplingGroupConfig(name="beta", update_amplitude_groups=("pp",),
                                             numstep=20)}
     likelihoods = _resolve_mcmc_likelihoods(mcmc, amp, "per_pixel", comp_list, report=False)
-    assert likelihoods == {"beta": "marginal"}
+    assert likelihoods == {"beta": "ridge"}
     state = CompSepState(
         band_name="Band30", band_identifier="Band30_I", target_pol="I",
         amplitude_method="per_pixel", amplitude_groups=amp, mcmc_groups=mcmc,
