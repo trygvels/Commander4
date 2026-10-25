@@ -6,6 +6,12 @@ Generative model, drawn exactly as the posterior assumes it:
     a_p   ~ N(m_p, T_p)  ["gauss"]   or   template values with log-normal scatter ["template"],
     d_p   = M_p(beta_{r(p)}) a_p + n_p,   n_p ~ N(0, diag(rms_p^2)).
 Units: GHz, uK_RJ, radians. All maps RING order; `region` follows the SPEC nest-shift recipe.
+
+Gaussian amplitude prior widths (SPEC "Decisions after the first build", 2026-10-25):
+    "default": T_p^(1/2) = max(0.5 |m_p|, 20) uK_RJ for synchrotron and dust, 70 uK_RJ for the
+               CMB (whose template mean is 0);
+    "wide":    T_p^(1/2) = 10 max(|m_p|, 10) uK_RJ for every component (the first-build setting,
+               floor 100 uK_RJ; allows negative and 10x amplitudes).
 """
 from __future__ import annotations
 
@@ -63,6 +69,27 @@ def noise_rms(nside_d: int, nu, scale: float = 1.0) -> np.ndarray:
     return np.broadcast_to(rms, (hp.nside2npix(nside_d), nu.size)).copy()
 
 
+AMP_PRIOR_WIDTHS = ("default", "wide")
+CMB_PRIOR_SD_UK_RJ = 70.0        # "default": prior sd of the CMB amplitude (m = 0)
+FG_PRIOR_FLOOR_UK_RJ = 20.0      # "default": floor of the synchrotron and dust prior sd
+
+
+def amplitude_prior_sd(m: np.ndarray, prior_width: str = "default") -> np.ndarray:
+    """Diagonal prior sd T^(1/2) (N, C) of the Gaussian amplitude prior a ~ N(m, T), uK_RJ.
+
+    "default": column 0 (cmb) = 70; columns 1, 2 (sync, dust) = max(0.5 |m|, 20).
+    "wide":    10 max(|m|, 10) for every column (first-build setting).
+    """
+    m = np.asarray(m, dtype=float)
+    if prior_width == "default":
+        T_sqrt = np.maximum(0.5 * np.abs(m), FG_PRIOR_FLOOR_UK_RJ)
+        T_sqrt[:, 0] = CMB_PRIOR_SD_UK_RJ
+        return T_sqrt
+    if prior_width == "wide":
+        return 10.0 * np.maximum(np.abs(m), 10.0)
+    raise ValueError(f"unknown prior_width {prior_width!r}; expected one of {AMP_PRIOR_WIDTHS}")
+
+
 def draw_hyper(hyper, rng) -> dict:
     """Draw theta from the hyperprior of E012 v2. Returns dict(mu, sigma, rho, log_sigma, u).
 
@@ -94,15 +121,18 @@ def draw_hyper(hyper, rng) -> dict:
 
 
 def simulate(nside_d: int, nside_beta: int, field, hyper, rng, amp_mode: str = "gauss",
-             noise_scale: float = 1.0, beta_d: float = 1.6, T_d: float = 20.0):
+             noise_scale: float = 1.0, beta_d: float = 1.6, T_d: float = 20.0,
+             prior_width: str = "default"):
     """Draw one data set from the hierarchical model. Returns (PixelData, truth).
 
     field: object with S_times(rho, z) -> (Nb,) and basis.V of shape (Nb, K) (field.MaternField).
     hyper: HyperPrior (posterior.py) or any object with its fields.
-    amp_mode "gauss": a_p ~ N(m_p, T_p), T_p^(1/2) = 10 max(|m_p|, 10) per component (floor
-    100 uK_RJ; E012 "Amplitude treatment"). "template": sync and dust a = m exp(0.1 N(0, 1)),
-    cmb ~ N(0, 70^2) uK_RJ. In both cases PixelData.m and .inv_T hold the Gaussian prior (m_p,
-    T_p^-1) so that mode "gauss" can be evaluated on template data as well (coverage study).
+    amp_mode "gauss": a_p ~ N(m_p, T_p) with T_p^(1/2) = amplitude_prior_sd(m, prior_width):
+    prior_width "default" is max(0.5 |m_p|, 20) uK_RJ for sync and dust and 70 uK_RJ for the cmb
+    (SPEC decision 2026-10-25); "wide" is the first-build 10 max(|m_p|, 10) uK_RJ (floor 100).
+    "template": sync and dust a = m exp(0.1 N(0, 1)), cmb ~ N(0, 70^2) uK_RJ. In both cases
+    PixelData.m and .inv_T hold the Gaussian prior (m_p, T_p^-1) of the chosen width so that
+    mode "gauss" can be evaluated on template data as well (coverage study).
     truth: dict(theta=dict(mu, sigma, rho, log_sigma, u), z (K,), beta (Nb,), a (N, C)).
     """
     N = hp.nside2npix(nside_d)
@@ -116,7 +146,7 @@ def simulate(nside_d: int, nside_beta: int, field, hyper, rng, amp_mode: str = "
     beta = theta["mu"] + theta["sigma"] * np.asarray(field.S_times(theta["rho"], z))
 
     m = templates(nside_d)
-    T_sqrt = 10.0 * np.maximum(np.abs(m), 10.0)
+    T_sqrt = amplitude_prior_sd(m, prior_width)
     if amp_mode == "gauss":
         a = m + T_sqrt * rng.standard_normal(m.shape)
     elif amp_mode == "template":
@@ -248,15 +278,37 @@ def _check_hyper_draws(rng, n=40000):
     return ok
 
 
+def _check_prior_sd(nside_d=16):
+    """amplitude_prior_sd: default = (70 | max(0.5|m|, 20)), wide = 10 max(|m|, 10), bad name
+    raises; the default is narrower than the wide setting everywhere."""
+    m = templates(nside_d)
+    dflt, wide = amplitude_prior_sd(m, "default"), amplitude_prior_sd(m, "wide")
+    ok = (dflt.shape == m.shape and np.all(dflt[:, 0] == 70.0)
+          and np.allclose(dflt[:, 1:], np.maximum(0.5 * np.abs(m[:, 1:]), 20.0))
+          and np.allclose(wide, 10.0 * np.maximum(np.abs(m), 10.0)) and np.all(dflt < wide)
+          and np.allclose(amplitude_prior_sd(m), dflt))
+    try:
+        amplitude_prior_sd(m, "narrow")
+        ok = False
+    except ValueError:
+        pass
+    print(f"  amplitude_prior_sd: default cmb {dflt[:, 0].min():.0f}, sync [{dflt[:, 1].min():.1f}"
+          f", {dflt[:, 1].max():.1f}], dust [{dflt[:, 2].min():.1f}, {dflt[:, 2].max():.1f}]; "
+          f"wide cmb {wide[:, 0].min():.0f}, sync max {wide[:, 1].max():.0f}; unknown width "
+          f"raises  {'PASS' if ok else 'FAIL'}")
+    return bool(ok)
+
+
 def _check_simulate(rng, nside_d=16, nside_beta=4):
     """Shapes, finiteness, residual chi^2 at the truth, and the amplitude-prior standardization."""
     from .model import collapsed_loglike
     field = _StandInField(_StandInBasis(nside_beta, rng))
     hyper = _StandInHyper()
     ok = True
-    for amp_mode in ("gauss", "template"):
+    for amp_mode, prior_width in (("gauss", "default"), ("gauss", "wide"),
+                                  ("template", "default")):
         data, truth = simulate(nside_d, nside_beta, field, hyper, rng, amp_mode=amp_mode,
-                               noise_scale=1.0)
+                               noise_scale=1.0, prior_width=prior_width)
         N, Nb = hp.nside2npix(nside_d), hp.nside2npix(nside_beta)
         shapes = (data.d.shape == (N, 12) and data.inv_var.shape == (N, 12)
                   and data.region.shape == (N,) and truth["beta"].shape == (Nb,)
@@ -272,9 +324,11 @@ def _check_simulate(rng, nside_d=16, nside_beta=4):
         this = shapes and fin and abs(chi2_red - 1.0) < 5 * np.sqrt(2.0 / (N * 12))
         if amp_mode == "gauss":
             this &= abs(zs.std() - 1.0) < 5 / np.sqrt(2 * N * 3)
+            this &= np.allclose(1.0 / np.sqrt(data.inv_T), amplitude_prior_sd(data.m, prior_width))
         ok &= this
         th = truth["theta"]
-        print(f"  simulate {amp_mode:8s}: shapes ok={shapes}, reduced chi2 at truth={chi2_red:.4f}"
+        print(f"  simulate {amp_mode:8s} {prior_width:7s}: shapes ok={shapes}, reduced chi2 at "
+              f"truth={chi2_red:.4f}"
               f", std((a-m)/T^1/2)={zs.std():.3f}, theta=(mu {th['mu']:.3f}, sigma "
               f"{th['sigma']:.3f}, rho {np.degrees(th['rho']):.1f} deg), sd(beta)={beta_sd:.3f}, "
               f"logL(gauss,w0,w1)=({logL[0]:.4e}, {logL[1]:.4e}, {logL[2]:.4e})  "
@@ -308,6 +362,7 @@ if __name__ == "__main__":
         _check_region(),
         _check_templates(),
         _check_noise(),
+        _check_prior_sd(),
         _check_hyper_draws(rng),
         _check_simulate(rng),
         _check_with_field_module(rng),

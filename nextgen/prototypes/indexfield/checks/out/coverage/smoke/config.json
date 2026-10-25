@@ -1,0 +1,28 @@
+{
+ "nside_d": 16,
+ "nside_beta": 2,
+ "family": "graph_laplacian",
+ "rho_prior": "loguniform",
+ "param": "centred",
+ "amp_prior": "default",
+ "theta_fixed": null,
+ "init": "random",
+ "n_warmup": 300,
+ "n_samples": 400,
+ "target_accept": 0.8,
+ "max_depth": 10,
+ "seed": 20261025,
+ "amp_mode": "template",
+ "out_dir": "/Users/trygvels/code/Commander4/nextgen/prototypes/indexfield/checks/out/coverage/smoke",
+ "overwrite": true,
+ "n_rep": 4,
+ "rep_start": 0,
+ "noise": [
+  1.0
+ ],
+ "modes": [
+  "gauss",
+  "w0",
+  "w1"
+ ]
+}

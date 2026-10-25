@@ -399,7 +399,7 @@ def _real_ylm(ell, m, theta, phi):
     return math.sqrt(2.0) * norm * P * np.sin(am * phi)
 
 
-def field_spec(nside_beta, family, lmax=None) -> FieldSpec:
+def field_spec(nside_beta, family, lmax=None, remove_constant=True) -> FieldSpec:
     """Own construction of the basis and eigenvalues of E012 v2.
 
     family "graph_laplacian" (alias "gmrf"): W = symmetrized 8-neighbour adjacency of the
@@ -407,9 +407,15 @@ def field_spec(nside_beta, family, lmax=None) -> FieldSpec:
     the eigenvector with eigenvalue 0 (constant mode) is dropped, so K = Nb - 1; lam = eigenvalue
     / (3 h^2) with h = sqrt(4 pi / Nb) (D009 continuum scale).
     family "harmonic": real Y_lm for 1 <= l <= lmax (default 2 nside_beta) at the pixel centres,
-    columns ordered by l then m = -l..l, orthonormalized by QR (the QR keeps the span of the
-    leading columns, so column (l, m) mixes only with lower or equal l); lam = l(l+1) of the
-    column's l; K = (lmax+1)^2 - 1, which must be < Nb.
+    columns ordered by l then m = -l..l. With remove_constant=True (SPEC decision "Constant mode
+    in the harmonic basis") every pixel-evaluated column y is first replaced by
+    y - (1^T y / Nb) 1, since the l >= 1 harmonics sampled on the HEALPix grid are not exactly
+    orthogonal to 1 (|1^T Y| / sqrt(Nb) up to 0.17 at nside 1), so dropping only l = 0 would
+    leave part of the constant mode in V; the columns are then orthonormalized by QR (the QR
+    keeps the span of the leading columns, so column (l, m) mixes only with lower or equal l),
+    which gives 1^T V = 0 exactly and range(V) orthogonal to 1. remove_constant=False keeps the
+    previous behaviour (QR of the raw columns). lam = l(l+1) of the column's l;
+    K = (lmax+1)^2 - 1, which must be < Nb.
     """
     n_beta = 12 * nside_beta * nside_beta
     h = math.sqrt(4.0 * math.pi / n_beta)
@@ -441,7 +447,12 @@ def field_spec(nside_beta, family, lmax=None) -> FieldSpec:
                 cols.append(_real_ylm(ell, m, theta, phi))
                 ells.append(ell)
         Y = np.stack(cols, axis=1)
+        if remove_constant:
+            Y = Y - Y.mean(axis=0, keepdims=True)
         Q, R = np.linalg.qr(Y)
+        rdiag = np.abs(np.diag(R))
+        if rdiag.min() < 1e-8 * rdiag.max():
+            raise RuntimeError("harmonic basis: columns linearly dependent after projection")
         Q = Q * np.sign(np.diag(R))[None, :]
         ell_arr = np.array(ells, dtype=np.int64)
         return FieldSpec(np.ascontiguousarray(Q), (ell_arr * (ell_arr + 1)).astype(np.float64), h,
@@ -1117,6 +1128,20 @@ def _selftest():
     check("harmonic nside 4 default lmax 8: K = 80 < 192, orthonormal, ell ordered",
           fs4.K == 80 and np.max(np.abs(fs4.V.T @ fs4.V - np.eye(80))) < 1e-12
           and np.all(np.diff(fs4.ell) >= 0), f"K={fs4.K}, ell[-1]={fs4.ell[-1]}")
+    # constant mode projected out (SPEC decision): |1^T V| / sqrt(Nb) < 1e-12 at nside 1, 2, 4;
+    # the raw basis (remove_constant=False) must show the known leakage so the test has teeth
+    for nside in (1, 2, 4):
+        fsh = field_spec(nside, "harmonic")
+        one = np.linalg.norm(fsh.V.T @ np.ones(fsh.n_beta)) / math.sqrt(fsh.n_beta)
+        fsr = field_spec(nside, "harmonic", remove_constant=False)
+        one_raw = np.linalg.norm(fsr.V.T @ np.ones(fsr.n_beta)) / math.sqrt(fsr.n_beta)
+        orth = np.max(np.abs(fsh.V.T @ fsh.V - np.eye(fsh.K)))
+        same_span_ell1 = np.max(np.abs(fsh.V[:, :3] @ fsh.V[:, :3].T
+                                       - fsr.V[:, :3] @ fsr.V[:, :3].T))
+        check(f"harmonic nside {nside}: |1^T V|/sqrt(Nb) < 1e-12 with constant removed",
+              one < 1e-12 and orth < 1e-12 and one_raw > 1e-3 and fsh.K == fsr.K,
+              f"removed {one:.1e}, raw {one_raw:.3f}, orth {orth:.1e}, K={fsh.K}, "
+              f"l=1 projector diff vs raw {same_span_ell1:.1e}")
     # rho transform round trip and Jacobian by finite differences
     hyp = default_hyper(fs)
     uu = np.linspace(-6, 6, 13)
