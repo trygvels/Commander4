@@ -237,8 +237,9 @@ def _check_mixing_derivative(h=1e-6):
     stack_ok = np.allclose(Mv[0], M) and np.allclose(dMv[0], dM)
     ok = err < 1e-8 and abs(cmb_to_rj(1e-3) - 1.0) < 1e-6 and stack_ok and \
         abs(M[np.argmin(np.abs(nu - 30.0)), SYNC_COL] - 1.0) < 1e-12
-    print(f"  mixing: max rel err dM/dbeta = {err:.2e}, cmb_to_rj(1e-3 GHz) = {cmb_to_rj(1e-3):.8f}, "
-          f"cmb_to_rj(100) = {cmb_to_rj(100.0):.6f}, stacked == scalar: {stack_ok}  "
+    print(f"  mixing: max rel err dM/dbeta = {err:.2e}, cmb_to_rj(1e-3 GHz) = "
+          f"{cmb_to_rj(1e-3):.8f}, cmb_to_rj(100) = {cmb_to_rj(100.0):.6f}, "
+          f"stacked == scalar: {stack_ok}  "
           f"{'PASS' if ok else 'FAIL'}")
     return ok
 
@@ -313,7 +314,8 @@ def _check_quadrature(rng, B=6, n_grid=801, half_width_sd=9.0):
         model = M[0][:, 0] * A0[..., None] + M[0][:, 1] * A1[..., None]           # (n, n, B)
         log_f = -0.5 * np.sum(inv_var[0] * (d[0] - model)**2, axis=-1)
         if mode == "gauss":
-            log_f = log_f - 0.5 * (inv_T[0, 0] * (A0 - m[0, 0])**2 + inv_T[0, 1] * (A1 - m[0, 1])**2)
+            log_f = log_f - 0.5 * (inv_T[0, 0] * (A0 - m[0, 0])**2
+                                   + inv_T[0, 1] * (A1 - m[0, 1])**2)
         peak = log_f.max()
         wgt = np.ones(n_grid)
         wgt[0] = wgt[-1] = 0.5

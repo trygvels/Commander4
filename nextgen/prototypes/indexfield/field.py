@@ -130,19 +130,29 @@ class HarmonicBasis(Basis):
     so that the corresponding diagonal of R is positive, which keeps Q_k close to the k-th
     harmonic). lam = l (l + 1) of the column's l. K = (lmax + 1)^2 - 1 < Nb.
 
+    The pixel-evaluated harmonics with l >= 1 are not exactly orthogonal to the constant vector
+    (|1^T Y_lm| / sqrt(Nb) reaches 0.17 at nside 1 and 0.006 at nside 8), so dropping only the
+    l = 0 column would leave part of the constant mode in V and partly restore the mu degeneracy
+    that E012 v2 removes. With remove_constant=True (default) the constant is projected out of
+    every column before the QR, so 1^T V = 0 exactly and V spans the same space as the QR of
+    (1, Y_1, ..., Y_lmax) without its first column. remove_constant=False gives the literal
+    SPEC.md construction.
+
     Attributes in addition to Basis: ells, ems (K,), and qr_departure = max |R - I| as a measure of
     how far the pixel-evaluated harmonics were from orthonormal before the QR.
     """
 
     kind = "harmonic"
 
-    def __init__(self, nside_beta: int, lmax: int | None = None):
+    def __init__(self, nside_beta: int, lmax: int | None = None, remove_constant: bool = True):
         if lmax is None:
             lmax = 2 * nside_beta
         nb = hp.nside2npix(nside_beta)
         if (lmax + 1) ** 2 - 1 >= nb:
             raise ValueError(f"lmax = {lmax} gives K >= Nb = {nb}; the QR would be rank deficient")
         Y, ells, ems = real_spherical_harmonics(nside_beta, lmax)
+        if remove_constant:
+            Y = Y - Y.mean(axis=0, keepdims=True)
         Q, R = np.linalg.qr(Y, mode="reduced")
         sign = np.sign(np.diag(R))
         sign[sign == 0] = 1.0
@@ -152,6 +162,7 @@ class HarmonicBasis(Basis):
             raise RuntimeError("pixelized harmonics are rank deficient at this nside/lmax")
         super().__init__(nside_beta, Q, ells * (ells + 1.0))
         self.lmax = int(lmax)
+        self.remove_constant = bool(remove_constant)
         self.ells = ells
         self.ems = ems
         self.qr_departure = float(np.max(np.abs(R - np.eye(R.shape[0]))))
@@ -307,22 +318,40 @@ def _selftest():
                    1e-10, const < 1e-10)
 
     # 2. Graph Laplacian eigenvalue scale against l(l+1), nside 8, by projecting onto harmonics.
+    #    Each graph mode gets an effective l(l+1) = sum_j p_j l_j(l_j+1) / sum_j p_j from its
+    #    harmonic content p_j = (Y_j^T v)^2 and is assigned to the l with the largest power. The
+    #    HEALPix graph has only a discrete symmetry, so each (2l+1) multiplet splits: the hard
+    #    check is on the power-weighted multiplet mean for l = 1, 2, 3 and on the l = 1 modes
+    #    individually; the within-multiplet spread is reported as a property of the GMRF family.
     print("graph Laplacian spectrum against l(l+1) at nside 8")
     g, hb = GraphLaplacianBasis(8), HarmonicBasis(8)
     proj = hb.V.T @ g.V                        # (K_h, K_g): harmonic content of each graph mode
-    power = (proj ** 2).sum(axis=0)
-    l_eff = (proj ** 2 * hb.lam[:, None]).sum(axis=0) / power
+    p2 = proj ** 2
+    power = p2.sum(axis=0)
+    l_eff = (p2 * hb.lam[:, None]).sum(axis=0) / power
     ratio = g.lam / l_eff
-    n_low = 15                                  # l = 1, 2, 3: 3 + 5 + 7 modes
-    print(f"        lowest {n_low} graph modes: lam/(l(l+1)) = "
-          f"{np.array2string(ratio[:n_low], precision=3)}")
-    print(f"        harmonic power captured (lmax 16): min {power[:n_low].min():.4f}")
-    report("min ratio, lowest modes", ratio[:n_low].min(), 0.8, ratio[:n_low].min() >= 0.8)
-    report("max ratio, lowest modes", ratio[:n_low].max(), 1.1, ratio[:n_low].max() <= 1.1)
-    sel = (hb.ells == 8)
-    ray = np.einsum("ik,ij,jk->k", hb.V[:, sel], g.G, hb.V[:, sel]) / (3 * g.h ** 2) / 72.0
-    print(f"        Rayleigh quotient of l = 8 harmonics / 72: mean {ray.mean():.3f} "
-          f"(E012 review quoted 2.65/3 = 0.88)")
+    ell_of_mode = np.array([np.bincount(hb.ells, weights=p2[:, k]).argmax()
+                            for k in range(g.K)])
+    print(f"        harmonic power captured (lmax 16) by the lowest 15 graph modes: "
+          f"min {power[:15].min():.4f}")
+    for ell in range(1, 9):
+        sel = ell_of_mode == ell
+        r = ratio[sel]
+        mean_r = np.sum(r * power[sel]) / np.sum(power[sel])
+        sel_h = hb.ells == ell
+        ray = np.einsum("ik,ij,jk->k", hb.V[:, sel_h], g.G, hb.V[:, sel_h])
+        ray = ray / (3 * g.h ** 2) / (ell * (ell + 1.0))
+        print(f"        l = {ell}: {sel.sum():2d} modes, multiplet mean lam/(l(l+1)) = "
+              f"{mean_r:.3f}, range [{r.min():.3f}, {r.max():.3f}], Rayleigh quotient of the "
+              f"exact harmonics / l(l+1): mean {ray.mean():.3f}")
+        if ell <= 3:
+            report(f"multiplet mean ratio l = {ell} in [0.8, 1.1]", mean_r, 0.8,
+                   0.8 <= mean_r <= 1.1)
+    r1 = ratio[ell_of_mode == 1]
+    report("l = 1 modes individually, min ratio", r1.min(), 0.8, r1.min() >= 0.8)
+    report("l = 1 modes individually, max ratio", r1.max(), 1.1, r1.max() <= 1.1)
+    print("        (E012 review quoted 2.97/3 = 0.99 at l = 1 and 2.65/3 = 0.88 at l = 8 for the "
+          "Rayleigh quotients)")
 
     # 3. Spectrum derivatives and the S / K operators.
     print("Matern spectrum and operators")
