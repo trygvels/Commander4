@@ -19,8 +19,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   +- 0.00005, beta_s -3.3425 +- 0.0004, but acceptance 0.4 percent (proposals 80x / 6x the posterior
   sd), ESS 44 / 97. Means are solid, widths to 15 percent. A tuned-proposal round (1.2e-4 / 9e-4,
   1000 iterations, tag `npipetuned`) is queued for all four modes.
-- DR1 dust amplitude anomaly confirmed directly: PR4 857 GHz in uK_RJ is 12.2x the DR1 dust `I_MEAN`
-  at |b| > 30 deg with correlation 0.994 (E014). Not understood; only the template shape is used.
+- DR1 dust amplitude anomaly resolved (F13): the DR1 dust map is referenced at 70 GHz, not the
+  545 GHz in its FITS header (parameter file `COMP_NU_REF_T03 = 70 857`, Commander3 keeps the first
+  token). Predicted 857 / 353 GHz slopes 11.3 / 7.3 against 12.2 / 7.2 measured. Zero levels
+  unaffected; prep script fixed; the BeyondPlanck dust header has the same error.
 
 **Running:** E014 pass 2 untuned driver (resolve_chisq since 20:08, then conditional, marginal;
 about 2 h each), then the tuned round (four modes, about 1 h each). SBC default, 96 of 300

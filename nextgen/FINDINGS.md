@@ -166,3 +166,12 @@ conditional sd 0.01 (field version of F3). With a proper Gaussian amplitude prio
 unimodal and prior-dominated at low S/N and correct at S/N 16. Preliminary until the E012 coverage
 study (queued) gives rates over replicates. Bearing on Q2: for spatially varying indices the amplitude
 prior is not a nuisance choice; neither the profile nor the flat-prior marginal is safe at low S/N.
+
+**F13. The Cosmoglobe DR1 dust map is referenced at 70 GHz, not the 545 GHz its FITS header states**
+(E014; DATA.md section "Cosmoglobe DR1 thermal dust reference frequency"): the parameter file
+overrides `COMP_NU_REF_T03` with `70 857` and Commander3 keeps the first token. Verified by
+regressing the 857 and 353 GHz maps on the DR1 amplitude at |b| > 30 deg (slopes 12.2 and 7.2
+against 11.3 and 7.3 predicted for 70 GHz, correlation 0.99). Consequence for us: DR1 dust can be
+used as a template or simulation truth only with the 70 GHz reference; the BeyondPlanck dust file
+has the same header error. The residual 7 to 14 percent is the delta-bandpass versus
+bandpass-integrated SED and is not yet quantified.

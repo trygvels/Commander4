@@ -114,15 +114,14 @@ npipe_uio`), each found from a chain that sat at a bound or at reduced chi-squar
    353 GHz; -0.56e6 uK_CMB, i.e. +1.28 MJy/sr, at 857 GHz). 100 GHz: mean over |b| > 30 deg
    (25.7 uK), as for the DR1 WMAP and LFI maps.
 
-Anomaly noted, not resolved: under the stated units (uK_RJ, nu_ref 545 GHz in the FITS header,
-857 GHz in `param_CG_v09.txt`) the DR1 dust amplitude is 7 to 10x below the NPIPE maps
-(regression slopes 10.2 at 353 GHz, 6.7 at 857 GHz, correlation 0.99). Only the template shape is
-used here, so the zero levels do not depend on it. Checked directly: the PR4 857 GHz map converted
-to uK_RJ (2.27 MJy/sr per K_CMB, then 44.32 uK_RJ per MJy/sr) regressed on the DR1 dust `I_MEAN` map
-at |b| > 30 deg (1 deg smoothing, nside 128) gives slope 12.2 with correlation 0.994 (full-sky 99th
-percentiles 6220 vs 450 uK_RJ), so the DR1 amplitude is 12x low in uK_RJ at 857 GHz, not an error
-in the MBB evaluation here. To be understood before DR1 components are used quantitatively
-anywhere.
+Anomaly, resolved (F13): under the header units (uK_RJ, nu_ref 545 GHz) the DR1 dust amplitude
+looked 7 to 12x too low (857 GHz in uK_RJ regressed on `I_MEAN` at |b| > 30 deg: slope 12.2,
+correlation 0.994). The amplitude is referenced at 70 GHz: `param_CG_v09.txt` line 1774 overrides
+`COMP_NU_REF_T03 = 70 857` and Commander3 reads the first token. Predicted slopes for a 70 GHz
+reference with the DR1 per-pixel beta and T are 11.3 at 857 GHz and 7.3 at 353 GHz against 12.2 and
+7.2 measured (an independent agent reproduced the regressions; polarization gives 8.3 vs 7.3). The
+zero-level fits here use the template with a free scale and are unaffected; `prep_pr4_maps.py` now
+uses 70 GHz (`DR1_DUST_NU_REF`). Details in DATA.md.
 
 Model-error floor: `add_signal_fraction_to_rms: 0.05` on the three HFI bands (Commander3 adds
 regularization noise to HFI for the same reason). Dust T stays fixed at 20 K.

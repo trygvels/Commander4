@@ -325,3 +325,19 @@ at 353 GHz (colour correction of the delta bandpass), left uncorrected in E014.
 
 PR4 frequency maps keep the solar dipole (PR3 maps do not): subtract 3362.08 uK toward
 (l, b) = (264.021, 48.253) before a maps-only run.
+
+## Cosmoglobe DR1 thermal dust reference frequency (verified 2026-10-25, E014)
+
+The DR1 dust component file `CG_dust_IQU_n1024_v1.fits` says `NU_REF_T = 545 GHz` (uK_RJ) in its
+header, but its `I_MEAN`, `Q_MEAN` and `U_MEAN` are the dust amplitude at 70 GHz. The run's
+parameter file `param_CG_v09.txt` sets `COMP_NU_REF_T03 = 857` and `COMP_NU_REF_P03 = 353` at line
+1731 and overrides them at line 1774 with `COMP_NU_REF_T03 = 70 857` and `COMP_NU_REF_P03 = 70`;
+Commander3 (`comm_param_mod.f90`, `get_parameter_hashtable(..., par_dp=...)`) reads one double from
+the string, so the reference frequency became 70 GHz for I and P. Regressions of the NPIPE and PR4
+857 GHz maps on `I_MEAN` at |b| > 30 deg give slope 12.1 to 12.3 against 11.3 predicted for a 70 GHz
+reference with the DR1 per-pixel beta and T (1.11 for 545, 1.00 for 857); 353 GHz I gives 7.2 vs
+7.3, 353 GHz Q/U give 8.3 vs 7.3. The paper (Watts et al. 2023, Fig. 29 caption) states the dust map
+is shown at 70 GHz. The BeyondPlanck dust file `BP_dust_IQU_n1024_v2.fits` carries the same wrong
+header (545) against a parameter file saying 857, so the release script writes 545 regardless. The
+other DR1 component headers (synchrotron 0.408 / 30, free-free 40, AME 22 GHz) match the parameter
+file. Anyone evaluating the DR1 dust SED from the header will be off by about 11x at 857 GHz.

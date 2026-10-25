@@ -23,6 +23,7 @@ FREQS = ["100", "143", "217", "353", "545", "857"]
 
 DIPOLE_UK, DIPOLE_LB = 3362.08, (264.021, 48.253)      # Planck 2018 solar dipole, uK_CMB
 HFI_MJY_PER_KCMB = {"545": 58.04, "857": 2.27}            # band-integrated, Planck 2013 IX
+DR1_DUST_NU_REF = 70.0   # GHz; the DR1 dust FITS header says 545, see dr1_dust_template_uk_cmb
 DR1 = "/Users/trygvels/data/cosmoglobe_DR1"
 H_K = 6.62607015e-34 / 1.380649e-23 * 1e9                 # h/k in K per GHz
 T_CMB = 2.7255
@@ -40,10 +41,12 @@ def solar_dipole(nside: int) -> np.ndarray:
 
 def dr1_dust_template_uk_cmb(nu: float, nside: int, fwhm_deg: float):
     """(dust, cmb) from Cosmoglobe DR1 at nu GHz, degraded to nside and smoothed to fwhm_deg, uK_CMB.
-    Dust: per-pixel modified blackbody with the DR1 beta and T maps, amplitude nu_ref 545 GHz, uK_RJ.
-    CMB: DR1 CMB with its dipole fitted and removed. Used only to set zero levels, dust as a
-    template with a free scale (its absolute scale under the stated units is 7 to 10x below the NPIPE
-    maps, see E014; the zero-level fit does not depend on it)."""
+    Dust: per-pixel modified blackbody with the DR1 beta and T maps, amplitude in uK_RJ at the
+    reference frequency DR1_DUST_NU_REF = 70 GHz. The FITS header says 545 GHz, which is wrong: the
+    DR1 parameter file overrides COMP_NU_REF_T03 with "70 857" and Commander3 reads the first token
+    (E014; verified against the 353 and 857 GHz maps to 7 and 14 percent). CMB: DR1 CMB with its
+    dipole fitted and removed. Used only to set zero levels, dust as a template with a free scale,
+    so the zero-level fit does not depend on the reference frequency."""
     hd = fits.open(f"{DR1}/CG_dust_IQU_n1024_v1.fits")[1]
     hc = fits.open(f"{DR1}/CG_cmb_IQU_n1024_v1.fits")[1]
 
@@ -51,8 +54,8 @@ def dr1_dust_template_uk_cmb(nu: float, nside: int, fwhm_deg: float):
         v = np.asarray(h.data[k], float).ravel()
         return hp.reorder(v, n2r=True) if str(h.header.get("ORDERING", "RING")).upper().startswith("NEST") else v
     a, beta, T = (col(hd, k) for k in ("I_MEAN", "I_BETA_MEAN", "I_T_MEAN"))
-    x0, x = H_K * 545.0 / T, H_K * nu / T
-    dust = hp.smoothing(hp.ud_grade(a * (nu / 545.0)**(beta + 1.0) * np.expm1(x0) / np.expm1(x)
+    x0, x = H_K * DR1_DUST_NU_REF / T, H_K * nu / T
+    dust = hp.smoothing(hp.ud_grade(a * (nu / DR1_DUST_NU_REF)**(beta + 1.0) * np.expm1(x0) / np.expm1(x)
                                     / _cmb_to_rj(nu), nside), fwhm=np.radians(fwhm_deg))
     cmb = hp.smoothing(hp.ud_grade(col(hc, "I_MEAN"), nside), fwhm=np.radians(fwhm_deg))
     cmb = hp.remove_dipole(cmb, fitval=False, verbose=False)
