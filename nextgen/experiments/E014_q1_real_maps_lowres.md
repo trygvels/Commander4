@@ -30,7 +30,7 @@ flat priors.
   stationary target (F1).
 
 ## Setup
-- Data: see `nextgen/DATA.md` local copies. DR1 maps are dipole- and monopole-corrected copies
+- Data (first pass; the second pass replaces PR4 HFI by NPIPE A 353/857 from UiO plus PR3 100 GHz, see Result): see `nextgen/DATA.md` local copies. DR1 maps are dipole- and monopole-corrected copies
   made by `nextgen/scripts/prep_q1_inputs.py` (Planck 2018 solar dipole subtracted; a high-latitude
   monopole per band subtracted as a stand-in for Commander3's per-band monopole sampling, which
   Commander4 lacks). WMAP DR1 maps are in mK, LFI in uK (the DR1 headers say so; the upstream
@@ -87,6 +87,63 @@ acceptance 0.0 to 0.1, reduced chi2 153.6 (the 1 percent floor is about 1 uK at 
 changes nothing). Two lessons: HFI is required for beta_d, and the proposal widths (0.01 / 0.02)
 are far too wide for a full-sky index constrained by 3072 pixels at about 1 uK noise, where the
 ridge posterior sd is of order 1e-3; the second pass uses 0.002 / 0.004 and `numstep` 20.
+
+
+**Second pass, input preparation (2026-10-25 evening).** The Planck Legacy Archive drops PR3
+transfers above about 60 MB for 143 and 217 GHz (100 GHz verified), so the HFI set is the NPIPE
+A-split 353 and 857 GHz maps hosted at UiO as BeyondPlanck inputs (`npipe6v20A_*`, 3.2 GB) plus
+PR3 100 GHz. Four things had to be fixed before the fit made sense (`prep_pr4_maps.py --release
+npipe_uio`), each found from a chain that sat at a bound or at reduced chi-square above 1e4:
+
+1. *Units.* The UiO files say K_CMB in the header but hold uK_CMB (file name, pixel rms 30 uK at
+   353 GHz, nside 512). Taken as uK_CMB.
+2. *Dipole.* NPIPE frequency maps keep the solar dipole: a fit at |b| > 30 deg to the 353 GHz map
+   returns 3311 uK toward (l, b) = (262.6, 47.5). The Planck 2018 dipole is subtracted.
+3. *857 GHz unit convention.* BeyondPlanck converted the 857 GHz MJy/sr map to K_CMB with the
+   band-integrated HFI factor (2.27 MJy/sr per K_CMB); Commander4 converts a K_CMB band back to
+   brightness with the monochromatic dB/dT at 857 GHz (1.44 MJy/sr per K_CMB), which makes the band
+   1.58x too faint and drives beta_d to its lower bound (1.0007, acceptance 0). Verified by
+   regressing the 353 and 857 maps on the Cosmoglobe DR1 dust template at |b| > 30 deg: the slopes
+   agree to 4 percent only after the 1.58 correction. The 857 GHz map is therefore written in MJy/sr
+   (BP's conversion undone), which Commander4 converts monochromatically as for the PR3 files. At
+   353 GHz the same effect is 2.5 percent and is left as a colour-correction error of the delta
+   bandpass (noted; Commander3 integrates the bandpass).
+4. *Zero levels.* Commander4 has no monopole sampling. 353 and 857 GHz: offset of a least-squares fit
+   of (map minus DR1 CMB, dipole removed) against the DR1 dust template at |b| > 30 deg after
+   2 deg smoothing, the HI-correlation idea with the DR1 dust model as tracer (447.9 uK_CMB at
+   353 GHz; -0.56e6 uK_CMB, i.e. +1.28 MJy/sr, at 857 GHz). 100 GHz: mean over |b| > 30 deg
+   (25.7 uK), as for the DR1 WMAP and LFI maps.
+
+Anomaly noted, not resolved: under the stated units (uK_RJ, nu_ref 545 GHz in the FITS header,
+857 GHz in `param_CG_v09.txt`) the DR1 dust amplitude is 7 to 10x below the NPIPE maps
+(regression slopes 10.2 at 353 GHz, 6.7 at 857 GHz, correlation 0.99). Only the template shape is
+used here, so the zero levels do not depend on it. To be understood before DR1 components are used
+quantitatively anywhere.
+
+Model-error floor: `add_signal_fraction_to_rms: 0.05` on the three HFI bands (Commander3 adds
+regularization noise to HFI for the same reason). Dust T stays fixed at 20 K.
+
+**Ridge smoke test, 30 iterations, 17 ranks (2.5 min):** beta_d 1.367 +- 0.002, beta_s -3.25 +-
+0.06 (burn 5), acceptance 0.24 with 20 steps per iteration and proposals 0.004 / 0.002; no bound.
+Total reduced chi-square 15000, all of it Galactic plane: rebuilding the sky model from the chain's
+component alms and comparing with the degraded, smoothed inputs gives at |b| > 30 deg (uK_RJ)
+
+| band | data sd | residual sd | rms (with floor) | red. chi2, |b|>30 | red. chi2, full sky |
+|---|---|---|---|---|---|
+| Haslam 0.408 | 5.96e6 | 4.2e5 | 1.3e5 | 6.4 | 278 |
+| WMAP K 22.8 | 96.6 | 8.4 | 5.6 | 4.5 | 481 |
+| Planck 30 | 66.8 | 4.2 | 3.3 | 3.8 | 418 |
+| Planck 70 | 43.7 | 2.5 | 3.1 | 1.1 | 169 |
+| WMAP Ka to W, Planck 44 | 39 to 57 | 2 to 5 | 4 to 15 | 0.1 to 0.6 | 4 to 32 |
+| Planck 100 | 38.9 | 0.94 | 5.1 | 0.1 | 24 |
+| Planck 353 | 39.6 | 1.8 | 13.4 | 0.0 | 24 |
+| Planck 857 | 66.5 | 3.1 | 23 | 0.0 | 121 |
+
+(This reconstruction uses a plain-average degrade and Gaussian smoothing, not Commander4's
+noise-weighted smoothing, so the plane numbers differ from Commander4's own per-band chi-square;
+the high-latitude picture is what matters for the masked index step.) The index chi-square uses
+the dx12 common mask at nside 64, so the plane does not enter the comparison between modes. Pass 2
+launched 18:31 with these inputs: ridge, resolve_chisq, conditional, marginal, 2000 iterations.
 
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
