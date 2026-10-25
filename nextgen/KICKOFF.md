@@ -3,7 +3,7 @@
 ## On the Mac mini (once)
 
 ```bash
-git clone -b nextgen https://github.com/trygvels/commander4.git
+git clone -b nextgen https://github.com/trygvels/Commander4.git
 cd commander4
 git remote add upstream https://github.com/Cosmoglobe/Commander4.git
 bash nextgen/scripts/setup_macos.sh      # add WITH_JULIA=1 for the Julia prototypes

@@ -14,7 +14,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 - Two per-pixel model issues: alm storage of amplitudes (F7) and smoothed noise treated as white
   (F8).
 
-**Pushed to `trygvels/commander4`**
+**Pushed to `trygvels/Commander4`**
 - `fix/mcmc-marginal-acceptance` (PR-ready, not opened upstream).
 - `feat/spatially-varying-beta-foundation` (region kernel with gradients, NUTS).
 - `nextgen` (this scaffolding, prototypes, research reports).
