@@ -310,3 +310,18 @@ whose abstract (A) or full text (F) was read. Anything not shown by a fetched pa
   now public") is wrong for C-BASS.
 - `research/03_instrument_and_external_data.md` line 69: the C-BASS entry should note the map is
   private (Taylor et al. in prep.).
+
+## Unit conventions for HFI 545 and 857 GHz (verified 2026-10-25, E014)
+
+PR4 (NPIPE) delivers 545 and 857 GHz in K_CMB, converted from MJy/sr with the band-integrated HFI
+factors (58.04 and 2.27 MJy/sr per K_CMB, Planck 2013 IX). The BeyondPlanck input files at UiO
+(`npipe6v20A_857_map_uK.fits`, header says K_CMB, values in uK_CMB) are the PR4 A-split maps in the
+same convention (slope 0.99 against the PR4 full map). Commander4 converts a K_CMB band back to
+brightness with the monochromatic dB/dT at the band centre (1.44 MJy/sr per K_CMB at 857 GHz), so
+feeding these maps as K_CMB makes 857 GHz 1.58x too faint (and 545 GHz about 1.1x). Convert them
+back to MJy/sr first (`nextgen/scripts/prep_pr4_maps.py` does this for `--release pr4` and
+`npipe_uio`); PR3 545/857 are already in MJy/sr. The same monochromatic conversion costs 2.5 percent
+at 353 GHz (colour correction of the delta bandpass), left uncorrected in E014.
+
+PR4 frequency maps keep the solar dipole (PR3 maps do not): subtract 3362.08 uK toward
+(l, b) = (264.021, 48.253) before a maps-only run.

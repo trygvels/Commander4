@@ -57,7 +57,7 @@ def band(name, sig_path, sig_cols, rms_path, rms_cols, fwhm, freq, pol, units, n
 
 def hfi_band(hfi, name, f, bw, nu, p, pol, nside, rms_floor):
     hdir = {"pr4": PR4, "pr3": PR3, "npipe": NPIPE}[hfi]
-    units = "MJy/sr" if (hfi in ("pr3", "npipe") and f in ("545", "857")) else "uK_CMB"
+    units = "MJy/sr" if f in ("545", "857") else "uK_CMB"   # 545/857 always written in MJy/sr
     return band(name, f"{hdir}/{hfi}_{f}_IQU_n0512.fits", '["I_STOKES", "Q_STOKES", "U_STOKES"]',
                 f"{hdir}/{hfi}_{f}_IQU_rms_n0512.fits", '["I_RMS", "Q_RMS", "U_RMS"]', bw, nu,
                 "I" if (p == "I" or pol == "I") else pol, units, nside, rms_floor)

@@ -91,7 +91,11 @@ def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr
     unit_in = str(hdu.columns["I_STOKES"].unit or "K_CMB").strip()
     # PR3 545/857 are in MJy/sr; keep that unit (Commander4 converts with pysm3 units), otherwise
     # convert K_CMB to uK_CMB.
-    if unit_in.upper().startswith("K_CMB") or unit_in.upper() == "KCMB":
+    if (unit_in.upper().startswith("K_CMB") or unit_in.upper() == "KCMB") and freq in HFI_MJY_PER_KCMB:
+        # PR4 545/857 GHz are delivered in K_CMB via the band-integrated factors (Planck 2013 IX);
+        # undo that and write MJy/sr, which Commander4 converts monochromatically (E014, item 3).
+        scale, unit_out = HFI_MJY_PER_KCMB[freq], "MJy/sr"
+    elif unit_in.upper().startswith("K_CMB") or unit_in.upper() == "KCMB":
         scale, unit_out = 1e6, "uK_CMB"
     elif "MJY" in unit_in.upper():
         scale, unit_out = 1.0, "MJy/sr"
