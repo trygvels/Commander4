@@ -67,7 +67,19 @@ done
 
 Smoke tests (3 iterations, ridge, no HFI): with the raw DR1 maps the reduced chi2 was 1.2e6 (the
 solar dipole of 3.35 mK was still in the maps and the WMAP units were wrong); after dipole and
-monopole removal 447; with spinning dust enabled see below.
+monopole removal 447; with spinning dust enabled 155 (Planck 30 GHz 293, WMAP Ka 758, Haslam 5).
+
+**First pass without HFI (stopped after 875 iterations, 2026-10-25): not usable.** The ridge chain
+ran beta_d to its hard bound (1.5116 at iteration 1, 1.009 at 10, 1.0000 from 50 on) and beta_s to
+-2.806, then accepted nothing (acceptance 0.0 for 800 iterations; reduced chi2 153.8). Cause: with
+no band above 94 GHz the dust index is unconstrained and the per-pixel white-noise likelihood at
+nside 64 (noise ~1 uK per pixel against model residuals of tens of uK) turns small model errors
+into chi2 differences of thousands, which overwhelm the N(1.56, 0.1) prior and pin the index to a
+bound. The comparison between likelihood modes is meaningless in that state, so the other three
+modes were not run. Fix for the second pass: HFI bands (PR3 from the Planck Legacy Archive, PR4 at
+NERSC transfers at 30 kB/s), a Galactic chi-square mask for the index likelihood (the dx12 common
+mask at nside 64, 0.9 threshold, and a |b| > 20 deg fallback are in `~/data/q1_inputs/`), and a
+model-error floor on the rms (`add_signal_fraction_to_rms`) if the chains still sit on bounds.
 
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
