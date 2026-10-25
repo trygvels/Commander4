@@ -91,6 +91,9 @@ sign error, and the 2024 MH module has F1** (E009). The alm / pixel-region sampl
 ridge x A^(1/2) rather than the flat-prior marginal; BeyondPlanck final used it for AME nu_p. In a
 toy the sign is irrelevant at high S/N and flips a 2 to 27 sd volume bias at low S/N. The 2024
 `sample_specind_mh` family redraws amplitudes by CG and accepts on chi^2, like Commander4.
+The BeyondPlanck polarized-index (alm / pixel-region) and bandpass samplers are valid conditional
+steps in the BP10 configuration (E010); their main approximations are prior-drawn frozen regions
+and a diagonal spurious-map chi^2 for relative bandpass shifts.
 
 ## 5. Commander4 versus Commander3 coverage
 

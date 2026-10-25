@@ -16,6 +16,7 @@ were run on 2026-10-25 in the exploratory cloud session; their details are summa
 | E007 | 2026-10-25 | Why does an unsmoothed maps-only run give reduced chi^2 ~794? | first attempt of E006 | Per-pixel amplitudes are stored as alms with lmax = 3 nside - 1; the round trip alone raises reduced chi^2 from 0.57 to ~794 | F7 |
 | E008 | 2026-10-25 | Are the region kernel and NUTS sampler correct? | `tests/test_nuts.py`, kernel checks in `tests/test_mcmc_likelihood.py` | Region kernel matches NumPy to 1e-16 and finite-difference gradients to ~1e-6; NUTS passes correlated Gaussian, 20-D scales, log-gamma, boundary, and 12-region joint NUTS vs exact | foundation for Q3 |
 | E009 | 2026-10-25 | Does Commander3's nonlinear sampler share F1? Are its per-pixel lnL options exact? | `E009_c3_nonlin_review.md` | BP-era alm/region and local chisq samplers valid (amplitudes fixed). 'marginal' lnL has the log-det sign flipped (used for AME nu_p in BP final). 2024 MH module has the F1 structure | F10 |
+| E010 | 2026-10-25 | Are Commander3's polarized index (alm/pixel-region) and bandpass samplers valid as used in BeyondPlanck? | `E010_c3_polarized_and_bandpass_review.md` | Yes: amplitudes, n_corr and gains held fixed; one symmetric proposal per iteration for bandpass. Approximations: prior-drawn frozen regions, diagonal spurious-map chi^2 for relative shifts | F10 |
 
 ## Notes on E006 settings
 NSIDE 16, common FWHM 480 arcmin, bands 30/44/70/100/143/217/353 GHz, noise RMS x20, dust amplitudes

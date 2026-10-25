@@ -2,6 +2,30 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-25 (later): Commander3 review, handover to the Mac mini
+
+**Learned**
+- Commander3's BeyondPlanck-era polarized-index sampler (alm / pixel regions) and bandpass sampler
+  are valid conditional MCMC steps in the BP10 configuration (E010). Main approximations: prior
+  draws for frozen regions, diagonal spurious-map chi^2 for relative bandpass shifts.
+- Commander3's per-pixel `marginal` likelihood has the log-det sign flipped (+1/2 ln A instead of
+  -1/2 ln A). BeyondPlanck final used it for the AME peak frequency (E009, F10).
+- Commander3's 2024 MH module (`sample_specind_mh` and siblings) has the same acceptance bug as
+  Commander4 when CG groups are updated inside the MH loop (E009).
+
+**Running:** nothing.
+
+**Next**
+1. M1.1 / M1.2 on the Mac (build, tests, reproduce E005 and E006).
+2. Independent `stats-reviewer` pass on E009 and E010 (give it the Commander3 code paths and the
+   stated targets, not our conclusions). Required before anything about Commander3 leaves this repo.
+3. Q14: rerun the BeyondPlanck / DR1 AME nu_p step with the sign corrected and with `ridge`.
+4. Then the plan in the entry below (Q1, M2.1, M2.2).
+
+**Needs Trygve**
+- Whether and when to tell Cosmoglobe about F1 (Commander4 and the 2024 Commander3 MH module) and
+  the `marginal` sign error.
+
 ## 2026-10-25: handover from the exploratory cloud session
 
 **Learned**

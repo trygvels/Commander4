@@ -14,7 +14,14 @@ claude                                   # start Claude Code in the repository r
 ```
 
 Claude Code reads `CLAUDE.md` automatically, and finds the subagents in `.claude/agents/` and the
-commands `/new-experiment`, `/validate`, `/status` in `.claude/commands/`.
+commands `/new-experiment`, `/validate`, `/status` in `.claude/commands/`. These load only when
+Claude Code is started with the repository root as its working directory. If a session is already
+running elsewhere on the Mac (for example one reached through Remote Control), let it do the clone
+and setup, then start a fresh session from the repository root for the research work.
+
+Where Commander3 is needed for comparison (E009, E010, Q14), clone it next to this repository:
+`git clone https://github.com/Cosmoglobe/Commander.git ../Commander` (tags BP10 and DR1v2 hold
+the BeyondPlanck and DR1 code and parameter files).
 
 For long unattended stretches, pre-approve the routine commands yourself with `/permissions` (for
 example `python -m pytest`, `mpirun`, `commander4`, `julia`, and local `git` commands other than
@@ -36,6 +43,8 @@ methods paper (Paper A) and then the synchrotron science paper (Paper B).
 Work plan:
 1. Phase 1 first: M1.1 and M1.2 (build, full test suite, reproduce E005 and E006 on this machine;
    fill in the machine record in nextgen/COMPUTE.md and adjust the compute tiers to it).
+   Also run the stats-reviewer subagent independently on the Commander3 code behind E009 and E010
+   (give it the code paths and stated targets, not our conclusions), then do Q14.
 2. Then run M1.3/M1.4 (Q1 on real low-resolution maps) and M2.1 (hierarchical GMRF index-field
    prototype) in parallel. Before writing M2.1 code, write the exact target (likelihood, priors,
    hyperpriors, parameterization) into its experiment record and have the stats-reviewer subagent
