@@ -1,0 +1,24 @@
+started
+== param=centred init=random warmup=500 15:56:37
+  rep 0 noise 1 w0   :    977 s, ESS min     5 (log sigma    73), div 0, zero-density 0, step 0.0201, depth 7.7, E-BFMI 0.67, z(mu, log sigma, u) = (+2.20, +22.06, -1.55), S/N index [0.4, 16.5]
+coverage: 1 cells in 977 s wall with 1 workers; per cell 977 s (min 977, max 977); per replicate and noise scale (all modes) 977 s CPU; total divergences 0, zero-density evaluations 0
+  w0   : 977 s per cell, ESS min median 5, divergences 0
+next: python -m indexfield.coverage_analyze --dir /Users/trygvels/code/Commander4/nextgen/prototypes/indexfield/checks/out/coverage/probe_centred_random
+== param=centred init=truth warmup=1000 16:12:55
+  rep 0 noise 1 w0   :   1238 s, ESS min     4 (log sigma   206), div 0, zero-density 0, step 0.0191, depth 7.8, E-BFMI 0.72, z(mu, log sigma, u) = (+3.45, +24.65, -1.70), S/N index [0.4, 16.5]
+coverage: 1 cells in 1238 s wall with 1 workers; per cell 1238 s (min 1238, max 1238); per replicate and noise scale (all modes) 1238 s CPU; total divergences 0, zero-density evaluations 0
+  w0   : 1238 s per cell, ESS min median 4, divergences 0
+next: python -m indexfield.coverage_analyze --dir /Users/trygvels/code/Commander4/nextgen/prototypes/indexfield/checks/out/coverage/probe_centred_truth
+== param=noncentred init=truth warmup=1000 16:33:34
+  rep 0 noise 1 w0   :   1596 s, ESS min     4 (log sigma    26), div 0, zero-density 0, step 0.018, depth 7.9, E-BFMI 0.60, z(mu, log sigma, u) = (+3.29, +25.07, -1.88), S/N index [0.4, 16.5]
+coverage: 1 cells in 1597 s wall with 1 workers; per cell 1596 s (min 1596, max 1596); per replicate and noise scale (all modes) 1596 s CPU; total divergences 0, zero-density evaluations 0
+  w0   : 1596 s per cell, ESS min median 4, divergences 0
+next: python -m indexfield.coverage_analyze --dir /Users/trygvels/code/Commander4/nextgen/prototypes/indexfield/checks/out/coverage/probe_noncentred_truth
+== param=noncentred init=random warmup=1000 17:00:12
+  rep 0 noise 1 w0   :   1545 s, ESS min     4 (log sigma    26), div 0, zero-density 0, step 0.0171, depth 7.9, E-BFMI 0.60, z(mu, log sigma, u) = (+2.90, +21.96, -1.94), S/N index [0.4, 16.5]
+coverage: 1 cells in 1545 s wall with 1 workers; per cell 1545 s (min 1545, max 1545); per replicate and noise scale (all modes) 1545 s CPU; total divergences 0, zero-density evaluations 0
+  w0   : 1545 s per cell, ESS min median 4, divergences 0
+next: python -m indexfield.coverage_analyze --dir /Users/trygvels/code/Commander4/nextgen/prototypes/indexfield/checks/out/coverage/probe_noncentred_random
+ALLDONE
+
+[exited with code 0]

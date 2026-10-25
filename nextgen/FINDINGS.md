@@ -156,3 +156,15 @@ runs until these exist and a published Commander3 result is reproduced.
 - Commander4 builds on Linux with pip-installed MPICH; ~860 tests pass on all three branches.
 - The Commander4 lead developer openly uses Claude and Copilot for helper code; AI-assisted
   contributions are normal in this project.
+
+## F12 (preliminary): at low per-pixel S/N the ridge likelihood inflates a hierarchical index field and the flat-prior marginal collapses it
+
+E012 probe and profile scan (one replicate, nside_d 16, 48 index regions, S/N 0.4 to 16): with
+amplitudes profiled (ridge, w0) the per-region likelihood in beta is rough and multimodal at S/N
+below a few, the per-region maxima scatter with rms 2.2 about the truth, the inferred field sigma is
+about 1.2 against a truth of 0.065 (z = +22 to +25) and NUTS mixes at ESS 4 to 5 per 1500 s in every
+parameterization. With the flat amplitude prior (w1) every region collapses to beta about -0.1 with
+conditional sd 0.01 (field version of F3). With a proper Gaussian amplitude prior the conditionals are
+unimodal and prior-dominated at low S/N and correct at S/N 16. Preliminary until the E012 coverage
+study (queued) gives rates over replicates. Bearing on Q2: for spatially varying indices the amplitude
+prior is not a nuisance choice; neither the profile nor the flat-prior marginal is safe at low S/N.

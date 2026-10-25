@@ -314,6 +314,46 @@ basis in both code paths; PC prior semantics fixed (exponential on sigma replace
 default Gaussian amplitude prior narrowed to T^(1/2) = max(0.5 |m|, 20) uK_RJ (CMB 70 uK_RJ);
 zero-density evaluations must be zero in the sampling phase.
 
+
+**Ridge (w0) mixing probe and profile scan (2026-10-25 evening; `checks/out/coverage/probe_*`,
+`checks/check_w0_profile.py`).** One coverage replicate (seed 20261025, rep 0, noise scale 1,
+nside_d 16, nside_beta 2, template amplitudes, hyperparameters drawn from the hyperprior: mu -1.69,
+sigma 0.065, rho 107 deg; per-region index S/N proxy 0.37 to 16.5), w0 target, four NUTS settings:
+
+| parameterization | init | warm-up + samples | wall | min ESS (region beta) | ESS log sigma | step | depth | E-BFMI | z(mu) | z(log sigma) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| centred | random | 500 + 600 | 977 s | 5 | 73 | 0.020 | 7.7 | 0.67 | +2.2 | +22 |
+| centred | truth | 1000 + 600 | 1238 s | 4 | 206 | 0.019 | 7.8 | 0.72 | +3.5 | +25 |
+| non-centred | truth | 1000 + 600 | 1596 s | 4 | 26 | 0.018 | 7.9 | 0.60 | +3.3 | +25 |
+| non-centred | random | 1000 + 600 | 1545 s | 4 | 26 | 0.017 | 7.9 | 0.60 | +2.9 | +22 |
+
+No divergences, no zero-density evaluations. Posterior field sd 1.36 and posterior log sigma mean
++0.2 (sigma about 1.2, truth 0.065) in all four. Geometry and initialization change nothing, so the
+cause is the target. The profile scan (each region's beta over [-7, 1], the other regions at
+truth, hyperprior excluded) shows why:
+
+| region S/N | truth | w0 ML, cond. sd | w1 ML, cond. sd | gauss ML, cond. sd |
+|---|---|---|---|---|
+| 0.37 | -1.57 | -0.09, 0.12 | -0.09, 0.01 | -0.35, 0.59 |
+| 0.37 | -1.57 | +1.00, 0.28 | -0.09, 0.01 | -0.82, 0.57 |
+| 0.54 | -1.74 | -0.10, 1.79 | -0.09, 0.01 | -0.15, 0.66 |
+| 3.5 | -1.61 | -0.77, 1.69 | -0.10, 0.02 | -1.25, 0.50 |
+| 16.5 | -1.78 | -2.07, 0.31 | -0.25, 0.02 | -1.72, 0.21 |
+
+Across the 48 regions the rms of the ML about the truth is 2.17 (w0), 1.58 (w1), 0.90 (gauss);
+median conditional sd 0.84, 0.014, 0.58. Reading: the profile likelihood (w0) per region is rough
+and multimodal at low S/N (the free amplitudes fit noise at whatever beta aligns the template with
+it), so the 48 per-region maxima scatter by about 2 in beta and the hierarchy infers sigma about
+1.2 against a half-N(0, 0.3) hyperprior; NUTS then has to cross the between-mode barriers of each
+low-S/N region, hence ESS 4 to 5 whatever the parameterization. The flat-prior marginal (w1)
+collapses every region to beta about -0.1 with conditional sd 0.01 (the field version of F3, at
+every S/N shown here). The proper Gaussian amplitude prior gives broad, unimodal, prior-dominated
+conditionals at low S/N and the right answer within 0.3 sd at S/N 16. Single replicate; the
+coverage study quantifies it (queued behind the SBC run). Consequence for the coverage design: the
+same NUTS budget for all three modes, ESS recorded per cell, w0 cells reported with their ESS
+rather than run longer (the 20 sd shift in log sigma does not depend on mixing), and a lower noise
+scale (0.3) added so that w0 is also seen where it is adequate.
+
 ## Negative control
 Listed under Reference 1e. The volume-term control for science is w = 1 versus w = 0 at low S/N in
 the coverage study.

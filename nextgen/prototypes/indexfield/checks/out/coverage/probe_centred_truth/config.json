@@ -1,0 +1,26 @@
+{
+ "nside_d": 16,
+ "nside_beta": 2,
+ "family": "graph_laplacian",
+ "rho_prior": "loguniform",
+ "param": "centred",
+ "amp_prior": "default",
+ "theta_fixed": null,
+ "init": "truth",
+ "n_warmup": 1000,
+ "n_samples": 600,
+ "target_accept": 0.8,
+ "max_depth": 10,
+ "seed": 20261025,
+ "amp_mode": "template",
+ "out_dir": "/Users/trygvels/code/Commander4/nextgen/prototypes/indexfield/checks/out/coverage/probe_centred_truth",
+ "overwrite": false,
+ "n_rep": 1,
+ "rep_start": 0,
+ "noise": [
+  1.0
+ ],
+ "modes": [
+  "w0"
+ ]
+}

@@ -2,6 +2,33 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-25 (Mac mini, night): ridge field pathology found; Q1 pass 2 switched to NPIPE
+
+**Learned**
+- Ridge (w0) chains in the index-field coverage harness mix at ESS 4 to 5 per 1500 s in all four
+  parameterization and initialization settings, and infer field sigma about 1.2 against a truth of
+  0.065 (z +22). A profile scan shows the cause is the target: per-region profile likelihoods are
+  rough and multimodal at S/N below a few (ML scatter rms 2.2 about truth). The flat-prior marginal
+  collapses every region to beta about -0.1 (sd 0.01). The proper Gaussian amplitude prior behaves.
+  Recorded as F12 (preliminary, one replicate) in E012.
+- Q1 pass 2 inputs: the Planck archive drops PR3 transfers above about 60 MB for 143 and 217 GHz
+  (100 GHz verified). The second pass uses the NPIPE A-split 353 and 857 GHz maps hosted at UiO
+  (BeyondPlanck inputs) plus PR3 100 GHz, dx12 chi-square mask, proposals 0.002 / 0.004, numstep 20.
+
+**Running:** SBC default (gauss, non-centred), 45 of 300 replicates at about 28 per hour. NPIPE
+353/857 downloads from UiO (about 1 MB/s combined, complete within the hour) with the pass-2 driver
+armed behind them (four modes, 17 ranks). Coverage study (gauss / w0 / w1, noise 0.3 / 1 / 3, 12
+replicates, same NUTS budget per cell) queued behind the SBC run.
+
+**Next**
+1. SBC analysis (sbc_analyze) when the 300 replicates finish; then the centred SBC.
+2. E014 pass 2 analysis (analyze_q1_chains.py) when the four chains finish.
+3. Coverage analysis; promote or drop F12; M2.2 scalar-index coverage table.
+
+**Needs Trygve:** unchanged (Cosmoglobe contact about F1, the sign error, F11, the disabled
+Jeffreys prior; Q13; cluster access; the DR2 parameter file). New: whether the ridge default of the
+fix branch (F3, F4) should be revisited for spatially varying indices once F12 is quantified.
+
 ## 2026-10-25 (Mac mini, evening): index-field prototype passes L1; SBC running
 
 **Learned**

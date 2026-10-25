@@ -1,0 +1,12 @@
+truth mu -1.693 sigma 0.065; beta range -1.80 -1.53
+region 47 S/N_index  0.37 truth  -1.57 | w0: ML  -0.09 sd  0.12 | w1: ML  -0.09 sd  0.01 | gauss: ML  -0.35 sd  0.59
+region 45 S/N_index  0.37 truth  -1.57 | w0: ML   1.00 sd  0.28 | w1: ML  -0.09 sd  0.01 | gauss: ML  -0.82 sd  0.57
+region  6 S/N_index  0.52 truth  -1.63 | w0: ML   0.08 sd  0.30 | w1: ML  -0.07 sd  0.01 | gauss: ML  -0.82 sd  0.62
+region  7 S/N_index  0.54 truth  -1.74 | w0: ML  -0.10 sd  1.79 | w1: ML  -0.09 sd  0.01 | gauss: ML  -0.15 sd  0.66
+region 34 S/N_index  3.52 truth  -1.61 | w0: ML  -0.77 sd  1.69 | w1: ML  -0.10 sd  0.02 | gauss: ML  -1.25 sd  0.50
+region 24 S/N_index 16.53 truth  -1.78 | w0: ML  -2.07 sd  0.31 | w1: ML  -0.25 sd  0.02 | gauss: ML  -1.72 sd  0.21
+w0   : ML scatter about truth, all regions: rms 2.165, low S/N (<1) rms 2.561, median conditional sd 0.837, in low S/N 0.814
+w1   : ML scatter about truth, all regions: rms 1.576, low S/N (<1) rms 1.581, median conditional sd 0.014, in low S/N 0.014
+gauss: ML scatter about truth, all regions: rms 0.899, low S/N (<1) rms 1.146, median conditional sd 0.583, in low S/N 0.701
+
+[exited with code 0]
