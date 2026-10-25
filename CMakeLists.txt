@@ -11,9 +11,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Commander4 is only supported on Linux HPC systems.
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  message(FATAL_ERROR "Commander4 build only supports Linux (got: ${CMAKE_SYSTEM_NAME}).")
+# Commander4 targets Linux HPC systems. macOS (Apple Silicon) is allowed for development work on
+# workstations; it is not an officially supported production platform.
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  message(WARNING "Building Commander4 on macOS: development use only, not officially supported.")
+elseif(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message(FATAL_ERROR "Commander4 build only supports Linux and macOS (got: ${CMAKE_SYSTEM_NAME}).")
 endif()
 
 if(DEFINED ENV{CMDR4_OPTIMIZATION})
@@ -57,8 +60,22 @@ target_include_directories(${PKGNAME} PRIVATE
 
 target_compile_definitions(${PKGNAME} PRIVATE PKGNAME=${PKGNAME} PKGVERSION=${PKGVERSION} DUCC0_USE_NANOBIND)
 
-### Architecture flags (Linux-only) ###
-set(CMDR4_ARCH_FLAGS "-march=native" CACHE STRING "Compiler flags for specifying target architecture.")
+### Architecture flags ###
+# -march=native on GCC and Clang. Some Apple Clang versions reject it on arm64, so fall back to
+# -mcpu=native there, and to no flag if neither is accepted.
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-march=native" CMDR4_HAS_MARCH_NATIVE)
+if(CMDR4_HAS_MARCH_NATIVE)
+  set(_cmdr4_default_arch "-march=native")
+else()
+  check_cxx_compiler_flag("-mcpu=native" CMDR4_HAS_MCPU_NATIVE)
+  if(CMDR4_HAS_MCPU_NATIVE)
+    set(_cmdr4_default_arch "-mcpu=native")
+  else()
+    set(_cmdr4_default_arch "")
+  endif()
+endif()
+set(CMDR4_ARCH_FLAGS "${_cmdr4_default_arch}" CACHE STRING "Compiler flags for specifying target architecture.")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(CMDR4_WARN_FLAGS
@@ -70,7 +87,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
   set(CMDR4_OPT_FLAGS -O3 -ffast-math)
   set(CMDR4_NOOPT_FLAGS -O0)
   set(CMDR4_DEBUG_FLAGS -g)
-  set(CMDR4_STRIP_FLAGS -s)
+  if(APPLE)
+    set(CMDR4_STRIP_FLAGS "")  # ld64 ignores -s with a warning; dev builds need no strip.
+  else()
+    set(CMDR4_STRIP_FLAGS -s)
+  endif()
 endif()
 
 target_compile_options(${PKGNAME} PRIVATE ${CMDR4_WARN_FLAGS})

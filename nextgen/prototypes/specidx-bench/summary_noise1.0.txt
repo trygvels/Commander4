@@ -1,0 +1,40 @@
+
+=== Efficiency (medians over pixels; minESS = worst of the 5 parameters) ===
+sampler              minESS/s  ESS/1k it   solves/ESS  grad+eval/ESS  time/pix [ms]
+MH chisq k=10          4683.5       90.8        13.77          302.9           69.7
+MH chisq k=100          541.0       86.5        14.46         2919.6          606.9
+MH marginal k=10      17186.4      320.1         7.81           85.9           74.8
+Gibbs + NUTS           7884.0       95.1        13.15           78.7           47.9
+Joint NUTS             9498.8      466.7         0.00           54.7          103.0
+Collapsed NUTS        43542.8      671.8         1.49           11.2           28.6
+
+=== minESS per second by pixel brightness ===
+sampler                 faint        mid     bright
+MH chisq k=10         37794.3     4683.5     1087.8
+MH chisq k=100         4893.8      541.0      129.5
+MH marginal k=10      44860.7    17186.4     4665.9
+Gibbs + NUTS          53863.2     7884.0     1549.9
+Joint NUTS            19089.7     9680.2     2961.0
+Collapsed NUTS        50005.8    50312.5    30866.3
+
+=== Which parameter limits each sampler (count of pixels) ===
+MH chisq k=10      a_cmb=1  A_d=4  beta_s=6  beta_d=289
+MH chisq k=100     a_cmb=4  A_s=2  A_d=4  beta_s=2  beta_d=288
+MH marginal k=10   a_cmb=5  A_s=8  A_d=3  beta_s=11  beta_d=273
+Gibbs + NUTS       a_cmb=18  A_s=1  A_d=2  beta_s=31  beta_d=248
+Joint NUTS         a_cmb=176  A_s=40  A_d=12  beta_s=2  beta_d=70
+Collapsed NUTS     a_cmb=56  A_s=38  A_d=13  beta_s=102  beta_d=91
+
+=== Agreement with Collapsed NUTS (median |mean diff| / ref sd) ===
+sampler                beta_s     beta_d        A_s        A_d
+MH chisq k=10           0.027      0.037      0.029      0.030
+MH chisq k=100          0.027      0.037      0.033      0.028
+MH marginal k=10        0.023      0.027      0.024      0.024
+Gibbs + NUTS            0.029      0.037      0.034      0.028
+Joint NUTS              0.031      0.029      0.030      0.028
+Collapsed NUTS          0.000      0.000      0.000      0.000
+
+=== Coverage of the true values (nominal 68% / 95%) ===
+Collapsed NUTS     beta_s   64% /   94%   beta_d   66% /   95%
+Joint NUTS         beta_s   65% /   95%   beta_d   65% /   95%
+MH chisq k=10      beta_s   66% /   94%   beta_d   64% /   95%
