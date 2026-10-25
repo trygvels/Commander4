@@ -2,6 +2,36 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-25 (Mac mini): M1.1 and M1.2 done
+
+**Learned**
+- The nextgen branch builds and passes on the Mac mini (Apple M4, 10 cores, 24 GB, macOS 27.0,
+  Apple clang 17, CPython 3.13.11, pip MPICH 5.0.2): 859 passed, 4 skipped in 25 s (E011).
+- The macOS setup script needed no Homebrew for the build: every dependency has an arm64 wheel,
+  cmake and ninja install as pip wheels, gfortran is unnecessary. The script was fixed accordingly
+  and the machine record and fixes are in COMPUTE.md. tmux and Julia (juliaup) were installed with
+  Trygve's approval; the specidx-bench prototype project is instantiated.
+- E005 reproduces to the quoted precision (resolve_chisq 3.22x / 4.35x too wide at 150 / 600
+  pixels, mean shifts +0.50 / +0.83 sd; marginal, ridge and conditional within 0.1 sd and 10% in
+  width). E006 reproduces: ridge within 0.03 sd of the exact ridge target, width ratios 0.94 / 0.97;
+  exact flat-prior target on the bounds; marginal stuck in the beta_s = -3.5 mode. F1, F2, F3 and F8
+  therefore hold on an independent toolchain. One E006 mode takes about 80 s on 7 ranks here (15
+  min in the cloud); resolve_chisq takes 5 min.
+- Disk is the binding constraint on this machine (~100 GB free): low-resolution maps only; T2 CG
+  runs and anything at nside 1024 go to a cluster (COMPUTE.md tiers adjusted).
+
+**Running:** nothing.
+
+**Next**
+1. Independent `stats-reviewer` pass on E009 and E010 (Commander3 code paths and stated targets,
+   not our conclusions). Clone Commander3 next to this repository first (KICKOFF.md).
+2. Q14: rerun the BeyondPlanck / DR1 AME nu_p step with the sign corrected and with `ridge`.
+3. M1.3 / M1.4 (Q1 on real low-resolution maps, within the disk budget) and M2.1 in parallel.
+
+**Needs Trygve**
+- Unchanged: Q13 (upstream pull request), whether to tell Cosmoglobe about F1 and the `marginal`
+  sign error, cluster access for T3/T4.
+
 ## 2026-10-25 (later): Commander3 review, handover to the Mac mini
 
 **Learned**
