@@ -262,18 +262,23 @@ L1 checks:
 - **1d (long run, 96000 draws).** Case A (graph Laplacian, independent bases): centred ESS 45500,
   |z| <= 3.4, sd ratios 0.992 to 1.011, PASS; non-centred ESS(log sigma) 5300, |z| <= 2.7, PASS.
   Case C (constant-projected harmonic basis, shared basis): PASS both parameterizations (ESS 33800
-  and 2100). Case B (literal harmonic basis, independent constructions): mu offset 0.0176 =
-  764 z in both NUTS chains, everything else agreeing. Diagnosis: the literal pixel-evaluated
-  harmonics leak a constant component (|1^T Y|/sqrt(Nb) = 0.17 at nside 1) and the two literal
-  constructions leak it differently, so the two "same" targets differ in the mu direction. This is
-  the leakage the SPEC decision removes; the decisive test is case C with the reference's own
-  constant-projected basis (reference updated 2026-10-25, rerun pending).
+  and 2100). Case B (literal harmonic basis): the first long run showed a mu offset of 0.0176 (z 764) in
+  both NUTS chains. Explanation after the rerun: the reference's harmonic basis had been switched
+  to the constant-projected construction while that run was in flight, so a literal prototype
+  basis was compared with a projected reference; with both sides literal (rerun _long2) case B
+  passes (mu z -0.58 and +1.67). The offset is the constant-mode leakage itself (0.17 of a unit
+  constant at nside 1), which is why the SPEC removes it. **Decisive rerun _long2 (96000 draws per
+  chain):** case A PASS (centred ESS 45500, non-centred 1490, |z| <= 3.5); case C with INDEPENDENT
+  constant-projected bases PASS (centred ESS 44800, non-centred 3170, |z| <= 1.8, sd ratios 0.989
+  to 1.009). L1 is complete: 1a to 1e all pass.
 - **1b (rerun, 12 cases).** gauss and w0 PASS at noise x1 and x5, N_beta 1 and 2 (|z| <= 3.2,
   sd ratios 0.959 to 1.046, ESS 790 to 2600). w1 PASS in 5 of 6 cases; at N_beta 2, noise x5 the
   flat-prior marginal is MULTIMODAL: the grid mode sits at beta = (-0.256, -0.233) with sd 0.003,
   one NUTS chain started near -3 stayed in a secondary basin at -2.3 (z -1240, sd ratio 14) while
-  the other pixel agreed. The check is being changed to four dispersed starts with a mode-mass
-  comparison; the result stands as a property of the w1 target.
+  the other pixel agreed. Rewritten check (four dispersed starts, basin search, local grid
+  refinement, mode-mass comparison): all 12 cases PASS with pooled ESS 3450 to 10700, worst |z|
+  2.13, sd ratios 0.974 to 1.032; secondary basins of w0/w1 exist (log mass -1660 to -6860 below
+  the main one) but carry no measurable mass. The w1 collapse to beta ~ -0.23 at noise x5 stands.
 - **1e (negative controls) PASS, i.e. every wrong target failed as expected, positive control
   passed.** (i) centred without -K log sigma - 1/2 log det K: log sigma shifted +3.06 sd (z 182),
   sd ratio 1.21. (ii) logit Jacobian dropped: the wrong target is IMPROPER in u (the likelihood
