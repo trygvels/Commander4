@@ -20,13 +20,18 @@ posterior draws is uniform on {0, ..., L} (L + 1 values). Test quantities (E012 
     for a reference point beta_ref the count of draws with |beta_i - beta_ref| < |beta* - beta_ref|
     among the L draws, which is again uniform on {0, ..., L}. Two reference schemes: "prior"
     (beta_ref an independent draw of the field prior) and "local" (beta_ref = posterior mean +
-    5 posterior sd x Uniform(-1, 1) per pixel; depends on the data only through the chain).
+    5 posterior sd x Uniform(-1, 1) per pixel, with the mean and sd taken from a SEPARATE short
+    pilot chain of pilot_samples draws, never from the chain whose draws are ranked, so the
+    reference point is independent of the ranked draws given the data).
 
-Thinning: the chain of n_samples states is reduced to L = 99 evenly spaced draws only when the
-Geyer ESS of every test quantity exceeds ess_min (400) and the sampling phase had no zero-density
-evaluations and no divergences; otherwise the replicate is rerun once automatically with 2x
-samples (target_accept 0.9 if it diverged), and if it still misses it is recorded with status
-"rerun" (ranks included but excluded from the tests by sbc_analyze.py), never dropped.
+Thinning and the escalation loop: the chain of n_samples states is reduced to L = 99 evenly
+spaced draws. An attempt is clean when the Geyer ESS of every test quantity exceeds ess_min
+(400), the sampling phase had no zero-density evaluations and no divergences. When an attempt is
+not clean, the replicate is rerun (up to max_tries attempts, default 5) with the sample budget
+doubled and target_accept raised along 0.8 -> 0.9 -> 0.95 -> 0.99 (then held) at every step,
+whatever the reason for the previous failure. The ranks of the LAST attempt are always recorded;
+a replicate whose last attempt is still not clean gets status "unclean" (sbc_analyze.py includes
+it in the primary analysis and reports it alongside). Replicates are never dropped.
 
 Amplitude prior widths (SPEC "Decisions", simulate.amplitude_prior_sd): "default" T^(1/2) =
 max(0.5 |m|, 20) uK_RJ for synchrotron and dust and 70 uK_RJ for the CMB; "wide" T^(1/2) =
@@ -34,7 +39,7 @@ max(0.5 |m|, 20) uK_RJ for synchrotron and dust and 70 uK_RJ for the CMB; "wide"
 
 Output: one JSON line per replicate appended to <out>/<config>.jsonl (truth, ranks, ESS, TARP
 counts, divergences, n_loglike_errors_sampling, seconds, per attempt); --resume skips indices
-already present (--redo-rerun redoes those whose latest record is "rerun", with a 2x budget).
+already present (--redo-unclean redoes those whose latest record is not "ok", with a 2x budget).
 Run from nextgen/prototypes:  python -m indexfield.sbc --config default --n 300 --workers 8
 """
 from __future__ import annotations
@@ -68,7 +73,9 @@ TARP_SCHEMES = ("prior", "local")
 DEFAULTS = dict(config="default", param="noncentred", family="graph", mode="gauss",
                 rho_prior="loguniform", nside_beta=4, nside_d=16, noise_scale=1.0,
                 amp_prior="default", warmup=500, samples=2000, ess_min=400.0, L=99,
-                n_tarp_ref=4, max_depth=10, target_accept=0.8, retry=True)
+                n_tarp_ref=4, max_depth=10, target_accept=0.8, max_tries=5, pilot_samples=500)
+ACCEPT_LADDER = (0.8, 0.9, 0.95, 0.99)     # target_accept of attempts 1, 2, 3, 4 and later
+UNCLEAN_STATUSES = ("unclean", "rerun")    # "rerun" is the name used by records before this fix
 
 
 # ------------------------------------------------------------------------------------ utilities
@@ -212,8 +219,18 @@ def run_one_chain(post, rng, n_warmup, n_samples, target_accept, max_depth):
                             max_depth=max_depth)
 
 
+def escalate(cfg: dict, attempt: int):
+    """(n_samples, target_accept) of attempt number `attempt` (1-based): the budget doubles and
+    target_accept climbs ACCEPT_LADDER at every retry, independent of why the previous attempt
+    was not clean; the user's --target-accept is a floor."""
+    n_samples = cfg["samples"] * 2 ** (attempt - 1)
+    ladder = ACCEPT_LADDER[min(attempt, len(ACCEPT_LADDER)) - 1]
+    return n_samples, max(cfg["target_accept"], ladder)
+
+
 def run_replicate(cfg: dict, index: int) -> dict:
-    """Draw replicate `index`, sample it (with the automatic retry) and return its record."""
+    """Draw replicate `index`, sample it (escalating retries, see the module docstring) and
+    return its record. The ranks are those of the last attempt, clean or not."""
     t_start = time.time()
     rng = np.random.default_rng([cfg["seed"], index])
     fld = make_field(cfg)
@@ -226,19 +243,28 @@ def run_replicate(cfg: dict, index: int) -> dict:
     rng_ref = np.random.default_rng([cfg["seed"], index, 7])
     refs = dict(prior=np.array([prior_field_draw(fld, hyper, rng_ref)
                                 for _ in range(cfg["n_tarp_ref"])]))
+    # Local TARP references from a separate pilot chain (posterior scale of beta only); the
+    # pilot's draws are not ranked and the ranked chains below start from a fresh random state.
+    t0 = time.time()
+    pilot = run_one_chain(post, rng, cfg["warmup"], cfg["pilot_samples"], cfg["target_accept"],
+                          cfg["max_depth"])
+    beta_pilot = np.array([post.beta(x) for x in pilot.samples])
+    refs["local"] = (beta_pilot.mean(axis=0)
+                     + 5.0 * beta_pilot.std(axis=0) * rng_ref.uniform(-1, 1, (cfg["n_tarp_ref"],
+                                                                           post.n_beta)))
+    pilot_info = dict(n_warmup=cfg["warmup"], n_samples=cfg["pilot_samples"],
+                      n_divergent=pilot.n_divergent,
+                      n_loglike_errors_sampling=pilot.n_loglike_errors_sampling,
+                      step_size=pilot.step_size, seconds=time.time() - t0)
+    q_true = truth_quantities(fld, truth, data, cfg["mode"], pix, refs)
     L = cfg["L"]
     attempts = []
-    n_warmup, n_samples, target_accept = cfg["warmup"], cfg["samples"], cfg["target_accept"]
-    for attempt in range(1, 3):
+    n_warmup = cfg["warmup"]
+    for attempt in range(1, cfg["max_tries"] + 1):
+        n_samples, target_accept = escalate(cfg, attempt)
         t0 = time.time()
         res = run_one_chain(post, rng, n_warmup, n_samples, target_accept, cfg["max_depth"])
-        # Local TARP references need the posterior scale of beta: a first pass over beta only.
-        beta_all = np.array([post.beta(x) for x in res.samples])
-        refs["local"] = (beta_all.mean(axis=0)
-                         + 5.0 * beta_all.std(axis=0) * rng_ref.uniform(-1, 1, (cfg["n_tarp_ref"],
-                                                                             post.n_beta)))
         Q, beta_all = chain_quantities(post, fld, res.samples, res.logp, pix, refs)
-        q_true = truth_quantities(fld, truth, data, cfg["mode"], pix, refs)
         ess = sampler.ess_geyer(Q)
         i_min = int(np.nanargmin(ess))
         reasons = []
@@ -259,13 +285,10 @@ def run_replicate(cfg: dict, index: int) -> dict:
                              tree_depth_mean=res.tree_depth_mean,
                              tree_depth_max=res.tree_depth_max, reasons=reasons,
                              seconds=time.time() - t0))
-        if not reasons or not cfg["retry"] or attempt == 2:
+        if not reasons:
             break
-        n_samples *= 2
-        if "divergent" in reasons:
-            target_accept = max(target_accept, 0.9)
-    status = "ok" if not reasons else "rerun"
-    # Thin to L evenly spaced draws and rank the truth among them.
+    status = "ok" if not reasons else "unclean"
+    # Thin the LAST attempt to L evenly spaced draws and rank the truth among them.
     idx = np.round(np.linspace(0, Q.shape[0] - 1, L)).astype(int)
     Q_thin, beta_thin = Q[idx], beta_all[idx]
     ranks = (Q_thin < q_true[None, :]).sum(axis=0).astype(int)
@@ -279,6 +302,7 @@ def run_replicate(cfg: dict, index: int) -> dict:
     th = truth["theta"]
     return dict(index=index, seed=cfg["seed"], config_name=config_name(cfg), config=cfg,
                 status=status, reasons=reasons, attempts=attempts, n_attempts=len(attempts),
+                pilot=pilot_info,
                 generator_matches_target=cfg["mode"] == "gauss", K=fld.K, dim=post.dim,
                 pixels=pix, quantities=QUANTITIES, L=L, n_samples_final=int(Q.shape[0]),
                 truth=dict(theta=th, beta=truth["beta"], q=dict(zip(QUANTITIES, q_true))),
@@ -326,8 +350,9 @@ def report_line(rec: dict) -> str:
     if rec["status"] == "error":
         return f"  rep {rec['index']:4d}  ERROR {rec['error'][:80]}"
     a = rec["attempts"][-1]
-    return (f"  rep {rec['index']:4d}  {rec['status']:5s} attempts {rec['n_attempts']} "
-            f"n {a['n_samples']} minESS {rec['min_ess']:6.0f} ({a['min_ess_quantity']}) "
+    return (f"  rep {rec['index']:4d}  {rec['status']:7s} attempts {rec['n_attempts']} "
+            f"n {a['n_samples']} acc {a['target_accept']:.2f} minESS {rec['min_ess']:6.0f} "
+            f"({a['min_ess_quantity']}) "
             f"div {rec['n_divergent']} err {rec['n_loglike_errors_sampling']} "
             f"ebfmi {rec['ebfmi']:.2f} depth {rec['tree_depth_mean']:.1f} "
             f"leapfrog {rec['n_leapfrog']} step {rec['step_size']:.3g} "
@@ -356,10 +381,13 @@ def parse_args(argv=None):
     ap.add_argument("--n-tarp-ref", type=int, default=DEFAULTS["n_tarp_ref"])
     ap.add_argument("--max-depth", type=int, default=DEFAULTS["max_depth"])
     ap.add_argument("--target-accept", type=float, default=DEFAULTS["target_accept"])
-    ap.add_argument("--no-retry", action="store_true", help="disable the automatic 2x retry")
+    ap.add_argument("--max-tries", type=int, default=DEFAULTS["max_tries"],
+                    help="attempts per replicate (budget x2 and target_accept up at each retry)")
+    ap.add_argument("--pilot-samples", type=int, default=DEFAULTS["pilot_samples"],
+                    help="draws of the separate pilot chain that sets the local TARP references")
     ap.add_argument("--resume", action="store_true", help="skip replicates already in the file")
-    ap.add_argument("--redo-rerun", action="store_true",
-                    help="with --resume: redo replicates whose latest status is rerun, 2x budget")
+    ap.add_argument("--redo-unclean", action="store_true",
+                    help="with --resume: redo replicates whose latest status is not ok, 2x budget")
     ap.add_argument("--workers", type=int, default=1, help="parallel replicate processes")
     return ap.parse_args(argv)
 
@@ -370,8 +398,8 @@ def main(argv=None):
                rho_prior=a.rho_prior, nside_beta=a.nside_beta, nside_d=a.nside_d,
                noise_scale=a.noise_scale, amp_prior=a.amp_prior, warmup=a.warmup,
                samples=a.samples, ess_min=a.ess_min, L=a.L, n_tarp_ref=a.n_tarp_ref,
-               max_depth=a.max_depth, target_accept=a.target_accept, retry=not a.no_retry,
-               seed=a.seed)
+               max_depth=a.max_depth, target_accept=a.target_accept,
+               max_tries=max(1, a.max_tries), pilot_samples=a.pilot_samples, seed=a.seed)
     name = config_name(cfg)
     os.makedirs(a.out, exist_ok=True)
     path = os.path.join(a.out, f"{name}.jsonl")
@@ -381,29 +409,30 @@ def main(argv=None):
         rec = done.get(i)
         if rec is None:
             jobs.append((cfg, i))
-        elif a.redo_rerun and rec["status"] != "ok":
+        elif a.redo_unclean and rec["status"] != "ok":
             jobs.append((dict(cfg, samples=2 * cfg["samples"]), i))
     print(f"sbc: config {name}, {a.n} replicates ({len(jobs)} to run, {len(done)} in file), "
           f"param {a.param}, family {a.family}, mode {a.mode}, nside_beta {a.nside_beta}, "
           f"nside_d {a.nside_d}, warmup {a.warmup}, samples {a.samples}, ess_min {a.ess_min:g}, "
-          f"L {a.L}, workers {a.workers}, seed {a.seed} -> {path}")
+          f"L {a.L}, max_tries {cfg['max_tries']}, pilot {a.pilot_samples}, workers "
+          f"{a.workers}, seed {a.seed} -> {path}")
     if cfg["mode"] != "gauss":
         print("  WARNING: generator (gauss amplitudes) does not match the target mode; this run "
               "is not a sampler test (E012 v2)")
     t0 = time.time()
-    n_ok = n_rerun = n_err = 0
+    n_ok = n_unclean = n_err = 0
     secs = []
 
     def record(rec):
-        nonlocal n_ok, n_rerun, n_err
+        nonlocal n_ok, n_unclean, n_err
         with open(path, "a") as f:
             f.write(json.dumps(to_py(rec)) + "\n")
             f.flush()
         print(report_line(rec), flush=True)
         if rec["status"] == "ok":
             n_ok += 1
-        elif rec["status"] == "rerun":
-            n_rerun += 1
+        elif rec["status"] in UNCLEAN_STATUSES:
+            n_unclean += 1
         else:
             n_err += 1
         if np.isfinite(rec["seconds"]):
@@ -421,7 +450,7 @@ def main(argv=None):
     if secs:
         print(f"sbc done: {len(jobs)} replicates in {wall:.0f} s wall ({a.workers} workers); per "
               f"replicate mean {np.mean(secs):.0f} s, median {np.median(secs):.0f} s, max "
-              f"{np.max(secs):.0f} s; ok {n_ok}, rerun {n_rerun}, error {n_err}; "
+              f"{np.max(secs):.0f} s; ok {n_ok}, unclean {n_unclean}, error {n_err}; "
               f"CPU-seconds total {np.sum(secs):.0f}")
     return 0 if n_err == 0 else 1
 

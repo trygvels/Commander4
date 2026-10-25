@@ -103,12 +103,14 @@ class _FieldPosterior:
 
     def loglike(self, beta: np.ndarray):
         """(log L, dlog L/dbeta). A Cholesky failure in the collapsed likelihood (amplitude normal
-        matrix not positive definite, which happens only for absurd beta reached during warm-up
-        step-size search) is reported as zero density, log L = -inf, and counted in
-        n_loglike_errors so that it is never silent."""
+        matrix A, or A + T^-1, not positive definite, which happens only for absurd beta reached
+        during warm-up step-size search) is reported as zero density, log L = -inf, and counted in
+        n_loglike_errors so that it is never silent (SPEC "Zero-density evaluations"). Both
+        exception types are caught: model._collapsed_core converts the LinAlgError of
+        np.linalg.cholesky into a ValueError, and a user-supplied loglike may raise either."""
         try:
             logL, g = self._loglike(beta)
-        except np.linalg.LinAlgError:
+        except (ValueError, np.linalg.LinAlgError):
             self.n_loglike_errors += 1
             return -np.inf, np.zeros(self.n_beta)
         if not np.isfinite(logL):
@@ -377,6 +379,18 @@ def _selftest():
     p_sig = np.exp(-post.pc_lam2 * post.hyper.pc_sigma0)
     report("PC prior P(sigma > sigma0)", abs(p_sig - PC_ALPHA), 1e-12,
            abs(p_sig - PC_ALPHA) < 1e-12)
+    # Zero-density path: a likelihood that fails as model._collapsed_core does on a singular A
+    # (ValueError) or as np.linalg.cholesky does (LinAlgError) gives log pi = -inf, a zero
+    # gradient and one counted error per call, in both parameterizations.
+    for exc in (ValueError, np.linalg.LinAlgError):
+        def failing(beta, _exc=exc):
+            raise _exc("A is not positive definite")
+        for Post in (NonCentredPosterior, CentredPosterior):
+            post = Post(field, HyperPrior(), loglike=failing)
+            lp, grad = post.logp_and_grad(post.random_init(rng))
+            good = lp == -np.inf and np.all(grad == 0.0) and post.n_loglike_errors == 1
+            report(f"{exc.__name__} in loglike -> -inf, counted, {Post.__name__}",
+                   float(post.n_loglike_errors), 1, good)
 
     print("posterior.py self-test:", "ALL PASS" if ok else "FAILURES")
     return ok

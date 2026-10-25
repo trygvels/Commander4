@@ -16,7 +16,12 @@ remove one term in logp_and_grad; posterior.py is not modified):
         the prior is flat in u instead of flat in log rho. In the u coordinate this target is
         IMPROPER: the likelihood depends on u only through rho(u), which saturates at rho_min and
         rho_max, so log pi_wrong is constant in both tails of u (the Jacobian's -|u| decay is what
-        makes the correct target proper). NUTS therefore drifts to |u| of hundreds with saturated
+        makes the correct target proper). NOTE (E012 result, first run 2026-10-25): this was
+        FOUND, not only predicted. E012 v2 described (ii) as a "1/rho tilt over the prior range";
+        in the u coordinate the wrong target has flat tails and is improper, and NUTS drifted to
+        |u| ~ 1e8 with rho pinned at a bound. The improper target has no moments, so the z-scores
+        below measure the drift within the budget, not a shift of a proper distribution. NUTS
+        therefore drifts to |u| of hundreds with saturated
         tree depth; this control runs on a capped budget (500 + 2000, max tree depth 6) and
         reports the drift (max |u|, fraction of draws with |u| > 8, where rho is within 0.03
         percent of its range from a bound) besides the z-scores. Run in both parameterizations;

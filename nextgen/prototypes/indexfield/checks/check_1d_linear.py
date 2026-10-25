@@ -17,11 +17,20 @@ field.MaternField on the prototype bases, sampler.run_nuts.
 Cases:
   A. graph Laplacian, nside_beta 1 (K = 11): prototype and reference bases built independently
      (both are eigenbases of the same G, so the targets are identical);
-  B. harmonics, nside_beta 1, lmax 2 (K = 8), literal SPEC construction
-     (HarmonicBasis(remove_constant=False)) against the reference's own harmonic basis;
-  C. harmonics, nside_beta 1, lmax 2, the prototype default remove_constant=True; the reference
-     has no independent construction of this basis, so the closed form is evaluated with the
-     prototype's V and lam (labelled "shared basis": tests posterior/field/sampler, not the basis).
+  B. harmonics, nside_beta 1, lmax 2 (K = 8), the LITERAL first-SPEC construction on both sides
+     (field.HarmonicBasis(remove_constant=False) against reference.field_spec(...,
+     remove_constant=False)): the pixel-evaluated l >= 1 harmonics leak a constant component
+     (|1^T Y| / sqrt(Nb) = 0.17 at nside 1) and two independent QR constructions leak it
+     differently, so the two "same" targets differ in the mu direction (first long run: mu offset
+     0.0176, z 764). Kept as a DIAGNOSTIC of that leakage; its status is reported but is NOT a
+     pass criterion of the check;
+  C. harmonics, nside_beta 1, lmax 2, constant projected out on both sides (the SPEC decision
+     "Constant mode in the harmonic basis"): field.HarmonicBasis(remove_constant=True) against
+     the reference's own, independently written, constant-projected basis
+     reference.field_spec(..., remove_constant=True). Both span the orthogonal complement of 1
+     within span(1, Y_1, ..., Y_lmax), so the targets are identical; this is the real test of
+     the harmonic family (basis, c(rho), Jacobians, hyperpriors).
+The overall status is decided by cases A and C.
 
 Sub-checks per case: (i) pointwise, zero MC error: prototype centred log density minus
 [log p(theta | d) + log N(y; E[y | theta, d], P^-1)] from the closed form is constant over random
@@ -234,19 +243,29 @@ def main():
                           field.GraphLaplacianBasis(NSIDE_BETA),
                           reference.field_spec(NSIDE_BETA, "graph_laplacian"), rng, n_warmup,
                           n_samples))
-    cases.append(run_case("B harmonic lmax 2, literal SPEC (remove_constant=False, independent)",
+    cases.append(run_case("B harmonic lmax 2, literal (remove_constant=False both sides, "
+                          "independent; DIAGNOSTIC, not a pass criterion)",
                           field.HarmonicBasis(NSIDE_BETA, lmax=2, remove_constant=False),
-                          reference.field_spec(NSIDE_BETA, "harmonic", lmax=2), rng, n_warmup,
-                          n_samples))
+                          reference.field_spec(NSIDE_BETA, "harmonic", lmax=2,
+                                               remove_constant=False), rng, n_warmup, n_samples))
+    cases[-1]["diagnostic_only"] = True
     hb = field.HarmonicBasis(NSIDE_BETA, lmax=2, remove_constant=True)
-    fspec_shared = reference.FieldSpec(hb.V.copy(), hb.lam.copy(), hb.h, hb.K, hb.n_beta,
-                                       NSIDE_BETA, "harmonic", hb.ells)
-    cases.append(run_case("C harmonic lmax 2, remove_constant=True (SHARED basis)", hb,
-                          fspec_shared, rng, n_warmup, n_samples))
+    fspec_c = reference.field_spec(NSIDE_BETA, "harmonic", lmax=2, remove_constant=True)
+    # Independence of the two constructions: same span (projector difference), 1^T V = 0 on both.
+    proj_diff = float(np.max(np.abs(hb.V @ hb.V.T - fspec_c.V @ fspec_c.V.T)))
+    print(f"case C bases: max |V V^T - V_ref V_ref^T| = {proj_diff:.2e}, max |1^T V| prototype "
+          f"{np.max(np.abs(hb.V.sum(axis=0))):.1e} reference "
+          f"{np.max(np.abs(fspec_c.V.sum(axis=0))):.1e}, max |V - V_ref| "
+          f"{np.max(np.abs(hb.V - fspec_c.V)):.2e} (columns need not coincide)")
+    cases.append(run_case("C harmonic lmax 2, remove_constant=True on both sides (INDEPENDENT "
+                          "constant-projected bases)", hb, fspec_c, rng, n_warmup, n_samples))
+    cases[-1]["basis_projector_diff"] = proj_diff
     statuses = [c["status"] for c in cases]
-    overall = "FAIL" if "FAIL" in statuses else ("PASS" if all(s == "PASS" for s in statuses)
+    decisive = [c["status"] for c in cases if not c.get("diagnostic_only")]
+    overall = "FAIL" if "FAIL" in decisive else ("PASS" if all(s == "PASS" for s in decisive)
                                                  else "PROVISIONAL")
-    worst_z = max(ch["max_abs_z"] for c in cases for ch in c["chains"])
+    worst_z = max(ch["max_abs_z"] for c in cases if not c.get("diagnostic_only")
+                  for ch in c["chains"])
     summary = dict(check="1d_linear", setting=dict(nside_d=NSIDE_D, nside_beta=NSIDE_BETA, B=B,
                                                    f_scale=50.0, noise_sd=30.0, truth=TRUTH,
                                                    n_warmup=n_warmup, n_samples=n_samples,
@@ -257,13 +276,15 @@ def main():
                                   worst_pointwise_spread=max(c["pointwise"]["spread_rel"]
                                                              for c in cases)),
                    threshold=f"|z| < {Z_MAX} on means and sds with ESS(log sigma) > {ESS_MIN:.0f}; "
-                             f"pointwise spread < {POINTWISE_TOL:g}",
+                             f"pointwise spread < {POINTWISE_TOL:g}; cases A and C decide, B is "
+                             f"a diagnostic of the constant-mode leakage",
                    cases=cases, status=overall, passed=overall == "PASS",
                    seconds=time.time() - t_all)
     with open(out, "w") as f:
         json.dump(to_py(summary), f, indent=1)
-    print(f"check 1d linear: cases {statuses}, worst |z| {worst_z:.2f} (threshold {Z_MAX})  "
-          f"{overall}  [{time.time() - t_all:.0f} s, {out}]")
+    print(f"check 1d linear: cases {statuses} (B diagnostic only; A and C decide), worst |z| "
+          f"{worst_z:.2f} over A and C (threshold {Z_MAX})  {overall}  [{time.time() - t_all:.0f} s"
+          f", {out}]")
     return {"PASS": 0, "FAIL": 1, "PROVISIONAL": 2}[overall]
 
 

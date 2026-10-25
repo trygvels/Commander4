@@ -1,8 +1,15 @@
 """Analysis of the SBC ranks written by sbc.py (E012 v2 L2 pass criteria).
 
-Input: <out>/<config>.jsonl, the latest record per replicate index; replicates with status
-"ok" enter the tests, "rerun" and "error" records are counted and listed, never dropped silently
-(--include-rerun adds the rerun ranks to the tests, flagged in the summary).
+Input: <out>/<config>.jsonl, the latest record per replicate index. EVERY replicate with ranks
+("ok" and "unclean", the latter being those whose last escalated attempt still missed the ESS,
+divergence or zero-density precondition) enters the primary analysis: dropping them would
+condition the rank distribution on the sampler's behaviour and bias the test (Talts et al. 2018;
+review of 2026-10-25). The number of unclean replicates, their reasons and the statistics of
+their TRUE parameters (median and range of sigma, rho, mu, the median minimum ESS) are reported
+alongside, because a concentration of unclean replicates at, say, large true sigma is itself a
+finding about the sampler. --clean-only restricts the analysis to the "ok" subset (a diagnostic,
+flagged in the summary, not the primary result). "error" records (an exception) carry no ranks
+and are listed.
 
 For each test quantity the n ranks r_i are in {0, ..., L} (L + 1 = 100 values for L = 99) and are
 uniform under a correct sampler. Tests:
@@ -48,9 +55,11 @@ from scipy import stats
 
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from indexfield.sbc import QUANTITIES, load_records, to_py          # noqa: E402
+from indexfield.sbc import QUANTITIES, UNCLEAN_STATUSES, load_records, to_py   # noqa: E402
 
 N_BINS = 20
+SUBSET_ALL = "every replicate with ranks, primary"
+SUBSET_CLEAN = "CLEAN-ONLY subset, diagnostic"
 
 
 # --------------------------------------------------------------------------------------- tests
@@ -180,7 +189,26 @@ def plot_all(prefix, names, rank_sets, results, band, tarp, L, n):
 
 
 # ---------------------------------------------------------------------------------------- main
-def analyze(path: str, alpha: float, n_sims: int, include_rerun: bool, seed: int,
+def unclean_summary(recs: list) -> dict:
+    """Count, reasons and truth statistics (median, min, max of sigma, rho, mu; median of the
+    minimum ESS and of the attempts) of the replicates whose last attempt was not clean."""
+    out = dict(n=len(recs), indices=sorted(r["index"] for r in recs), reasons={})
+    if not recs:
+        return out
+    for r in recs:
+        for reason in r["reasons"]:
+            out["reasons"][reason] = out["reasons"].get(reason, 0) + 1
+    for key in ("sigma", "rho", "mu"):
+        v = np.array([r["truth"]["theta"][key] for r in recs], dtype=float)
+        out[f"true_{key}"] = dict(median=float(np.median(v)), min=float(v.min()),
+                                  max=float(v.max()))
+    out["min_ess_median"] = float(np.median([r["min_ess"] for r in recs]))
+    out["n_attempts_median"] = float(np.median([r["n_attempts"] for r in recs]))
+    out["n_divergent_total"] = int(sum(r["n_divergent"] for r in recs))
+    return out
+
+
+def analyze(path: str, alpha: float, n_sims: int, clean_only: bool, seed: int,
             make_plots: bool = True) -> dict:
     recs = load_records(path)
     if not recs:
@@ -188,11 +216,15 @@ def analyze(path: str, alpha: float, n_sims: int, include_rerun: bool, seed: int
     by_status = {}
     for r in recs.values():
         by_status.setdefault(r["status"], []).append(r["index"])
-    used = [r for r in recs.values() if r["status"] == "ok"
-            or (include_rerun and r["status"] == "rerun")]
+    with_ranks = [r for r in recs.values() if r["status"] != "error"]
+    unclean = [r for r in with_ranks if r["status"] in UNCLEAN_STATUSES]
+    used = [r for r in with_ranks if r["status"] == "ok"] if clean_only else with_ranks
     used.sort(key=lambda r: r["index"])
     if not used:
         raise SystemExit("no usable replicates")
+    # Truth statistics of ALL replicates with ranks, for comparison with the unclean subset.
+    truth_all = {key: float(np.median([r["truth"]["theta"][key] for r in with_ranks]))
+                 for key in ("sigma", "rho", "mu")}
     L = used[0]["L"]
     names = list(used[0]["quantities"])
     n = len(used)
@@ -253,15 +285,10 @@ def analyze(path: str, alpha: float, n_sims: int, include_rerun: bool, seed: int
         quad_minus_ztz_maxabs=float(np.max([r["checks"]["quad_minus_ztz_maxabs"] for r in used])),
         config=used[0]["config"], n_samples_final_median=float(np.median(
             [r["n_samples_final"] for r in used])))
-    rerun_reasons = {}
-    for r in recs.values():
-        if r["status"] == "rerun":
-            for reason in r["reasons"]:
-                rerun_reasons[reason] = rerun_reasons.get(reason, 0) + 1
-    out = dict(path=path, n_used=n, L=L, alpha=alpha, include_rerun=include_rerun,
+    out = dict(path=path, n_used=n, L=L, alpha=alpha, clean_only=clean_only,
                status_counts={k: len(v) for k, v in by_status.items()},
-               rerun_indices=sorted(by_status.get("rerun", [])),
-               error_indices=sorted(by_status.get("error", [])), rerun_reasons=rerun_reasons,
+               unclean=unclean_summary(unclean), truth_median_all=truth_all,
+               error_indices=sorted(by_status.get("error", [])),
                quantities=names, distinct=distinct, duplicates=duplicates, results=results,
                bonferroni=dict(level=bonferroni_level, min_p=float(pvals.min()),
                                min_p_quantity=distinct[int(pvals.argmin())], ok=bonferroni_ok),
@@ -286,6 +313,23 @@ def analyze(path: str, alpha: float, n_sims: int, include_rerun: bool, seed: int
     return out
 
 
+def unclean_line(out: dict) -> str:
+    """One summary line on the unclean replicates and the truths they were drawn at."""
+    u = out["unclean"]
+    if u["n"] == 0:
+        return "  unclean replicates: 0"
+    t = out["truth_median_all"]
+    return (f"  unclean replicates: {u['n']} (reasons {u['reasons']}; indices {u['indices']}); "
+            f"median min ESS {u['min_ess_median']:.0f}, median attempts "
+            f"{u['n_attempts_median']:.0f}, divergences {u['n_divergent_total']}; their truths: "
+            f"sigma median "
+            f"{u['true_sigma']['median']:.3f} [{u['true_sigma']['min']:.3f}, "
+            f"{u['true_sigma']['max']:.3f}] (all replicates {t['sigma']:.3f}), rho median "
+            f"{u['true_rho']['median']:.3f} [{u['true_rho']['min']:.3f}, "
+            f"{u['true_rho']['max']:.3f}] (all {t['rho']:.3f}), mu median "
+            f"{u['true_mu']['median']:.3f} (all {t['mu']:.3f})")
+
+
 def write_summary(out: dict, path: str) -> str:
     cfg = out["diagnostics"]["config"]
     d = out["diagnostics"]
@@ -293,12 +337,13 @@ def write_summary(out: dict, path: str) -> str:
              f"  configuration: param {cfg['param']}, family {cfg['family']}, mode {cfg['mode']}, "
              f"rho_prior {cfg['rho_prior']}, nside_beta {cfg['nside_beta']}, nside_d "
              f"{cfg['nside_d']}, noise x{cfg['noise_scale']:g}, amp_prior {cfg['amp_prior']}, "
-             f"warmup {cfg['warmup']}, samples {cfg['samples']} (x2 on retry), ess_min "
+             f"warmup {cfg['warmup']}, samples {cfg['samples']} (x2 per retry, up to "
+             f"{cfg.get('max_tries', '?')} tries), ess_min "
              f"{cfg['ess_min']:g}, L {out['L']}",
-             f"  replicates: {out['status_counts']} ; used in tests: {out['n_used']}"
-             f"{' (rerun included)' if out['include_rerun'] else ''}; rerun reasons "
-             f"{out['rerun_reasons']}; rerun indices {out['rerun_indices']}; error indices "
-             f"{out['error_indices']}",
+             f"  replicates: {out['status_counts']} ; used in tests: {out['n_used']} "
+             f"({SUBSET_CLEAN if out['clean_only'] else SUBSET_ALL}"
+             f"); error indices {out['error_indices']}",
+             unclean_line(out),
              f"  sampler: seconds per replicate mean {d['seconds_mean']:.0f} / median "
              f"{d['seconds_median']:.0f} / max {d['seconds_max']:.0f}; attempts mean "
              f"{d['n_attempts_mean']:.2f}; final n median {d['n_samples_final_median']:.0f}; "
@@ -349,12 +394,13 @@ def main(argv=None):
     ap.add_argument("--config", default="default", help="config name, <out>/<config>.jsonl")
     ap.add_argument("--alpha", type=float, default=0.01)
     ap.add_argument("--band-sims", type=int, default=4000)
-    ap.add_argument("--include-rerun", action="store_true")
+    ap.add_argument("--clean-only", action="store_true",
+                    help="analyze the status ok subset only (diagnostic, not the primary result)")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--no-plots", action="store_true")
     a = ap.parse_args(argv)
     path = a.path or os.path.join(a.out, f"{a.config}.jsonl")
-    out = analyze(path, a.alpha, a.band_sims, a.include_rerun, a.seed, not a.no_plots)
+    out = analyze(path, a.alpha, a.band_sims, a.clean_only, a.seed, not a.no_plots)
     return 0 if out["verdict"] == "PASS" else 1
 
 
