@@ -104,7 +104,29 @@ def main():
                 print(f"{mode:14s} {p:6s} {r['mean']:10.4f} {r['sd']:8.4f} {r['ess']:7.0f} {r['rhat']:6.3f} "
                       f"{shift:+8.2f} +- {se_shift:4.2f} {r['sd'] / ref[p]['sd']:9.2f} {res['accept']:7.3f} "
                       f"{res['red_chi2']:9.1f}")
-    out = os.path.join(a.root, "summary_q1.json")
+    # Exact grid targets (q1_grid_check.py) if present in the ridge directory: the chains that are
+    # exact for a target should sit on it (ridge on "ridge", conditional and marginal on
+    # "marginal"); resolve_chisq has no target.
+    gpath = os.path.join(a.root, "ridge" + a.suffix, "grid_check.json")
+    if os.path.exists(gpath):
+        grid = json.load(open(gpath))["final"]
+        print("\nexact grid targets (q1_grid_check.py):")
+        for key in ("ridge", "marginal"):
+            g = grid[key]
+            print(f"  {key:9s} sync {g['mean_sync']:10.4f} +- {g['sd_sync']:.4f}   dust "
+                  f"{g['mean_dust']:10.4f} +- {g['sd_dust']:.4f}")
+        print("chain minus grid, in grid sd (chain se in brackets):")
+        for mode, res in summary.items():
+            key = "ridge" if mode in ("ridge", "resolve_chisq") else "marginal"
+            g = grid[key]
+            parts = []
+            for p, gm, gs in (("sync", g["mean_sync"], g["sd_sync"]), ("dust", g["mean_dust"], g["sd_dust"])):
+                if p in res:
+                    parts.append(f"{p} {(res[p]['mean'] - gm) / gs:+.2f} [{res[p]['se'] / gs:.2f}] "
+                                 f"sd ratio {res[p]['sd'] / gs:.2f}")
+            print(f"  {mode:14s} vs {key:9s} " + "   ".join(parts))
+        summary["grid"] = grid
+    out = os.path.join(a.root, "summary_q1" + a.suffix + ".json")
     json.dump(summary, open(out, "w"), indent=1)
     print("written", out)
 
