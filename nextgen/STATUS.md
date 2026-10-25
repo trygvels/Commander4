@@ -2,6 +2,35 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-25 (Mac mini, evening): index-field prototype passes L1; SBC running
+
+**Learned**
+- M2.1 prototype (`nextgen/prototypes/indexfield/`, E012 v2): collapsed likelihood with gauss / w0 /
+  w1 modes, GMRF and harmonic Matern fields (constant mode removed, logit rho), NUTS; an
+  independently written reference path (plain-loop likelihood, own bases, centred Gibbs, closed
+  forms). L1 complete: 1a gradients (1.7e-8), C++ kernel agreement (7e-12); 1b exact SED grids,
+  12 cases, pooled ESS 3450 to 10700, |z| <= 2.1; 1c hyperparameters vs Gibbs reference, |z| <= 1.7
+  at ESS > 800; 1d closed form vs NUTS with independent bases, 96000 draws, |z| <= 3.5; 1e all
+  three wrong targets fail as expected (dropped logit Jacobian makes the target improper).
+- Centred parameterization mixes 10x better than non-centred at strong data (E-BFMI 1.0 vs 0.8).
+- Flat-prior marginal (w1) collapses the index field to beta ~ -0.2 even at S/N 30 (field version
+  of F3); ridge and the proper Gaussian prior behave. To be quantified in the coverage study.
+- Independent review of the implementation: correct with caveats; caveats fixed (no replicate ever
+  dropped from the SBC, singular-A handling, dispersed starts).
+
+**Running:** SBC, default configuration (gauss, GMRF nside_beta 4, non-centred), 300 replicates,
+4 workers (`sbc_out/`). HFI PR3 maps from the Planck Legacy Archive (1 of 6 verified; the archive
+does not resume, so each file must complete in one transfer). Q1 pass 2 armed behind it.
+
+**Next**
+1. SBC analysis; then the centred-parameterization SBC and the coverage study (w0 chains need a
+   budget or geometry decision: ESS 3 to 4 at 300 + 400 transitions).
+2. E014 pass 2 (HFI, Galactic chi-square mask, narrow proposals).
+3. FINDINGS F12 (w1 collapse) once quantified; M2.2 scalar-index coverage table with the same code.
+
+**Needs Trygve:** unchanged (Cosmoglobe contact about F1, the sign error, F11, the disabled
+Jeffreys prior; Q13; cluster access; the DR2 parameter file).
+
 ## 2026-10-25 (Mac mini, afternoon): Commander3 reviews done, Q14 answered for BeyondPlanck, real maps load
 
 **Learned**
