@@ -2,6 +2,37 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-25 (Mac mini, afternoon): Commander3 reviews done, Q14 answered for BeyondPlanck, real maps load
+
+**Learned**
+- Ten independent stats-reviewer passes (two per item, code paths and stated targets only) confirm
+  E009/E010: BP-era index samplers valid conditional steps, `marginal` sign flip (quadrature by
+  both), 2024 MH module has F1 (toy inflation 1.3x to 4.6x). Corrections: BP10's Jeffreys prior was
+  hard-disabled in the code; BP10 sampled AME nu_p as one full-sky value with monopoles profiled.
+- New defect F11 (E015, verified line by line): BP's absolute bandpass chi^2 is never MPI-reduced,
+  so the 30 GHz absolute shift was accepted on rank 0's scans only. Present at HEAD and in the
+  WMAP/DIRBE/SPIDER/LiteBIRD/QUIET TOD modules.
+- Q14 (E013): the sign error moved BP's nu_p by 0.008 GHz (0.8 of a 0.01 GHz conditional sd);
+  negligible because the masked AME pixels have S/N above 30. DR1 never used the `marginal` path.
+- E012 target revised (v2) after review: constant mode dropped, radians, logit rho, SBC with a
+  proper Gaussian amplitude prior (D008, D009); F4 wording corrected (conditional Jeffreys on a).
+- M1.3: DR1 WMAP+LFI, Haslam and (partially) PR4 maps are local (~15 GB); Commander4 maps-only runs
+  on them at nside 64 after dipole and monopole removal (reduced chi^2 ~150 with spinning dust).
+
+**Running:** E014 (Q1) first pass without HFI: ridge, resolve_chisq, conditional, marginal, 2000
+Gibbs iterations each, ~50 min per mode, 14 ranks. PR4 (NERSC) and PR3 (IRSA) HFI downloads, slow
+(~0.3 MB/s).
+
+**Next**
+1. M2.1: implement the index-field prototype per E012 v2 (L1 checks 1a to 1e, then the SBC).
+2. E014 analysis when the four chains finish; then the HFI variant and IQU.
+3. M2.2 coverage study with the same prototype at N_beta = 1.
+
+**Needs Trygve**
+- Whether to tell Cosmoglobe about F1, the `marginal` sign error, and now F11 (bandpass reduce)
+  and the disabled Jeffreys prior. All are code-reading findings with written derivations.
+- Unchanged: Q13 upstream pull request, cluster access for T3/T4.
+
 ## 2026-10-25 (Mac mini): M1.1 and M1.2 done
 
 **Learned**
