@@ -164,3 +164,25 @@ def linear_gaussian_closed_form(F, m, N_inv, field_spec, hyper, mu_grid, logsig_
 ## Test quantities and reporting
 Every check prints: the setting, ESS, the statistic, the threshold, PASS or FAIL. Nothing is
 tuned to pass; a FAIL is logged in E012 as a result.
+
+## Decisions after the first build (2026-10-25)
+- **Constant mode in the harmonic basis:** the pixel-evaluated l >= 1 harmonics are not orthogonal
+  to 1 on the HEALPix grid (|1^T Y|/sqrt(Nb) = 0.17 at nside 1, 0.006 at nside 8), so dropping only
+  the l = 0 column leaves part of the constant mode in V. Decision: project the constant out of
+  every harmonic column before the QR, in BOTH `field.HarmonicBasis` (default `remove_constant=True`)
+  and `reference.field_spec(family="harmonic")`. The reference must add this (its own code).
+- **PC prior semantics** (`rho_prior = "pc"`): the joint PC prior of Fuglstad et al. 2019 with
+  d = 2: rho density lambda_1 rho^-2 exp(-lambda_1/rho), lambda_1 = -log(0.05) rho_0, truncated to
+  [rho_min, rho_max] through the u map (normalization dropped), and sigma ~ Exponential(lambda_2),
+  lambda_2 = -log(0.05)/sigma_0, REPLACING the half-normal in that mode. All three modules
+  (simulate, posterior, reference) implement this reading; it is now the specification.
+- **Gaussian amplitude prior for the SBC generator and target** (`amp_mode = "gauss"`): the first
+  build used T^(1/2) = 10 max(|m|, 10) uK_RJ, which allows negative and 10x amplitudes and makes
+  |log pi| ~ 1e8. Decision for the default SBC configuration: T^(1/2) = max(0.5 |m|, 20) uK_RJ for
+  synchrotron and dust, 70 uK_RJ for the CMB (m = 0). The wide setting stays available as an option.
+- **Zero-density evaluations:** `Posterior.loglike` returns -inf on a Cholesky failure and counts
+  it; `run_nuts` reports `n_loglike_errors_sampling`. Every check and the SBC require it to be 0
+  in the sampling phase (warm-up step-size search may hit such states).
+- **Dropped constants:** exactly those listed in the `collapsed_loglike` docstring; the reference
+  grid adds them back and agrees with brute-force quadrature absolutely (2e-11), so pointwise
+  comparisons between the paths are made with the same convention (spread 1e-15 relative).

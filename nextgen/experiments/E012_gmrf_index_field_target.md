@@ -206,11 +206,68 @@ negative control: at strong data it is the better geometry. Second sampler for Q
 
 ## Command
 ```bash
-# filled in when the prototype exists
+cd nextgen/prototypes/indexfield
+../../../.venv/bin/python -m indexfield.model      # self-tests (run from nextgen/prototypes)
+../../../.venv/bin/python checks/check_1a_gradient.py
+../../../.venv/bin/python checks/check_1b_grid.py
+../../../.venv/bin/python checks/check_1c_hyper.py
+../../../.venv/bin/python checks/check_1d_linear.py [--scale 12 --tag _long]
 ```
 
 ## Result
-(pending)
+**Build (2026-10-25, commit 49f913a).** Modules written by three agents in parallel against
+`SPEC.md`; `reference.py` by an agent that was not allowed to read the other modules (independent
+code path, own plain-loop likelihood, own basis construction, own 2-D grid draw). Integration and
+checks by a fourth agent; results in `nextgen/prototypes/indexfield/checks/out/`. Numbers below are
+from that report; the three runs it had to cut short are being rerun.
+
+Module self-tests: gradient of the collapsed likelihood vs finite differences, relative error below
+1e-7 for gauss, w0, w1; mode gauss equals brute-force 2-D quadrature over a_p to 1e-13; one
+evaluation at N = 3072, B = 12 takes 3 to 4 ms. Bases orthonormal to 1e-14; Matern derivatives
+including the c(rho) term within 1e-6; centred minus non-centred log density equals
+-K log sigma - 1/2 log det K to 4e-13. NUTS on a 20-D correlated Gaussian: 3 seeds x 30000 samples,
+sd ratios 0.992 to 1.024. Reference: grid_1d gauss equals brute-force 3-D quadrature absolutely
+(2e-11, dropped constants verified); 2-D grid conditional draw chi-square p = 0.38; centred Gibbs
+reference reproduces the linear-Gaussian closed form (ESS 6600 to 20000, all |z| < 1).
+
+L1 checks:
+- **1a PASS.** Per-index-pixel gradients, all modes, |g_fd - g| max 1.7e-8 against the tolerance
+  1e-6 |g| + 1e-4; posterior gradients (both parameterizations, both families, three modes) worst
+  err/tol 1.9e-4. The C++ kernel `marginal_loglike_regions` agrees with the NumPy w0/w1
+  likelihood to 7e-12 and the gradients to 5e-14, nskipped 0.
+- **1b PASS (gauss, w0), w1 pending rerun.** Prototype vs reference per-pixel log density pointwise:
+  relative spread 3e-15 to 8e-15 (|log L| ~ 1e6). Grid vs NUTS at N_beta 1 and 2 with a fixed
+  Gaussian prior: mean |z| <= 1.76, sd ratios 0.97 to 1.022, ESS 970 to 2900, no divergences. For
+  w1 at noise x5 the flat-prior marginal target sits at beta = -0.25 +- 0.002, 3750 log units above
+  beta = -3 (F3 in the toy: the -1/2 sum log det A term rewards near-degenerate cmb/sync columns);
+  the first run's grid did not cover it (a check defect, not a sampler one); NUTS agrees with the
+  wide-grid maximum; the fine comparison is in the rerun.
+- **1c PROVISIONAL.** Pointwise: centred posterior equals the reference joint density up to a
+  constant (spread 6e-15), Jacobian to 6e-11. NUTS vs centred Gibbs reference at nside_beta 1,
+  18 quantities: all |z| <= 2.2, sd ratios 0.95 to 1.09. Precondition ESS(log sigma) > 800 met by
+  the Gibbs reference (15500) but not by NUTS (centred 659, non-centred 64 within the budget);
+  rerun at 2.5x budget in progress. **Result in itself:** at this data strength the non-centred
+  parameterization mixes 10x worse than the centred one (ESS/n 2 percent, E-BFMI 0.78, no
+  divergences), as the review predicted: centred is the better geometry at strong data.
+- **1d PASS (centred), non-centred provisional.** Closed form vs NUTS for the fixed-amplitude linear
+  model, three cases (graph Laplacian with independent bases; literal harmonic basis with
+  independent bases; constant-projected harmonic basis on the shared basis): pointwise spread 2e-15,
+  centred chains |z| <= 2.9 on means and sds with ESS 2300 to 4100 (long run: 45500, |z| <= 3.4,
+  sd ratios 0.992 to 1.011); non-centred chains agree (|z| <= 2.1) at ESS 40 to 70, long run
+  pending.
+- **1e** not yet run.
+
+Properties recorded for the GMRF family: after the 1/(3 h^2) rescaling the graph-Laplacian
+eigenvalues over l(l+1) are 0.94 for the l = 1 multiplet at nside 8 (within-multiplet spread 0.77
+to 1.10 at l = 2, 3; 0.74 to 0.93 at l = 8) and 0.64 at nside 1, 0.90 at nside 2: "rho in radians"
+is approximate at the few-percent level for nside_beta >= 4 and at the 30 percent level at
+nside_beta 1. E012 v2's "2.97 at l = 1" (0.99 after rescaling) is softened to "about 1 at low l for
+nside >= 4".
+
+Decisions taken after the build (SPEC.md "Decisions"): constant projected out of the harmonic
+basis in both code paths; PC prior semantics fixed (exponential on sigma replaces the half-normal);
+default Gaussian amplitude prior narrowed to T^(1/2) = max(0.5 |m|, 20) uK_RJ (CMB 70 uK_RJ);
+zero-density evaluations must be zero in the sampling phase.
 
 ## Negative control
 Listed under Reference 1e. The volume-term control for science is w = 1 versus w = 0 at low S/N in
