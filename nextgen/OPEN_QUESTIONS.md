@@ -101,3 +101,12 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
 - Cosmoglobe is building OpenHFI (end-to-end HFI) and plans AKARI, FIRAS, SO, LiteBIRD work. Which
   of our results should be upstreamed, which published independently, and when to talk to Jonas
   Lunde / Hans Kristian Eriksen? This is Trygve's call.
+
+## Q14. How much did the Commander3 `marginal` sign error and 2024 MH module change published results?
+- **Why:** E009/F10. BeyondPlanck final (and likely DR1) sampled AME nu_p with the sign-flipped
+  `marginal` lnL; DR2-era runs may have used `sample_specind_mh` with CG updates (F1 structure).
+- **How:** rerun the AME nu_p step on BeyondPlanck / DR1 inputs (or on DR1 chain samples as fixed
+  inputs) with the sign corrected and with `ridge`; compare nu_p and the AME amplitude map. For DR2,
+  find the production parameter files and check `MCMC_SAMPLING_GROUP_UPDATE_CG_GROUPS`.
+- **Decides:** whether to report this to Cosmoglobe (Trygve decides), and how to frame it in Paper A.
+

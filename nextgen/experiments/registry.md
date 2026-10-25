@@ -15,6 +15,7 @@ were run on 2026-10-25 in the exploratory cloud session; their details are summa
 | E006 | 2026-10-25 | End to end: full Commander4 (7 MPI ranks, maps only, nside 16, 7 bands) vs exact grid target | `aux/validate_mcmc_likelihood.py` | Ridge within 0.03 sd of exact, width ratios 0.94 / 0.97. Flat-prior marginal: exact target on the hard bounds, chain stuck in a local mode (barrier ~22). Ridge target 1.9 sd / 3.7 sd from input because smoothed noise is treated as white | F2, F3, F8 |
 | E007 | 2026-10-25 | Why does an unsmoothed maps-only run give reduced chi^2 ~794? | first attempt of E006 | Per-pixel amplitudes are stored as alms with lmax = 3 nside - 1; the round trip alone raises reduced chi^2 from 0.57 to ~794 | F7 |
 | E008 | 2026-10-25 | Are the region kernel and NUTS sampler correct? | `tests/test_nuts.py`, kernel checks in `tests/test_mcmc_likelihood.py` | Region kernel matches NumPy to 1e-16 and finite-difference gradients to ~1e-6; NUTS passes correlated Gaussian, 20-D scales, log-gamma, boundary, and 12-region joint NUTS vs exact | foundation for Q3 |
+| E009 | 2026-10-25 | Does Commander3's nonlinear sampler share F1? Are its per-pixel lnL options exact? | `E009_c3_nonlin_review.md` | BP-era alm/region and local chisq samplers valid (amplitudes fixed). 'marginal' lnL has the log-det sign flipped (used for AME nu_p in BP final). 2024 MH module has the F1 structure | F10 |
 
 ## Notes on E006 settings
 NSIDE 16, common FWHM 480 arcmin, bands 30/44/70/100/143/217/353 GHz, noise RMS x20, dust amplitudes
