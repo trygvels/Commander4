@@ -85,14 +85,9 @@ def convert_npipe_uio(indir: str, nside: int, outdir: str, freq: str) -> None:
     rp = os.path.join(indir, f"npipe6v20A_{freq}_rms_uK_{'mcscaled' if freq == '353' else 'hrscaled'}.fits")
     hm, hr = fits.open(mp)[1], fits.open(rp)[1]
     unit_in = str(hm.columns[0].unit or "uK_CMB").strip()
-    if unit_in.upper() in ("UK_CMB", "UK", "UKCMB", "MICROK_CMB", "MUK_CMB"):
-        scale, unit_out = 1.0, "uK_CMB"
-    elif unit_in.upper().startswith("K_CMB") or unit_in.upper() == "KCMB":
-        scale, unit_out = 1e6, "uK_CMB"
-    elif "MJY" in unit_in.upper():
-        scale, unit_out = 1.0, "MJy/sr"
-    else:
-        raise ValueError(f"unknown unit {unit_in!r} in {mp}")
+    # The UiO files are in uK_CMB (file name "_uK", BeyondPlanck parameter files, and the pixel rms of
+    # about 30 uK at 353 GHz) although their headers say K_CMB; trust the file name.
+    scale, unit_out = 1.0, "uK_CMB"
     nested = hm.header.get("ORDERING", "RING").upper().startswith("NEST")
     nested_r = hr.header.get("ORDERING", "RING").upper().startswith("NEST")
     ncol = len(hm.columns)
