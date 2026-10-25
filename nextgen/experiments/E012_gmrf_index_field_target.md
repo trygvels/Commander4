@@ -35,8 +35,10 @@ this model (F7 and F8 do not enter by construction).
 With A_p = M_p^T N_p^-1 M_p (C x C), b_p = M_p^T N_p^-1 d_p:
 
 - **Proper Gaussian amplitude prior (sampler-correctness target) [v2]:** a_p ~ N(m_p, T_p) with
-  known m_p, T_p (diagonal, physically wide: T_p^(1/2) = 10 x template amplitude per component,
-  floor 100 uK_RJ). Exact marginal
+  known m_p, T_p (diagonal). **[v2.1, 2026-10-25]** Default width T_p^(1/2) = max(0.5 |m_p|, 20)
+  uK_RJ for synchrotron and dust and 70 uK_RJ for the CMB (m = 0); the first-build setting
+  10 max(|m_p|, 10) uK_RJ stays available as "wide" (it allows negative and 10x amplitudes and
+  makes |log pi| ~ 1e8, which spoils finite-difference checks). Exact marginal
 
       log L_G(beta) = sum_p [ 1/2 b'_p^T (A_p + T_p^-1)^-1 b'_p - 1/2 log det (A_p + T_p^-1) ] + const,
       b'_p = b_p + T_p^-1 m_p,
@@ -255,7 +257,45 @@ L1 checks:
   centred chains |z| <= 2.9 on means and sds with ESS 2300 to 4100 (long run: 45500, |z| <= 3.4,
   sd ratios 0.992 to 1.011); non-centred chains agree (|z| <= 2.1) at ESS 40 to 70, long run
   pending.
-- **1e** not yet run.
+- **1c (rerun, 2.5x budget) PASS.** Centred: ESS(log sigma) 840 vs 2661 (reference), max |z|
+  1.67; non-centred: ESS 928, max |z| 1.23, sd ratios 0.976 to 1.063. Precondition met in both.
+- **1d (long run, 96000 draws).** Case A (graph Laplacian, independent bases): centred ESS 45500,
+  |z| <= 3.4, sd ratios 0.992 to 1.011, PASS; non-centred ESS(log sigma) 5300, |z| <= 2.7, PASS.
+  Case C (constant-projected harmonic basis, shared basis): PASS both parameterizations (ESS 33800
+  and 2100). Case B (literal harmonic basis, independent constructions): mu offset 0.0176 =
+  764 z in both NUTS chains, everything else agreeing. Diagnosis: the literal pixel-evaluated
+  harmonics leak a constant component (|1^T Y|/sqrt(Nb) = 0.17 at nside 1) and the two literal
+  constructions leak it differently, so the two "same" targets differ in the mu direction. This is
+  the leakage the SPEC decision removes; the decisive test is case C with the reference's own
+  constant-projected basis (reference updated 2026-10-25, rerun pending).
+- **1b (rerun, 12 cases).** gauss and w0 PASS at noise x1 and x5, N_beta 1 and 2 (|z| <= 3.2,
+  sd ratios 0.959 to 1.046, ESS 790 to 2600). w1 PASS in 5 of 6 cases; at N_beta 2, noise x5 the
+  flat-prior marginal is MULTIMODAL: the grid mode sits at beta = (-0.256, -0.233) with sd 0.003,
+  one NUTS chain started near -3 stayed in a secondary basin at -2.3 (z -1240, sd ratio 14) while
+  the other pixel agreed. The check is being changed to four dispersed starts with a mode-mass
+  comparison; the result stands as a property of the w1 target.
+- **1e (negative controls) PASS, i.e. every wrong target failed as expected, positive control
+  passed.** (i) centred without -K log sigma - 1/2 log det K: log sigma shifted +3.06 sd (z 182),
+  sd ratio 1.21. (ii) logit Jacobian dropped: the wrong target is IMPROPER in u (the likelihood
+  saturates at rho_min and rho_max so log pi is flat in both tails), stronger than v2's "1/rho tilt":
+  NUTS drifts to |u| ~ 1e8 with rho pinned at a bound. (iii) log sigma Jacobian dropped: shift
+  -0.197 sd (z -11.6 centred at ESS 3360; z -7.1 non-centred at ESS 1200 with a 10x budget), as
+  v2 predicted (0.2 sd at K = 12).
+
+**Finding for Q2 (field-model version of F3):** with amplitudes integrated under a FLAT prior
+(w = 1) the field posterior collapses to beta ~ -0.1 to -0.25 for every index pixel even at
+per-index-pixel S/N of 30 (coverage smoke test, nside_beta 2: z(mu) ~ +1400), because the
+-1/2 sum_p log det A_p term rewards the near-degenerate CMB/synchrotron columns and is summed over
+all pixels. The flat-prior marginal is unusable for spatially varying indices; ridge (w = 0) and
+the proper Gaussian prior behave. This confirms D003 and is a Paper A result; it goes into FINDINGS
+as F12 once the coverage study quantifies it.
+
+**Independent review of the implementation (stats-reviewer, 2026-10-25): correct with caveats.**
+Its own 60-line implementation of the E012 density matches both posteriors up to the declared
+constants (1e-12) for all 12 combinations of prior, mode and parameterization; the SBC generator
+matches the gauss target term by term; rank binning exact. Caveats being fixed: unclean SBC
+replicates must not be excluded (escalating retries instead); posterior must catch the ValueError
+from a singular A; check 1b needs dispersed starts; TARP local references from a separate chain.
 
 Properties recorded for the GMRF family: after the 1/(3 h^2) rescaling the graph-Laplacian
 eigenvalues over l(l+1) are 0.94 for the l = 1 multiplet at nside 8 (within-multiplet spread 0.77
