@@ -4,7 +4,7 @@
 
 ```bash
 git clone -b nextgen https://github.com/trygvels/Commander4.git
-cd commander4
+cd Commander4
 git remote add upstream https://github.com/Cosmoglobe/Commander4.git
 bash nextgen/scripts/setup_macos.sh      # add WITH_JULIA=1 for the Julia prototypes
 source .venv/bin/activate
