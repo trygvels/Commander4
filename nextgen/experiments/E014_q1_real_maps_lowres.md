@@ -81,6 +81,13 @@ NERSC transfers at 30 kB/s), a Galactic chi-square mask for the index likelihood
 mask at nside 64, 0.9 threshold, and a |b| > 20 deg fallback are in `~/data/q1_inputs/`), and a
 model-error floor on the rms (`add_signal_fraction_to_rms`) if the chains still sit on bounds.
 
+Masked test (150 iterations, ridge, no HFI, dx12 common mask at nside 64 for the index chi2,
+1 percent rms floor): beta_d still at the bound (1.000), beta_s -3.17 (more sensible than -2.81),
+acceptance 0.0 to 0.1, reduced chi2 153.6 (the 1 percent floor is about 1 uK at 30 GHz and
+changes nothing). Two lessons: HFI is required for beta_d, and the proposal widths (0.01 / 0.02)
+are far too wide for a full-sky index constrained by 3072 pixels at about 1 uK noise, where the
+ridge posterior sd is of order 1e-3; the second pass uses 0.002 / 0.004 and `numstep` 20.
+
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
 

@@ -146,7 +146,7 @@ components:
       lmax: {lmax}
       spatially_varying_MM: False
       sample_spectral_index: True
-      spectral_index_proposal_sigma: 0.02
+      spectral_index_proposal_sigma: 0.004
       spectral_index_bounds: [1.0, 2.5]
       spectral_index_prior:
         type: "gaussian"
@@ -165,7 +165,7 @@ components:
       lmax: {lmax}
       spatially_varying_MM: False
       sample_spectral_index: True
-      spectral_index_proposal_sigma: 0.01
+      spectral_index_proposal_sigma: 0.002
       spectral_index_bounds: [-4.0, -2.0]
   FreeFree:
     enabled: true
