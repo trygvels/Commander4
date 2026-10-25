@@ -103,8 +103,8 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   Lunde / Hans Kristian Eriksen? This is Trygve's call.
 
 ## Q14. How much did the Commander3 `marginal` sign error and 2024 MH module change published results?
-- **Why:** E009/F10. BeyondPlanck final (and likely DR1) sampled AME nu_p with the sign-flipped
-  `marginal` lnL; DR2-era runs may have used `sample_specind_mh` with CG updates (F1 structure).
+- **Why:** E009/F10. BeyondPlanck final sampled AME nu_p with the sign-flipped `marginal` lnL
+  (DR1 did not: it used the exponential AME model with `prior` index steps, see E013); DR2-era runs may have used `sample_specind_mh` with CG updates (F1 structure).
 - **How:** rerun the AME nu_p step on BeyondPlanck / DR1 inputs (or on DR1 chain samples as fixed
   inputs) with the sign corrected and with `ridge`; compare nu_p and the AME amplitude map. For DR2,
   find the production parameter files and check `MCMC_SAMPLING_GROUP_UPDATE_CG_GROUPS`.

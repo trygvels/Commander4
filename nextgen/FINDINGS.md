@@ -88,7 +88,7 @@ latest sky.
 sign error, and the 2024 MH module has F1** (E009). The alm / pixel-region sampler and the local
 `chisq` sampler hold amplitudes fixed during MH: valid conditional Gibbs. The local `marginal` lnL adds
 +1/2 ln A instead of -1/2 ln A (both `comp_lnL_*_diagonal` functions, still at HEAD), so it samples
-ridge x A^(1/2) rather than the flat-prior marginal; BeyondPlanck final used it for AME nu_p. In a
+ridge x A^(1/2) rather than the flat-prior marginal; BeyondPlanck final used it for AME nu_p (confirmed in `BP_param_c0001_v2.txt`). Cosmoglobe DR1 did not: its parameter file models AME with the exponential parameterization and `prior` index steps (E013 scoping). In a
 toy the sign is irrelevant at high S/N and flips a 2 to 27 sd volume bias at low S/N. The 2024
 `sample_specind_mh` family redraws amplitudes by CG and accepts on chi^2, like Commander4.
 The BeyondPlanck polarized-index (alm / pixel-region) and bandpass samplers are valid conditional
