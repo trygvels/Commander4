@@ -157,9 +157,7 @@ runs until these exist and a published Commander3 result is reproduced.
 - The Commander4 lead developer openly uses Claude and Copilot for helper code; AI-assisted
   contributions are normal in this project.
 
-## F12 (preliminary): at low per-pixel S/N the ridge likelihood inflates a hierarchical index field and the flat-prior marginal collapses it
-
-E012 probe and profile scan (one replicate, nside_d 16, 48 index regions, S/N 0.4 to 16): with
+**F12 (preliminary). At low per-pixel S/N the ridge likelihood inflates a hierarchical index field and the flat-prior marginal collapses it** (E012 probe and profile scan; one replicate, nside_d 16, 48 index regions, S/N 0.4 to 16): with
 amplitudes profiled (ridge, w0) the per-region likelihood in beta is rough and multimodal at S/N
 below a few, the per-region maxima scatter with rms 2.2 about the truth, the inferred field sigma is
 about 1.2 against a truth of 0.065 (z = +22 to +25) and NUTS mixes at ESS 4 to 5 per 1500 s in every
