@@ -115,6 +115,8 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
 - **Decides:** whether to report this to Cosmoglobe (Trygve decides), and how to frame it in Paper A.
 - **Status (2026-10-25):** BeyondPlanck: negligible (E013: 0.008 GHz, 0.8 conditional sd, because
   nu_p was one full-sky parameter at high S/N). DR1: not affected (E013 scoping). Open: which
-  DR2-era runs used `sample_specind_mh` with CG updates (no parameter file in the repository does),
+  DR2-era runs used `sample_specind_mh` with CG updates (no parameter file in the repository does;
+  the DR2 product page's link to `CG_param_c0001_DR2.txt` on tsih3.uio.no returns 404 as of
+  2026-10-25, so this needs the file from Cosmoglobe or from Trygve's own access),
   and the size of the E015 bandpass effect (needs Commander3 on simulated TOD, cluster).
 
