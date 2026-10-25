@@ -115,13 +115,15 @@ compsep:
       dense_matrix_debug_mode: false
 
   # Dust and synchrotron beta are proposed jointly (one group, one Metropolis accept/reject on the
-  # joint chi^2), with the amplitude group re-solved between proposal and decision.
+  # joint chi^2). With CG amplitudes `likelihood: auto` resolves to `conditional`: amplitudes held
+  # fixed while stepping, then redrawn once if a proposal was accepted.
   mcmc_sampling_groups:
     sample_spectral_indices:
       enabled: true
       parameters: spectral_indices
       comps: [Synchrotron, ThermalDust]
       update_amplitude_groups: [sample_amps_CG]
+      likelihood: auto
       numstep: 1
       # Optional: restrict the accept/reject chi^2 to a subset of the bands.
       # chisq_bands: [Band30GHz, Band44GHz, Band217GHz, Band353GHz]

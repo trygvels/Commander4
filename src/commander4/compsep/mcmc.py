@@ -22,6 +22,9 @@ from commander4.diagnostics.performance import benchmark
 
 logger = logging.getLogger(__name__)
 
+# What an MH step's acceptance ratio is computed from; see `MCMCSamplingGroup.run`.
+MCMC_LIKELIHOODS = ("marginal", "ridge", "conditional", "resolve_chisq")
+
 
 def resolve_chisq_mask(mask_map: NDArray | None, nside: int) -> NDArray[np.bool_] | None:
     """Convert a raw HEALPix mask to a boolean keep-mask at `nside`, or None for full sky.
@@ -163,8 +166,105 @@ class MCMCSamplingGroup(ABC):
 
     # The MH loop itself, identical for every parameter set.
     def run(self, *, numstep: int, resolve_amplitudes: Callable[[], None],
-            rng: np.random.Generator) -> dict:
-        """Take ``numstep`` joint MH steps, each coupled to an amplitude re-solve.
+            rng: np.random.Generator, likelihood: str = "resolve_chisq",
+            marginal_loglike: Callable[[], float] | None = None) -> dict:
+        """Take ``numstep`` MH steps with the chosen likelihood (see `MCMC_LIKELIHOODS`).
+
+        ``likelihood`` selects what the acceptance ratio is computed from:
+
+        * ``"marginal"``: ``marginal_loglike()``, the likelihood with the coupled amplitudes
+          integrated out analytically. The amplitudes are not touched while stepping, and are
+          redrawn once from their conditional (``resolve_amplitudes``) after the last step if any
+          proposal was accepted. Together with that redraw this is a valid (collapsed) Gibbs step
+          for the joint posterior of parameters and amplitudes.
+        * ``"ridge"``: as ``"marginal"`` but without the ln det term of the amplitude covariance
+          (C3's ``ridge``): the profile likelihood. Exact for the posterior whose parameter prior
+          carries an extra det(A)^(1/2) factor, which cancels the prior-volume term that flat
+          amplitude priors defined at an SED reference frequency put on the spectral parameters.
+        * ``"conditional"``: the chi-squared with all amplitudes held fixed (C3's ``chisq``). A
+          valid Gibbs step for the parameters given the amplitudes. ``resolve_amplitudes`` runs
+          once after the steps if any proposal was accepted (an extra amplitude Gibbs step).
+        * ``"resolve_chisq"``: the original behaviour, kept for comparison. Every proposal re-solves
+          the amplitudes and the step is accepted on the chi-squared at the newly drawn amplitudes.
+          When the re-solve draws a constrained realization, this does not leave the joint
+          posterior invariant: the acceptance should be the ratio of marginal likelihoods, which
+          does not depend on the drawn amplitudes. See `_run_resolve_chisq`.
+        """
+        if likelihood == "resolve_chisq":
+            return self._run_resolve_chisq(numstep=numstep, resolve_amplitudes=resolve_amplitudes,
+                                           rng=rng)
+        if likelihood not in MCMC_LIKELIHOODS:
+            raise ValueError(f"Unknown MCMC likelihood {likelihood!r}; expected one of "
+                             f"{MCMC_LIKELIHOODS}.")
+        if likelihood in ("marginal", "ridge") and marginal_loglike is None:
+            raise ValueError(f"The {likelihood!r} MCMC likelihood needs a marginal_loglike "
+                             "callable.")
+        if not self.has_parameters():
+            if self.is_root:
+                logger.verbose("MCMC group has nothing to sample; skipping.")
+            return {}
+        loglike = marginal_loglike if likelihood in ("marginal", "ridge") else self.global_loglike
+
+        n_accept = 0
+        current_state = self.capture_state()
+        with benchmark("mcmc-loglike"):
+            loglike_current = loglike()
+        for step in range(numstep):
+            if self.is_root:
+                proposed_state, in_bounds = self.propose(current_state, rng)
+            else:
+                proposed_state, in_bounds = None, None
+            proposed_state = self.comm.bcast(proposed_state, root=self.root)
+            in_bounds = self.comm.bcast(in_bounds, root=self.root)
+            if not in_bounds:
+                continue
+
+            self.apply_state(proposed_state)
+            with benchmark("mcmc-loglike"):
+                loglike_proposed = loglike()
+            delta_loglike = loglike_proposed - loglike_current
+            if self.is_root:
+                log_accept = (delta_loglike
+                              + self.log_prior(proposed_state) - self.log_prior(current_state))
+                accept = log_accept >= 0.0 or np.log(rng.random()) < log_accept
+            else:
+                accept = None
+            accept = self.comm.bcast(accept, root=self.root)
+            if self.is_root:
+                logger.debug(f"MCMC step {step+1}/{numstep} ({likelihood}): "
+                             f"dloglike={delta_loglike:.3e} [{'ACCEPT' if accept else 'reject'}] "
+                             f"({current_state} -> {proposed_state}).")
+            if accept:
+                n_accept += 1
+                current_state, loglike_current = proposed_state, loglike_proposed
+            else:
+                self.apply_state(current_state)
+
+        if n_accept > 0:
+            # The amplitudes were drawn for the parameters before this group ran. Redraw them for
+            # the accepted parameters (required after a marginal move, an extra Gibbs step
+            # otherwise).
+            with benchmark("mcmc-amp-resolve"):
+                resolve_amplitudes()
+        if self.is_root:
+            logger.info(f"MCMC group finished ({likelihood}): {n_accept}/{numstep} proposals "
+                        "accepted.")
+        return {"numstep": numstep, "n_accept": n_accept,
+                "accept_rate": n_accept/numstep if numstep > 0 else float("nan"),
+                "params": self.capture_state()}
+
+    def _run_resolve_chisq(self, *, numstep: int, resolve_amplitudes: Callable[[], None],
+                           rng: np.random.Generator) -> dict:
+        """Take ``numstep`` joint MH steps, each coupled to an amplitude re-solve (original method).
+
+        Note on correctness: for a move that proposes theta' and then draws a' ~ p(a | theta', d),
+        the MH acceptance that leaves p(theta, a | d) invariant is p(theta' | d) / p(theta | d),
+        the ratio of *marginal* posteriors. Accepting on the chi-squared at the drawn amplitudes
+        instead adds the random term (X' - X), with X ~ chi^2 over the amplitude degrees of
+        freedom, and drops the ln det term of the amplitude covariance. In tests on simulated
+        per-pixel data this widens the parameter posterior (by a factor that grows with the number
+        of pixels) and shifts it towards the profile likelihood. Use ``likelihood="marginal"`` (per-
+        pixel amplitudes) or ``"conditional"`` instead; this path is kept for comparison.
 
         Called collectively by *all* CompSep ranks. ``resolve_amplitudes`` is a collective callback
         that re-solves the amplitude (CG) sampling groups this MCMC group is coupled to (C3's

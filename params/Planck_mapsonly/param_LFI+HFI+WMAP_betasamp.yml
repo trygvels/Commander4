@@ -75,15 +75,17 @@ compsep:
       bands: all
 
   # MCMC sampling groups: Metropolis-Hastings over the spectral indices of the selected
-  # components. After each in-bounds proposal the CG groups named in `update_amplitude_groups` are re-solved,
-  # the chi2 over `chisq_bands` (all bands here) drives the accept/reject, and a rejected step reverts
-  # both the indices and all amplitudes. `numstep` MH steps are taken per Gibbs sweep.
+  # components. With CG amplitudes `likelihood: auto` resolves to `conditional`: the chi2 over
+  # `chisq_bands` (all bands here) with the amplitudes held fixed drives the accept/reject, and the CG
+  # groups in `update_amplitude_groups` are redrawn once after the steps if anything was accepted.
+  # `numstep` MH steps are taken per Gibbs sweep.
   mcmc_sampling_groups:
     sample_spectral_indices:
       enabled: true
       parameters: spectral_indices
       comps: [Synchrotron, ThermalDust]
       update_amplitude_groups: [sample_amps_CG]
+      likelihood: auto
       numstep: 1
 
       # chisq_bands: [Planck30GHz, WMAPKa, WMAPQ1, WMAPQ2, WMAPV1, WMAPV2, Planck857GHz, Planck353GHz]

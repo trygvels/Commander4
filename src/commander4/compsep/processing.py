@@ -11,7 +11,7 @@ import healpy as hp
 import logging
 import os
 from copy import deepcopy
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from numbers import Integral, Real
 from mpi4py import MPI
 from numpy.typing import NDArray
@@ -24,7 +24,8 @@ from commander4.sky.diffuse_components import DiffuseComponent
 from commander4.sky.sky_model import SkyModel
 from commander4.compsep.cg_solver import CompSepSolver
 from commander4.compsep.chisq import ChisqResult, collect_fit_diagnostics, evaluate_chi2
-from commander4.compsep.perpix_solver import solve_compsep_perpix
+from commander4.compsep.mcmc import MCMC_LIKELIHOODS, resolve_chisq_mask
+from commander4.compsep.perpix_solver import PerPixelMarginalLikelihood, solve_compsep_perpix
 from commander4.compsep.spectral_index import SpectralIndexSamplingGroup
 from commander4.file_io import paths
 from commander4.file_io.chain_restart import ChainStart
@@ -133,12 +134,19 @@ class MCMCSamplingGroupConfig(SamplingGroupConfig):
     numstep: int = 1
     chisq_bands: tuple[str, ...] | None = None
     chisq_mask: str | None = None
+    # What the MH acceptance is computed from: "marginal", "ridge", "conditional",
+    # "resolve_chisq", or "auto" (marginal where available, else conditional). See
+    # `MCMCSamplingGroup.run` and `_resolve_mcmc_likelihoods`.
+    likelihood: str = "auto"
 
     def __post_init__(self) -> None:
         super().__post_init__()
         if self.parameters != "spectral_indices":
             raise ValueError(f"MCMC sampling group {self.name!r} has unsupported parameters "
                              f"{self.parameters!r}; only 'spectral_indices' is implemented.")
+        if self.likelihood not in ("auto",) + MCMC_LIKELIHOODS:
+            raise ValueError(f"MCMC sampling group {self.name!r} likelihood must be one of "
+                             f"{('auto',) + MCMC_LIKELIHOODS}, got {self.likelihood!r}.")
         if not isinstance(self.numstep, int) or isinstance(self.numstep, bool) or self.numstep < 1:
             raise ValueError(f"MCMC sampling group {self.name!r} numstep must be at least 1.")
         if self.chisq_mask is not None and not isinstance(self.chisq_mask, str):
@@ -175,6 +183,9 @@ class CompSepState:
     nside_chisq: int  # Resolution of the chi-squared map (C3's NSIDE_CHISQ).
     include_chisq_map: bool
     include_residual_maps: bool
+    # Resolved MH likelihood of each MCMC group (see `_resolve_mcmc_likelihoods`). A group missing
+    # here runs with the original "resolve_chisq" behaviour.
+    mcmc_likelihoods: dict[str, str] = field(default_factory=dict)
 
 
 def _read_sampling_groups(params: Bunch, key: str,
@@ -336,6 +347,84 @@ def _validate_mcmc_sampled_components(mcmc_groups: dict[str, MCMCSamplingGroupCo
                              "and will do nothing.")
 
 
+def _sampled_component_names(group: MCMCSamplingGroupConfig, comp_list: CompList) -> set[str]:
+    """Names of the components whose spectral index this MCMC group proposes."""
+    names = set()
+    for comp in comp_list.joined():
+        if "sample_spectral_index" not in comp.comp_params \
+                or not bool(comp.comp_params.sample_spectral_index):
+            continue
+        if group.comps is None or comp.comp_name in group.comps:
+            names.add(comp.comp_name)
+    return names
+
+
+def _marginal_unavailable_reason(group: MCMCSamplingGroupConfig,
+                                 amplitude_groups: dict[str, SamplingGroupConfig],
+                                 amplitude_method: str | None,
+                                 comp_list: CompList) -> str | None:
+    """Why the analytic marginal likelihood cannot be used for `group`, or None if it can.
+
+    The per-pixel marginal is exact for one per-pixel amplitude group whose active components
+    include every component the MCMC group perturbs (so the residual of the fixed components does
+    not change between proposals), evaluated over that amplitude group's bands.
+    """
+    if not group.update_amplitude_groups:
+        return "it couples to no amplitude group (update_amplitude_groups is empty)"
+    if amplitude_method != "per_pixel":
+        return ("the amplitudes are solved by CG, whose marginal likelihood needs the log "
+                "determinant of the full CG system, which is not implemented")
+    if len(group.update_amplitude_groups) != 1:
+        return "it couples to more than one amplitude group"
+    amp_group = amplitude_groups[group.update_amplitude_groups[0]]
+    sampled = _sampled_component_names(group, comp_list)
+    if amp_group.comps is not None and not sampled <= set(amp_group.comps):
+        missing = sorted(sampled - set(amp_group.comps))
+        return (f"amplitude group {amp_group.name!r} does not solve for sampled component(s) "
+                f"{missing}")
+    if group.chisq_bands is not None and (amp_group.bands is None
+                                          or set(group.chisq_bands) != set(amp_group.bands)):
+        return (f"chisq_bands differs from the bands of amplitude group {amp_group.name!r}; the "
+                "marginal likelihood is defined over the amplitude group's bands")
+    return None
+
+
+def _resolve_mcmc_likelihoods(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
+                              amplitude_groups: dict[str, SamplingGroupConfig],
+                              amplitude_method: str | None, comp_list: CompList,
+                              report: bool) -> dict[str, str]:
+    """Resolve each MCMC group's `likelihood` setting to the method it runs with.
+
+    ``auto`` selects ``marginal`` where it is exact and available and ``conditional`` otherwise;
+    both leave the joint posterior invariant. An explicit ``marginal`` that cannot be honoured is an
+    error. ``resolve_chisq`` (the original behaviour) is allowed but reported, because accepting on
+    the chi-squared at freshly drawn amplitudes does not sample the posterior.
+    """
+    resolved = {}
+    for name, group in mcmc_groups.items():
+        reason = _marginal_unavailable_reason(group, amplitude_groups, amplitude_method, comp_list)
+        if group.likelihood in ("marginal", "ridge") and reason is not None:
+            raise ValueError(f"MCMC sampling group {name!r} asks for likelihood: "
+                             f"{group.likelihood}, but that is unavailable because {reason}. Use "
+                             "'conditional' instead.")
+        if group.likelihood == "auto":
+            resolved[name] = "marginal" if reason is None else "conditional"
+        else:
+            resolved[name] = group.likelihood
+        if not report:
+            continue
+        if resolved[name] == "resolve_chisq" and group.update_amplitude_groups:
+            logger.warning(
+                f"MCMC sampling group {name!r} uses likelihood: resolve_chisq. It accepts on the "
+                "chi-squared at amplitudes redrawn for each proposal, which does not leave the "
+                "posterior invariant (the parameter posterior comes out too wide and biased). Use "
+                "'marginal' (per-pixel amplitudes) or 'conditional'.")
+        elif group.likelihood == "auto":
+            why = "" if reason is None else f" (marginal unavailable: {reason})"
+            logger.info(f"MCMC sampling group {name!r}: likelihood auto -> {resolved[name]}{why}.")
+    return resolved
+
+
 def _validate_component_lmax(comp_list: CompList, params: Bunch) -> None:
     """Report component multipoles that no band can constrain.
 
@@ -468,6 +557,9 @@ def init_compsep_processing(mpi_info: Bunch, params: Bunch, start: ChainStart)\
     nthreads = params.resources.compsep.num_threads
     if not isinstance(nthreads, int):
         nthreads = nthreads[mpi_info.compsep.rank]
+    mcmc_likelihoods = _resolve_mcmc_likelihoods(
+        mcmc_groups, amplitude_groups, amplitude_method, comp_list,
+        report=mpi_info.compsep.rank == mpi_info.compsep.master)
     # Read the MCMC groups' chi-squared masks once here, rather than on every Gibbs iteration when
     # the sampling groups are rebuilt.
     chisq_masks = _read_chisq_masks(mpi_info.compsep.comm, mcmc_groups)
@@ -488,6 +580,7 @@ def init_compsep_processing(mpi_info: Bunch, params: Bunch, start: ChainStart)\
         nside_chisq=int(getattr(chains, "nside_chisq", 256)),
         include_chisq_map=bool(getattr(include, "chisq_map", False)),
         include_residual_maps=bool(getattr(include, "compsep_residual_maps", False)),
+        mcmc_likelihoods=mcmc_likelihoods,
     )
 
     # Read the Gaussian amplitude prior's mean mu (each component's amp_prior_mean_map, else a
@@ -595,6 +688,37 @@ def _run_amplitude_group(mpi_info: Bunch, compsep_state: CompSepState,
     return {pol: stats for pol, stats in all_stats if stats}
 
 
+def _make_marginal_loglike(mpi_info: Bunch, compsep_state: CompSepState,
+                           detector_data: DetectorMap, comp_list: CompList,
+                           amp_group: PerPixelSamplingGroupConfig,
+                           chisq_mask: NDArray | None,
+                           use_logdet: bool = True) -> PerPixelMarginalLikelihood:
+    """Build the per-pixel marginal likelihood for one MCMC group run (collective on CompSep).
+
+    Uses the same band and component selection, and the same conditional residual, as the
+    per-pixel amplitude group the MCMC group is coupled to, so the likelihood describes exactly the
+    model whose amplitudes `_run_amplitude_group` draws afterwards.
+    """
+    compsep = mpi_info.compsep
+    band_is_active = _sampling_group_selects_band(
+        amp_group.bands, compsep_state.band_name, compsep_state.band_identifier)
+    active_sublist = _filter_sampling_group_components(
+        comp_list.split_for_eval_pol(compsep_state.target_pol), amp_group.comps)
+    takes_part = band_is_active and len(active_sublist) > 0
+    solver_comm = compsep.subcomm.Split(0 if takes_part else MPI.UNDEFINED, key=compsep.rank)
+    residual, keep = None, None
+    if takes_part:
+        residual = _build_conditional_residual(
+            detector_data, comp_list, compsep_state.target_pol, active_sublist)
+        keep = resolve_chisq_mask(chisq_mask, detector_data.nside)
+    marginal = PerPixelMarginalLikelihood(
+        compsep.comm, solver_comm if takes_part else None, residual, list(active_sublist), keep,
+        compsep_state.num_threads, use_logdet=use_logdet)
+    if takes_part:
+        solver_comm.Free()
+    return marginal
+
+
 def process_compsep(mpi_info: Bunch, compsep_state: CompSepState,
                     detector_data: DetectorMap, iter: int, chain: int,
                     params: Bunch, comp_list: CompList, rng: np.random.Generator) -> SkyModel:
@@ -657,9 +781,18 @@ def process_compsep(mpi_info: Bunch, compsep_state: CompSepState,
             compsep.comm, detector_data, comp_list, target_pol=compsep_state.target_pol,
             selected_comps=group.comps, chisq_active=chisq_active,
             chisq_mask=compsep_state.chisq_masks.get(group.name), root=compsep.master)
+        likelihood = getattr(compsep_state, "mcmc_likelihoods", {}).get(
+            group.name, "resolve_chisq")
+        marginal_loglike = None
+        if likelihood in ("marginal", "ridge") and sampler.has_parameters():
+            marginal_loglike = _make_marginal_loglike(
+                mpi_info, compsep_state, detector_data, comp_list,
+                amplitude_groups[group.update_amplitude_groups[0]],
+                compsep_state.chisq_masks.get(group.name), use_logdet=likelihood == "marginal")
         with benchmark(f"mcmc-{group.name}"):
             mcmc_stats = sampler.run(numstep=group.numstep, resolve_amplitudes=resolve_amplitudes,
-                                     rng=rng)
+                                     rng=rng, likelihood=likelihood,
+                                     marginal_loglike=marginal_loglike)
         if mcmc_stats:
             sampler_stats.setdefault("mcmc", {})[group.name] = mcmc_stats
         fit = evaluate(f"MCMC group {group.name!r}")
