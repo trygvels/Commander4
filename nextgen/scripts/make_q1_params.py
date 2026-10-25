@@ -64,7 +64,7 @@ def hfi_band(hfi, name, f, bw, nu, p, pol, nside, rms_floor):
 
 
 def make(mode, nside, fwhm, niter, numstep, outdir, with_hfi, pol, hfi="pr4", chisq_mask="", rms_floor=0.0,
-         outtag="", extra_pr3=(), hfi_rms_floor=0.0):
+         outtag="", extra_pr3=(), hfi_rms_floor=0.0, prop_dust=0.004, prop_sync=0.002):
     bands = band("Haslam408MHz", f"{BP}/haslam_n0512_60arcmin_uK.fits",
                  '["TEMPERATURE", "Q-POLARISATION", "U-POLARISATION"]',
                  f"{BP}/haslam_rms_n0512_60arcmin_uK_1pct_0.8K.fits",
@@ -156,7 +156,7 @@ components:
       lmax: {lmax}
       spatially_varying_MM: False
       sample_spectral_index: True
-      spectral_index_proposal_sigma: 0.004
+      spectral_index_proposal_sigma: {prop_dust}
       spectral_index_bounds: [1.0, 2.5]
       spectral_index_prior:
         type: "gaussian"
@@ -175,7 +175,7 @@ components:
       lmax: {lmax}
       spatially_varying_MM: False
       sample_spectral_index: True
-      spectral_index_proposal_sigma: 0.002
+      spectral_index_proposal_sigma: {prop_sync}
       spectral_index_bounds: [-4.0, -2.0]
   FreeFree:
     enabled: true
@@ -224,6 +224,8 @@ def main():
     ap.add_argument("--hfi-rms-floor", type=float, default=0.0,
                     help="add_signal_fraction_to_rms for the HFI bands only (model-error floor)")
     ap.add_argument("--tag", default="")
+    ap.add_argument("--prop-dust", type=float, default=0.004, help="MH proposal sd for beta_d")
+    ap.add_argument("--prop-sync", type=float, default=0.002, help="MH proposal sd for beta_s")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     for mode in a.modes:
@@ -233,7 +235,7 @@ def main():
             fh.write(make(mode, a.nside, a.fwhm, a.niter, a.numstep, a.out, not a.no_hfi, a.pol,
                           a.hfi, a.chisq_mask, a.rms_floor,
                           ('_nohfi' if a.no_hfi else '') + (('_' + a.tag) if a.tag else ''),
-                          tuple(a.extra_pr3), a.hfi_rms_floor))
+                          tuple(a.extra_pr3), a.hfi_rms_floor, a.prop_dust, a.prop_sync))
         print(p)
 
 

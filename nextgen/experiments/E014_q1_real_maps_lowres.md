@@ -117,8 +117,12 @@ npipe_uio`), each found from a chain that sat at a bound or at reduced chi-squar
 Anomaly noted, not resolved: under the stated units (uK_RJ, nu_ref 545 GHz in the FITS header,
 857 GHz in `param_CG_v09.txt`) the DR1 dust amplitude is 7 to 10x below the NPIPE maps
 (regression slopes 10.2 at 353 GHz, 6.7 at 857 GHz, correlation 0.99). Only the template shape is
-used here, so the zero levels do not depend on it. To be understood before DR1 components are used
-quantitatively anywhere.
+used here, so the zero levels do not depend on it. Checked directly: the PR4 857 GHz map converted
+to uK_RJ (2.27 MJy/sr per K_CMB, then 44.32 uK_RJ per MJy/sr) regressed on the DR1 dust `I_MEAN` map
+at |b| > 30 deg (1 deg smoothing, nside 128) gives slope 12.2 with correlation 0.994 (full-sky 99th
+percentiles 6220 vs 450 uK_RJ), so the DR1 amplitude is 12x low in uK_RJ at 857 GHz, not an error
+in the MBB evaluation here. To be understood before DR1 components are used quantitatively
+anywhere.
 
 Model-error floor: `add_signal_fraction_to_rms: 0.05` on the three HFI bands (Commander3 adds
 regularization noise to HFI for the same reason). Dust T stays fixed at 20 K.
@@ -144,6 +148,16 @@ noise-weighted smoothing, so the plane numbers differ from Commander4's own per-
 the high-latitude picture is what matters for the masked index step.) The index chi-square uses
 the dx12 common mask at nside 64, so the plane does not enter the comparison between modes. Pass 2
 launched 18:31 with these inputs: ridge, resolve_chisq, conditional, marginal, 2000 iterations.
+
+**Pass 2, ridge, 2000 iterations (18:31 to 20:08, 17 ranks):** beta_d 1.36539 +- 0.00005, beta_s
+-3.3425 +- 0.0004 (burn 400, one Commander4 chain written). The chain reached the mode by iteration
+50 and then accepted 0.4 percent of proposals (117 distinct values in 1600 iterations, ESS 44 and
+97): the proposals 0.004 / 0.002 are 80x and 6x the posterior sds, which at nside 64 full-sky are
+of order 1e-4. The mean is well determined (standard error about 1e-5) but the width is known to
+about 15 percent only. A tuned round (proposals 1.2e-4 / 9e-4, about 2.4 sd, 1000 iterations, tag
+`npipetuned`) is queued behind the untuned driver for all four modes; the untuned chains of the
+other three modes are kept because the comparison in E005 used one proposal width for all modes.
+Reduced chi-square 14994 (Galactic plane, outside the index mask).
 
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.

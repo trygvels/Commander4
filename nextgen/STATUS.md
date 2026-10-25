@@ -15,14 +15,22 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   (100 GHz verified). The second pass uses the NPIPE A-split 353 and 857 GHz maps hosted at UiO
   (BeyondPlanck inputs) plus PR3 100 GHz, dx12 chi-square mask, proposals 0.002 / 0.004, numstep 20.
 
-**Running:** SBC default (gauss, non-centred), 45 of 300 replicates at about 28 per hour. NPIPE
-353/857 downloads from UiO (about 1 MB/s combined, complete within the hour) with the pass-2 driver
-armed behind them (four modes, 17 ranks). Coverage study (gauss / w0 / w1, noise 0.3 / 1 / 3, 12
-replicates, same NUTS budget per cell) queued behind the SBC run.
+- E014 pass 2 ridge (NPIPE 353/857 + PR3 100, dx12 mask, 2000 iterations, 1.6 h): beta_d 1.36539
+  +- 0.00005, beta_s -3.3425 +- 0.0004, but acceptance 0.4 percent (proposals 80x / 6x the posterior
+  sd), ESS 44 / 97. Means are solid, widths to 15 percent. A tuned-proposal round (1.2e-4 / 9e-4,
+  1000 iterations, tag `npipetuned`) is queued for all four modes.
+- DR1 dust amplitude anomaly confirmed directly: PR4 857 GHz in uK_RJ is 12.2x the DR1 dust `I_MEAN`
+  at |b| > 30 deg with correlation 0.994 (E014). Not understood; only the template shape is used.
+
+**Running:** E014 pass 2 untuned driver (resolve_chisq since 20:08, then conditional, marginal;
+about 2 h each), then the tuned round (four modes, about 1 h each). SBC default, 96 of 300
+replicates at 20:12 (load 27, rate dropping toward 20 per hour). Coverage study queued behind the
+SBC run.
 
 **Next**
-1. SBC analysis (sbc_analyze) when the 300 replicates finish; then the centred SBC.
-2. E014 pass 2 analysis (analyze_q1_chains.py) when the four chains finish.
+1. E014 pass 2 analysis (analyze_q1_chains.py --suffix _npipemask, then _npipetuned) as modes
+   finish; resolve_chisq is the first comparison against ridge.
+2. SBC analysis (sbc_analyze) when the 300 replicates finish; then the centred SBC.
 3. Coverage analysis; promote or drop F12; M2.2 scalar-index coverage table.
 
 **Needs Trygve:** unchanged (Cosmoglobe contact about F1, the sign error, F11, the disabled
