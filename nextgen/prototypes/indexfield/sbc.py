@@ -282,9 +282,7 @@ def run_replicate(cfg: dict, index: int) -> dict:
     pix = test_pixels(cfg)
     names = quantities_for(cfg["mode"])
     if cfg["mode"] == "hier":
-        if cfg["param"] != "centred":
-            raise ValueError("mode 'hier' is implemented for the centred parameterization only")
-        post = posterior.HierPosterior(fld, hyper, data, truth["g"])
+        post = posterior.hier_posterior_class(cfg["param"])(fld, hyper, data, truth["g"])
     else:
         Post = posterior.CentredPosterior if cfg["param"] == "centred" else \
             posterior.NonCentredPosterior

@@ -117,12 +117,98 @@ cd nextgen/prototypes
 python -m indexfield.checks.check_2a_hier
 python -m indexfield.coverage --n-rep 12 --noise 0.3 1 3 --modes hier hier_distort hier_scatter --jobs 2 --tag study_v1_hier
 python -m indexfield.coverage_analyze --dir indexfield/checks/out/coverage/study_v1_hier
-cd indexfield && python -u sbc.py --config hier --mode hier --param centred --n 300 --workers 4
-python sbc_analyze.py --config hier_centred_hier
+cd indexfield && python -u sbc.py --config hier --mode hier --param noncentred --n 300 --workers 4
+python sbc_analyze.py --config hier_hier
 ```
+The SBC runs the non-centred index parameterization (`HierNonCentredPosterior`, same target as
+`HierPosterior`; `posterior.py` self-test verifies the Jacobian identity between the two to 5e-14
+and the gradients to 5e-2 of 1e-5 relative). Reason: the centred gauss SBC of E012 (nside_beta 4,
+K 192) ran 5.4 h on 4 workers without completing one replicate (4.5 CPU-hours per worker; the
+centred field at K 192 sits in a funnel and NUTS runs at tree depth 10), and the hier SBC was
+first planned centred because the hier posterior only existed centred. The coverage study
+(nside_beta 2, K 48) ran centred without trouble, so the centred parameterization stays there.
 
 ## Result
-(pending)
+
+### Coverage study (scientific question), 2026-10-26 15:27
+108 cells (3 modes x 3 noise scales x 12 replicates, 280 to 290 s per cell, output
+`checks/out/coverage/study_v1_hier/coverage_summary.txt`), same replicates, truths and S/N bins as
+study_v1, so the rows below compare directly with the gauss / w0 / w1 rows of E012. Bias z is the
+mean of (posterior mean minus truth) / posterior sd over index pixels with its standard error; cov68
+and cov95 are the fractions of truths inside the central 68 / 95 percent intervals (binomial SE
+0.02 for the all-pixel rows, larger per bin). The template-data truth is a_p = m_p 10^(0.1 N(0,1)),
+so the "hier" shape g = m is correctly specified up to log-normal versus Gaussian scatter;
+"hier_distort" multiplies g by 1 + 0.3 cos(theta) (large-scale wrong), "hier_scatter" by
+10^(0.1 N) (pixel-scale wrong, independent of the truth's scatter).
+
+| noise | mode | beta all pixels: z, sd z, cov68 / cov95 | lowest populated S/N bin: z, cov68 / cov95 (n) |
+|---|---|---|---|
+| 0.3 | hier | +0.10 +- 0.04, 1.02, 0.66 / 0.95 | S/N 1.6 to 3.3: +0.03 +- 0.06, 0.70 / 0.96 (256) |
+| 0.3 | hier_distort | +0.09 +- 0.04, 1.08, 0.64 / 0.92 | +0.03 +- 0.06, 0.64 / 0.94 (256) |
+| 0.3 | hier_scatter | +0.04 +- 0.05, 1.08, 0.67 / 0.94 | +0.06 +- 0.07, 0.70 / 0.95 (256) |
+| 0.3 | gauss (E012) | +14.3 +- 0.6, 13.2, 0.10 / 0.20 | +25.7 +- 0.4, 0.00 / 0.00 (256) |
+| 0.3 | w0 (E012) | +1.1 +- 0.4, 9.3, 0.65 / 0.91 | +1.7 +- 0.7, 0.62 / 0.89 (256) |
+| 1 | hier | +0.35 +- 0.04, 0.93, 0.64 / 0.95 | S/N < 0.54: -0.02 +- 0.14, 0.56 / 0.96 (57) |
+| 1 | hier_distort | +0.29 +- 0.04, 0.87, 0.69 / 0.97 | -0.19 +- 0.13, 0.54 / 0.96 (57) |
+| 1 | hier_scatter | +0.19 +- 0.04, 0.85, 0.73 / 0.97 | -0.16 +- 0.11, 0.74 / 0.98 (57) |
+| 1 | gauss (E012) | +2.08 +- 0.05, 1.18, 0.15 / 0.45 | +2.34 +- 0.11, 0.02 / 0.21 (57) |
+| 1 | w0 (E012) | +4.7 +- 0.9, 21.3, 0.44 / 0.72 | +8.5 +- 3.4, 0.33 / 0.61 (57) |
+| 3 | hier | +0.24 +- 0.05, 1.27, 0.67 / 0.93 | S/N < 0.54: +0.35 +- 0.08, 0.67 / 0.91 (288) |
+| 3 | hier_distort | +0.10 +- 0.04, 0.99, 0.69 / 0.95 | +0.18 +- 0.06, 0.72 / 0.95 (288) |
+| 3 | hier_scatter | +0.04 +- 0.04, 0.97, 0.72 / 0.95 | +0.12 +- 0.06, 0.75 / 0.95 (288) |
+| 3 | gauss (E012) | +0.60 +- 0.04, 0.94, 0.59 / 0.93 | +0.68 +- 0.06, 0.57 / 0.93 (288) |
+| 3 | w0 (E012) | +9.1 +- 1.2, 28.7, 0.39 / 0.62 | +13.1 +- 2.1, 0.34 / 0.57 (288) |
+
+Per S/N bin (full tables in the summary file): the hier rows have mean z within +-0.5 in every bin
+with more than one pixel at every noise level, except the 12-pixel S/N 0.54 to 1.57 bin at noise
+0.3 (z -0.96 +- 0.16, sd z 0.55, cov 0.50 / 1.00: over-wide, 12 pixels from 12 replicates). Coverage
+is within about two binomial SE of 0.68 / 0.95 in every bin except S/N 3.3 to 15.6 at noise 0.3
+(58 pixels; hier 0.48 +- 0.07 / 0.86 +- 0.05 with sd z 1.28; w0 has 0.59 / 0.88 and sd z 1.25 in the
+same bin, gauss 0.02 / 0.10) and the S/N < 0.54 bin at noise 3 for the ideal template only
+(0.67 / 0.91, sd z 1.35; the two distorted templates give 0.72 / 0.95 and 0.75 / 0.95 there). The
+pre-registered criterion (z within +-0.5 and coverage within binomial error at S/N below 15 at
+noise 0.3 and 1) is met in all bins but the 58-pixel one above.
+
+Residuals worth understanding: (i) at noise 1 all three variants show a positive mean z of +0.2
+to +0.35 (0.3 sd) in the measured bins with sd z 0.85 to 0.93, i.e. a small bias with slightly
+over-wide intervals, not seen at noise 0.3 or 3; (ii) the misspecified templates are, if
+anything, better calibrated than the ideal one (the learned scatter absorbs the shape error, see
+the hyperparameters below); (iii) low E-BFMI (0.03 to 0.17) at every noise level and 2 and 3
+divergences in one and two chains at noise 3 (hier, hier_distort), median min ESS 13 to 29 per
+1000 draws at noise 1 and 3 (the minimum is log sigma of the index field), 170 to 210 at noise
+0.3. Whether (i) is the sampler or the log-normal versus Gaussian misspecification is what the SBC
+below decides (the SBC generator is exactly the target).
+
+Index hyperparameters (12 values per cell, so weak): mu z +0.1 to +0.8 with cov68 0.42 to 0.75;
+log sigma z +0.5 to +1.3 with cov68 0.25 to 0.67 and cov95 0.75 to 0.92 (ESS 13 to 214). Compare
+gauss (mu z +67 at noise 0.3, +8 at noise 1) and w0 (log sigma z +4.6 at noise 0.3, +20 at
+noise 1) in E012.
+
+Amplitude hyperparameters (posterior mean over the 12 replicates; posterior sd in brackets):
+truth for mode hier is mu_c = E[10^(0.1 N)] = 1.027 and relative scatter 0.233 (log s = -1.46).
+hier: mu_sync 1.037 (0.014), 1.037 (0.028), 1.021 (0.055) and log s_sync -1.42 (0.04), -1.48
+(0.10), -1.66 (0.45) at noise 0.3 / 1 / 3; mu_dust 1.03 to 1.06, log s_dust -1.50 to -1.67 (sd
+0.11 to 0.76). hier_scatter (truth scatter sqrt(2) x 0.233 = 0.33, log -1.11): log s_sync -1.10
+(0.04) at noise 0.3, -1.17 (0.08) at noise 1, -1.37 (0.33) at noise 3; mu_sync 1.02, 0.99, 0.95.
+hier_distort: same as hier within 0.01 (the 30 percent cos theta distortion is absorbed by mu_c
+and s_c at the 1 percent level, as it is a large-scale modulation of a shape that the per-pixel
+data constrain). ESS of the amplitude block 230 to 980 per 1000 draws.
+
+Reading: at every S/N where the fixed Gaussian prior is biased and the profile (w0) mode is
+unusable (S/N below 15, E012 F12), the hierarchical amplitude prior gives index posteriors with
+mean z within 0.35 sd of zero and coverage at or near nominal, with the amplitude scale and
+scatter recovered from the data to within their posterior widths, and this holds when the shape
+template is wrong at the 30 percent level on large scales or at the 23 percent level per pixel.
+This is the first mode in this programme that is usable below index-pixel S/N 15 without a
+hand-set amplitude prior. The cost is the same per gradient as gauss; mixing of log sigma is the
+bottleneck as before (centred parameterization at K 48).
+
+Tooling fix recorded here: `coverage_analyze.py` had the mode list hard-coded to gauss / w0 / w1
+and printed no tables for this directory; it now takes the list from `coverage.MODES`. The main
+study's summary is unchanged by this.
+
+### SBC (L2)
+(running; see Setup)
 
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,

@@ -28,6 +28,8 @@ import sys
 
 import numpy as np
 
+from indexfield import coverage
+
 HYPER = ("mu", "log_sigma", "u")
 
 
@@ -105,7 +107,7 @@ def main(argv=None):
     cfg_path = os.path.join(args.dir, "config.json")
     config = json.load(open(cfg_path)) if os.path.exists(cfg_path) else {}
     noises = sorted({r["noise_scale"] for r in recs})
-    modes = [m for m in ("gauss", "w0", "w1") if any(r["mode"] == m for r in recs)]
+    modes = [m for m in coverage.MODES if any(r["mode"] == m for r in recs)]
     n_beta = recs[0]["n_beta"]
     lsnr_all = np.log10(np.concatenate([r[args.snr] for r in recs]))
     if args.edges is not None:

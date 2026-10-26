@@ -279,11 +279,13 @@ class CentredPosterior(_FieldPosterior):
         return self.pack(np.exp(ls) * w * z, mu, ls, u)
 
 
-class HierPosterior(CentredPosterior):
-    """E016: centred field posterior with the hierarchical amplitude prior of model.hier_loglike.
+class _HierMixin:
+    """E016: field posterior with the hierarchical amplitude prior of model.hier_loglike, as a
+    mixin over CentredPosterior or NonCentredPosterior (the index parameterization does not
+    change the target; it changes only the sampling geometry).
 
-    x = (y[K], mu, log_sigma, u, mu_sync, mu_dust, log s_sync, log s_dust), dim = K + 7.
-    Hyperpriors on the amplitude block: mu_c ~ N(HIER_MU0, HIER_MU_SD^2),
+    x = (field block[K], mu, log_sigma, u, mu_sync, mu_dust, log s_sync, log s_dust),
+    dim = K + 7. Hyperpriors on the amplitude block: mu_c ~ N(HIER_MU0, HIER_MU_SD^2),
     log s_c ~ N(log HIER_S0, HIER_LOGS_SD^2) (E016 "Target and priors").
     """
 
@@ -352,6 +354,21 @@ class HierPosterior(CentredPosterior):
     def random_amp(self, rng: np.random.Generator) -> np.ndarray:
         """A draw of (mu_sync, mu_dust, log s_sync, log s_dust) from the hyperprior (generator)."""
         return self.random_init(rng)[self.K + 3:]
+
+
+class HierPosterior(_HierMixin, CentredPosterior):
+    """Centred index block (y = beta - mu) with the hierarchical amplitude prior (E016)."""
+
+
+class HierNonCentredPosterior(_HierMixin, NonCentredPosterior):
+    """Non-centred index block (z, beta = mu + sigma S z) with the hierarchical amplitude prior.
+    Same target as HierPosterior: logp_c(from_noncentred(x)) = logp_nc(x) - K log sigma
+    - sum log w (Jacobian of y = sigma w z), which posterior.py's self-test verifies."""
+
+
+def hier_posterior_class(param: str):
+    """The hier posterior class for index parameterization "centred" or "noncentred"."""
+    return {"centred": HierPosterior, "noncentred": HierNonCentredPosterior}[param]
 
 
 # ------------------------------------------------------------------------------------ self-tests
@@ -467,6 +484,41 @@ def _selftest():
             good = lp == -np.inf and np.all(grad == 0.0) and post.n_loglike_errors == 1
             report(f"{exc.__name__} in loglike -> -inf, counted, {Post.__name__}",
                    float(post.n_loglike_errors), 1, good)
+
+    # E016: the hier posterior in both index parameterizations on one small simulated replicate
+    # (coverage.simulate_template): gradient against finite differences, and the same Jacobian
+    # identity as above with the amplitude block carried over unchanged.
+    if hier_loglike is not None:
+        from . import coverage as _cov
+        basis = GraphLaplacianBasis(1)
+        field = MaternField(basis)
+        hyper = HyperPrior().resolved(basis.h)
+        data, _ = _cov.simulate_template(8, 1, field, hyper, np.random.default_rng(5), 1.0, None,
+                                         "default")
+        posts = dict(noncentred=HierNonCentredPosterior(field, hyper, data, data.m),
+                     centred=HierPosterior(field, hyper, data, data.m))
+        for name, post in posts.items():
+            worst = 0.0
+            for trial in range(3):
+                x = post.random_init(rng)
+                lp, grad = post.logp_and_grad(x)
+                g_fd = _fd4_grad(lambda v: post.logp_and_grad(v)[0], x, 1e-4)
+                worst = max(worst, float(np.max(np.abs(g_fd - grad)
+                                                / (1e-5 * np.abs(grad) + 1e-6))))
+            report(f"hier gradient FD |g_fd - g| / (1e-5|g| + 1e-6), {name} (dim={post.dim})",
+                   worst, 1.0, worst < 1.0)
+        x_nc = posts["noncentred"].random_init(rng)
+        K = posts["centred"].K
+        x_c = np.concatenate([posts["centred"].from_noncentred(x_nc[:K + 3]), x_nc[K + 3:]])
+        lp_nc = posts["noncentred"].logp_and_grad(x_nc)[0]
+        lp_c = posts["centred"].logp_and_grad(x_c)[0]
+        mu, sigma, rho = posts["noncentred"].theta(x_nc[:K + 3])
+        expected = -K * np.log(sigma) - 0.5 * field.logdet_K(rho)
+        d = abs((lp_c - lp_nc) - expected) / max(1.0, abs(expected))
+        report("hier: centred - noncentred = -K log sigma - 1/2 logdet K", d, 1e-10, d < 1e-10)
+        db = np.max(np.abs(posts["noncentred"].beta(x_nc[:K + 3])
+                           - posts["centred"].beta(x_c[:K + 3])))
+        report("hier: same beta in both parameterizations", db, 1e-12, db < 1e-12)
 
     print("posterior.py self-test:", "ALL PASS" if ok else "FAILURES")
     return ok

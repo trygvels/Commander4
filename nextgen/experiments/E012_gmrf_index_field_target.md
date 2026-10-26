@@ -381,6 +381,16 @@ a factor 0.8 is detected with probability 0.84, a bias of 0.5 sd with probabilit
 `sbc_out/default_*` (summary, analysis JSON, rank histograms, ECDF, p-value and TARP plots). The
 centred-parameterization SBC is queued behind the coverage study.
 
+Centred SBC (2026-10-26): started 10:07 with the same settings (nside_beta 4, K 192, 300
+replicates, 4 workers) and stopped at 15:32 after 4.5 CPU-hours per worker without one completed
+replicate (the non-centred run above took a median 449 s per replicate, maximum 2725 s). The
+centred field at K 192 is a funnel for NUTS (tree depth at the cap of 10, so about 1000 gradients
+per draw); the coverage study ran the centred parameterization at K 48 at 240 to 360 s per chain
+with no such problem. Not rerun: the centred posterior's density and gradient are verified against
+the non-centred one by the `posterior.py` self-test (Jacobian identity to 1e-14, same beta), and
+the coverage study (K 48, centred) is the use case. A centred SBC at K 48 is a possible follow-up
+if the centred parameterization is ever used at larger K.
+
 Coverage study note (2026-10-26, during the run): three `invalid value encountered in multiply`
 warnings in 53 cells came from `0 * logdet` in w0 mode when an extreme beta overflows the SED (logdet
 inf); the resulting nan is treated by NUTS as zero density, the same as the -inf it would get in w1

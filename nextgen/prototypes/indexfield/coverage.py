@@ -57,7 +57,7 @@ from indexfield.model import PixelData, mixing                   # noqa: E402
 
 DEFAULT_OUT = os.path.join(HERE, "checks", "out", "coverage")
 MODES = ("gauss", "w0", "w1", "hier", "hier_distort", "hier_scatter")
-# hier modes (E016): HierPosterior with shape template g = templates ("hier"), templates times a
+# hier modes (E016): the hier posterior (either parameterization) with shape template g = templates ("hier"), templates times a
 # smooth 1 + 0.3 cos(theta) distortion ("hier_distort"), or templates times an independent
 # pixel-scale 10^(0.1 N(0,1)) scatter ("hier_scatter"), seeded by (seed, rep, noise, 11).
 
@@ -200,10 +200,9 @@ def run_cell(job):
     rng = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale)),
                                  MODES.index(mode), 7])
     if mode.startswith("hier"):
-        if cfg["param"] != "centred":
-            raise ValueError("hier modes are implemented for the centred parameterization only")
         rng_g = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale)), 11])
-        post = posterior.HierPosterior(fld, hyper, data, shape_template(mode, cfg["nside_d"], rng_g))
+        post = posterior.hier_posterior_class(cfg["param"])(
+            fld, hyper, data, shape_template(mode, cfg["nside_d"], rng_g))
     else:
         cls = posterior.CentredPosterior if cfg["param"] == "centred" else \
             posterior.NonCentredPosterior
@@ -212,6 +211,8 @@ def run_cell(job):
     if cfg["init"] == "truth":
         x_nc = post.pack(truth["z"], th["mu"], th["log_sigma"], th["u"])
         x0 = post.from_noncentred(x_nc) if cfg["param"] == "centred" else x_nc
+        if mode.startswith("hier"):
+            x0 = np.concatenate([x0, post.random_amp(rng)])
         n_init = 1
     else:
         x0, n_init = None, 0
