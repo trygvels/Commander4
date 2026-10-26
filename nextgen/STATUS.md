@@ -2,6 +2,44 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-26 (Mac mini, afternoon): hierarchical amplitude prior calibrated at every S/N on template data
+
+**Learned**
+- E016 coverage study (108 cells, same replicates and S/N bins as E012 study_v1): with the
+  amplitude scale and relative scatter per component learned from the data, the index-field
+  posteriors are calibrated at every S/N tested: mean z +0.10 / +0.35 / +0.24 sd over all pixels at
+  noise 0.3 / 1 / 3 with coverage 0.66 / 0.95, 0.64 / 0.95, 0.67 / 0.93, against w0 z +1 to +9 and
+  gauss z +14 / +2 / +0.6 on the same replicates. In the bins below S/N 1 (where w0 is biased by 8
+  to 13 sd): z -0.02 and +0.35, coverage 0.56 / 0.96 and 0.67 / 0.91. Shape templates wrong by 30
+  percent (large scale) or 23 percent (per pixel) change nothing: the learned scatter absorbs it
+  (log s recovered to its posterior sd). F16, provisional until the SBC passes. Residuals: +0.3 sd
+  mean bias at noise 1 in all variants; one 58-pixel bin with coverage 0.48 / 0.86 (same as w0).
+- F15 (joint flat-prior posterior has the w1 collapse as its exact beta marginal) confirmed by the
+  stats-reviewer and recorded; wording restricted to the flat-prior joint, not Commander3/4
+  production targets.
+- E016 L1 checks all pass (direct form 7e-13, gradients 4e-9, w1 limit scales as 1/s^2, gauss limit
+  exact); `HierNonCentredPosterior` added (same target, Jacobian identity to 5e-14) because the
+  centred SBC at K 192 could not complete one replicate in 4.5 CPU-hours per worker (stopped,
+  recorded in E012; not needed: the centred parameterization is used only at K 48).
+
+**Running:** E014 tuned round: `resolve_chisq` (since 10:27, 667 iterations of 1000 at 15:30),
+then `conditional` and `marginal`. E016 SBC of the hier target (non-centred, 300 replicates, 4
+workers) starts after its smoke test; about 10 h at the current load.
+
+**Next**
+1. E016: SBC result, Conclusion, F16 final or withdrawn; understand the +0.3 sd residual at noise 1
+   (log-normal versus Gaussian scatter is the first suspect: rerun one noise-1 cell with Gaussian
+   generative scatter).
+2. E014: tuned legacy / conditional / marginal results, Conclusion, registry row.
+3. M2.2 scalar-index coverage table with the hier mode included; then the Commander4
+   implementation plan for the hierarchical amplitude prior (D-entry: where mu_c, s_c live in the
+   parameter file, which template on real data) with stats-reviewer on the target before code.
+4. Paper A outline: F1/F2 (sampler), F3/F12/F16 (priors), F10/F11 (Commander3), F13 (DR1 dust).
+
+**Needs Trygve:** unchanged (Cosmoglobe contact on F1, F10, F11, F13 and the Jeffreys default; Q13;
+cluster; DR2 parameter file; ridge default for spatially varying indices, now with F16 as the
+candidate replacement: learned amplitude prior rather than profile below S/N 15).
+
 ## 2026-10-26 (Mac mini, midday): both exact modes verified on real data; coverage study: no safe prior-free option for a varying index below S/N 15
 
 **Learned**

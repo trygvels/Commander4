@@ -222,3 +222,21 @@ Commander3/4 production chains as they stand, whose targets include a C_l prior 
 amplitudes (which regularises the CMB/synchrotron direction but not synchrotron/dust), index priors
 and bounds, and index steps on smoothed data; what it does say is that "sample amplitudes with flat
 priors, then sample the index on chi2" is not a route around the prior question of Q2.
+
+**F16 (provisional until the E016 SBC passes). A hierarchical amplitude prior, with the per-component
+scale and relative scatter learned from the data, gives calibrated index-field posteriors on
+template data at every index-pixel S/N tested, including below S/N 1 where the profile is biased by
+5 to 13 sd and the fixed Gaussian prior by 0.6 to 14 sd** (E016 coverage study, same 108 replicates
+and S/N bins as E012 study_v1). Over all index pixels, mean z is +0.10 +- 0.04, +0.35 +- 0.04 and
++0.24 +- 0.05 at noise 0.3 / 1 / 3 with coverage 0.66 / 0.95, 0.64 / 0.95 and 0.67 / 0.93; in the
+lowest populated S/N bins (S/N 1.6 to 3.3 at noise 0.3, below 0.54 at noise 1 and 3) z is +0.03,
+-0.02 and +0.35 with coverage 0.70 / 0.96, 0.56 / 0.96 and 0.67 / 0.91. The result survives a wrong
+shape template: a 30 percent large-scale distortion or 23 percent independent per-pixel scatter of
+the template gives z within 0.3 sd and coverage 0.64 to 0.75 / 0.92 to 0.98 everywhere, because the
+learned scatter absorbs the shape error (log s recovered to its posterior width in both cases, e.g.
+-1.10 +- 0.04 against the expected -1.11 for the scattered template at noise 0.3). Residuals: a
++0.2 to +0.35 sd mean bias at noise 1 common to all three template variants, and one 58-pixel bin
+(S/N 3.3 to 15.6 at noise 0.3) with coverage 0.48 / 0.86, the same as the profile there. This is the
+first mode in this programme usable below index-pixel S/N 15 without a hand-set amplitude prior;
+it answers the Q2 design question in favour of learning the amplitude prior rather than fixing it or
+removing it (F12).

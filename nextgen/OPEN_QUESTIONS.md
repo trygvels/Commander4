@@ -43,6 +43,12 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   varying index the flat-prior marginal is unusable at every S/N, the profile likelihood is
   calibrated only above index-pixel S/N of about 15, and a Gaussian amplitude prior is calibrated
   only when it is the generative one; widening it moves the answer toward the flat-prior collapse.
+- **Hierarchical amplitude prior (E016, 2026-10-26, F16 provisional):** learning the per-component
+  amplitude scale and relative scatter from the data gives calibrated index posteriors at every S/N
+  tested (z within 0.35 sd, coverage 0.64 to 0.73 / 0.92 to 0.97 over all pixels), also with a shape
+  template wrong by 30 percent on large scales or 23 percent per pixel. Pending: the SBC of the
+  hier target (sampler correctness), the +0.3 sd residual at noise 1, the scalar-index version
+  (M2.2), and the real-data step (which template, and the Commander4 implementation).
   Next experiment: a hierarchical amplitude prior (m and T learned from the data, e.g. a smoothness
   prior on the amplitude maps with sampled scale) in the collapsed likelihood, coverage-tested on
   template data; and the index-resolution rule from the S/N map for the profile option (Q3).
