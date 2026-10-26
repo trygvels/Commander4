@@ -50,3 +50,15 @@ The hierarchical field drops the constant mode (the field mean is mu, sigma is t
 fluctuations about it), uses radians for the correlation length in both the GMRF and the alm family
 with the graph-Laplacian eigenvalues rescaled by 1/(3 h^2), and samples the bounded log-uniform
 correlation length through a logit transform with its Jacobian. Reasons in E012 v2.
+
+## D010 (2026-10-26): Q1 is answered at nside 64; Q2 (prior choice) moves to the top of the ranking
+E014 settled Q1 on real maps: the legacy move is 16 to 17x too wide and shifts beta_d by 3 sd, and the
+exact `ridge` and `marginal` chains both reproduce independent grid targets. The same run showed that
+the flat-prior volume term moves beta_s by 54 posterior sd with no change in width or chi-square, so
+the prior is the dominant systematic for full-sky indices on real data, far above sampler width. The
+ranking in OPEN_QUESTIONS therefore becomes Q2 (coverage study, E012 coverage run in progress, then
+a scalar-index coverage table at M2.2), Q3/Q4 (index-field model and sampler, M2.x), then the second
+half of Q14. Q1's remaining items (IQU, nside 128 scaling, HFI full set) are follow-ups in E014, not
+blockers. The `conditional` Gibbs mode is dropped from real-data comparisons (F14: conditional sd
+2e-6 against marginal 3.6e-4; of order 3e4 iterations per independent sample); it stays in the code
+as a documented option. No default changes.
