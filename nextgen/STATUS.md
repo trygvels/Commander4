@@ -2,6 +2,43 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-26 (Mac mini, night): pass-3 ridge on 20 bands; zero-level inconsistency found (Q15); M2.4 plan drafted
+
+**Learned**
+- E014 pass 3 (all six PR4 HFI bands, 20 bands): ridge beta_s = -2.9103 +- 0.0001, beta_d =
+  1.4150 +- 0.00003 (ESS 111 / 316), against -3.3425 / 1.3654 in pass 2 (17 bands): the full-sky
+  indices move by 0.43 and 0.05, about 1250 posterior sd, when the HFI set changes. The chain is
+  healthy (no bound, acceptance 0.04 because the pass-2 proposals are now too wide).
+- Cause candidate, measured on the inputs: two zero-level conventions. WMAP/LFI had the
+  |b| > 30 median removed (40.9 uK at 30 GHz, 78 uK at K); HFI were referenced to the DR1 CMB plus
+  dust, and the DR1 CMB map has mean +28.6 uK at |b| > 30 (+41.9 at |b| > 60). The pass-3 100 GHz
+  map sits at +45 uK at high latitude, the pass-2 one at 0. Commander4 has no monopole sampling, so
+  a 29 uK_CMB step between the band sets goes into the foregrounds. E014's method results (chain
+  versus grid on the same inputs) are unaffected; the index values are not science. Q15 opened.
+- M2.4 implementation plan written and code-checked (`nextgen/plans/M2.4_commander4_index_field.md`):
+  Gaussian and hier amplitude priors enter the existing region kernel as pseudo-bands (A' = A +
+  T^-1, b' = b + T^-1 m), so one kernel serves likelihood, gradient and the exact amplitude draw;
+  NUTS over the non-centred field plus hyperparameters; about 1000 source lines in 8 commits.
+  Stats-reviewer on its section 1 running.
+
+**Running:** E014 pass-3 marginal chain (23:16 to about 00:40) then the exact grid; E017 hier
+modes (60 percent at 23:30); E016 SBC (66 of 100 replicates); pass-4 consistent zero levels
+(subagent: `dr1_model_zero_levels.py`, offset = mean of map minus DR1 sky model at |b| > 30 for
+all 20 bands); stats review of the M2.4 target.
+
+**Next**
+1. Pass-3 marginal and grid: record the 20-band ridge/marginal gap and the chain-versus-grid
+   check in E014; then the exact grid on pass-4 inputs (minutes) to measure the zero-level
+   sensitivity of both indices before any further chain.
+2. E017 table and Conclusion; E016 SBC result and F16 final.
+3. M2.4 stage 1 after the stats review (first commits: C++ `solve_perpix_regions` and the
+   pseudo-band augmentation, with the bitwise parity test).
+
+**Needs Trygve:** unchanged, plus (Q15) whether a per-band zero-level (monopole) parameter with a
+prior should go into Commander4's per-pixel path as an offset column of the mixing matrix (it is
+linear, so it collapses like an amplitude); without it, real-data spectral indices from the fork
+depend on the input convention at the 0.4 level.
+
 ## 2026-10-26 (Mac mini, evening): E016 residual resolved; tuned legacy chain; scalar-index coverage (E017) running
 
 **Learned**
