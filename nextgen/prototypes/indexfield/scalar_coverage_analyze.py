@@ -81,6 +81,7 @@ def main(argv=None):
                 s["amp_mean"] = amp.mean(axis=0).tolist()
                 s["amp_sd_median"] = np.median(amp_sd, axis=0).tolist()
                 s["n_divergent"] = int(sum(r["n_divergent"] for r in rr))
+                s["bad_reps"] = [r["rep"] for r in rr if r["n_divergent"] > 0 or r["ebfmi"] < 0.3]
                 s["ebfmi_min"] = float(min(r["ebfmi"] for r in rr))
                 s["seconds_mean"] = float(np.mean([r["seconds_total"] for r in rr]))
             summary["cells"][f"noise{ns:g}_{mode}"] = s
@@ -100,7 +101,9 @@ def main(argv=None):
                              f"{w[3]:.2f}); generator "
                              f"(1.027, 1.027, {np.log(sc.GEN_S):.2f}, {np.log(sc.GEN_S):.2f}); "
                              f"divergences {s['n_divergent']}, min E-BFMI {s['ebfmi_min']:.2f}, "
-                             f"{s['seconds_mean']:.0f} s per chain")
+                             f"{s['seconds_mean']:.0f} s per chain"
+                             + (f"; CHAINS WITH DIVERGENCES OR E-BFMI < 0.3 (rows above include "
+                                f"them): reps {s['bad_reps']}" if s["bad_reps"] else ""))
     lines += ["", "columns: n = replicates; S/N = median full-sky S/N proxy; mean z = mean "
               "(post. mean - truth) / post. sd with its SE over replicates; sd z = sd of z (1 if "
               "calibrated); cov68, cov95 = fraction of truths inside the central intervals with "

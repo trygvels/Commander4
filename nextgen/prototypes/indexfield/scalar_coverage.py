@@ -160,6 +160,9 @@ class ScalarHierPosterior:
         if x.shape != (5,):
             raise ValueError("x must have shape (5,)")
         beta, mu, ls = x[0], x[1:3], x[3:5]
+        if np.any(ls < posterior.HIER_LOGS_MIN):
+            self.n_errors += 1
+            return -np.inf, np.zeros(5)
         try:
             with np.errstate(over="ignore", invalid="ignore"):
                 logL, g_beta, g_mu, g_ls = model.hier_loglike(np.array([beta]), self.data,

@@ -279,6 +279,9 @@ class CentredPosterior(_FieldPosterior):
         return self.pack(np.exp(ls) * w * z, mu, ls, u)
 
 
+HIER_LOGS_MIN = -8.0
+
+
 class _HierMixin:
     """E016: field posterior with the hierarchical amplitude prior of model.hier_loglike, as a
     mixin over CentredPosterior or NonCentredPosterior (the index parameterization does not
@@ -290,6 +293,10 @@ class _HierMixin:
     """
 
     HIER_MU0, HIER_MU_SD, HIER_S0, HIER_LOGS_SD = 1.0, 0.5, 0.3, 1.0
+    # Numerical guard (E017, 2026-10-26): below log s = HIER_LOGS_MIN the prior precision
+    # 1/(s g)^2 swamps M^T N^-1 M in double precision, the density turns into rounding noise and
+    # NUTS diverges on every step. The hyperprior mass below -8 is 5e-12 (6.8 sd), so truncating
+    # the target there is immaterial; states below it are reported as zero density.
 
     def __init__(self, field: MaternField, hyper: HyperPrior, data, g):
         if hier_loglike is None:
@@ -337,6 +344,8 @@ class _HierMixin:
             raise ValueError(f"x must have shape ({self.dim},)")
         self._amp = x[self.K + 3:].copy()
         self._last_amp_grad = np.zeros(4)
+        if np.any(self._amp[2:] < HIER_LOGS_MIN):
+            return -np.inf, np.zeros(self.dim)
         lp, grad = super().logp_and_grad(x[:self.K + 3])
         if not np.isfinite(lp):
             return -np.inf, np.zeros(self.dim)

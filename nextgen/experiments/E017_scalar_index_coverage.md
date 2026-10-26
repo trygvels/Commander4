@@ -92,6 +92,37 @@ were launched at 18:52 (2 workers).
 edge of the support (mean -1.5008, z +1704). The hier modes (hier, hier_distort) were launched at
 19:38 (2 workers).
 
+**Grid modes (288 cells, 81 min, done 20:13)** and the first 5 hier replicates per noise scale,
+24 replicates per grid cell (`scalar_summary.txt` of 20:15, provisional for hier):
+
+| noise (S/N) | w0 z, cov68/95 | w1 z, shift/w0 sd | gauss z, shift/w0 sd | hier z, cov68/95 (n) |
+|---|---|---|---|---|
+| 0.1 (680) | +0.13 +- 0.17, 0.75/1.00 | +6.0, +5.8 | +5.2, +4.9 | +0.07 +- 0.40, 0.83/1.00 (6) |
+| 0.3 (230) | +0.35 +- 0.19, 0.50/1.00 | +17.7, +16.2 | +10.1, +8.6 | -0.14 +- 0.60, 0.00/1.00 (5) |
+| 1 (67) | -0.20 +- 0.21, 0.54/0.96 | at edge (all 24), +19.7 | +4.4, +3.5 | one chain broken (see below) |
+| 3 (22) | -0.34 +- 0.40, sd z 1.98, 0.21/0.58 | at edge (all 24), +10.0 | +0.4, +0.7; 0.46/0.88 | -0.31 +- 0.30, 0.80/1.00 (5) |
+
+Reading so far: the flat-prior marginal is unusable for a scalar index at every S/N (its bias in sd
+grows with S/N from 6 sd at S/N 680 to 18 sd at S/N 230, and below S/N 70 the posterior piles up
+at the upper boundary of the support, the F12/F15 collapse); the fixed Gaussian prior is 4 to 10 sd
+off wherever the index is well measured; the profile is calibrated at S/N 680 but at S/N 22 its
+posterior is two times too narrow (sd z 1.98, coverage 0.21 / 0.58) and at S/N 230 and 67 its 68
+percent coverage is 0.50 and 0.54 (+- 0.10); 72 more w0 replicates are running to settle that. The
+hier amplitude hyperparameters are recovered at the high-S/N scales (mu 1.027 / 1.027 +- 0.01,
+log s -1.44 / -1.39 +- 0.03 against the generator 1.027, -1.45).
+
+**Broken hier chain (rep 4, noise 1):** 983 divergences, E-BFMI 0.03, step size 1.9e-14, posterior
+"sd" 8e-13, log s_dust at -19. A numerical floor, not a property of the target: at that log s the
+prior precision 1/(s g)^2 is of order 1e16 and swamps M^T N^-1 M in double precision, so the density
+is rounding noise and every step diverges; the chain got there in early warm-up (large trial step)
+and could not return. The other four noise-1 chains have log s_dust -1.9 to -2.0 +- 0.6 (dust is
+barely detected at noise 1, so its scatter is prior-dominated). Fix (2026-10-26 20:30): a guard
+log s_c >= -8 in both hier posteriors (`posterior.HIER_LOGS_MIN`; hyperprior mass below it 5e-12,
+so the target is unchanged to that level; states below are reported as zero density); the
+analyzer lists chains with divergences or E-BFMI below 0.3; the cell was rerun with the guard. The
+E016 SBC (42 replicates by then, all with 0 divergences) runs the unguarded code; the guard would
+not have acted on any of them.
+
 ## Negative control
 `w1` on template data: E012/F12/F15 predict a bias from the flat-prior volume term that does not
 shrink with S/N in sd units (E014: 54 sd on real data); `gauss` with the misspecified fixed prior
