@@ -351,3 +351,24 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   the DR1 sky model at band b), script `dr1_model_zero_levels.py`, then the exact grid on the
   pass-4 inputs (the grid takes minutes, so it is the instrument for zero-level sensitivity, no
   chains needed) and the chain only for the final configuration. Q15.
+  **Pass-4 zero levels (00:20, `dr1_model_zero_levels.py`, inputs in `~/data/q1_inputs_pass4/`,
+  table in `zero_levels.txt` there).** The DR1 sky model (CMB; synchrotron power law beta -3.154
+  referenced at 408 MHz; free-free T_e 7000 K; AME as DR1's `exponential` SED exp(beta (nu/22 - 1))
+  with beta -3.568, not spdust; dust MBB beta 1.500 referenced at 70 GHz with the DR1 T map; delta
+  bandpasses) reproduces the DR1 30 / 70 GHz maps and the PR4 353 GHz map with slopes 1.04 / 1.00 /
+  0.985 and correlations 0.965 / 0.9975 / 0.998 at |b| > 30 after 2 deg smoothing (the foreground
+  part alone has slopes 1.05 to 1.11 at 30 and 70 GHz, the delta-bandpass approximation, a few uK
+  in the offsets at K / 30 GHz). New offsets against the old ones: WMAP K 20.0 vs 78.3 uK_CMB,
+  LFI 30 10.7 vs 40.9, LFI 70 2.0 vs 11.2, W 1.3 to 1.5 vs 14.2 to 14.4 (the old convention removed
+  the foreground mean too), HFI 100 / 143 / 217 / 353 -65.5 / -80.3 / -174.0 / +465.7 vs -96.6 /
+  -107.9 / -201.5 / +444.5 (the old convention kept the DR1 CMB monopole plus the dust mean):
+  the old inconsistency between the sets was 30 to 90 uK_CMB. Haslam: the model puts the map
+  9.2 K above the DR1 sky at |b| > 30 (the DR1 chain's `md` monopole for Haslam, read remotely for
+  six samples, is 7.0 to 10.4 K, mean 8.9 K) with a 3.4 K non-solar dipole toward (l, b) =
+  (12, -13) that DR1 also has (fixed (3.2, 0.7, -0.8) K); passes 1 to 3 used Haslam at its native
+  zero level, which changes the high-latitude synchrotron amplitude by about 40 percent and is
+  the largest single zero-level effect on beta_s. Pass 4 subtracts the 9.2 K and keeps the Haslam
+  dipole; a variant set (`q1_inputs_pass4_hdip`, tag `pass4hdip`) removes it too. The DR1 chain
+  monopoles for WMAP/LFI scatter by 8 to 15 uK between samples; the pass-4 offsets are within one
+  sd of their means. Next: exact 2D grids on pass 4 and the variant (queued after the pass-3
+  grid), compared with the pass-2 grid (-3.3424 / 1.3654) and the pass-3 grid.
