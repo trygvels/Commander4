@@ -1,0 +1,75 @@
+{
+ "all_ok": true,
+ "results": {
+  "direct form: residual constant across (beta, mu, s), rel": {
+   "value": 6.60101421185539e-13,
+   "thresh": 1e-08,
+   "ok": true
+  },
+  "grad vs fd4 at s = 1000 (|lp| 3.4e+03), max rel": {
+   "value": 5.116988966154225e-10,
+   "thresh": 1e-05,
+   "ok": true
+  },
+  "grad vs fd4 at s = 1000, amp block max rel": {
+   "value": 5.116988966154225e-10,
+   "thresh": 1e-05,
+   "ok": true
+  },
+  "grad vs fd4 at s = 0.3 (|lp| 1.0e+04), max rel": {
+   "value": 4.233171109578659e-09,
+   "thresh": 1e-05,
+   "ok": true
+  },
+  "grad vs fd4 at s = 0.3, amp block max rel": {
+   "value": 3.730906571235858e-09,
+   "thresh": 1e-05,
+   "ok": true
+  },
+  "grad vs fd4 at s = 0.001 (|lp| 1.0e+04), max rel": {
+   "value": 2.0530768689825163e-05,
+   "thresh": 0.0001,
+   "ok": true
+  },
+  "grad vs fd4 at s = 0.001, amp block max rel": {
+   "value": 3.3751182506336323e-06,
+   "thresh": 1e-05,
+   "ok": true
+  },
+  "s = 1000 vs w1 + cmb prior: ptp(diff) / ptp(w1)": {
+   "value": 0.00019432700873289638,
+   "thresh": 1.0,
+   "ok": true
+  },
+  "s = 1000 vs w1 + cmb prior: beta gradient rel": {
+   "value": 0.0003723018321716642,
+   "thresh": 10.0,
+   "ok": true
+  },
+  "s = 10000 vs w1 + cmb prior: ptp(diff) / ptp(w1)": {
+   "value": 1.9439250157567332e-06,
+   "thresh": 1.0,
+   "ok": true
+  },
+  "s = 10000 vs w1 + cmb prior: beta gradient rel": {
+   "value": 3.7245196218560547e-06,
+   "thresh": 10.0,
+   "ok": true
+  },
+  "s = 100000 vs w1 + cmb prior: ptp(diff) / ptp(w1)": {
+   "value": 1.9439330709165185e-08,
+   "thresh": 1e-06,
+   "ok": true
+  },
+  "s = 100000 vs w1 + cmb prior: beta gradient rel": {
+   "value": 3.7245346983002684e-08,
+   "thresh": 9.999999999999999e-06,
+   "ok": true
+  },
+  "s = 0.5, mu = 1 vs gauss (no floor), rel": {
+   "value": 0.0,
+   "thresh": 1e-10,
+   "ok": true
+  }
+ }
+}

@@ -39,9 +39,10 @@ import numpy as np
 from .field import MaternField, RhoTransform
 
 try:
-    from .model import collapsed_loglike
+    from .model import collapsed_loglike, hier_loglike
 except ImportError:                      # model.py written by another agent; optional here
     collapsed_loglike = None
+    hier_loglike = None
 
 PC_ALPHA = 0.05      # tail probabilities of the PC prior, P(rho < rho_0) = P(sigma > sigma_0)
 
@@ -276,6 +277,81 @@ class CentredPosterior(_FieldPosterior):
         z, mu, ls, u = self._split(x_nc)
         w, _ = self.field.weights(float(self.transform.rho(u)))
         return self.pack(np.exp(ls) * w * z, mu, ls, u)
+
+
+class HierPosterior(CentredPosterior):
+    """E016: centred field posterior with the hierarchical amplitude prior of model.hier_loglike.
+
+    x = (y[K], mu, log_sigma, u, mu_sync, mu_dust, log s_sync, log s_dust), dim = K + 7.
+    Hyperpriors on the amplitude block: mu_c ~ N(HIER_MU0, HIER_MU_SD^2),
+    log s_c ~ N(log HIER_S0, HIER_LOGS_SD^2) (E016 "Target and priors").
+    """
+
+    HIER_MU0, HIER_MU_SD, HIER_S0, HIER_LOGS_SD = 1.0, 0.5, 0.3, 1.0
+
+    def __init__(self, field: MaternField, hyper: HyperPrior, data, g):
+        if hier_loglike is None:
+            raise ImportError("indexfield.model is not importable")
+        self.g = np.asarray(g, dtype=float)
+        self.data = data
+        self._amp = np.array([1.0, 1.0, np.log(0.3), np.log(0.3)])
+        self._last_amp_grad = np.zeros(4)
+        super().__init__(field, hyper, data=data, mode="hier", loglike=self._hier_call)
+
+    @property
+    def dim(self) -> int:
+        return self.K + 7
+
+    def _hier_call(self, beta):
+        logL, g_beta, g_mu, g_ls = hier_loglike(beta, self.data, self.g, self._amp[:2],
+                                                self._amp[2:])
+        self._last_amp_grad = np.concatenate([g_mu, g_ls])
+        return logL, g_beta
+
+    def _split(self, x: np.ndarray):
+        x = np.asarray(x, dtype=float)
+        if x.shape not in ((self.K + 3,), (self.dim,)):
+            raise ValueError(f"x must have shape ({self.dim},)")
+        return x[:self.K], float(x[self.K]), float(x[self.K + 1]), float(x[self.K + 2])
+
+    def amp_hyper_terms(self, amp):
+        """Log hyperprior of (mu_sync, mu_dust, log s_sync, log s_dust) and its gradient."""
+        mu, ls = amp[:2], amp[2:]
+        r_mu = (mu - self.HIER_MU0) / self.HIER_MU_SD
+        r_ls = (ls - np.log(self.HIER_S0)) / self.HIER_LOGS_SD
+        lp = -0.5 * float(r_mu @ r_mu + r_ls @ r_ls)
+        return lp, np.concatenate([-r_mu / self.HIER_MU_SD, -r_ls / self.HIER_LOGS_SD])
+
+    def unpack(self, x: np.ndarray) -> dict:
+        up = super().unpack(x)
+        x = np.asarray(x, dtype=float)
+        if x.shape == (self.dim,):
+            up.update(mu_amp=x[self.K + 3:self.K + 5].copy(), log_s=x[self.K + 5:].copy())
+        return up
+
+    def logp_and_grad(self, x: np.ndarray):
+        x = np.asarray(x, dtype=float)
+        if x.shape != (self.dim,):
+            raise ValueError(f"x must have shape ({self.dim},)")
+        self._amp = x[self.K + 3:].copy()
+        self._last_amp_grad = np.zeros(4)
+        lp, grad = super().logp_and_grad(x[:self.K + 3])
+        if not np.isfinite(lp):
+            return -np.inf, np.zeros(self.dim)
+        lp_a, g_a = self.amp_hyper_terms(self._amp)
+        return float(lp + lp_a), np.concatenate([grad, self._last_amp_grad + g_a])
+
+    def random_init(self, rng: np.random.Generator) -> np.ndarray:
+        x = super().random_init(rng)
+        amp = np.array([rng.normal(self.HIER_MU0, self.HIER_MU_SD),
+                        rng.normal(self.HIER_MU0, self.HIER_MU_SD),
+                        rng.normal(np.log(self.HIER_S0), self.HIER_LOGS_SD),
+                        rng.normal(np.log(self.HIER_S0), self.HIER_LOGS_SD)])
+        return np.concatenate([x, amp])
+
+    def random_amp(self, rng: np.random.Generator) -> np.ndarray:
+        """A draw of (mu_sync, mu_dust, log s_sync, log s_dust) from the hyperprior (generator)."""
+        return self.random_init(rng)[self.K + 3:]
 
 
 # ------------------------------------------------------------------------------------ self-tests

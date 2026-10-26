@@ -94,7 +94,7 @@ class PixelData:
 
 
 def _collapsed_core(M, dM, d, inv_var, region, n_beta, mode, m=None, inv_T=None,
-                    sync_col=SYNC_COL):
+                    sync_col=SYNC_COL, return_extras=False):
     """Collapsed log-likelihood and per-index-pixel gradient for a given mixing stack.
 
     M: (N, B, C), dM: (N, B) derivative of column `sync_col` with respect to beta. The component
@@ -143,7 +143,72 @@ def _collapsed_core(M, dM, d, inv_var, region, n_beta, mode, m=None, inv_T=None,
         y = np.linalg.solve(np.swapaxes(L, 1, 2), np.linalg.solve(L, MNg[:, :, None]))[:, :, 0]
         grad_p = grad_p - w * y[:, sync_col]
     grad = np.bincount(region, weights=grad_p, minlength=n_beta)
+    if return_extras:
+        # x = A'^-1 b' (the conditional posterior mean of the amplitudes) and diag(A'^-1) (their
+        # conditional variances), needed by the hierarchical-prior gradients (E016).
+        Ainv = np.linalg.inv(A)
+        return float(np.sum(logL_p)), grad, dict(x=x, Ainv_diag=np.diagonal(Ainv, axis1=1, axis2=2))
     return float(np.sum(logL_p)), grad
+
+
+# ----------------------------------------------------------------------------------------------
+# E016: hierarchical amplitude prior, a_p,c ~ N(mu_c g_p,c, (s_c g_p,c)^2) for c in HIER_COLS,
+# cmb ~ N(0, CMB_SD^2) fixed. Hyperparameters (mu_sync, mu_dust) and (log s_sync, log s_dust).
+# ----------------------------------------------------------------------------------------------
+
+HIER_COLS = (1, 2)          # sync, dust
+CMB_SD = 70.0
+
+
+def hier_prior(g, mu, log_s, cmb_sd=CMB_SD):
+    """(m, inv_T) of the hierarchical amplitude prior for shape template g (N, 3) > 0 in the
+    HIER_COLS columns, mu = (mu_sync, mu_dust), log_s = (log s_sync, log s_dust)."""
+    g = np.asarray(g, dtype=float)
+    m = np.zeros_like(g)
+    inv_T = np.empty_like(g)
+    inv_T[:, 0] = 1.0 / cmb_sd ** 2
+    for j, c in enumerate(HIER_COLS):
+        if np.any(g[:, c] <= 0.0):
+            raise ValueError(f"shape template must be strictly positive in column {c}")
+        m[:, c] = mu[j] * g[:, c]
+        inv_T[:, c] = 1.0 / (np.exp(log_s[j]) * g[:, c]) ** 2
+    return m, inv_T
+
+
+def hier_loglike(beta, data: PixelData, g, mu, log_s, cmb_sd=CMB_SD):
+    """E016 collapsed log-likelihood log L(beta, mu, s) and its gradients.
+
+    Per pixel, with A' = A + T^-1, b' = b + T^-1 m, m = mu_c g_p,c, T_p,c = (s_c g_p,c)^2:
+        F_p = 1/2 b'^T A'^-1 b' - 1/2 log det A' - 1/2 m^T T^-1 m - 1/2 log det T,
+    which is the exact log int N(d_p; M_p a, N_p) N(a; m_p, T_p) da up to -1/2 d^T N^-1 d
+    - (B/2) log 2 pi - 1/2 log det N (E016 "Target", reviewed 2026-10-26). The cmb column has
+    m = 0, T = cmb_sd^2 fixed, so its trailing terms are constants (kept for the direct-form
+    check). Gradients, with x = A'^-1 b', P = T^-1 (E016 derivation):
+        dF/dmu_c    = sum_p P_p,c g_p,c (x_p,c - m_p,c),
+        dF/dlog s_c = sum_p [ P_p,c (x_p,c - m_p,c)^2 + P_p,c (A'^-1)_p,cc ] - N,
+    and dF/dbeta is the mode-"gauss" envelope gradient (the trailing terms do not depend on beta).
+    Returns (logL, grad_beta (Nb,), grad_mu (2,), grad_log_s (2,)).
+    """
+    beta = np.asarray(beta, dtype=float)
+    if beta.shape != (data.n_beta,):
+        raise ValueError(f"beta must have shape ({data.n_beta},), got {beta.shape}")
+    mu = np.asarray(mu, dtype=float)
+    log_s = np.asarray(log_s, dtype=float)
+    m, inv_T = hier_prior(g, mu, log_s, cmb_sd)
+    M, dM = mixing(data.nu, beta[data.region], beta_d=data.beta_d, T_d=data.T_d)
+    logL, grad, ex = _collapsed_core(M, dM, data.d, data.inv_var, data.region, data.n_beta,
+                                     "gauss", m=m, inv_T=inv_T, sync_col=SYNC_COL,
+                                     return_extras=True)
+    N = data.d.shape[0]
+    logL += -0.5 * np.sum(m * m * inv_T) + 0.5 * np.sum(np.log(inv_T))
+    dx = ex["x"] - m
+    grad_mu = np.empty(2)
+    grad_ls = np.empty(2)
+    for j, c in enumerate(HIER_COLS):
+        P = inv_T[:, c]
+        grad_mu[j] = np.sum(P * np.asarray(g)[:, c] * dx[:, c])
+        grad_ls[j] = np.sum(P * dx[:, c] ** 2 + P * ex["Ainv_diag"][:, c]) - N
+    return float(logL), grad, grad_mu, grad_ls
 
 
 def collapsed_loglike(beta, data: PixelData, mode: str):
