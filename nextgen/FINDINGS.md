@@ -184,8 +184,11 @@ field mean off by 400 to 1400 sd (field version of F3, now quantified). Ridge (w
 maxima of low-S/N regions scatter by about 2 in beta and the hierarchy reads that as field variance).
 Gaussian amplitude prior N(m, T) with T^(1/2) = max(0.5 |m|, 20) on template data with 0.23 |m|
 scatter: z +0.6 (coverage 0.59 / 0.93) at noise 3, +2.1 at noise 1, +14 at noise 0.3 (median error
-1.5 in beta); the SBC run with amplitudes drawn from the same prior passes, so this is prior
-sensitivity, not a sampler error (well-specified and wide-prior diagnostics running, E012). Bearing on
+1.5 in beta). With the generative prior in the likelihood the same cells are calibrated (z +0.08 +-
+0.06 and -0.22 +- 0.06, coverage 0.69 / 0.95 and 0.68 / 0.92), so the bias is prior misspecification,
+not a sampler error; widening the prior to 10 abs(m) makes it 4x worse (z +60 and +26), because the
+Gaussian marginal tends to the w1 volume term as T grows. There is no uninformative safe Gaussian
+amplitude prior: it must be learned from the data or replaced by the profile at adequate S/N. Bearing on
 Q2/Q3: the index resolution must be chosen from the S/N map so index pixels stay above the ridge
 threshold, or a proper amplitude prior must be used and its specification treated as a modelled
 systematic.

@@ -39,6 +39,13 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   marginal and ridge targets for beta_s differ by 0.019, which is 54 posterior sd, with identical
   widths and chi-square. The prior is the dominant systematic for full-sky indices on real data;
   Q2 ranks above sampler efficiency until the coverage study settles it.
+- **Coverage study result (E012 study_v1 and diagnostics, 2026-10-26, F12):** for a spatially
+  varying index the flat-prior marginal is unusable at every S/N, the profile likelihood is
+  calibrated only above index-pixel S/N of about 15, and a Gaussian amplitude prior is calibrated
+  only when it is the generative one; widening it moves the answer toward the flat-prior collapse.
+  Next experiment: a hierarchical amplitude prior (m and T learned from the data, e.g. a smoothness
+  prior on the amplitude maps with sampled scale) in the collapsed likelihood, coverage-tested on
+  template data; and the index-resolution rule from the S/N map for the profile option (Q3).
 
 ## Q3. What is the optimal spatially varying index model?
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather

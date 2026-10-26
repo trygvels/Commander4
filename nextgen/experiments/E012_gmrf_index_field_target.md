@@ -439,6 +439,37 @@ Reading, per mode:
   template amplitudes with the 10 |m| prior), 6 replicates each at noise 0.3 and 1. Until it
   reports, the gauss column is "biased under a misspecified amplitude prior", not "wrong".
 
+**Gaussian-prior diagnostic (`diag_gauss_wellspec`, `diag_gauss_wide`; 6 replicates x noise 0.3
+and 1, gauss mode only, same NUTS budget; `coverage.py --amp-mode`):**
+
+| generative amplitudes | prior in the likelihood | noise | beta z (all pixels) | cov68 / cov95 | mu z |
+|---|---|---|---|---|---|
+| drawn from N(m, T), T^(1/2) = max(0.5 abs(m), 20) | the same | 0.3 | +0.08 +- 0.06, sd(z) 1.02 | 0.69 / 0.95 | +0.3 |
+| same | same | 1 | -0.22 +- 0.06, sd(z) 1.00 | 0.68 / 0.92 | -0.1 |
+| templates with 0.1 dex scatter | wide, T^(1/2) = 10 abs(m) | 0.3 | +60 +- 2 | 0.06 / 0.12 | +244 |
+| same | wide | 1 | +26 +- 1 | 0.00 / 0.01 | +139 |
+| (study_v1) templates with 0.1 dex scatter | default | 0.3 | +14.3 +- 0.6 | 0.10 / 0.20 | +67 |
+
+Reading: with the generative amplitude prior in the likelihood the index posterior is calibrated at
+both noise levels in every S/N bin (sd(z) 1.0, coverage 0.68 / 0.95 within binomial error, hyper-
+parameters calibrated), which confirms the SBC result with template-like S/N and settles that the
+study_v1 gauss bias is prior misspecification, not a sampler error. Widening the prior does NOT
+make it safer: with T^(1/2) = 10 abs(m) the bias is 4x larger than with the default prior and the
+pixels move toward the w1 collapse value (median error 2.3 to 2.4 in beta, posterior sd 0.03 to
+0.08). This is expected from the form of the collapsed likelihood: as T grows, the term
+-1/2 log det(M^T N^-1 M + T^-1) tends to the flat-prior volume term of w1, so the Gaussian
+marginal interpolates between a template fit with known amplitudes (tight T, exact only if m is
+right) and the w1 collapse (wide T). There is no "uninformative but safe" setting of T. The
+amplitude prior for a spatially varying index must therefore be (a) learned from the data
+(hierarchical amplitude model, m and T sampled, which is what a smoothness or power-spectrum prior
+on the amplitude maps does), or (b) avoided by using the profile likelihood at an index resolution
+whose S/N keeps w0 calibrated. Both are Paper A method choices; (a) is the natural continuation of
+the hierarchical field (Q3) and is added to OPEN_QUESTIONS Q2 as the next experiment. A corollary
+to check with the stats-reviewer before it is claimed: a Gibbs sampler over (a, beta) with flat
+amplitude priors targets the joint posterior whose beta marginal is exactly w1, so its correct
+stationary distribution is the collapsed one; the conditional chains of Commander3/4 avoid this only
+by not mixing (F14).
+
 Consequence for Q2 and the roadmap: among the prior-free options only the profile likelihood is
 usable, and only above a per-index-pixel S/N of order 10; below that the index posterior needs a
 proper amplitude prior, whose specification then matters at the level of several posterior sd.
