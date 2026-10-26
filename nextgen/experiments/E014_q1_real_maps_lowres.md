@@ -249,6 +249,19 @@ tuned chain confirms the order of magnitude (above 11x) and the same reduced chi
 14994 for ridge). The legacy move was not rerun with its own tuned proposals; the untuned chain
 already has ESS 1184 in beta_d.
 
+**Tuned round, conditional, 1000 iterations (17:44 to 19:52, proposals 5e-6 / 7e-5, acceptance
+0.361):** the proposals are now at the conditional sd and the acceptance is where a tuned random
+walk sits, but the chain still cannot reach the posterior: beta_s moved from the start -3.100 to
+-3.107 +- 0.003 (ESS 3) in 1000 iterations and is 659 +- 6 marginal sd from the exact marginal
+target; beta_d went from 1.54 to 1.3692 +- 0.0001 (ESS 4), 84 marginal sd from the target. With a
+random-walk displacement of about 5e-6 x sqrt(0.36) = 3e-6 per iteration in beta_s the chain
+needs of order (0.24 / 3e-6)^2 = 6e9 iterations to diffuse to the mode from this start (or 2e4
+iterations of drift if every accepted step went the right way), and of order (3.6e-4 / 2e-6)^2 =
+3e4 iterations per independent sample once there (F14 prediction). The Gibbs move is therefore
+not usable on real data at this resolution with any proposal width: untuned it does not move
+(acceptance 5e-4), tuned it moves 3e-6 per iteration. Reduced chi-square 14805 (amplitude draw
+includes the fluctuation term).
+
 Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
 uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
 to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `marginal` chain measures
