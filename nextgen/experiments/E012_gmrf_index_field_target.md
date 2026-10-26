@@ -381,6 +381,13 @@ a factor 0.8 is detected with probability 0.84, a bias of 0.5 sd with probabilit
 `sbc_out/default_*` (summary, analysis JSON, rank histograms, ECDF, p-value and TARP plots). The
 centred-parameterization SBC is queued behind the coverage study.
 
+Coverage study note (2026-10-26, during the run): three `invalid value encountered in multiply`
+warnings in 53 cells came from `0 * logdet` in w0 mode when an extreme beta overflows the SED (logdet
+inf); the resulting nan is treated by NUTS as zero density, the same as the -inf it would get in w1
+or gauss, so no sample is affected. `model.py` now skips the product in w0 (check 1a re-run: 20
+sub-checks pass); the running study uses the pre-change code in its workers, with identical
+behaviour.
+
 ## Negative control
 Listed under Reference 1e. The volume-term control for science is w = 1 versus w = 0 at low S/N in
 the coverage study.
