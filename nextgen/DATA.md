@@ -52,7 +52,16 @@ you actually download (path, size, checksum, date) in the "Local copies" table.
 
 | Dataset | Path | Size | Date | Notes |
 |---|---|---|---|---|
-| | | | | |
+| Cosmoglobe DR1 frequency maps (WMAP K to W, LFI 30/44/70) and component maps (cmb, synch, dust, ame, freefree), `param_CG_v09.txt`, `synch_beta/` | `~/data/cosmoglobe_DR1/` | 8.1 GB | 2026-10-25 | Used in E014. WMAP in mK, LFI in uK. Dust map referenced at 70 GHz (F13). |
+| DR1 maps, dipole and high-latitude monopole removed, plus rms maps and the nside-64 masks (dx12 common, b20) | `~/data/q1_inputs/` | 2.3 GB | 2026-10-25 | Made by `nextgen/scripts/prep_q1_inputs.py`; the E014 inputs. |
+| BeyondPlanck v2 inputs: BP frequency and component maps, Haslam (`haslam_n0512_60arcmin_uK`, rms 1 percent + 0.8 K), WMAP9 pol maps, AME masks, `BP_mean_v2.h5`, bandpasses | `~/data/beyondplanck/` | 10 GB | 2026-10-25 | Haslam map and rms used in E014. |
+| NPIPE A-split 353 and 857 GHz (UiO BeyondPlanck copies, `npipe6v20A_*_map_uK`, rms mcscaled/hrscaled) and their nside-512 preparations | `~/data/beyondplanck/npipe/`, `.../npipe/n512/` | 3.2 GB | 2026-10-25 | Header says K_CMB, values are uK_CMB; dipole kept; 857 in BP's band-integrated K_CMB convention. Fixed by `prep_pr4_maps.py --release npipe_uio` (E014 pass 2). Used in E014. |
+| Planck PR3 100 GHz full mission (R3.01, nside 2048) and nside-512 preparation | `~/data/planck_pr3/`, `.../n512/` | 2.0 GB | 2026-10-25 | Used in E014. |
+| Planck PR3 143 and 217 GHz (R3.01) | `~/data/planck_pr3/` | 62 MB each, TRUNCATED | 2026-10-25 | PLA dropped the transfers at about 60 MB (three attempts); unusable, not used. Retry from PLA or a mirror. |
+| Planck PR4 545 and 857 GHz full mission (R4.00, nside 2048) and nside-512 preparations | `~/data/planck_pr4/`, `.../n512/` | 1.4 GB | 2026-10-25 | Downloaded from NERSC at 30 kB/s (other PR4 bands not fetched). Prepared but not used in pass 2 (replaced by the NPIPE A-split UiO files; the full-mission 545/857 remain available). |
+| Haslam 408 MHz destriped, desourced (Remazeilles 2014) | `~/data/haslam/` | 12 MB | 2026-10-25 | Reference copy; E014 uses the BP-smoothed version above. |
+| Cosmoglobe DR2 | `~/data/cosmoglobe_DR2/` | empty | | Not downloaded (needs the DR2 parameter file; see STATUS "Needs Trygve"). |
+| Commander4 chain outputs (E014 passes) | `~/data/c4_chains/q1_n64/` | 10 GB | 2026-10-25/26 | ridge / resolve_chisq / conditional / marginal, suffixes nohfi, npipemask, npipetuned. |
 
 ## External low-frequency data: verified 2026-10-25
 
