@@ -1,0 +1,29 @@
+SBC summary: default.jsonl
+  configuration: param noncentred, family graph, mode gauss, rho_prior loguniform, nside_beta 4, nside_d 16, noise x1, amp_prior default, warmup 500, samples 2000 (x2 per retry, up to 5 tries), ess_min 400, L 99
+  replicates: {'ok': 300} ; used in tests: 300 (every replicate with ranks, primary); error indices []
+  unclean replicates: 0
+  sampler: seconds per replicate mean 672 / median 449 / max 2725; attempts mean 1.31; final n median 2000; min ESS median 588 (min 402); divergences 0; sampling loglike errors 0; E-BFMI median 0.95 (min 0.78); tree depth 4.2; leapfrogs per chain 52288
+  checks: loglike recovery max |diff| 1.46e-11; K^-1 form minus z^T z max |diff| 8.50e-09
+  median ESS by quantity: mu 2392, log_sigma 708, u 1838, beta_bright0 2421, beta_bright1 2429, beta_faint0 2420, beta_faint1 2361, beta_mean 2392, ztz 719, quad_Kinv 719, logprior_beta 745, loglike 717, tarp_prior_dist0 1842, tarp_local_dist0 1173
+  quantity              chi2       p  z_mean var_ratio ecdf_maxdiff  ecdf
+  mu                   10.40  0.9424   +0.76     1.037       0.0467  inside
+  log_sigma            12.93  0.8420   -1.38     0.947       0.0500  inside
+  u                    19.33  0.4356   -1.87     1.090       0.0733  inside
+  beta_bright0         17.07  0.5854   -0.96     0.926       0.0500  inside
+  beta_bright1         27.20  0.1001   +0.14     0.928       0.0533  inside
+  beta_faint0          29.73  0.0553   +0.19     1.067       0.0500  inside
+  beta_faint1          23.07  0.2344   +2.21     1.013       0.0800  inside
+  beta_mean            10.40  0.9424   +0.76     1.037       0.0467  inside  (= mu, not counted)
+  ztz                  20.40  0.3709   -0.06     0.969       0.0367  inside
+  quad_Kinv            20.40  0.3709   -0.06     0.969       0.0367  inside  (= ztz, not counted)
+  logprior_beta        24.00  0.1962   +0.71     1.032       0.0500  inside
+  loglike              10.53  0.9385   -1.04     1.002       0.0367  inside
+  tarp_prior_dist0     27.33  0.0971   -0.15     0.948       0.0300  inside
+  tarp_local_dist0     18.80  0.4697   -0.76     0.968       0.0400  inside
+  tarp_prior           27.33  0.0971   -0.15     0.948       0.0300  inside  (= tarp_prior_dist0, not counted)
+  tarp_local           18.80  0.4697   -0.76     0.968       0.0400  inside  (= tarp_local_dist0, not counted)
+  Bonferroni over 12 distinct quantities at alpha 0.01: level 0.00083, min p 0.0553 (beta_faint0)  PASS
+  KS of the p-value set against uniform: D 0.197, p 0.671  PASS
+  ECDF simultaneous 99% band (gamma 0.00037, realized coverage 0.993 on 4000 sims): all inside  PASS
+  TARP: prior references 4/4 ECP curves inside the band, local references 4/4
+  VERDICT PASS (n = 300; E012 v2 power at n = 300: sd off by 0.8 detected with prob 0.84, bias of 0.5 sd with 1.0)

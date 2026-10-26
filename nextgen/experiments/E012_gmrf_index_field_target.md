@@ -354,12 +354,43 @@ same NUTS budget for all three modes, ESS recorded per cell, w0 cells reported w
 rather than run longer (the 20 sd shift in log sigma does not depend on mixing), and a lower noise
 scale (0.3) added so that w0 is also seen where it is adequate.
 
+**L2, SBC, default configuration (gauss, non-centred, graph Matern, nside_beta 4, nside_d 16,
+noise x1, log-uniform rho; 300 replicates, 4 workers, 14.0 h wall, 2026-10-25 15:30 to 2026-10-26
+05:35): PASS.** Every replicate clean (300 ok, 0 unclean, 0 errors, 0 divergences); min ESS median
+588 (minimum 402, target 400), E-BFMI median 0.95 (minimum 0.78), attempts mean 1.31. Internal
+checks: log-likelihood recovery 1.5e-11, K^-1 quadratic form against z^T z 8.5e-9. Rank statistics
+over 12 distinct quantities (mu, log sigma, u, four field pixels, z^T z, log prior, log likelihood,
+two TARP distances), L = 99 bins:
+
+| quantity | chi2 (98 dof) | p | z of rank mean | rank var ratio | ECDF max diff |
+|---|---|---|---|---|---|
+| mu | 10.4 | 0.94 | +0.76 | 1.04 | 0.047 |
+| log sigma | 12.9 | 0.84 | -1.38 | 0.95 | 0.050 |
+| u (logit rho) | 19.3 | 0.44 | -1.87 | 1.09 | 0.073 |
+| beta, bright pixels | 17.1, 27.2 | 0.59, 0.10 | -0.96, +0.14 | 0.93, 0.93 | 0.050, 0.053 |
+| beta, faint pixels | 29.7, 23.1 | 0.055, 0.23 | +0.19, +2.21 | 1.07, 1.01 | 0.050, 0.080 |
+| z^T z | 20.4 | 0.37 | -0.06 | 0.97 | 0.037 |
+| log prior, log likelihood | 24.0, 10.5 | 0.20, 0.94 | +0.71, -1.04 | 1.03, 1.00 | 0.050, 0.037 |
+| TARP prior, local | 27.3, 18.8 | 0.097, 0.47 | -0.15, -0.76 | 0.95, 0.97 | 0.030, 0.040 |
+
+Bonferroni over 12 quantities at alpha 0.01 (level 8.3e-4): minimum p 0.055, pass. KS of the
+p-value set against uniform: D 0.20, p 0.67. Simultaneous 99 percent ECDF band (realized coverage
+0.993 on 4000 simulations): all inside. TARP: 4 of 4 prior-reference and 4 of 4 local-reference
+expected-coverage curves inside the band. Power at n = 300 (pre-registered): a posterior sd off by
+a factor 0.8 is detected with probability 0.84, a bias of 0.5 sd with probability 1.0. Output in
+`sbc_out/default_*` (summary, analysis JSON, rank histograms, ECDF, p-value and TARP plots). The
+centred-parameterization SBC is queued behind the coverage study.
+
 ## Negative control
 Listed under Reference 1e. The volume-term control for science is w = 1 versus w = 0 at low S/N in
 the coverage study.
 
 ## Conclusion
-(pending)
+(partial, 2026-10-26) The hierarchical index-field sampler with the proper Gaussian amplitude prior
+passes L1 (exact targets) and L2 (SBC, 300 replicates, all quantities calibrated at the power of the
+pre-registered test). This is the M2.1 acceptance criterion ("exact-target checks pass; SBC ranks
+uniform for beta field and hyperparameters") for the default configuration. The ridge (w0) and
+flat-prior (w1) variants are not yet quantified (F12 preliminary; coverage study running).
 
 ## Follow-ups
 - M2.2 uses this prototype with a scalar index (N_beta = 1) for the full-sky coverage table (Q2).

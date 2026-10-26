@@ -174,6 +174,32 @@ prior moves the exact beta_s target by +0.019, which is 54 ridge sd, and beta_d 
 on these maps the prior choice (Q2, F3) matters far more than the sampler width. The `conditional`
 and `marginal` chains should land on the marginal row; `resolve_chisq` has no target.
 
+**Pass 2, resolve_chisq (legacy move), 2000 iterations (20:08 to 05:55, 9.8 h, 17 ranks):**
+beta_d 1.3655 +- 0.0007, beta_s -3.343 +- 0.006, acceptance 0.073 (burn 400; ESS 1184 and 74).
+Against the exact ridge target on the same data:
+
+| | beta_s | beta_d |
+|---|---|---|
+| exact ridge | -3.34244 +- 0.00036 | 1.36539 +- 0.000043 |
+| ridge chain | shift -0.03 +- 0.10 sd, width ratio 1.01 | shift -0.17 +- 0.18 sd, width ratio 1.18 |
+| resolve_chisq chain | shift -2.7 +- 2.0 sd, width ratio 17.1 | shift +3.0 +- 0.5 sd, width ratio 16.5 |
+
+The legacy move's posterior is 16 to 17x too wide for both indices on these real maps (38165
+masked pixels at nside 64, five components, 17 bands), and its mean is shifted by 3.0 +- 0.5 ridge
+sd in beta_d (6 sigma); the beta_s shift of -2.7 sd is not significant at ESS 74. The width
+inflation is far above the 3.2x to 4.4x of the 150 to 600 pixel unit tests (E005) and follows the
+k^(1/4) scaling of F1 taken at face value (k about 1.9e5 amplitude degrees of freedom: (1.9e5 /
+600)^(1/4) x 4.4 = 18.5). Both chains used the same proposal widths (0.004 / 0.002), which are
+2.4 sd for the legacy chain and 80 / 6 sd for the ridge chain; the legacy posterior is wide enough
+to be sampled well by them, which is why its acceptance (0.073) is larger than ridge's (0.004). The
+reduced chi-square of the two chains is the same (14989 vs 14994): the sky fit does not tell the
+two apart, only the index posterior does.
+
+Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
+uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
+to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `conditional` and
+`marginal` chains (running) measure the prior effect separately.
+
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
 

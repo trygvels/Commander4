@@ -3,7 +3,12 @@
 Ranked by how much the answer changes what we build next. Each entry: why it matters, how to answer
 it, and what the answer decides. Mark an entry RESOLVED with the experiment ID when answered.
 
-## Q1. Does the legacy acceptance matter on real-data configurations?
+## Q1. Does the legacy acceptance matter on real-data configurations? (ANSWERED at nside 64, E014)
+- **Answer (2026-10-26):** yes. On DR1 WMAP + LFI, NPIPE 353 / 857, PR3 100 and Haslam at nside 64
+  with the dx12 mask, the legacy `resolve_chisq` index posterior is 16 to 17x too wide and the dust
+  index is shifted by 3 ridge sd (E014, exact grid reference). The scaling of F1 predicts factors
+  above 50 at nside 512 to 1024. Remaining: the `conditional` / `marginal` chains (prior effect,
+  running), IQU, and a direct run at nside 128 to confirm the scaling (open, lower priority).
 - **Why:** F1 shows the original move inflates and shifts beta posteriors in simulations. We need
   to know how much it changed real Commander4 results before raising it upstream.
 - **How:** Run `params/Planck_mapsonly/param_LFI+HFI+WMAP_perpix_betasamp.yml` (and the CG variant)

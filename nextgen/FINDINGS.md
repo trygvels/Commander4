@@ -18,17 +18,22 @@ amplitude degrees of freedom, and drops the -1/2 ln det A term.
 | Full-sky scalar index, 256 pixels (E002) | 3.9x | -0.43 sd (+-0.09) |
 | Full-sky scalar index, 1024 pixels (E002) | 5.7x | -0.99 sd (+-0.20) |
 | Commander4 unit test, 150 / 600 pixels (E005) | 3.2x / 4.4x | +0.50 / +0.83 sd |
+| Real maps, nside 64, 38165 masked pixels, 17 bands, 5 components (E014) | 16.5x (beta_d) / 17.1x (beta_s) | +3.0 +- 0.5 sd (beta_d), -2.7 +- 2.0 sd (beta_s) |
 
 The inflation grows roughly as k^(1/4), with k the number of amplitude degrees of freedom, so at
 full resolution (k ~ 10^7) it would be far larger. The shifted means match the profile ("ridge")
 posterior. Commander4's `perpix_betasamp` example config uses exactly this setup at nside 512. An
-independent subagent reading the upstream code reached the same conclusion. Real-data impact is
-not yet measured (see OPEN_QUESTIONS Q1).
+independent subagent reading the upstream code reached the same conclusion. Real-data impact
+(E014, Q1): on public maps at nside 64 the legacy posterior is 16 to 17x too wide against the exact
+ridge target computed on the same data, consistent with the k^(1/4) scaling (predicted 18.5x), and
+the dust index is shifted by 3 ridge sd. At nside 512 to 1024 the scaling predicts factors above 50.
 
 **F2. Fixed** on branch `fix/mcmc-marginal-acceptance` (E005, E006). Options `marginal`, `ridge`,
 `conditional` are exact for their stated targets; `resolve_chisq` keeps the old behaviour with a
 warning. Unit tests reproduce the exact posterior; a full Commander4 run on 7 MPI ranks matched the
-exact ridge target within 0.03 sd with width ratios 0.94 and 0.97.
+exact ridge target within 0.03 sd with width ratios 0.94 and 0.97. On real maps at nside 64 (E014)
+the ridge chain matches an independent grid evaluation of its target within 0.2 sd (width ratios
+1.01 and 1.18 at ESS 97 and 44).
 
 ## 2. Priors matter as much as the sampler
 

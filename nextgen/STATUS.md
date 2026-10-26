@@ -2,6 +2,41 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-26 (Mac mini, morning): Q1 answered at nside 64; index-field SBC passes; DR1 dust header error
+
+**Learned**
+- Q1 (E014, pass 2 on NPIPE 353/857 + PR3 100 + DR1 WMAP/LFI + Haslam, nside 64, dx12 mask): the
+  legacy `resolve_chisq` index posterior is 16.5x (beta_d) and 17.1x (beta_s) too wide against an
+  exact grid evaluation of the ridge target on the same data, and beta_d is shifted by +3.0 +- 0.5
+  ridge sd. The ridge chain itself matches the grid within 0.2 sd (width ratios 1.01 / 1.18). The
+  inflation follows the F1 scaling (k^(1/4) predicts 18.5x); nside 512 to 1024 would give above 50x.
+- The flat-prior marginal target on the same data sits 54 ridge sd from the ridge target in beta_s
+  (+0.019): the amplitude prior (Q2) matters more than any sampler detail on real low-resolution maps.
+- E012 L2: SBC of the hierarchical index-field sampler (gauss, non-centred, 300 replicates, 14 h)
+  PASSES on all 12 quantities (min p 0.055, Bonferroni, ECDF band, TARP); M2.1 acceptance met for
+  the default configuration.
+- F13: the Cosmoglobe DR1 dust map is referenced at 70 GHz, not the 545 GHz in its header
+  (parameter file `COMP_NU_REF_T03 = 70 857`, Commander3 keeps the first token); the BeyondPlanck
+  dust file has the same header error. The truncated local DR1 synchrotron file was re-fetched.
+
+**Running:** E014 `conditional` (since 05:56) then `marginal` (untuned, 2000 iterations), then the
+tuned-proposal round for all four modes (1000 iterations each). E012 coverage study (gauss / w0 /
+w1 x noise 0.3 / 1 / 3, 12 replicates, 4 jobs) starting as the SBC released its workers; the centred
+SBC is queued behind it.
+
+**Next**
+1. E014: conditional and marginal against the exact marginal target; tuned round; write the Q1
+   conclusion and the E014 record; then IQU and a nside 128 scaling check (lower priority).
+2. E012: coverage analysis (promote or drop F12), centred SBC; then M2.2 scalar-index coverage table
+   (Q2) with the same code.
+3. Re-rank OPEN_QUESTIONS (Q1 answered; Q2 now has a real-data number) and log in DECISIONS.
+
+**Needs Trygve:** the Q1 answer sharpens the Cosmoglobe question (F1 is a 16x effect on real data at
+nside 64; the `perpix_betasamp` example config runs at nside 512). Unchanged otherwise (F1 and the
+sign error, F11, the disabled Jeffreys prior, Q13, cluster access, DR2 parameter file, ridge
+default revisit once F12 is quantified). New: F13 is a documentation defect in a public data
+release; whether to report it to Cosmoglobe.
+
 ## 2026-10-25 (Mac mini, night): ridge field pathology found; Q1 pass 2 switched to NPIPE
 
 **Learned**
