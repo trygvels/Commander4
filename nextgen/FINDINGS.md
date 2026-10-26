@@ -114,7 +114,10 @@ term. **Impact of the sign error on BeyondPlanck's nu_p is negligible (E013):** 
 the sampling mask have median S/N above 30 and nu_p was a single parameter; the flipped volume term
 moved the full-sky conditional posterior by 0.8 of its 0.01 GHz sd (0.008 GHz), the correct
 marginal would move it equally the other way; per pixel the median shift is 0.04 ridge sd, 0.14 sd
-at S/N 3 to 10. Cosmoglobe DR1 did not use the `marginal` path at all.
+at S/N 3 to 10. Cosmoglobe DR1 did not use the `marginal` path at all. Branch status (2026-10-26 survey, E009): present at the master tip
+(2026-03-17) and on all active branches; corrected only on an unmerged test branch
+(`fable-test-SOLAT`); the 2024 MH module's acceptance is still wrong on `hfi_Tbol` after its
+2026-10-23 "Fixed MH sampler" rewrite.
 
 **F11. BeyondPlanck's absolute bandpass shift was accepted on rank 0's chi^2 only** (E015, code
 reading confirmed line by line). In the absolute-shift branch `compute_chisq_abs_bp` accumulates the
@@ -124,7 +127,8 @@ runs; `sample_bp` sums on rank 0. The 30 GHz absolute shift posterior is the con
 the WMAP, DIRBE, SPIDER, LiteBIRD and QUIET TOD modules. Also: no Gaussian prior enters the
 bandpass acceptance (flat prior; the `bp_init` "PROP MEAN" is a proposal width), and after an
 accepted shift the frequency map handed to component separation still carries the old correction
-while the mixing matrices use the new one.
+while the mixing matrices use the new one. Present on all 37 Commander3 branches with source (2026-10-26
+survey, E015).
 
 ## 5. Commander4 versus Commander3 coverage
 

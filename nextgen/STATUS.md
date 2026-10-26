@@ -15,6 +15,12 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 - E012 L2: SBC of the hierarchical index-field sampler (gauss, non-centred, 300 replicates, 14 h)
   PASSES on all 12 quantities (min p 0.055, Bonferroni, ECDF band, TARP); M2.1 acceptance met for
   the default configuration.
+- Commander3 branch survey (E009, E015): all four Commander3 defects are present at the master tip
+  (2026-03-17) and on every active branch (akari, spider, hfi, hfi_Tbol, litebird). The marginal
+  sign is corrected only on an unmerged test branch; `hfi_Tbol`'s 2026-10-23 MH rewrite still
+  accepts on chi2 after CG. Our earlier readings were on dr1_repro-era code; conclusions unchanged.
+- F14 (E014): the Gibbs `conditional` chain cannot mix on real data (conditional sd of beta_s 2e-6
+  against marginal 3.6e-4); the collapsed modes do.
 - F13: the Cosmoglobe DR1 dust map is referenced at 70 GHz, not the 545 GHz in its header
   (parameter file `COMP_NU_REF_T03 = 70 857`, Commander3 keeps the first token); the BeyondPlanck
   dust file has the same header error. The truncated local DR1 synchrotron file was re-fetched.

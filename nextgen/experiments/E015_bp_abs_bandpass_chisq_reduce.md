@@ -47,3 +47,11 @@ test must include a one-rank versus many-rank equivalence check.
 
 ## Follow-ups
 - Measure the effect on simulated LFI TOD with Commander3 if a cluster becomes available.
+
+
+## Branch survey (2026-10-26)
+The absolute bandpass chi2 is unreduced on all 37 branches with source (master
+`comm_tod_lfi_smod.f90` line 913 and `comm_tod_bandpass_mod.f90` lines 44 to 49 summing on `myid == 0`;
+hfi branch also in akari, dirbe, hfi, litebird and spider TOD submodules). The dr1_repro tip removes
+absolute bandpass sampling for WMAP only. No commit message on any branch mentions it. See
+`nextgen/research/commander3_branch_survey_2026-10-26.txt` and E009 for the method.

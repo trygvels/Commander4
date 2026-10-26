@@ -97,3 +97,23 @@ New facts the review added (not in the text above):
   `UPDATE_CG_GROUPS = none` Gibbs chain has no common joint in that case.
 - Hard-bound handling by redraw-until-inside makes the stationary density pi(theta) Z(theta);
   negligible at BP10 settings (Z = 1 to double precision).
+
+
+## Branch survey (2026-10-26)
+A subagent scanned all 53 branches of Cosmoglobe/Commander after a fetch (raw notes in
+`nextgen/research/commander3_branch_survey_2026-10-26.txt`); the lines quoted here were re-read by
+hand. The clone used for the earlier readings was on `dr1_repro` (673584ed, 2025-07-08), not on
+master; the findings hold at the master tip f760333a (2026-03-17) and on every branch with source.
+- Log-determinant sign (F10): present on master (`comm_nonlin_smod.f90` lines 3996 and 4090,
+  `- 0.5d0*log(invMNM)`), devel, dr1_repro, hfi, litebird, AST9240_2024 and all 30 active 2025 to
+  2026 branches. Fixed only on `fable-test-SOLAT` (c7875148, 2026-06-11, `+ 0.5d0*log(invMNM)` with
+  a BUGFIX comment), a test branch whose commit message says the changes are not to be merged.
+- MH module acceptance after CG (the Commander4 F1 analogue): present on every branch that has
+  `comm_mh_specind_mod.f90` (master, devel, hfi, litebird, AST9240_2024, the akari / spider / hfi
+  branches); absent on dr1_repro (module does not exist there). `hfi_Tbol` (ba088787, 2026-10-23,
+  "Fixed MH sampler") restructures the module but still runs CG inside the loop and accepts on chi2.
+- Jeffreys prior hard-disabled (`cs_apply_jeffreys = .false.`, "Disabled until properly debugged
+  and validated"): every branch with source, since 0550debf (2020-04-29).
+- Active development (commits since 2026-06): akari (104), spider (71), hfi (68), hfi_Tbol_polang_poleff
+  (68), hfi_Tbol (67), all branched from master at a7c33da0 (2025-08-20); master, devel, litebird
+  and dr1_repro have no commits since June 2026.
