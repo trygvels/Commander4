@@ -3,15 +3,15 @@ coverage study: indexfield/checks/out/coverage/study_v1_hier_gaussgen
 config: {"nside_d": 16, "nside_beta": 2, "family": "graph_laplacian", "rho_prior": "loguniform", "param": "centred", "amp_prior": "default", "theta_fixed": null, "init": "random", "n_warmup": 500, "n_samples": 1000, "target_accept": 0.8, "max_depth": 10, "seed": 20261025, "amp_mode": "hier", "overwrite": false, "n_rep": 12, "rep_start": 0, "noise": [1.0], "modes": ["hier"]}
 
 noise x1, mode hier: 12 replicates, divergences 2 (in 1 chains), zero-density evaluations 0, min E-BFMI 0.03, median min ESS 18, 237 s per chain
-  bin / quantity              n          mean z   sd z          cov68          cov95    med sd  med |err|  med ESS
-  mu                         12   +0.77 +- 0.36   1.25   0.42 +- 0.14   0.83 +- 0.11    0.0930    0.1066      187
-  log_sigma                  12   +0.32 +- 0.44   1.51   0.67 +- 0.14   0.83 +- 0.11    0.5629    0.1980       18
-  u                          12   -0.09 +- 0.30   1.04   0.75 +- 0.12   0.92 +- 0.08    1.7528    0.8911      158
-  beta (all pixels)         576   +0.34 +- 0.05   1.14   0.59 +- 0.02   0.93 +- 0.01    0.1691    0.1262      273
-  beta S/N < 0.608          115   +0.23 +- 0.09   1.01   0.52 +- 0.05   0.97 +- 0.01    0.1538    0.1205      234
-  beta S/N [0.608, 0.803)    115   +0.18 +- 0.11   1.13   0.73 +- 0.04   0.94 +- 0.02    0.2818    0.1253      296
-  beta S/N [0.803, 4.67)    115   +0.57 +- 0.13   1.44   0.50 +- 0.05   0.83 +- 0.03    0.1979    0.1355      271
-  beta S/N [4.67, 5.79)     115   +0.27 +- 0.09   0.93   0.63 +- 0.05   0.97 +- 0.01    0.2014    0.1482      268
-  beta S/N >= 5.79          116   +0.47 +- 0.10   1.09   0.58 +- 0.05   0.93 +- 0.02    0.1501    0.1224      285
+  bin / quantity              n        mean z [rep SE]   sd z          cov68          cov95    med sd  med |err|  med ESS
+  mu                         12   +0.77 +- 0.36          1.25   0.42 +- 0.14   0.83 +- 0.11    0.0930    0.1066      187
+  log_sigma                  12   +0.32 +- 0.44          1.51   0.67 +- 0.14   0.83 +- 0.11    0.5629    0.1980       18
+  u                          12   -0.09 +- 0.30          1.04   0.75 +- 0.12   0.92 +- 0.08    1.7528    0.8911      158
+  beta (all pixels)         576   +0.34 +- 0.05 [0.17]   1.14   0.59 +- 0.02   0.93 +- 0.01    0.1691    0.1262      273
+  beta S/N < 0.608          115   +0.23 +- 0.09 [0.21]   1.01   0.52 +- 0.05   0.97 +- 0.01    0.1538    0.1205      234
+  beta S/N [0.608, 0.803)    115   +0.18 +- 0.11 [0.13]   1.13   0.73 +- 0.04   0.94 +- 0.02    0.2818    0.1253      296
+  beta S/N [0.803, 4.67)    115   +0.57 +- 0.13 [0.24]   1.44   0.50 +- 0.05   0.83 +- 0.03    0.1979    0.1355      271
+  beta S/N [4.67, 5.79)     115   +0.27 +- 0.09 [0.24]   0.93   0.63 +- 0.05   0.97 +- 0.01    0.2014    0.1482      268
+  beta S/N >= 5.79          116   +0.47 +- 0.10 [0.21]   1.09   0.58 +- 0.05   0.93 +- 0.02    0.1501    0.1224      285
 
-columns: n = pooled count; mean z = mean (post. mean - truth) / post. sd with its SE; sd z = sd of z (1 if calibrated); cov68, cov95 = fraction of truths inside the central 68 / 95 percent intervals with binomial SE; med sd = median posterior sd; med |err| = median |post. mean - truth|; med ESS = median Geyer ESS. Curves, not a test (E012 principle 4).
+columns: n = pooled count; mean z = mean (post. mean - truth) / post. sd with its pooled SE and, for beta rows, the replicate-clustered SE in brackets (the one to use: pixels of a replicate share truth and noise); sd z = sd of z (1 if calibrated); cov68, cov95 = fraction of truths inside the central 68 / 95 percent intervals with binomial SE; med sd = median posterior sd; med |err| = median |post. mean - truth|; med ESS = median Geyer ESS. Curves, not a test (E012 principle 4).

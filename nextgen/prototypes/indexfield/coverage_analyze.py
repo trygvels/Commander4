@@ -55,7 +55,11 @@ def calibration(truth, mean, sd, q):
     return z, in68, in95
 
 
-def summarize(z, in68, in95, sd, abs_err, ess=None):
+def summarize(z, in68, in95, sd, abs_err, ess=None, rep=None):
+    """Pooled statistics of z. `rep` (replicate index per entry) adds the replicate-clustered
+    standard error of mean z: pixels of one replicate share the field hyperparameters, the truth
+    and the noise realization, so their z are correlated and the pooled SE understates (E016
+    residual check: pooled SE 0.04, clustered SE 0.15 for 12 replicates x 48 pixels)."""
     n = int(z.size)
     if n == 0:
         return dict(n=0)
@@ -66,6 +70,13 @@ def summarize(z, in68, in95, sd, abs_err, ess=None):
                cov68=c68, cov68_se=float(np.sqrt(c68 * (1 - c68) / n)),
                cov95=c95, cov95_se=float(np.sqrt(c95 * (1 - c95) / n)),
                sd_median=float(np.median(sd)), abs_err_median=float(np.median(abs_err)))
+    if rep is not None:
+        reps = np.unique(rep)
+        means = np.array([z[rep == r].mean() for r in reps])
+        out["n_rep"] = int(reps.size)
+        out["bias_se_rep"] = float(means.std(ddof=1) / np.sqrt(reps.size)) if reps.size > 1 \
+            else float("nan")
+        out["bias_mean_rep"] = means.tolist()
     if ess is not None:
         out["ess_median"] = float(np.median(ess))
         out["ess_min"] = float(np.min(ess))
@@ -75,8 +86,9 @@ def summarize(z, in68, in95, sd, abs_err, ess=None):
 def fmt_row(label, s):
     if s.get("n", 0) == 0:
         return f"  {label:<22s} {'(no data)':>9s}"
-    return (f"  {label:<22s} {s['n']:>6d}  {s['bias_mean']:+6.2f} +- {s['bias_se']:4.2f}  "
-            f"{s['bias_sd']:5.2f}  {s['cov68']:5.2f} +- {s['cov68_se']:4.2f}  "
+    rep_se = f" [{s['bias_se_rep']:4.2f}]" if "bias_se_rep" in s else " " * 7
+    return (f"  {label:<22s} {s['n']:>6d}  {s['bias_mean']:+6.2f} +- {s['bias_se']:4.2f}"
+            f"{rep_se}  {s['bias_sd']:5.2f}  {s['cov68']:5.2f} +- {s['cov68_se']:4.2f}  "
             f"{s['cov95']:5.2f} +- {s['cov95_se']:4.2f}  {s['sd_median']:8.4f}  "
             f"{s['abs_err_median']:8.4f}" + (f"  {s['ess_median']:7.0f}" if "ess_median" in s
                                             else ""))
@@ -91,7 +103,7 @@ def bin_label(lo, hi):
     return f"beta S/N >= {10 ** lo:.3g}"
 
 
-HEADER = (f"  {'bin / quantity':<22s} {'n':>6s}  {'mean z':>14s}  {'sd z':>5s}  {'cov68':>13s}  "
+HEADER = (f"  {'bin / quantity':<22s} {'n':>6s}  {'mean z [rep SE]':>21s}  {'sd z':>5s}  {'cov68':>13s}  "
           f"{'cov95':>13s}  {'med sd':>8s}  {'med |err|':>8s}  {'med ESS':>7s}")
 
 
@@ -163,20 +175,24 @@ def main(argv=None):
             q = np.concatenate([r["quantiles"][:, 3:] for r in rr], axis=1)
             ess = np.concatenate([r["ess"][3:] for r in rr])
             lsnr = np.log10(np.concatenate([r[args.snr] for r in rr]))
+            rep = np.concatenate([np.full(r["truth"].size - 3, r["rep"]) for r in rr])
             z, in68, in95 = calibration(tr, mn, sd, q)
-            s_all = summarize(z, in68, in95, sd, np.abs(mn - tr), ess)
+            s_all = summarize(z, in68, in95, sd, np.abs(mn - tr), ess, rep)
             cell["beta_all"] = s_all
             lines.append(fmt_row("beta (all pixels)", s_all))
             for b in range(len(edges) - 1):
                 sel = (lsnr >= edges[b]) & (lsnr < edges[b + 1])
-                s = summarize(z[sel], in68[sel], in95[sel], sd[sel], np.abs(mn - tr)[sel], ess[sel])
+                s = summarize(z[sel], in68[sel], in95[sel], sd[sel], np.abs(mn - tr)[sel], ess[sel],
+                              rep[sel])
                 s.update(lo=float(edges[b]), hi=float(edges[b + 1]),
                          snr_median=float(10 ** np.median(lsnr[sel])) if sel.any() else None)
                 cell["beta_bins"].append(s)
                 lines.append(fmt_row(bin_label(edges[b], edges[b + 1]), s))
             summary["cells"][key] = cell
     lines += ["", "columns: n = pooled count; mean z = mean (post. mean - truth) / post. sd with "
-              "its SE; sd z = sd of z (1 if calibrated); cov68, cov95 = fraction of truths inside "
+              "its pooled SE and, for beta rows, the replicate-clustered SE in brackets (the one "
+              "to use: pixels of a replicate share truth and noise); sd z = sd of z (1 if "
+              "calibrated); cov68, cov95 = fraction of truths inside "
               "the central 68 / 95 percent intervals with binomial SE; med sd = median posterior "
               "sd; med |err| = median |post. mean - truth|; med ESS = median Geyer ESS. Curves, "
               "not a test (E012 principle 4)."]

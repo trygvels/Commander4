@@ -234,9 +234,12 @@ lowest populated S/N bins (S/N 1.6 to 3.3 at noise 0.3, below 0.54 at noise 1 an
 shape template: a 30 percent large-scale distortion or 23 percent independent per-pixel scatter of
 the template gives z within 0.3 sd and coverage 0.64 to 0.75 / 0.92 to 0.98 everywhere, because the
 learned scatter absorbs the shape error (log s recovered to its posterior width in both cases, e.g.
--1.10 +- 0.04 against the expected -1.11 for the scattered template at noise 0.3). Residuals: a
-+0.2 to +0.35 sd mean bias at noise 1 common to all three template variants, and one 58-pixel bin
-(S/N 3.3 to 15.6 at noise 0.3) with coverage 0.48 / 0.86, the same as the profile there. This is the
+-1.10 +- 0.04 against the expected -1.11 for the scattered template at noise 0.3). Standard errors
+above are pooled over pixels; with the replicate-clustered SE (pixels of a replicate share truth
+and noise) the all-pixel biases are +0.10 +- 0.07, +0.35 +- 0.16 and +0.24 +- 0.25, so the apparent
++0.3 sd bias at noise 1, common to all variants because they share the 12 truths, is a 2 sigma
+fluctuation (36-replicate check running). One 58-pixel bin (S/N 3.3 to 15.6 at noise 0.3) has
+coverage 0.48 / 0.86, the same as the profile there. This is the
 first mode in this programme usable below index-pixel S/N 15 without a hand-set amplitude prior;
 it answers the Q2 design question in favour of learning the amplitude prior rather than fixing it or
 removing it (F12).

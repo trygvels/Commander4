@@ -171,7 +171,8 @@ noise 0.3 and 1) is met in all bins but the 58-pixel one above.
 
 Residuals worth understanding: (i) at noise 1 all three variants show a positive mean z of +0.2
 to +0.35 (0.3 sd) in the measured bins with sd z 0.85 to 0.93, i.e. a small bias with slightly
-over-wide intervals, not seen at noise 0.3 or 3; (ii) the misspecified templates are, if
+over-wide intervals, not seen at noise 0.3 or 3 (resolved below: +0.30 +- 0.15 with the
+replicate-clustered SE, a fluctuation shared by all variants through the common truths); (ii) the misspecified templates are, if
 anything, better calibrated than the ideal one (the learned scatter absorbs the shape error, see
 the hyperparameters below); (iii) low E-BFMI (0.03 to 0.17) at every noise level and 2 and 3
 divergences in one and two chains at noise 3 (hier, hier_distort), median min ESS 13 to 29 per
@@ -230,6 +231,24 @@ Remaining suspects: sampling in the centred parameterization at noise 1 (the fun
 data and prior are comparable: min ESS 18 to 29 on log sigma, E-BFMI 0.03, divergences), or the
 target. Part 2 (16:10): the same 12 cells with `--param noncentred`
 (`study_v1_hier_gaussgen_nc/`). If the bias goes away it is sampling; the SBC then confirms.
+
+Part 2 result (16:50, 372 s per cell): non-centred mixes well (median min ESS 394, E-BFMI 0.79,
+no divergences) and the bias stays: z +0.30 +- 0.04, sd z 0.88, coverage 0.66 / 0.97. So it is
+not sampling either.
+
+Resolution of the pooled standard error: the per-replicate mean z over the 48 index pixels is
+(-0.71, +0.43, -0.02, +0.90, -0.13, +0.72, +0.01, -0.21, +0.34, +0.83, +0.42, +1.04) for this
+run, and the same pattern to +-0.1 in every hier run at noise 1 (template generator, centred or
+non-centred, distorted or scattered template), because all share the 12 index-field truths and
+noise realizations (seeded by replicate). The field-mean mu z per replicate follows the same
+pattern (-1.0 to +2.9). Pixels of one replicate are therefore not independent and the pooled SE
+0.04 is wrong; the replicate-clustered SE of the mean z is 0.15, so the "residual" is +0.30 +- 0.15,
+a 2 sigma fluctuation of 12 replicates (the E012 well-specified gauss diagnostic, 6 replicates,
+gave -0.22 +- 0.24 the same way). `coverage_analyze.py` now prints the clustered SE in brackets
+after the pooled one for every beta row, and all summaries were regenerated; the E012 numbers that
+matter are unchanged in kind (gauss at noise 1: +2.08 +- 0.05 [0.11], every replicate between +1.5
+and +2.7; w0 at noise 3: +9.1 [1.4]). Part 3 (16:51): 24 fresh replicates (12 to 35), non-centred,
+hier generator, noise 1 (`study_v1_hier_gaussgen_nc2/`), to settle it at 36 replicates.
 
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,
