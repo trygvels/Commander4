@@ -238,7 +238,8 @@ learned scatter absorbs the shape error (log s recovered to its posterior width 
 above are pooled over pixels; with the replicate-clustered SE (pixels of a replicate share truth
 and noise) the all-pixel biases are +0.10 +- 0.07, +0.35 +- 0.16 and +0.24 +- 0.25, so the apparent
 +0.3 sd bias at noise 1, common to all variants because they share the 12 truths, is a 2 sigma
-fluctuation (36-replicate check running). One 58-pixel bin (S/N 3.3 to 15.6 at noise 0.3) has
+fluctuation: 24 fresh replicates at noise 1 give +0.01 +- 0.07, and all 36 give +0.10 +- 0.07
+with coverage 0.71 / 0.975. One 58-pixel bin (S/N 3.3 to 15.6 at noise 0.3) has
 coverage 0.48 / 0.86, the same as the profile there. This is the
 first mode in this programme usable below index-pixel S/N 15 without a hand-set amplitude prior;
 it answers the Q2 design question in favour of learning the amplitude prior rather than fixing it or

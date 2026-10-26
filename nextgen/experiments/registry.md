@@ -30,3 +30,4 @@ NSIDE 16, common FWHM 480 arcmin, bands 30/44/70/100/143/217/353 GHz, noise RMS 
 per mode on 2 cores. The exact target is a bounded coarse-to-fine grid computed for both log-det
 settings by the analysis script.
 | E016 | 2026-10-26 | Q2: does a hierarchical (learned mean scale and width) amplitude prior give calibrated index-field posteriors on template data where the fixed Gaussian prior is biased and the flat marginal collapses | `E016_hierarchical_amplitude_prior.md` | coverage done: calibrated at every S/N bin where gauss and w0 are not (z within 0.35 sd, cov 0.64 to 0.73 / 0.92 to 0.97 over all pixels at noise 0.3 / 1 / 3), also with 30 percent distorted or 23 percent scattered shape templates; SBC (non-centred) running | |
+| E017 | 2026-10-26 | Q2 / M2.2: coverage of profile (w0), flat marginal (w1), fixed Gaussian and hierarchical amplitude priors for a scalar full-sky index on template data | `E017_scalar_index_coverage.md` | running | |

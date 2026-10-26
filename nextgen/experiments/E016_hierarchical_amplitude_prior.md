@@ -249,6 +249,12 @@ after the pooled one for every beta row, and all summaries were regenerated; the
 matter are unchanged in kind (gauss at noise 1: +2.08 +- 0.05 [0.11], every replicate between +1.5
 and +2.7; w0 at noise 3: +9.1 [1.4]). Part 3 (16:51): 24 fresh replicates (12 to 35), non-centred,
 hier generator, noise 1 (`study_v1_hier_gaussgen_nc2/`), to settle it at 36 replicates.
+Result (18:45): the 24 fresh replicates give mean z over all pixels +0.01 +- 0.07 (clustered SE;
+per-bin -0.19 to +0.09), coverage 0.74 / 0.98, 0 divergences, median min ESS 357, 388 s per chain;
+pooled with the first 12, the 36-replicate mean z is +0.10 +- 0.07 with coverage 0.71 / 0.975. The
++0.30 of the first 12 was a fluctuation of their shared truths. Resolved: no residual bias at
+noise 1 at the 0.1 sd level; the hier posterior is if anything slightly conservative (sd z 0.86,
+cov68 0.71 to 0.74 on the fresh replicates).
 
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,
