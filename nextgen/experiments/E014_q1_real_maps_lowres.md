@@ -319,9 +319,9 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   acceptance 0.04 (the pass-2 proposals, 0.00012 / 0.0009, are now 1 to 25 times the posterior
   sd; the sync posterior is three times narrower than in pass 2, so the chain is usable but the
   dust proposal is far too wide). Against the pass-2 ridge values (-3.3425 +- 0.0003,
-  1.36540 +- 0.00001, 17 bands with NPIPE A-split 353 and PR3 100): the full-sky synchrotron
+  1.36540 +- 0.00004, 17 bands with NPIPE A-split 353 and PR3 100): the full-sky synchrotron
   index moves by +0.43 and the dust index by +0.05 when the HFI maps change, i.e. by about
-  1400 posterior sd in each. The all-sky reduced chi-square rises during burn-in from 10700 to
+  1250 pass-2 posterior sd in each. The all-sky reduced chi-square rises during burn-in from 10700 to
   15500 and stays there (pass 2: 9060 to 14994; the index step sees only the dx12 chisq-mask
   region, the logged chi-square is all-sky); nothing hits a bound. Reading: the single full-sky
   index is dominated by the data set (zero levels, which HFI bands enter, bandpass and CO
