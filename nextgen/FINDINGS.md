@@ -33,7 +33,8 @@ the dust index is shifted by 3 ridge sd. At nside 512 to 1024 the scaling predic
 warning. Unit tests reproduce the exact posterior; a full Commander4 run on 7 MPI ranks matched the
 exact ridge target within 0.03 sd with width ratios 0.94 and 0.97. On real maps at nside 64 (E014)
 the ridge chain matches an independent grid evaluation of its target within 0.2 sd (width ratios
-1.01 and 1.18 at ESS 97 and 44).
+1.01 and 1.18 at ESS 97 and 44), and the marginal chain matches the exact flat-prior marginal
+target within 0.05 sd (width ratios 1.08 and 1.23).
 
 ## 2. Priors matter as much as the sampler
 
@@ -43,6 +44,10 @@ normalized at 545 GHz (above all bands), the log density rose by ~1800 towards t
 the exact posterior sat on the hard limits (beta_s = -2.008 at the bound, input -3.0), with a second
 local mode near beta_s = -3.5 separated by a barrier of ~22 in log density. Chi^2 at the best-fit
 amplitudes was slightly better at the true beta.
+On real nside-64 maps (E014, dust referenced at 70 GHz, 17 bands, 38165 pixels) the volume term
+shifts the exact beta_s target by +0.019 (54 ridge sd) and beta_d by +0.0002 (5 sd) with the same
+widths; two exact chains (`ridge`, `marginal`) reproduce both targets within 0.2 sd, and the
+reduced chi-square differs by 0.07 percent, so the data do not pick the prior.
 
 **F4. Ridge is the principled default.** Ridge is the profile ("spectral") likelihood of parametric
 component separation (Stompor et al. 2009). As an MH target it equals the flat-prior marginal times

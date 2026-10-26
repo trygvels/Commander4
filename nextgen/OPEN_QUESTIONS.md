@@ -32,6 +32,10 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   prior is the one in the sampled target. Sampler correctness is therefore tested with a proper
   Gaussian amplitude prior and its exact marginal; ridge, flat-prior marginal and Jeffreys are
   compared as a frequentist coverage study (bias and coverage versus S/N), as principle 4 requires.
+- **Real-data size of the effect (E014, 2026-10-26):** at nside 64 with 17 bands the flat-prior
+  marginal and ridge targets for beta_s differ by 0.019, which is 54 posterior sd, with identical
+  widths and chi-square. The prior is the dominant systematic for full-sky indices on real data;
+  Q2 ranks above sampler efficiency until the coverage study settles it.
 
 ## Q3. What is the optimal spatially varying index model?
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather

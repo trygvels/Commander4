@@ -209,10 +209,29 @@ collapsed `ridge` and `marginal` chains do not have this problem). The tuned rou
 used in the comparison. (Reduced chi-square 14796, lower than ridge because the amplitude draw
 includes the fluctuation term, not because the fit is better.)
 
+**Pass 2, marginal (flat amplitude priors, -1/2 ln det A volume term), 2000 iterations (07:57 to
+09:36, 17 ranks):** beta_d 1.36562 +- 0.00005, beta_s -3.3232 +- 0.0004, acceptance 0.003 (burn
+400; ESS 45 and 76; 0.004 / 0.002 proposals, same untuned widths as the other modes). Against the
+exact flat-prior marginal target from the grid (-3.32314 +- 0.00033, 1.36562 +- 0.000043): shift
+-0.05 +- 0.12 sd in beta_s and -0.04 +- 0.18 sd in beta_d, width ratios 1.08 and 1.23 (widths
+uncertain at the 15 to 20 percent level at this ESS). The `marginal` chain is therefore exact for
+its stated target on real data, as `ridge` is for its own. Relative to the ridge chain the marginal
+chain sits +53.4 +- 0.2 ridge sd higher in beta_s and +4.5 +- 0.2 sd higher in beta_d, matching the
+grid prediction (54 and 5 sd): the two exact chains measure the F3 volume-term effect directly on
+the data. Reduced chi-square 14983 vs 14994 for ridge, a 0.07 percent difference; the sky fit does
+not distinguish the two priors. Both sds are equal to the ridge sds within the ESS uncertainty, so
+on these maps the prior choice moves the beta_s mean by 54 sd without changing the width.
+
+**Status of the four modes on pass-2 data:** ridge and marginal land on their independent exact
+targets (within 0.2 sd); resolve_chisq is 16 to 17x too wide and 3 sd off in beta_d; conditional
+cannot mix (F14). The tuned round (proposals at about 2.4 sd for the collapsed modes, conditional
+sd for `conditional`) is running and will tighten the width ratios.
+
 Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
 uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
-to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `conditional` and
-`marginal` chains (running) measure the prior effect separately.
+to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `marginal` chain measures
+the prior effect: 54 ridge sd in beta_s on these maps (Q2, F3), with the same width; the
+`conditional` chain cannot mix on real data (F14).
 
 ## Negative control
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
