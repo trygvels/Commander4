@@ -77,7 +77,14 @@ cd nextgen/prototypes && python -m indexfield.scalar_coverage_analyze --dir inde
 ```
 
 ## Result
-(running)
+**Self-test, first pass (18:30, 500+1000 NUTS, pinned hyperpriors):** on the noise-3 replicate
+(truth -3.151, full-sky S/N 23) the pinned hier posterior gives -3.098 +- 0.123 against the gauss
+grid -3.083 +- 0.119: width ratio 1.03, mean difference -0.13 grid sd at ESS 196 (Monte Carlo
+error 0.07 sd), inconclusive at the 0.1 sd criterion; rerun with 3000 samples. On the same
+replicate the flat-prior marginal `w1` has its maximum at the upper edge of the support (-1.5): the
+F12/F15 collapse appears for a scalar index at S/N 23. `grid_posterior` now reports such cells
+truncated to the support with an `at_edge` flag instead of failing. The grid modes of the study
+were launched at 18:52 (2 workers); the hier modes follow once the self-test passes.
 
 ## Negative control
 `w1` on template data: E012/F12/F15 predict a bias from the flat-prior volume term that does not

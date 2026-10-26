@@ -105,7 +105,12 @@ def grid_posterior(data: PixelData, mode: str, lo=-4.5, hi=-1.5, n_coarse=3001, 
     lp = _logpost_grid(data, mode, coarse)
     i = int(np.nanargmax(lp))
     if i in (0, coarse.size - 1):
-        raise RuntimeError(f"{mode}: coarse maximum at the grid edge ({coarse[i]:.3f})")
+        # The posterior piles up at the boundary of the support (the flat-prior w1 collapse of
+        # F12/F15 for a scalar index): report the posterior truncated to [lo, hi] and flag it.
+        s = grid_summary(coarse, lp)
+        s.update(grid_lo=float(lo), grid_hi=float(hi), n_grid=int(n_coarse), n_evals=int(n_coarse),
+                 sd_coarse=float("nan"), at_edge=True)
+        return s
     # curvature estimate from the three points around the maximum
     h = coarse[1] - coarse[0]
     curv = (lp[i - 1] - 2 * lp[i] + lp[i + 1]) / h ** 2
@@ -120,7 +125,7 @@ def grid_posterior(data: PixelData, mode: str, lo=-4.5, hi=-1.5, n_coarse=3001, 
         ok_spacing = (fine[1] - fine[0]) < s["sd"] / 50.0
         if ok_width and ok_spacing:
             s.update(grid_lo=float(fine[0]), grid_hi=float(fine[-1]), n_grid=int(n_fine),
-                     n_evals=int(n_coarse + n_fine), sd_coarse=float(sd0))
+                     n_evals=int(n_coarse + n_fine), sd_coarse=float(sd0), at_edge=False)
             return s
         centre = s["mean"]
         half = (half_sd + 1.0) * s["sd"] if ok_spacing else half
@@ -223,9 +228,11 @@ def run_cell(job):
     if mode in GRID_MODES:
         s = grid_posterior(data, mode)
         record.update(names=["beta"], truth=[truth["beta"]], mean=[s["mean"]], sd=[s["sd"]],
-                      quantiles=np.asarray(s["quantiles"])[:, None], grid=dict(
-                          lo=s["grid_lo"], hi=s["grid_hi"], n=s["n_grid"], n_evals=s["n_evals"]))
-        status = dict(z=(s["mean"] - truth["beta"]) / s["sd"], sd=s["sd"], extra="")
+                      quantiles=np.asarray(s["quantiles"])[:, None], at_edge=s["at_edge"],
+                      grid=dict(lo=s["grid_lo"], hi=s["grid_hi"], n=s["n_grid"],
+                                n_evals=s["n_evals"]))
+        status = dict(z=(s["mean"] - truth["beta"]) / s["sd"], sd=s["sd"],
+                      extra=" AT EDGE of the support" if s["at_edge"] else "")
     else:
         rng_g = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale)), 11])
         g = coverage.shape_template(mode, cfg["nside_d"], rng_g)
@@ -248,7 +255,7 @@ def run_cell(job):
                 seconds=record["seconds_total"], snr=snr, **status)
 
 
-def _selftest(nside_d=16, noise_scale=3.0, seed=20261026):
+def _selftest(nside_d=16, noise_scale=3.0, seed=20261026, n_samples=1000):
     """Pinned hier posterior against the gauss grid with the generator's (mu*, s*)."""
     rng = np.random.default_rng([seed, 0, int(1000 * noise_scale)])
     data, truth = simulate_scalar(nside_d, rng, noise_scale)
@@ -262,7 +269,7 @@ def _selftest(nside_d=16, noise_scale=3.0, seed=20261026):
     grid = grid_posterior(data_star, "gauss")
     t_grid = time.time() - t0
     t0 = time.time()
-    s = sample_hier(data, g, np.random.default_rng(seed + 1), 500, 1000,
+    s = sample_hier(data, g, np.random.default_rng(seed + 1), 500, n_samples,
                     pin=(GEN_MU, GEN_S))
     t_nuts = time.time() - t0
     dmean = (s["mean"][0] - grid["mean"]) / grid["sd"]
@@ -279,7 +286,8 @@ def _selftest(nside_d=16, noise_scale=3.0, seed=20261026):
         t0 = time.time()
         gm = grid_posterior(data, mode)
         print(f"  {mode:5s}: {gm['mean']:.5f} +- {gm['sd']:.2e}, z {((gm['mean'] - truth['beta'])
-              / gm['sd']):+.2f}, {gm['n_evals']} evals, {time.time() - t0:.0f} s")
+              / gm['sd']):+.2f}, {gm['n_evals']} evals, {time.time() - t0:.0f} s"
+              f"{' AT EDGE' if gm['at_edge'] else ''}", flush=True)
     print("ALL PASS" if ok else "FAIL")
     return 0 if ok else 1
 
@@ -287,6 +295,7 @@ def _selftest(nside_d=16, noise_scale=3.0, seed=20261026):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--selftest-samples", type=int, default=1000)
     ap.add_argument("--n-rep", type=int, default=4)
     ap.add_argument("--rep-start", type=int, default=0)
     ap.add_argument("--noise", type=float, nargs="+", default=[1.0, 3.0, 10.0, 30.0])
@@ -304,7 +313,7 @@ def main(argv=None):
     ap.add_argument("--overwrite", action="store_true")
     args = ap.parse_args(argv)
     if args.selftest:
-        return _selftest()
+        return _selftest(n_samples=args.selftest_samples)
     out_dir = os.path.join(args.out_dir, args.tag)
     os.makedirs(out_dir, exist_ok=True)
     cfg = dict(nside_d=args.nside_d, amp_prior=args.amp_prior, n_warmup=args.n_warmup,
