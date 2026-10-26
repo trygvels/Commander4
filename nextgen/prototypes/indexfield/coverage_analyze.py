@@ -103,8 +103,8 @@ def bin_label(lo, hi):
     return f"beta S/N >= {10 ** lo:.3g}"
 
 
-HEADER = (f"  {'bin / quantity':<22s} {'n':>6s}  {'mean z [rep SE]':>21s}  {'sd z':>5s}  {'cov68':>13s}  "
-          f"{'cov95':>13s}  {'med sd':>8s}  {'med |err|':>8s}  {'med ESS':>7s}")
+HEADER = (f"  {'bin / quantity':<22s} {'n':>6s}  {'mean z [rep SE]':>21s}  {'sd z':>5s}  "
+          f"{'cov68':>13s}  {'cov95':>13s}  {'med sd':>8s}  {'med |err|':>8s}  {'med ESS':>7s}")
 
 
 def main(argv=None):
