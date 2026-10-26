@@ -72,7 +72,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 52.8
       freq: 22.8
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPKa:
       enabled: true
@@ -87,7 +87,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 39.6
       freq: 33.0
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPQ1:
       enabled: true
@@ -102,7 +102,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 30.6
       freq: 40.6
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPQ2:
       enabled: true
@@ -117,7 +117,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 30.6
       freq: 40.6
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPV1:
       enabled: true
@@ -132,7 +132,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 21.0
       freq: 60.8
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPV2:
       enabled: true
@@ -147,7 +147,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 21.0
       freq: 60.8
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPW1:
       enabled: true
@@ -162,7 +162,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 13.2
       freq: 93.5
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPW2:
       enabled: true
@@ -177,7 +177,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 13.2
       freq: 93.5
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPW3:
       enabled: true
@@ -192,7 +192,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 13.2
       freq: 93.5
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     WMAPW4:
       enabled: true
@@ -207,7 +207,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 13.2
       freq: 93.5
-      polarization: "IQU"
+      polarization: "I"
       units: "mK_CMB"
     Planck30GHz:
       enabled: true
@@ -222,7 +222,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 32.3
       freq: 28.4
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
     Planck44GHz:
       enabled: true
@@ -237,7 +237,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 27.0
       freq: 44.1
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
     Planck70GHz:
       enabled: true
@@ -252,7 +252,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 13.2
       freq: 70.1
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
     Planck100GHz:
       enabled: true
@@ -267,7 +267,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 9.7
       freq: 100.0
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
       add_signal_fraction_to_rms: 0.05
     Planck143GHz:
@@ -283,7 +283,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 7.3
       freq: 143.0
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
       add_signal_fraction_to_rms: 0.05
     Planck217GHz:
@@ -299,7 +299,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 5.0
       freq: 217.0
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
       add_signal_fraction_to_rms: 0.05
     Planck353GHz:
@@ -315,7 +315,7 @@ compsep:
         dataset_names: ["I_RMS", "Q_RMS", "U_RMS"]
       fwhm: 4.9
       freq: 353.0
-      polarization: "IQU"
+      polarization: "I"
       units: "uK_CMB"
       add_signal_fraction_to_rms: 0.05
     Planck545GHz:
@@ -356,7 +356,7 @@ components:
     enabled: true
     component_class: "CMB"
     params:
-      polarization: "IQU"
+      polarization: "I"
       longname: "CMB"
       shortname: "cmb"
       Cl_prior_amplitude: null
@@ -366,7 +366,7 @@ components:
     enabled: true
     component_class: "ThermalDust"
     params:
-      polarization: "IQU"
+      polarization: "I"
       longname: "Thermal-Dust"
       shortname: "dust"
       Cl_prior_amplitude: null
@@ -386,7 +386,7 @@ components:
     enabled: true
     component_class: "Synchrotron"
     params:
-      polarization: "IQU"
+      polarization: "I"
       longname: "Synchrotron"
       shortname: "sync"
       Cl_prior_amplitude: null
