@@ -329,3 +329,25 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   the two HFI sets is closer to the truth is not decided by this; the 100 GHz zero level (above) is
   the first suspect for pass 3, and the pass-2 PR3 100 GHz map was a stopgap. The marginal chain
   and the grid check are running (23:16 onward).
+  **Zero-level conventions are inconsistent across the bands (found 23:40, after the ridge
+  chain).** Measured on the inputs: the DR1 WMAP and LFI maps in `q1_inputs/` had the median over
+  |b| > 30 deg subtracted (`prep_q1_inputs.py`; 40.9 uK_CMB at 30 GHz, 78.3 at K band), the HFI maps
+  the intercept of (map minus DR1 CMB) on the DR1 dust template (`prep_pr4_maps.py`, method dr1).
+  The DR1 CMB map with its full-sky dipole removed has mean +28.6 uK at |b| > 30 and +41.9 at
+  |b| > 60 (Galactic residuals in the plane bias the full-sky monopole), so the HFI convention
+  keeps a CMB-like +29 uK plus the dust mean at high latitude while the WMAP/LFI convention
+  removes the CMB, synchrotron, free-free and AME means. The pass-3 100 GHz map has median +44.9 uK
+  at |b| > 30 against -0.3 uK for the pass-2 PR3 100 GHz map (which used the high-latitude median
+  like WMAP/LFI); the 353 GHz maps of the two passes differ by -10 uK. The DR1 native frequency
+  maps are not consistent with the DR1 CMB either (70 GHz: map minus DR1 CMB has mean -17 uK at
+  |b| > 30), so the DR1 fitted per-band monopoles (component `md`) are not removed in the released
+  maps. Commander4 has no monopole sampling, so every band must carry a zero level consistent with
+  one sky model before it goes in; the current inputs do not, and a 29 uK_CMB step between the
+  WMAP/LFI set and the HFI set is absorbed by the foreground amplitudes and indices. This is the
+  first suspect for the 0.43 shift between passes and for the reduced chi-square of 1.5e4 (the
+  plane dominates that number, but the step is there everywhere). The method results of E014 are
+  unaffected (chain versus exact grid on the same inputs), the index values are not science. Pass 4
+  (in preparation): one convention for all 20 bands, offset_b = mean over |b| > 30 of (map_b minus
+  the DR1 sky model at band b), script `dr1_model_zero_levels.py`, then the exact grid on the
+  pass-4 inputs (the grid takes minutes, so it is the instrument for zero-level sensitivity, no
+  chains needed) and the chain only for the final configuration. Q15.

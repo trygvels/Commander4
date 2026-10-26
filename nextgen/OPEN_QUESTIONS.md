@@ -152,3 +152,23 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   2026-10-25, so this needs the file from Cosmoglobe or from Trygve's own access),
   and the size of the E015 bandpass effect (needs Commander3 on simulated TOD, cluster).
 
+## Q15. Zero levels (monopoles) for maps-only Commander4 runs on real data
+- **Why:** Commander4 has no per-band monopole sampling. E014 pass 2 and 3 mixed two zero-level
+  conventions (WMAP/LFI: high-latitude median removed; HFI: referenced to the DR1 CMB, which has a
+  +28.6 uK mean at |b| > 30, plus the DR1 dust template); the full-sky synchrotron index moved by
+  0.43 (1250 posterior sd) between the two HFI sets and the dust index by 0.05. Any real-data
+  index (Paper B) is meaningless until the zero levels are consistent, and the question of which
+  reference (DR1 model, HI correlation, Commander3 `md` samples) is right is a systematic that must
+  be propagated, not fixed by hand.
+- **How:** (1) Pass 4 of E014: one convention for all bands, offset_b = mean over |b| > 30 of
+  (map_b minus DR1 sky model at band b) with `nextgen/scripts/dr1_model_zero_levels.py`; compare
+  with the DR1 chain `md` values read remotely; exact 2D grid (minutes) on pass-2, pass-3 and
+  pass-4 inputs to measure the index sensitivity to the convention. (2) Decide whether Commander4
+  needs a monopole component (per band, with the Commander3 priors: HI cross-correlation for HFI,
+  monopole-dipole from a mask for WMAP/LFI) or whether offsets with a prior can be sampled as one
+  extra parameter per band in the collapsed likelihood (the offset is linear, so it can be
+  profiled or marginalized exactly like an amplitude: an "offset template" column in the mixing
+  matrix). (3) Propagate the zero-level uncertainty into the index posterior (prior width per band).
+- **Decides:** whether real-data spectral-index results from this fork can be reported at all;
+  the design of the mixing-matrix offset column (ties into M2.4).
+- **Status (2026-10-26):** found; pass-4 inputs in preparation; grid sensitivity next.
