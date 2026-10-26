@@ -56,7 +56,20 @@ from indexfield import field, posterior, sampler, simulate      # noqa: E402
 from indexfield.model import PixelData, mixing                   # noqa: E402
 
 DEFAULT_OUT = os.path.join(HERE, "checks", "out", "coverage")
-MODES = ("gauss", "w0", "w1")
+MODES = ("gauss", "w0", "w1", "hier", "hier_distort", "hier_scatter")
+# hier modes (E016): HierPosterior with shape template g = templates ("hier"), templates times a
+# smooth 1 + 0.3 cos(theta) distortion ("hier_distort"), or templates times an independent
+# pixel-scale 10^(0.1 N(0,1)) scatter ("hier_scatter"), seeded by (seed, rep, noise, 11).
+
+
+def shape_template(mode: str, nside_d: int, rng_g) -> np.ndarray:
+    g = simulate.templates(nside_d).copy()
+    if mode == "hier_distort":
+        theta, _ = hp.pix2ang(nside_d, np.arange(hp.nside2npix(nside_d)))
+        g[:, 1:] *= (1.0 + 0.3 * np.cos(theta))[:, None]
+    elif mode == "hier_scatter":
+        g[:, 1:] *= 10.0 ** (0.1 * rng_g.standard_normal(g[:, 1:].shape))
+    return g
 QUANTILES = (2.5, 16.0, 84.0, 97.5)
 
 
@@ -150,10 +163,17 @@ def posterior_summary(post, res):
     K = post.K
     beta = np.array([post.beta(x) for x in s])
     q = np.column_stack([s[:, K], s[:, K + 1], s[:, K + 2], beta])
-    return dict(mean=q.mean(axis=0), sd=q.std(axis=0, ddof=1),
-                quantiles=np.percentile(q, QUANTILES, axis=0), ess=sampler.ess_geyer(q),
-                beta_mean_field=float(beta.mean(axis=1).mean()),
-                beta_sd_field=float(beta.std(axis=1).mean()))
+    out = dict(mean=q.mean(axis=0), sd=q.std(axis=0, ddof=1),
+               quantiles=np.percentile(q, QUANTILES, axis=0), ess=sampler.ess_geyer(q),
+               beta_mean_field=float(beta.mean(axis=1).mean()),
+               beta_sd_field=float(beta.std(axis=1).mean()))
+    if post.dim == K + 7:                      # hier modes: amplitude hyperparameter block
+        amp = s[:, K + 3:K + 7]
+        out["amp_names"] = ["mu_sync", "mu_dust", "log_s_sync", "log_s_dust"]
+        out["amp_mean"] = amp.mean(axis=0)
+        out["amp_sd"] = amp.std(axis=0, ddof=1)
+        out["amp_ess"] = sampler.ess_geyer(amp)
+    return out
 
 
 def run_cell(job):
@@ -179,9 +199,15 @@ def run_cell(job):
     snr_index, snr_pix = snr_proxy(data, truth["beta"])
     rng = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale)),
                                  MODES.index(mode), 7])
-    cls = posterior.CentredPosterior if cfg["param"] == "centred" else \
-        posterior.NonCentredPosterior
-    post = cls(fld, hyper, data=data, mode=mode)
+    if mode.startswith("hier"):
+        if cfg["param"] != "centred":
+            raise ValueError("hier modes are implemented for the centred parameterization only")
+        rng_g = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale)), 11])
+        post = posterior.HierPosterior(fld, hyper, data, shape_template(mode, cfg["nside_d"], rng_g))
+    else:
+        cls = posterior.CentredPosterior if cfg["param"] == "centred" else \
+            posterior.NonCentredPosterior
+        post = cls(fld, hyper, data=data, mode=mode)
     th = truth["theta"]
     if cfg["init"] == "truth":
         x_nc = post.pack(truth["z"], th["mu"], th["log_sigma"], th["u"])
@@ -219,7 +245,9 @@ def run_cell(job):
         step_size=res.step_size, ebfmi=res.ebfmi, accept_stat=res.accept_stat,
         n_leapfrog=res.n_leapfrog, n_leapfrog_warmup=res.n_leapfrog_warmup,
         tree_depth_mean=res.tree_depth_mean, tree_depth_max=res.tree_depth_max,
-        n_init_draws=n_init, seconds_nuts=t_nuts, seconds_total=time.time() - t0)
+        n_init_draws=n_init, seconds_nuts=t_nuts, seconds_total=time.time() - t0,
+        amp_names=summ.get("amp_names"), amp_mean=summ.get("amp_mean"),
+        amp_sd=summ.get("amp_sd"), amp_ess=summ.get("amp_ess"))
     with open(out, "w") as f:
         json.dump(to_py(record), f, indent=1)
     i_ls = 1

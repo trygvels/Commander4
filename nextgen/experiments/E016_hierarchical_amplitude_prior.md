@@ -66,7 +66,20 @@ a_c ~ N(mu_c g_c, S_c(s_c, rho_c)) with a GMRF S_c, where the collapse is global
 nside 16). Deferred; its target will be written in a separate record.
 
 ## Setup
-(to be filled when the code exists) Prototype `nextgen/prototypes/indexfield/`, new mode
+Code (commits 9cdb462, cc7c8e1 and the coverage.py hier modes): `model.hier_loglike` and
+`hier_prior`, `posterior.HierPosterior` (centred, dim K + 7), `sbc.py --mode hier` (generator
+draws the four hyperparameters from their hyperpriors and the amplitudes from the resulting
+prior), `coverage.py --modes hier hier_distort hier_scatter` (shape templates g = m, m times
+1 + 0.3 cos theta, m times 10^(0.1 N'(0,1)); amplitude hyperparameter posteriors stored per cell
+as amp_mean / amp_sd / amp_ess). L1: `checks/check_2a_hier.py` (all pass, 2026-10-26: direct
+form 7e-13, gradients 4e-9 at s = 1e3 and 0.3 and 2e-5 at s = 1e-3 where cond(A') ~ 1e8, w1
+limit residual 1.9e-4, 1.9e-6, 1.9e-8 at s = 1e3, 1e4, 1e5, gauss limit exact). Smoke tests of
+both harnesses run; on one template replicate at noise 1 the posterior of log s_sync is -1.51 +-
+0.14, i.e. s = 0.22 against the generator's 0.23 relative scatter.
+
+Runs: coverage `study_v1_hier` (12 replicates x noise 0.3 / 1 / 3 x three hier modes, seed and
+nside as study_v1, 2 workers, started 2026-10-26 midday) and SBC `hier_centred_hier` (300
+replicates, nside_beta 4, 4 workers, queued behind the centred SBC). Original plan text: prototype `nextgen/prototypes/indexfield/`, new mode
 "hier" in `model.py` taking (g, mu, log s) with gradients; `posterior.py` extended with the four
 hyperparameters; `coverage.py --modes hier`. nside_d 16, nside_beta 2 (48 index pixels, as
 study_v1) and 4 (SBC, as the L2 run). Template data as study_v1: a_p,c = m_p,c 10^(0.1 N(0,1)),
@@ -100,7 +113,12 @@ proxy, generator, noise and replicate seeds as study_v1 so the rows are comparab
 
 ## Command
 ```bash
-# none yet
+cd nextgen/prototypes
+python -m indexfield.checks.check_2a_hier
+python -m indexfield.coverage --n-rep 12 --noise 0.3 1 3 --modes hier hier_distort hier_scatter --jobs 2 --tag study_v1_hier
+python -m indexfield.coverage_analyze --dir indexfield/checks/out/coverage/study_v1_hier
+cd indexfield && python -u sbc.py --config hier --mode hier --param centred --n 300 --workers 4
+python sbc_analyze.py --config hier_centred_hier
 ```
 
 ## Result
