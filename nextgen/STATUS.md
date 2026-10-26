@@ -2,6 +2,45 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-26 (Mac mini, midday): both exact modes verified on real data; coverage study: no safe prior-free option for a varying index below S/N 15
+
+**Learned**
+- E014: the `marginal` chain lands on the exact flat-prior marginal grid target within 0.05 sd
+  (width ratios 1.08 / 1.23 at ESS 76 / 45), and the tuned `ridge` chain (ESS 559 / 422) matches
+  its target to 0.06 sd with width ratios 0.96 / 0.94. Two exact chains measure the prior effect
+  directly on the data: 54 ridge sd in beta_s, 5 sd in beta_d, same widths, chi-square differs by
+  0.07 percent. Q1 is answered at nside 64 and the ranking changed (D010: Q2 first).
+- E012 coverage study (108 cells, 12 replicates x noise 0.3 / 1 / 3 x gauss / w0 / w1): the
+  flat-prior marginal (w1) is unusable at every S/N (z 100 to 300, zero coverage); the profile (w0)
+  is calibrated at index-pixel S/N above about 15 (coverage 0.70 / 0.96) and biased with heavy tails
+  below S/N 3 (z +5 to +13, field sd biased +5 to +28 sd, ESS 4 to 6); the Gaussian amplitude
+  prior is calibrated only when it is the generative one (diagnostic: z +0.08 +- 0.06, coverage
+  0.69 / 0.95), biased by 2 to 14 sd on template data with the default width, and 4x worse with a
+  10x wider prior, because the Gaussian marginal tends to the w1 volume term as T grows. F12 final.
+  There is no uninformative safe amplitude prior for a spatially varying index: learn it from the
+  data (hierarchical amplitude model) or use the profile at an index resolution set by S/N.
+- A corollary (joint posterior with flat amplitude priors has the w1 collapse as its exact beta
+  marginal; Gibbs chains avoid it only by not mixing) is with the stats-reviewer before it is
+  claimed anywhere.
+
+**Running:** E014 tuned round: `resolve_chisq` (since 10:27, about 5 h), then `conditional` and
+`marginal` (about 1 h each). E012 centred SBC (300 replicates, since 10:07, slow under load 28 on
+10 cores). Stats-reviewer on the Gibbs corollary.
+
+**Next**
+1. E014: tuned legacy / conditional / marginal results, Conclusion, registry row; then IQU and the
+   nside 128 scaling check (lower priority).
+2. E012: centred SBC analysis; record the reviewer's verdict; then the hierarchical amplitude-prior
+   experiment (Q2 next step) with its target written and reviewed first; M2.2 scalar-index coverage
+   table.
+3. Paper A outline: F1/F2 (sampler), F3/F12 (priors), F10/F11 (Commander3), F13 (DR1 dust).
+
+**Needs Trygve:** unchanged from the morning entry (Cosmoglobe contact on F1, F10, F11, F13 and the
+Jeffreys default; Q13; cluster; DR2 parameter file). New for the ridge-default decision (D003): on
+a spatially varying index the profile is safe only above index-pixel S/N 15; the default for
+Phase 2 will need either an S/N-driven index resolution or a learned amplitude prior. No default
+changed yet.
+
 ## 2026-10-26 (Mac mini, morning): Q1 answered at nside 64; index-field SBC passes; DR1 dust header error
 
 **Learned**
