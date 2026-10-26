@@ -84,7 +84,13 @@ error 0.07 sd), inconclusive at the 0.1 sd criterion; rerun with 3000 samples. O
 replicate the flat-prior marginal `w1` has its maximum at the upper edge of the support (-1.5): the
 F12/F15 collapse appears for a scalar index at S/N 23. `grid_posterior` now reports such cells
 truncated to the support with an `at_edge` flag instead of failing. The grid modes of the study
-were launched at 18:52 (2 workers); the hier modes follow once the self-test passes.
+were launched at 18:52 (2 workers).
+
+**Self-test, second pass (500+3000 NUTS, 40 min under load 28): PASS.** Pinned hier
+-3.0849 +- 0.127 against the gauss grid -3.0827 +- 0.119: mean difference -0.02 grid sd at ESS
+618, width ratio 1.07, 0 divergences. On the same replicate: w0 z +0.30, gauss z +0.95, w1 at the
+edge of the support (mean -1.5008, z +1704). The hier modes (hier, hier_distort) were launched at
+19:38 (2 workers).
 
 ## Negative control
 `w1` on template data: E012/F12/F15 predict a bias from the flat-prior volume term that does not
