@@ -35,10 +35,18 @@ So m_p,c = mu_c g_p,c and T_p,c = (s_c g_p,c)^2 in the notation of `model.collap
 with A'_p = M_p^T N_p^-1 M_p + T_p^-1, b'_p = M_p^T N_p^-1 d_p + T_p^-1 m_p. The two trailing
 terms, dropped as constants in E012 because (m, T) were fixed, are now part of the target: the
 -1/2 sum_p log det T_p = -sum_p sum_c log(s_c g_p,c) term is what prevents the drift toward the
-flat-prior (w1) collapse as s_c grows, because for s -> infinity the full expression is the proper
-marginal N(d_p; M_p m_p, M_p T_p M_p^T + N_p), whose own log-determinant penalises amplitude
-variance that the data do not show. (The w1 collapse of F12 is the s -> infinity limit of the first
-line alone, without this normalisation.)
+flat-prior (w1) collapse as s_c grows, because the full expression equals the proper marginal
+N(d_p; M_p m_p, M_p T_p M_p^T + N_p) for every s, and its log-determinant grows as 2 log s_c per
+pixel and component as s_c -> infinity (one power only for exactly collinear sync and dust
+columns), so log L is bounded above in s and the maximum-marginal-likelihood s is finite or at the
+s -> 0 boundary. (The w1 collapse of F12 is the s -> infinity limit of the first line alone,
+without this normalisation.) Reviewed 2026-10-26 (stats-reviewer): target CONFIRMED, including the
+dropped constants -1/2 d^T N^-1 d, -(B/2) log 2 pi, -1/2 log det N; condition g_p,c > 0 strictly;
+mu_c and s_c identified by the N pixels through the fixed shape g, beta identified by band ratios
+and not absorbed by mu_sync; the prior is pivot-dependent (nu_0 = 30 GHz for sync), so the
+generator must use the same pivot. Hyperpriors proper, likelihood bounded, posterior proper;
+mu_c g < 0 has prior probability 2.3 percent per component and is unphysical but harmless for SBC
+because generator and target are the same model.
 
 Index field and hyperpriors exactly as E012 / D009: beta = mu_beta 1 + sigma S(rho) z, centred
 parameterisation, mu_beta ~ N(-3, 0.5^2), sigma ~ half-N(0.3), rho log-uniform on [rho_min,
@@ -63,9 +71,12 @@ nside 16). Deferred; its target will be written in a separate record.
 hyperparameters; `coverage.py --modes hier`. nside_d 16, nside_beta 2 (48 index pixels, as
 study_v1) and 4 (SBC, as the L2 run). Template data as study_v1: a_p,c = m_p,c 10^(0.1 N(0,1)),
 which is log-normal and therefore mildly misspecified for the Gaussian hierarchy (relative sd
-0.23, skewed). Shape template g: (i) g = m (the true template, "ideal shape"); (ii) g = m times a
-smooth multiplicative distortion 1 + 0.3 cos(theta_p) ("wrong shape"), to measure sensitivity to
-the template, which a real analysis never has exactly.
+0.23, skewed). Shape template g: (i) g = m (the true template, "ideal shape", a near-generative
+best case); (ii) g = m times a smooth multiplicative distortion 1 + 0.3 cos(theta_p) ("wrong
+large-scale shape", mostly absorbed by mu_c, so a weak test); (iii) g = m 10^(0.1 N'(0,1)) with an
+independent pixel-scale scatter ("wrong small-scale shape", the honest test the reviewer asked
+for), to measure sensitivity to the template, which a real analysis never has exactly. Same S/N
+proxy, generator, noise and replicate seeds as study_v1 so the rows are comparable.
 
 ## Reference
 1. **Sampler correctness (L2):** SBC (Talts et al. 2018, as E012 L2) with the generative model
@@ -79,9 +90,13 @@ the template, which a real analysis never has exactly.
    rows are comparable. The answer is "calibrated" if the hier rows have mean z within +-0.5 and
    coverage within binomial error of 0.68 / 0.95 in every S/N bin where w0 is not, i.e. S/N below
    15, at noise 0.3 and 1.
-3. **Limit checks (L1, cheap):** s_c fixed at a large value (1e3) must reproduce the w1 column of
-   study_v1 up to the normalisation term; s_c fixed at 0.5 and mu_c = 1 must reproduce mode
-   "gauss" with the default T exactly (same numbers as `collapsed_loglike(..., "gauss")`).
+3. **Limit checks (L1, cheap):** (a) s_c fixed at 1e3 must reproduce w1 with the fixed cmb prior
+   1/70^2 added to A (not the flat-cmb w1 of study_v1; the difference is a 1 to 2 percent change
+   of one diagonal entry), up to a beta-independent constant; (b) s_c = 0.5, mu_c = 1, g = m must
+   reproduce mode "gauss" with inv_T = 1/(0.5 m)^2 (no floor) after dropping the two trailing
+   terms; with the default T = max(0.5 |m|, 20)^2 equality holds only in pixels with m_p,c >= 40
+   uK_RJ (about 10 percent of the sky), so the check is run with the floor removed; (c) the (mu,
+   log s) gradients against finite differences at s = 1e3, s = 0.3 and s = 1e-3 (check_1a style).
 
 ## Command
 ```bash

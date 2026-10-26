@@ -29,4 +29,4 @@ NSIDE 16, common FWHM 480 arcmin, bands 30/44/70/100/143/217/353 GHz, noise RMS 
 [-4, -2], beta_d in [1.0, 2.5]; 250 iterations, 80 burn-in, 50 MH steps per iteration. About 15 min
 per mode on 2 cores. The exact target is a bounded coarse-to-fine grid computed for both log-det
 settings by the analysis script.
-| E016 | 2026-10-26 | Q2: does a hierarchical (learned mean scale and width) amplitude prior give calibrated index-field posteriors on template data where the fixed Gaussian prior is biased and the flat marginal collapses | `E016_hierarchical_amplitude_prior.md` | running (target and reference written; stats-reviewer check before code) | |
+| E016 | 2026-10-26 | Q2: does a hierarchical (learned mean scale and width) amplitude prior give calibrated index-field posteriors on template data where the fixed Gaussian prior is biased and the flat marginal collapses | `E016_hierarchical_amplitude_prior.md` | running (target reviewed and CONFIRMED by stats-reviewer 2026-10-26; code next) | |
