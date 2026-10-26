@@ -464,11 +464,24 @@ amplitude prior for a spatially varying index must therefore be (a) learned from
 (hierarchical amplitude model, m and T sampled, which is what a smoothness or power-spectrum prior
 on the amplitude maps does), or (b) avoided by using the profile likelihood at an index resolution
 whose S/N keeps w0 calibrated. Both are Paper A method choices; (a) is the natural continuation of
-the hierarchical field (Q3) and is added to OPEN_QUESTIONS Q2 as the next experiment. A corollary
-to check with the stats-reviewer before it is claimed: a Gibbs sampler over (a, beta) with flat
-amplitude priors targets the joint posterior whose beta marginal is exactly w1, so its correct
-stationary distribution is the collapsed one; the conditional chains of Commander3/4 avoid this only
-by not mixing (F14).
+the hierarchical field (Q3) and is added to OPEN_QUESTIONS Q2 as the next experiment (E016).
+
+**Corollary, reviewed (stats-reviewer, 2026-10-26, independent derivation plus a 3-pixel Gibbs
+check; F15):** a Gibbs sampler alternating the exact amplitude conditional (including the
+fluctuation term, which is what a constrained realisation provides) and any valid MH move on chi2 at
+fixed amplitudes has, as its stationary beta marginal, exactly the flat-prior marginal w1 with its
+-1/2 log det A term (importance-sampled check: w1 minus the exact integral constant to 0.007 across
+beta, w0 varies by 0.69; Gibbs beta mean -2.02 +- 0.03 against the w1 grid -1.95, sd 0.70, and the
+w0 grid -2.59). Neither the profile nor the fixed-amplitude conditional is a marginal of that joint.
+So the collapse above is a property of the joint posterior with flat amplitude priors, and a
+correctly mixing Gibbs chain with that target reproduces it. Conditions stated by the reviewer: the
+same target (flat priors on all amplitudes, no positivity bounds, same beta prior, same data and
+noise model); and the inference "a chain that does not show it is not mixing" needs the
+implementation verified to be that kernel. Commander3/4 production chains differ in target (C_l
+prior on the CMB, which partially regularises the CMB/sync direction only; index priors and bounds;
+index steps on smoothed low-resolution data), so for them the statement is not established either
+way; with a global amplitude prior S the volume term becomes -1/2 log det(A + S^-1), bounded below
+by the prior scale, which is the same tempering as the gauss mode's T.
 
 Consequence for Q2 and the roadmap: among the prior-free options only the profile likelihood is
 usable, and only above a per-index-pixel S/N of order 10; below that the index posterior needs a

@@ -210,3 +210,15 @@ beta_s sample. The Commander4 `conditional` chain with proposals of 0.002 stayed
 for 2000 iterations. The collapsed (`ridge`, `marginal`) chains mix in tens of iterations on the
 same data. This is F5 measured on real data and is the quantitative case for collapsing amplitudes
 in any index sampler at Planck resolution.
+
+**F15. The joint posterior with flat amplitude priors has the collapsed flat-prior marginal (w1, with
+-1/2 ln det A) as its exact spectral-parameter marginal; a Gibbs sampler that draws amplitudes with
+their fluctuation and moves beta on chi2 at fixed amplitudes targets exactly that** (E012 corollary,
+independently derived and checked numerically by the stats-reviewer, 2026-10-26). Consequences: the
+F3 and F12 pathologies are properties of the flat-prior joint, not of the collapsed implementation;
+the profile ("ridge") and the fixed-amplitude conditional are not marginals of that joint; and a
+Gibbs chain with that target either shows the collapse or is not mixing. This does not transfer to
+Commander3/4 production chains as they stand, whose targets include a C_l prior on the CMB
+amplitudes (which regularises the CMB/synchrotron direction but not synchrotron/dust), index priors
+and bounds, and index steps on smoothed data; what it does say is that "sample amplitudes with flat
+priors, then sample the index on chi2" is not a route around the prior question of Q2.
