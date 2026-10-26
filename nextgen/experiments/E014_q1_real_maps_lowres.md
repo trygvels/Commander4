@@ -195,6 +195,20 @@ to be sampled well by them, which is why its acceptance (0.073) is larger than r
 reduced chi-square of the two chains is the same (14989 vs 14994): the sky fit does not tell the
 two apart, only the index posterior does.
 
+**Pass 2, conditional (Gibbs: MH on chi2 at the current amplitudes, then an amplitude draw),
+2000 iterations (05:56 to 07:57, 17 ranks): does not move.** beta_s stayed at its start value
+(-3.0999 +- 0.0001, 18 distinct values in 1600 iterations), beta_d drifted from 1.54 to 1.369 in
+the first 50 iterations and then stuck (acceptance 0.0005, 80 accepted moves in 40000 proposals).
+Cause, computed with the grid machinery at the ridge mode with the amplitudes fixed at their ML:
+the conditional sd of beta given the amplitudes is 2.0e-6 for beta_s and 2.8e-5 for beta_d (a
+0.002 step in beta_s changes chi2 by 9.8e5), against marginal sds of 3.6e-4 and 4.3e-5. The ratio
+of marginal to conditional sd is 180 for beta_s, so even with perfectly tuned proposals the Gibbs
+chain needs of order 180^2 = 3e4 iterations per independent beta_s sample (F5 on real data; the
+collapsed `ridge` and `marginal` chains do not have this problem). The tuned round runs
+`conditional` with proposals 5e-6 / 7e-5 to measure its ESS directly; its untuned chain is not
+used in the comparison. (Reduced chi-square 14796, lower than ridge because the amplitude draw
+includes the fluctuation term, not because the fit is better.)
+
 Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
 uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
 to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `conditional` and

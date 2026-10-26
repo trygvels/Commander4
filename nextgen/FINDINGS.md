@@ -180,3 +180,12 @@ against 11.3 and 7.3 predicted for 70 GHz, correlation 0.99). Consequence for us
 used as a template or simulation truth only with the 70 GHz reference; the BeyondPlanck dust file
 has the same header error. The residual 7 to 14 percent is the delta-bandpass versus
 bandpass-integrated SED and is not yet quantified.
+
+**F14. On real maps the Gibbs conditional for a full-sky spectral index cannot mix** (E014, nside
+64, 38165 masked pixels, 17 bands): the conditional sd of beta_s given the per-pixel amplitudes is
+2.0e-6 against a marginal sd of 3.6e-4 (ratio 180; for beta_d 2.8e-5 against 4.3e-5, ratio 1.5),
+so Gibbs with an MH step on chi2 at fixed amplitudes needs of order 3e4 iterations per independent
+beta_s sample. The Commander4 `conditional` chain with proposals of 0.002 stayed at its start value
+for 2000 iterations. The collapsed (`ridge`, `marginal`) chains mix in tens of iterations on the
+same data. This is F5 measured on real data and is the quantitative case for collapsing amplitudes
+in any index sampler at Planck resolution.

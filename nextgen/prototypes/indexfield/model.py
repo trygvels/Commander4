@@ -131,7 +131,9 @@ def _collapsed_core(M, dM, d, inv_var, region, n_beta, mode, m=None, inv_T=None,
     quad = 0.5 * np.einsum("nc,nc->n", b, x)                            # 1/2 b^T A^-1 b
     logdet = 2.0 * np.sum(np.log(np.diagonal(L, axis1=1, axis2=2)), axis=1)
     w = 0.0 if mode == "w0" else 1.0
-    logL_p = quad - 0.5 * w * logdet
+    # In w0 the log-determinant does not enter; skip the product so an overflowed SED (logdet
+    # inf at an extreme beta) gives -inf / nan from `quad` alone and is rejected, not 0 * inf.
+    logL_p = quad if w == 0.0 else quad - 0.5 * w * logdet
 
     resid = d - np.einsum("nbc,nc->nb", M, x)                           # d - M x       (N, B)
     gNr = np.einsum("nb,nb->n", dM * inv_var, resid)                    # g^T N^-1 (d - M x)
