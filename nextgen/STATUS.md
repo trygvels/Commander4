@@ -2,6 +2,42 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-26 (Mac mini, evening): E016 residual resolved; tuned legacy chain; scalar-index coverage (E017) running
+
+**Learned**
+- E016 residual: the +0.3 sd mean bias at noise 1 was a fluctuation of the 12 shared truths, not
+  misspecification (Gaussian-scatter generator: +0.34) and not sampling (non-centred, ESS 394:
+  +0.30). The pooled pixel SE (0.04) was wrong because pixels of a replicate share truth and noise;
+  the replicate-clustered SE is 0.15. 24 fresh replicates give +0.01 +- 0.07; all 36: +0.10 +- 0.07,
+  coverage 0.71 / 0.975. `coverage_analyze.py` prints the clustered SE for every beta row; all
+  summaries regenerated (E012 conclusions unchanged: gauss at noise 1 is +2.08 with clustered SE
+  0.11). F16 stays provisional only on the SBC.
+- E014 tuned legacy chain (7.3 h, 1000 iterations): proposals sized for the ridge width give ESS
+  17 to 20 and a width ratio above 11 (lower bound, chain has not traversed its posterior); the
+  untuned chain's 16 to 17x stays the measurement. Tuned ridge: chain and exact grid agree to 0.06 sd
+  and 5 percent in width.
+- E017 (M2.2 scalar index): new `scalar_coverage.py` computes the w0 / w1 / gauss posteriors of one
+  full-sky index exactly on adaptive grids and samples the hier target (5 parameters) with NUTS;
+  pinned-hier-versus-gauss-grid check passes (ESS 618, -0.02 sd, width ratio 1.07). First cells: at
+  full-sky S/N 23 the flat-prior marginal piles up at the boundary of the support (z +1700), at
+  S/N 220 it is +17 sd off, gauss +10 sd, w0 within 0.3 sd.
+
+**Running:** E017 grid modes (24 replicates x 4 noise scales, 2 workers, half done at 19:40) and
+hier modes (launched 19:38, 2 workers). E016 SBC non-centred (about 25 of 300 at 19:40; speeds up
+when the E014 chains end). E014 tuned `conditional` (since 17:44), then `marginal`.
+
+**Next**
+1. E017 table and Conclusion (expected: w0 and hier calibrated at full-sky S/N, w1 and gauss not;
+   quantify the w1 shift in w0 sd against the 54 sd of E014 on real data); F17 if it holds.
+2. E016 SBC result, Conclusion, F16 final; E014 tuned conditional / marginal, Conclusion.
+3. Commander4 implementation plan for the hierarchical amplitude prior (D-entry: where mu_c, s_c
+   live in the parameter file, which template on real data), stats-reviewer on the target first.
+4. Paper A outline.
+
+**Needs Trygve:** unchanged (Cosmoglobe contact on F1, F10, F11, F13 and the Jeffreys default; Q13;
+cluster; DR2 parameter file; ridge default for spatially varying indices with F16 as the candidate
+replacement).
+
 ## 2026-10-26 (Mac mini, afternoon): hierarchical amplitude prior calibrated at every S/N on template data
 
 **Learned**
