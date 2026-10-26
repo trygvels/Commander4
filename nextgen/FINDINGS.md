@@ -33,7 +33,8 @@ the dust index is shifted by 3 ridge sd. At nside 512 to 1024 the scaling predic
 warning. Unit tests reproduce the exact posterior; a full Commander4 run on 7 MPI ranks matched the
 exact ridge target within 0.03 sd with width ratios 0.94 and 0.97. On real maps at nside 64 (E014)
 the ridge chain matches an independent grid evaluation of its target within 0.2 sd (width ratios
-1.01 and 1.18 at ESS 97 and 44), and the marginal chain matches the exact flat-prior marginal
+1.01 and 1.18 at ESS 97 and 44; with tuned proposals and ESS 559 and 422: shifts -0.06 +- 0.04
+and +0.06 +- 0.05 sd, width ratios 0.96 and 0.94), and the marginal chain matches the exact flat-prior marginal
 target within 0.05 sd (width ratios 1.08 and 1.23).
 
 ## 2. Priors matter as much as the sampler

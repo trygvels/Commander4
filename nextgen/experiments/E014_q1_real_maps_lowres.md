@@ -227,6 +227,16 @@ targets (within 0.2 sd); resolve_chisq is 16 to 17x too wide and 3 sd off in bet
 cannot mix (F14). The tuned round (proposals at about 2.4 sd for the collapsed modes, conditional
 sd for `conditional`) is running and will tighten the width ratios.
 
+**Tuned round, ridge, 1000 iterations (09:38 to 10:27, proposals 1.2e-4 / 9e-4, acceptance
+0.203):** the chain drifts from the start (-3.10, 1.56) to the mode in about 350 iterations (the
+small proposals make burn-in slow: 0.24 in beta_s at 1e-4 per accepted move); with burn 400,
+beta_d 1.36539 +- 0.00004, beta_s -3.34246 +- 0.00034, ESS 422 and 559 (10x the untuned chain).
+Against the exact grid target: shift -0.06 +- 0.04 sd in beta_s and +0.06 +- 0.05 sd in beta_d,
+width ratios 0.96 and 0.94. Chain and grid now agree in mean and width at the 5 percent level, so
+the 1.18 width ratio of the untuned chain was ESS noise. (Analysis: `analyze_q1_chains.py --suffix
+_npipetuned --burn 400`; the grid file is copied into `ridge_npipetuned/`.) The tuned
+resolve_chisq, conditional and marginal chains follow.
+
 Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
 uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
 to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `marginal` chain measures
