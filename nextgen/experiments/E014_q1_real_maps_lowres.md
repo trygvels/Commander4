@@ -314,3 +314,18 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   100 GHz zero level is the least certain of the six). Median I rms at nside 512: 11.9 / 4.7 / 6.5 /
   21.9 uK_CMB and 0.0083 / 0.0078 MJy/sr. The 353 GHz offset (+444.5) agrees with the pass-2 NPIPE
   A-split value (+447.9). Then IQU; per-pixel chi2 maps for model checking.
+  **Pass-3 ridge chain (21:52 to 23:16, 1000 iterations, 2 s per iteration, 20 ranks):**
+  beta_s = -2.91027 +- 0.00010 (ESS 111 after burn 400), beta_d = 1.41496 +- 0.00003 (ESS 316),
+  acceptance 0.04 (the pass-2 proposals, 0.00012 / 0.0009, are now 1 to 25 times the posterior
+  sd; the sync posterior is three times narrower than in pass 2, so the chain is usable but the
+  dust proposal is far too wide). Against the pass-2 ridge values (-3.3425 +- 0.0003,
+  1.36540 +- 0.00001, 17 bands with NPIPE A-split 353 and PR3 100): the full-sky synchrotron
+  index moves by +0.43 and the dust index by +0.05 when the HFI maps change, i.e. by about
+  1400 posterior sd in each. The all-sky reduced chi-square rises during burn-in from 10700 to
+  15500 and stays there (pass 2: 9060 to 14994; the index step sees only the dx12 chisq-mask
+  region, the logged chi-square is all-sky); nothing hits a bound. Reading: the single full-sky
+  index is dominated by the data set (zero levels, which HFI bands enter, bandpass and CO
+  treatment), not by the noise; its statistical error is meaningless at the 1e-4 level. Which of
+  the two HFI sets is closer to the truth is not decided by this; the 100 GHz zero level (above) is
+  the first suspect for pass 3, and the pass-2 PR3 100 GHz map was a stopgap. The marginal chain
+  and the grid check are running (23:16 onward).
