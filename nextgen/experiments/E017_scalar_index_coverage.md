@@ -121,7 +121,8 @@ log s_c >= -8 in both hier posteriors (`posterior.HIER_LOGS_MIN`; hyperprior mas
 so the target is unchanged to that level; states below are reported as zero density); the
 analyzer lists chains with divergences or E-BFMI below 0.3; the cell was rerun with the guard. The
 E016 SBC (42 replicates by then, all with 0 divergences) runs the unguarded code; the guard would
-not have acted on any of them.
+not have acted on any of them. Rerun of rep 4 with the guard: z +0.32, sd 0.074, ESS min 294,
+0 divergences, E-BFMI 0.97, log s_dust -1.39 (113 s).
 
 ## Negative control
 `w1` on template data: E012/F12/F15 predict a bias from the flat-prior volume term that does not
