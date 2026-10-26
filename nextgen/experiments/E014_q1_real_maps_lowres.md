@@ -262,6 +262,14 @@ not usable on real data at this resolution with any proposal width: untuned it d
 (acceptance 5e-4), tuned it moves 3e-6 per iteration. Reduced chi-square 14805 (amplitude draw
 includes the fluctuation term).
 
+**Tuned round, marginal, 1000 iterations (19:52 to 21:40, proposals 1.2e-4 / 9e-4, acceptance
+0.186):** beta_d 1.36562 +- 0.00004, beta_s -3.32319 +- 0.00031, ESS 461 and 416 (burn 400).
+Against the exact flat-prior marginal grid: shift -0.07 +- 0.05 sd in beta_s and -0.03 +- 0.05 sd
+in beta_d, width ratios 0.95 and 1.02. Relative to the tuned ridge chain: +56.05 +- 0.06 ridge sd
+in beta_s and +5.45 +- 0.07 in beta_d (grid prediction 54 and 5), reduced chi-square 14983 against
+14994. Both exact modes now agree with their independent targets to better than 0.1 sd in mean and
+5 percent in width at ESS above 400.
+
 Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
 uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
 to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `marginal` chain measures
@@ -272,7 +280,29 @@ the prior effect: 54 ridge sd in beta_s on these maps (Q2, F3), with the same wi
 `resolve_chisq` is the known-wrong method; E005/E006 predict it is wider and shifted.
 
 ## Conclusion
-(pending)
+On real intensity maps at nside 64 (Haslam, WMAP K to W, LFI 30/44/70, NPIPE A 353/857, PR3 100;
+38165 pixels outside the dx12 mask; five components, two scalar indices):
+1. The two collapsed modes are exact for their stated targets: `ridge` and `marginal` chains agree
+   with independent grid posteriors to 0.07 sd in mean and 5 percent in width (tuned proposals, ESS
+   416 to 559). This is the L3 validation of the fix branch on real data.
+2. The legacy `resolve_chisq` move overstates the index uncertainty by a factor 16 to 17 and shifts
+   beta_d by 3 +- 0.5 sd (F1 on real data; the k^(1/4) scaling predicts factors above 50 at nside
+   512 to 1024). A tuned rerun could not even traverse its own posterior (ESS 17 to 20).
+3. The Gibbs `conditional` move cannot mix: untuned it does not move (acceptance 5e-4); tuned to
+   the conditional sd (acceptance 0.36) it moves 3e-6 per iteration in beta_s and after 1000
+   iterations is 659 sd from the target (F14; of order 3e4 iterations per independent sample).
+4. The prior matters at the level of 56 ridge sd in beta_s and 5.5 sd in beta_d between the
+   flat-prior marginal and the profile, with the same width and a 0.07 percent chi-square
+   difference: the data do not pick the prior (F3 on real data). E017 on template simulations shows
+   that for a scalar index at full-sky S/N above 200 the profile is calibrated and the flat-prior
+   marginal is 6 to 18 sd biased, so the `marginal` number is the biased one here as well, under
+   the E017 generative model.
+Changes: F1, F3, F14 get the real-data numbers; the DECISIONS entry on the `auto` default (ridge)
+is supported for scalar indices; the Conclusion of E017 governs the spatially varying case.
+Not established: anything about polarization, the 143/217 bands, or the plane (masked).
 
 ## Follow-ups
-- IQU run; HFI bands once the PR4 transfer completes; per-pixel chi2 maps for model checking.
+- Pass 3 (2026-10-26 evening): all six PR4 full-mission HFI bands 100 to 857 from NERSC
+  (`prep_pr4_maps.py --release pr4 --zero-level dr1`, dipole removed, into
+  `~/data/planck_pr4/n512_pass3/`), 20 bands, ridge and marginal with tuned proposals plus the grid
+  check; tag `pr4tuned`. Then IQU; per-pixel chi2 maps for model checking.

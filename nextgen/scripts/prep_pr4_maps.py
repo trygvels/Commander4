@@ -89,15 +89,18 @@ def _col(hdu, names):
 
 
 def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr4",
-            zero_method: str = "") -> None:
+            zero_method: str = "", subtract_dipole: bool = False) -> None:
     hdu = fits.open(path)[1]
     unit_in = str(hdu.columns["I_STOKES"].unit or "K_CMB").strip()
     # PR3 545/857 are in MJy/sr; keep that unit (Commander4 converts with pysm3 units), otherwise
     # convert K_CMB to uK_CMB.
+    to_mjy = None
     if (unit_in.upper().startswith("K_CMB") or unit_in.upper() == "KCMB") and freq in HFI_MJY_PER_KCMB:
         # PR4 545/857 GHz are delivered in K_CMB via the band-integrated factors (Planck 2013 IX);
         # undo that and write MJy/sr, which Commander4 converts monochromatically (E014, item 3).
-        scale, unit_out = HFI_MJY_PER_KCMB[freq], "MJy/sr"
+        # The dipole and zero level are handled in uK_CMB first, then the map is converted.
+        scale, unit_out = 1e6, "uK_CMB"
+        to_mjy = HFI_MJY_PER_KCMB[freq] * 1e-6
     elif unit_in.upper().startswith("K_CMB") or unit_in.upper() == "KCMB":
         scale, unit_out = 1e6, "uK_CMB"
     elif "MJY" in unit_in.upper():
@@ -131,12 +134,22 @@ def convert(path: str, nside: int, outdir: str, freq: str, tag_prefix: str = "pr
         sky.append(m_lo * scale)
         rms.append(np.sqrt(var_lo) * scale)
     hdr_extra = []
+    if subtract_dipole:
+        # PR4 (NPIPE) frequency maps keep the solar dipole (PR3 maps do not): remove it in uK_CMB.
+        assert unit_out == "uK_CMB", "dipole subtraction needs a K_CMB input"
+        sky[0] = sky[0] - solar_dipole(nside) * (rms[0] > 0)
+        hdr_extra.append(("DIPSUB", DIPOLE_UK, "uK_CMB solar dipole removed"))
     if zero_method:
+        assert unit_out == "uK_CMB", "zero level is fitted in uK_CMB"
         off, slope = zero_level(sky[0], float(freq), zero_method)
         sky[0] = sky[0] - off * (rms[0] > 0)
         hdr_extra.append(("MONOSUB", off, f"{unit_out} zero level ({zero_method}) subtracted"))
-        print(f"{freq}: zero level ({zero_method}) {off:.4g} {unit_out} subtracted"
+        print(f"{freq}: {'dipole removed; ' if subtract_dipole else ''}zero level ({zero_method}) "
+              f"{off:.4g} {unit_out} subtracted"
               + (f"; gain vs DR1 model: {slope:.3f}" if slope is not None else ""))
+    if to_mjy is not None:
+        sky = [m * to_mjy for m in sky]; rms = [r * to_mjy for r in rms]
+        unit_out = "MJy/sr"
     tag = f"{freq}_IQU_n{nside:04d}"
     hp.write_map(os.path.join(outdir, f"{tag_prefix}_{tag}.fits"), np.array(sky), overwrite=True,
                  column_names=["I_STOKES", "Q_STOKES", "U_STOKES"], column_units=[unit_out] * 3,
@@ -219,6 +232,9 @@ def main() -> None:
     ap.add_argument("--release", default="pr4", choices=["pr4", "pr3", "npipe_uio"])
     ap.add_argument("--zero-level", default=None, choices=["", "highlat", "dr1"],
                     help="zero-level method; default dr1 for npipe_uio, none for pr3/pr4")
+    ap.add_argument("--keep-dipole", action="store_true",
+                    help="pr4 only: do not subtract the solar dipole (the pass-1 545/857 files "
+                         "of E014 were made this way)")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     for f in a.freqs:
@@ -233,7 +249,8 @@ def main() -> None:
         if not os.path.exists(path):
             print(f"missing {path}")
             continue
-        convert(path, a.nside, a.out, f, a.release, a.zero_level or "")
+        convert(path, a.nside, a.out, f, a.release, a.zero_level or "",
+                subtract_dipole=(a.release == "pr4" and not a.keep_dipole))
 
 
 if __name__ == "__main__":

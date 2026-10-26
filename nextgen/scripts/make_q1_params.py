@@ -207,6 +207,7 @@ experiments: {{}}
 
 
 def main():
+    global PR4
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="nextgen/params/q1")
     ap.add_argument("--nside", type=int, default=64)
@@ -217,6 +218,7 @@ def main():
     ap.add_argument("--pol", default="IQU")
     ap.add_argument("--modes", nargs="*", default=["ridge", "conditional", "marginal", "resolve_chisq"])
     ap.add_argument("--hfi", default="pr4", choices=["pr4", "pr3", "npipe"])
+    ap.add_argument("--pr4-dir", default=PR4, help="directory of the prepared PR4 nside-512 maps")
     ap.add_argument("--extra-pr3", nargs="*", default=[], help="PR3 HFI frequencies to add, e.g. 100")
     ap.add_argument("--chisq-mask", default="")
     ap.add_argument("--rms-floor", type=float, default=0.0,
@@ -227,6 +229,7 @@ def main():
     ap.add_argument("--prop-dust", type=float, default=0.004, help="MH proposal sd for beta_d")
     ap.add_argument("--prop-sync", type=float, default=0.002, help="MH proposal sd for beta_s")
     a = ap.parse_args()
+    PR4 = a.pr4_dir
     os.makedirs(a.out, exist_ok=True)
     for mode in a.modes:
         tag = f"{mode}{'_nohfi' if a.no_hfi else ''}{('_' + a.tag) if a.tag else ''}"
