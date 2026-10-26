@@ -219,6 +219,18 @@ Gaussian twin of the template generator), mode hier, output
 the log-normal versus Gaussian misspecification; if it stays, the SBC decides whether it is the
 sampler.
 
+Result (16:09, 12 cells, 237 s per cell): the bias stays. beta over all pixels z +0.34 +- 0.05,
+sd z 1.14, coverage 0.59 / 0.93 (template generator: +0.35 +- 0.04, 0.93, 0.64 / 0.95); every
+S/N bin between +0.18 and +0.57. Index hyperparameters mu z +0.77 +- 0.36, log sigma +0.32 +- 0.44
+(ESS 18), u -0.09. Divergences 2 in one chain, min E-BFMI 0.03. So the residual is not the
+log-normal versus Gaussian scatter. With this generator the hier target is the exact marginal of
+the generative model except that (mu_c, s_c) are fixed at (1.0269, 0.2336) instead of drawn from
+their hyperprior, which cannot produce a 0.3 sd shift in beta when the data measure them to 0.03.
+Remaining suspects: sampling in the centred parameterization at noise 1 (the funnel is worst where
+data and prior are comparable: min ESS 18 to 29 on log sigma, E-BFMI 0.03, divergences), or the
+target. Part 2 (16:10): the same 12 cells with `--param noncentred`
+(`study_v1_hier_gaussgen_nc/`). If the bias goes away it is sampling; the SBC then confirms.
+
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,
 z +14 at noise 0.3). Mode "w1": known collapsed. Both run through the same analysis.
