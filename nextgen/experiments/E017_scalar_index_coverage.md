@@ -111,6 +111,14 @@ percent coverage is 0.50 and 0.54 (+- 0.10); 72 more w0 replicates are running t
 hier amplitude hyperparameters are recovered at the high-S/N scales (mu 1.027 / 1.027 +- 0.01,
 log s -1.44 / -1.39 +- 0.03 against the generator 1.027, -1.45).
 
+**w0 with 96 replicates (extension of 72, done 21:05):** z +0.09 +- 0.09 / +0.08 +- 0.09 /
+-0.09 +- 0.12 / +0.02 +- 0.19 at noise 0.1 / 0.3 / 1 / 3, sd z 0.93 / 0.89 / 1.14 / 1.90, coverage
+0.72 / 0.98, 0.72 / 0.98, 0.56 / 0.93, 0.33 / 0.66 (binomial SE 0.05). So the profile is calibrated
+at full-sky S/N 680 and 230, its posterior is about 15 percent too narrow at S/N 68, and two times
+too narrow at S/N 23 (no mean bias at any scale). The 24-replicate cov68 of 0.50 at noise 0.3 was a
+fluctuation. Hier at noise 3 on the first 10 replicates: z +0.04 +- 0.29, sd z 0.91, coverage
+0.80 / 0.90.
+
 **Broken hier chain (rep 4, noise 1):** 983 divergences, E-BFMI 0.03, step size 1.9e-14, posterior
 "sd" 8e-13, log s_dust at -19. A numerical floor, not a property of the target: at that log s the
 prior precision 1/(s g)^2 is of order 1e16 and swamps M^T N^-1 M in double precision, so the density
