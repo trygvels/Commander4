@@ -237,6 +237,18 @@ the 1.18 width ratio of the untuned chain was ESS noise. (Analysis: `analyze_q1_
 _npipetuned --burn 400`; the grid file is copied into `ridge_npipetuned/`.) The tuned
 resolve_chisq, conditional and marginal chains follow.
 
+**Tuned round, resolve_chisq, 1000 iterations (10:27 to 17:44, 7.3 h, proposals 1.2e-4 / 9e-4,
+acceptance 0.129):** beta_d 1.3654 +- 0.0005, beta_s -3.342 +- 0.005 (burn 400; ESS 17 and 20).
+Against the exact ridge target: shift +0.5 +- 2.7 sd in beta_d and +1.1 +- 2.9 sd in beta_s,
+width ratios 11.1 and 13.0. These proposals are 2.4 sd for the ridge posterior but only 0.2 sd for
+the legacy one, so in 600 post-burn iterations at acceptance 0.13 the chain random-walks about
+1e-3 in beta_s against a posterior width of 0.006: it has not traversed its own posterior, and the
+width ratios are lower bounds (the sd of a short random walk underestimates the target sd). The
+untuned chain (proposals 0.004 / 0.002, ESS 1184 and 74) remains the measurement: 16 to 17x. The
+tuned chain confirms the order of magnitude (above 11x) and the same reduced chi-square (14993 vs
+14994 for ridge). The legacy move was not rerun with its own tuned proposals; the untuned chain
+already has ESS 1184 in beta_d.
+
 Answer to Q1 at this resolution: on real data, Commander4's legacy index move overstates the index
 uncertainty by a factor of 16 to 17 and shifts the dust index by several (correct) sd. At nside 512
 to 1024 (k 100 to 400x larger) the F1 scaling predicts factors above 50. The `marginal` chain measures
