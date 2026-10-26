@@ -305,4 +305,12 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
 - Pass 3 (2026-10-26 evening): all six PR4 full-mission HFI bands 100 to 857 from NERSC
   (`prep_pr4_maps.py --release pr4 --zero-level dr1`, dipole removed, into
   `~/data/planck_pr4/n512_pass3/`), 20 bands, ridge and marginal with tuned proposals plus the grid
-  check; tag `pr4tuned`. Then IQU; per-pixel chi2 maps for model checking.
+  check; tag `pr4tuned`. Input preparation (21:49 to 21:51): dipole removed and zero level from
+  the DR1-dust regression at |b| > 30 deg in uK_CMB for every band, then 545/857 written in
+  MJy/sr. Offsets -96.6 / -107.9 / -201.5 / +444.5 / -3533 / -5.50e5 uK_CMB at 100 / 143 / 217 /
+  353 / 545 / 857; slopes against the DR1 dust model 1.40 / 1.03 / 1.01 / 0.99 / 0.97 / 0.65 (the
+  0.65 at 857 is the band-integrated K_CMB convention, 1.44 / 2.27, undone by the MJy/sr write-out;
+  the 1.40 at 100 GHz is CO and the other components, which the offset fit does not model, so the
+  100 GHz zero level is the least certain of the six). Median I rms at nside 512: 11.9 / 4.7 / 6.5 /
+  21.9 uK_CMB and 0.0083 / 0.0078 MJy/sr. The 353 GHz offset (+444.5) agrees with the pass-2 NPIPE
+  A-split value (+447.9). Then IQU; per-pixel chi2 maps for model checking.
