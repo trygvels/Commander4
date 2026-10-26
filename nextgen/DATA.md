@@ -63,6 +63,40 @@ you actually download (path, size, checksum, date) in the "Local copies" table.
 | Cosmoglobe DR2 | `~/data/cosmoglobe_DR2/` | empty | | Not downloaded (needs the DR2 parameter file; see STATUS "Needs Trygve"). |
 | Commander4 chain outputs (E014 passes) | `~/data/c4_chains/q1_n64/` | 10 GB | 2026-10-25/26 | ridge / resolve_chisq / conditional / marginal, suffixes nohfi, npipemask, npipetuned. |
 
+## PR4 HFI maps: resumable source (verified 2026-10-26)
+
+The NERSC portal directory `https://portal.nersc.gov/cfs/cmb/planck2020/frequency_maps/Single-frequency/`
+serves `HFI_SkyMap_{100,143,217,353}_2048_R4.00_full.fits` (2,013,275,520 bytes each: I, Q, U, II,
+IQ, IU, QQ, QU, UU, hits, the PLA layout) and the 545/857 files we hold, with HTTP range support
+(206 on a 1 kB range), so `curl -C -` resumes; 1.9 MB/s on 2026-10-26 evening (30 kB/s the day
+before). Also there: `_full-ringhalf-1/2` splits, LFI 030/044/070 at nside 1024, and
+`Light_maps/HFI_SkyMap_<freq>-field-IQU_2048_R4.00_full.fits` (IQU only, no covariance, 604 MB).
+Dead ends: the PLA AIO catalogue has no R4 products (metadata queries on R4 / NPIPE return empty)
+and PLA product-action ignores range requests, so browser downloads from PLA stall and cannot be
+resumed by a script; the CMB-S4 Globus HTTPS mirror returns 404 for every path. Fetch script:
+`nextgen/scripts/fetch_pr4_hfi.sh` (loop over `curl -C -` until the size matches).
+
+## Cosmoglobe Python package: example chain (verified 2026-10-26)
+
+`cosmoglobe` 0.9.86 (PyPI, github.com/Cosmoglobe/Cosmoglobe). `cosmoglobe.get_test_chain()`
+downloads `https://sdc.uio.no/vol/cosmoglobe-data/BeyondPlanck/compsep/compsep_chain.h5` (1.49 GiB,
+2021-10-11, range requests supported): a BeyondPlanck Commander3 component-separation chain with
+2 samples (`000000`, `000001`) and a `parameters` group; components cmb, synch, dust, ff, ame,
+radio at nside 1024 with `amp_alm` (lmax 2000 / 1500 / 3000 / 1500 / 1000), `synch/beta_map` and
+`beta_alm` (lmax 100) with the pixel-region sampler state (`beta_pixreg_{nprop,proplen,val}`),
+`dust/beta_map` (two region values 1.5476, 1.5766), `dust/T_map` (17.33 K), `ff/Te_map`,
+`ame/nu_p_map`, `radio/amp` and `specind` for 12192 sources, `sigma_l` per component. No tod, gain
+or bandpass groups. `cosmoglobe.sky_model(nside)` downloads `BeyondPlanck/releases/v2/BP_mean_v2.h5`
+(801 MB, the mean over the BP chains; we hold a copy in `~/data/beyondplanck/`). Chain reader
+(`cosmoglobe/h5/chain.py`): zero-padded sample groups plus `parameters/<comp>/{class, type, nside,
+fwhm, nu_ref, polarization, unit}`; alms are Commander's real-packed layout (index l^2+l+m real,
+l^2+l-m imaginary, divided by sqrt 2 for m > 0) with a sibling `<name>_lmax`. Useful as a cheap
+Commander3-format reference for a chain reader and for the DR1 comparison; the full DR1 chains
+(`cosmoglobe_DR1/CG_c000{1,2}_v1.h5`, 841 GB each) can be probed over HTTP ranges without
+downloading (`nextgen/scripts/probe_remote_h5.py` from this session reads HDF5 metadata remotely).
+Installable in the project venv with numpy 2.5 and Python 3.13 (dry run clean) except for its
+`setuptools<69` pin: install with `--no-deps` plus astropy, numba, cmasher, rich, click, tqdm.
+
 ## External low-frequency data: verified 2026-10-25
 
 Every statement below comes from a page or file listing fetched on 2026-10-25, or from a paper
