@@ -64,12 +64,17 @@ import healpy as hp                # noqa: E402
 if __package__ in (None, ""):                         # run as a script from indexfield/
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from indexfield import field, posterior, sampler, simulate            # noqa: E402
-from indexfield.model import collapsed_loglike                       # noqa: E402
+from indexfield.model import collapsed_loglike, hier_loglike, hier_prior   # noqa: E402
 
 QUANTITIES = ["mu", "log_sigma", "u", "beta_bright0", "beta_bright1", "beta_faint0",
               "beta_faint1", "beta_mean", "ztz", "quad_Kinv", "logprior_beta", "loglike",
               "tarp_prior_dist0", "tarp_local_dist0"]
+HIER_QUANTITIES = ["mu_sync", "mu_dust", "log_s_sync", "log_s_dust"]   # mode "hier" (E016)
 TARP_SCHEMES = ("prior", "local")
+
+
+def quantities_for(mode: str) -> list:
+    return QUANTITIES + (HIER_QUANTITIES if mode == "hier" else [])
 DEFAULTS = dict(config="default", param="noncentred", family="graph", mode="gauss",
                 rho_prior="loguniform", nside_beta=4, nside_d=16, noise_scale=1.0,
                 amp_prior="default", warmup=500, samples=2000, ess_min=400.0, L=99,
@@ -108,6 +113,32 @@ def make_field(cfg: dict):
     return field.MaternField(basis)
 
 
+def draw_hier_replicate(cfg: dict, fld, hyper, rng):
+    """E016 generator: (theta, z, beta) as simulate.simulate, then (mu_c, log s_c) from the
+    HierPosterior hyperpriors and a_p,c ~ N(mu_c g_p,c, (s_c g_p,c)^2) with g the templates,
+    cmb ~ N(0, 70^2); so the "hier" target is the exact marginal of the generator."""
+    N = hp.nside2npix(cfg["nside_d"])
+    Nb = hp.nside2npix(cfg["nside_beta"])
+    region = simulate.region_map(cfg["nside_d"], cfg["nside_beta"])
+    theta = simulate.draw_hyper(hyper, rng)
+    z = rng.standard_normal(fld.K)
+    beta = theta["mu"] + theta["sigma"] * np.asarray(fld.S_times(theta["rho"], z))
+    g = simulate.templates(cfg["nside_d"])
+    HP = posterior.HierPosterior
+    amp = np.array([rng.normal(HP.HIER_MU0, HP.HIER_MU_SD), rng.normal(HP.HIER_MU0, HP.HIER_MU_SD),
+                    rng.normal(np.log(HP.HIER_S0), HP.HIER_LOGS_SD),
+                    rng.normal(np.log(HP.HIER_S0), HP.HIER_LOGS_SD)])
+    m, inv_T = hier_prior(g, amp[:2], amp[2:])
+    a = m + rng.standard_normal(m.shape) / np.sqrt(inv_T)
+    nu = simulate.BANDS_GHZ
+    rms = simulate.noise_rms(cfg["nside_d"], nu, cfg["noise_scale"])
+    M, _ = simulate.mixing(nu, beta[region], beta_d=1.6, T_d=20.0)
+    d = np.einsum("nbc,nc->nb", M, a) + rms * rng.standard_normal(rms.shape)
+    data = simulate.PixelData(nu=nu, d=d, inv_var=1.0 / rms ** 2, region=region, n_beta=Nb,
+                              beta_d=1.6, T_d=20.0)
+    return data, dict(theta=theta, z=z, beta=beta, a=a, amp=amp, g=g)
+
+
 def draw_replicate(cfg: dict, fld, hyper, rng):
     """One joint draw (theta, z, beta, a, d) of the hierarchical model; returns (PixelData, truth).
 
@@ -115,6 +146,8 @@ def draw_replicate(cfg: dict, fld, hyper, rng):
     .inv_T carry exactly the (m, T) the amplitudes were drawn with, so the "gauss" target
     matches the generator (the only configuration in which the SBC tests the sampler).
     """
+    if cfg["mode"] == "hier":
+        return draw_hier_replicate(cfg, fld, hyper, rng)
     return simulate.simulate(cfg["nside_d"], cfg["nside_beta"], fld, hyper, rng,
                              amp_mode="gauss", noise_scale=cfg["noise_scale"],
                              prior_width=cfg["amp_prior"])
@@ -168,6 +201,8 @@ def chain_quantities(post, fld, samples, logp, pix, refs):
         quad[i] = fld.Kinv_quadform(rho, beta[i] - up["mu"]) / up["sigma"] ** 2
         logdet[i] = 2.0 * np.sum(np.log(w))
         lp_h[i] = post._hyper_terms(up["mu"], up["log_sigma"], up["u"])[0]
+        if "mu_amp" in up:
+            lp_h[i] += post.amp_hyper_terms(samples[i, K + 3:K + 7])[0]
     logprior = -K * ls - 0.5 * logdet - 0.5 * ztz
     if post.centred:
         loglike = logp + 0.5 * ztz + K * ls + 0.5 * logdet - lp_h
@@ -178,6 +213,8 @@ def chain_quantities(post, fld, samples, logp, pix, refs):
     Q = np.column_stack([mu, ls, u, beta[:, pix["bright"][0]], beta[:, pix["bright"][1]],
                          beta[:, pix["faint"][0]], beta[:, pix["faint"][1]], beta.mean(axis=1),
                          ztz, quad, logprior, loglike, d_prior, d_local])
+    if post.dim == K + 7:                                   # mode "hier": the amplitude block
+        Q = np.column_stack([Q, samples[:, K + 3:K + 7]])
     return Q, beta
 
 
@@ -188,12 +225,18 @@ def truth_quantities(fld, truth, data, mode, pix, refs):
     ztz = float(z @ z)
     quad = fld.Kinv_quadform(th["rho"], beta - th["mu"]) / th["sigma"] ** 2
     logprior = -K * th["log_sigma"] - np.sum(np.log(w)) - 0.5 * ztz
-    loglike = collapsed_loglike(beta, data, mode)[0]
-    return np.array([th["mu"], th["log_sigma"], th["u"], beta[pix["bright"][0]],
-                     beta[pix["bright"][1]], beta[pix["faint"][0]], beta[pix["faint"][1]],
-                     beta.mean(), ztz, quad, logprior, loglike,
-                     np.linalg.norm(beta - refs["prior"][0]),
-                     np.linalg.norm(beta - refs["local"][0])])
+    if mode == "hier":
+        loglike = hier_loglike(beta, data, truth["g"], truth["amp"][:2], truth["amp"][2:])[0]
+    else:
+        loglike = collapsed_loglike(beta, data, mode)[0]
+    q = [th["mu"], th["log_sigma"], th["u"], beta[pix["bright"][0]],
+         beta[pix["bright"][1]], beta[pix["faint"][0]], beta[pix["faint"][1]],
+         beta.mean(), ztz, quad, logprior, loglike,
+         np.linalg.norm(beta - refs["prior"][0]),
+         np.linalg.norm(beta - refs["local"][0])]
+    if mode == "hier":
+        q += list(truth["amp"])
+    return np.array(q)
 
 
 def tarp_counts(beta_thin, beta_true, refs):
@@ -237,9 +280,15 @@ def run_replicate(cfg: dict, index: int) -> dict:
     hyper = posterior.HyperPrior(rho_prior=cfg["rho_prior"]).resolved(fld.basis.h)
     data, truth = draw_replicate(cfg, fld, hyper, rng)
     pix = test_pixels(cfg)
-    Post = posterior.CentredPosterior if cfg["param"] == "centred" else \
-        posterior.NonCentredPosterior
-    post = Post(fld, hyper, data=data, mode=cfg["mode"])
+    names = quantities_for(cfg["mode"])
+    if cfg["mode"] == "hier":
+        if cfg["param"] != "centred":
+            raise ValueError("mode 'hier' is implemented for the centred parameterization only")
+        post = posterior.HierPosterior(fld, hyper, data, truth["g"])
+    else:
+        Post = posterior.CentredPosterior if cfg["param"] == "centred" else \
+            posterior.NonCentredPosterior
+        post = Post(fld, hyper, data=data, mode=cfg["mode"])
     rng_ref = np.random.default_rng([cfg["seed"], index, 7])
     refs = dict(prior=np.array([prior_field_draw(fld, hyper, rng_ref)
                                 for _ in range(cfg["n_tarp_ref"])]))
@@ -276,7 +325,7 @@ def run_replicate(cfg: dict, index: int) -> dict:
             reasons.append("loglike_errors")
         attempts.append(dict(attempt=attempt, n_warmup=n_warmup, n_samples=n_samples,
                              target_accept=target_accept, min_ess=float(ess[i_min]),
-                             min_ess_quantity=QUANTITIES[i_min], n_divergent=res.n_divergent,
+                             min_ess_quantity=names[i_min], n_divergent=res.n_divergent,
                              n_divergent_warmup=res.n_divergent_warmup,
                              n_loglike_errors_sampling=res.n_loglike_errors_sampling,
                              n_loglike_errors=res.n_loglike_errors, step_size=res.step_size,
@@ -294,23 +343,30 @@ def run_replicate(cfg: dict, index: int) -> dict:
     ranks = (Q_thin < q_true[None, :]).sum(axis=0).astype(int)
     tarp = tarp_counts(beta_thin, truth["beta"], refs)
     # Consistency of the recovered log likelihood with direct evaluation on the thinned draws.
-    direct = np.array([collapsed_loglike(b, data, cfg["mode"])[0] for b in beta_thin[::7]])
-    ll_err = float(np.max(np.abs(direct - Q_thin[::7, QUANTITIES.index("loglike")])))
+    if cfg["mode"] == "hier":
+        x_thin = res.samples[idx]
+        direct = np.array([hier_loglike(b, data, truth["g"], x[post.K + 3:post.K + 5],
+                                        x[post.K + 5:post.K + 7])[0]
+                           for b, x in zip(beta_thin[::7], x_thin[::7])])
+    else:
+        direct = np.array([collapsed_loglike(b, data, cfg["mode"])[0] for b in beta_thin[::7]])
+    ll_err = float(np.max(np.abs(direct - Q_thin[::7, names.index("loglike")])))
     ll_scale = float(np.max(np.abs(direct)))
-    quad_vs_ztz = float(np.max(np.abs(Q[:, QUANTITIES.index("quad_Kinv")]
-                                      - Q[:, QUANTITIES.index("ztz")])))
+    quad_vs_ztz = float(np.max(np.abs(Q[:, names.index("quad_Kinv")]
+                                      - Q[:, names.index("ztz")])))
     th = truth["theta"]
     return dict(index=index, seed=cfg["seed"], config_name=config_name(cfg), config=cfg,
                 status=status, reasons=reasons, attempts=attempts, n_attempts=len(attempts),
                 pilot=pilot_info,
-                generator_matches_target=cfg["mode"] == "gauss", K=fld.K, dim=post.dim,
-                pixels=pix, quantities=QUANTITIES, L=L, n_samples_final=int(Q.shape[0]),
-                truth=dict(theta=th, beta=truth["beta"], q=dict(zip(QUANTITIES, q_true))),
-                ranks=dict(zip(QUANTITIES, ranks)),
+                generator_matches_target=cfg["mode"] in ("gauss", "hier"), K=fld.K, dim=post.dim,
+                pixels=pix, quantities=names, L=L, n_samples_final=int(Q.shape[0]),
+                truth=dict(theta=th, beta=truth["beta"], q=dict(zip(names, q_true)),
+                           amp=truth.get("amp")),
+                ranks=dict(zip(names, ranks)),
                 tarp_counts={k: v for k, v in tarp.items()},
-                ess=dict(zip(QUANTITIES, ess)), min_ess=float(ess[i_min]),
-                post_mean=dict(zip(QUANTITIES, Q.mean(axis=0))),
-                post_sd=dict(zip(QUANTITIES, Q.std(axis=0, ddof=1))),
+                ess=dict(zip(names, ess)), min_ess=float(ess[i_min]),
+                post_mean=dict(zip(names, Q.mean(axis=0))),
+                post_sd=dict(zip(names, Q.std(axis=0, ddof=1))),
                 n_divergent=res.n_divergent, n_divergent_warmup=res.n_divergent_warmup,
                 n_loglike_errors_sampling=res.n_loglike_errors_sampling,
                 n_loglike_errors=res.n_loglike_errors, ebfmi=res.ebfmi, step_size=res.step_size,
@@ -368,7 +424,7 @@ def parse_args(argv=None):
                                                   "sbc_out"))
     ap.add_argument("--param", choices=["centred", "noncentred"], default=DEFAULTS["param"])
     ap.add_argument("--family", choices=["graph", "harmonic"], default=DEFAULTS["family"])
-    ap.add_argument("--mode", choices=["gauss", "w0", "w1"], default=DEFAULTS["mode"])
+    ap.add_argument("--mode", choices=["gauss", "w0", "w1", "hier"], default=DEFAULTS["mode"])
     ap.add_argument("--rho-prior", choices=["loguniform", "pc"], default=DEFAULTS["rho_prior"])
     ap.add_argument("--nside-beta", type=int, default=DEFAULTS["nside_beta"])
     ap.add_argument("--nside-d", type=int, default=DEFAULTS["nside_d"])
@@ -416,7 +472,7 @@ def main(argv=None):
           f"nside_d {a.nside_d}, warmup {a.warmup}, samples {a.samples}, ess_min {a.ess_min:g}, "
           f"L {a.L}, max_tries {cfg['max_tries']}, pilot {a.pilot_samples}, workers "
           f"{a.workers}, seed {a.seed} -> {path}")
-    if cfg["mode"] != "gauss":
+    if cfg["mode"] not in ("gauss", "hier"):
         print("  WARNING: generator (gauss amplitudes) does not match the target mode; this run "
               "is not a sampler test (E012 v2)")
     t0 = time.time()
