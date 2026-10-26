@@ -171,15 +171,23 @@ runs until these exist and a published Commander3 result is reproduced.
 - The Commander4 lead developer openly uses Claude and Copilot for helper code; AI-assisted
   contributions are normal in this project.
 
-**F12 (preliminary). At low per-pixel S/N the ridge likelihood inflates a hierarchical index field and the flat-prior marginal collapses it** (E012 probe and profile scan; one replicate, nside_d 16, 48 index regions, S/N 0.4 to 16): with
-amplitudes profiled (ridge, w0) the per-region likelihood in beta is rough and multimodal at S/N
-below a few, the per-region maxima scatter with rms 2.2 about the truth, the inferred field sigma is
-about 1.2 against a truth of 0.065 (z = +22 to +25) and NUTS mixes at ESS 4 to 5 per 1500 s in every
-parameterization. With the flat amplitude prior (w1) every region collapses to beta about -0.1 with
-conditional sd 0.01 (field version of F3). With a proper Gaussian amplitude prior the conditionals are
-unimodal and prior-dominated at low S/N and correct at S/N 16. Preliminary until the E012 coverage
-study (queued) gives rates over replicates. Bearing on Q2: for spatially varying indices the amplitude
-prior is not a nuisance choice; neither the profile nor the flat-prior marginal is safe at low S/N.
+**F12. For a spatially varying index the flat-prior marginal is unusable at every S/N, the profile
+likelihood (ridge) is calibrated only above a per-index-pixel S/N of about 15, and a proper Gaussian
+amplitude prior gives calibrated indices only if it is well specified** (E012 coverage study
+`study_v1`: 12 replicates x noise 0.3 / 1 / 3 x three modes, nside_d 16, 48 index pixels, template
+amplitudes with 0.1 dex scatter, 108 NUTS cells). Flat-prior marginal (w1): every index pixel pulled
+to beta about -0.2 with sd 0.01, standardized bias z of +100 to +300, zero 68 / 95 percent coverage,
+field mean off by 400 to 1400 sd (field version of F3, now quantified). Ridge (w0): at S/N >= 15.6, z
++0.09 +- 0.06 and +0.17 +- 0.11 with coverage 0.70 / 0.96 and 0.67 / 0.91; at S/N below 3, z +5 to
++13 with sd(z) 20 to 35, coverage 0.3 to 0.6, field sd biased +5 to +28 sd, ESS 4 to 6 (the profile
+maxima of low-S/N regions scatter by about 2 in beta and the hierarchy reads that as field variance).
+Gaussian amplitude prior N(m, T) with T^(1/2) = max(0.5 |m|, 20) on template data with 0.23 |m|
+scatter: z +0.6 (coverage 0.59 / 0.93) at noise 3, +2.1 at noise 1, +14 at noise 0.3 (median error
+1.5 in beta); the SBC run with amplitudes drawn from the same prior passes, so this is prior
+sensitivity, not a sampler error (well-specified and wide-prior diagnostics running, E012). Bearing on
+Q2/Q3: the index resolution must be chosen from the S/N map so index pixels stay above the ridge
+threshold, or a proper amplitude prior must be used and its specification treated as a modelled
+systematic.
 
 **F13. The Cosmoglobe DR1 dust map is referenced at 70 GHz, not the 545 GHz its FITS header states**
 (E014; DATA.md section "Cosmoglobe DR1 thermal dust reference frequency"): the parameter file

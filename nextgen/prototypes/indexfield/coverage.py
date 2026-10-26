@@ -98,12 +98,15 @@ def theta_from_values(hyper, mu: float, sigma: float, rho: float) -> dict:
 
 
 def simulate_template(nside_d: int, nside_beta: int, fld, hyper, rng, noise_scale: float,
-                      theta: dict | None, amp_prior: str, beta_d: float = 1.6, T_d: float = 20.0):
+                      theta: dict | None, amp_prior: str, beta_d: float = 1.6, T_d: float = 20.0,
+                      amp_mode: str = "template"):
     """One replicate with template amplitudes (module docstring). Returns (PixelData, truth).
 
     theta None: drawn from the hyperprior (simulate.draw_hyper); otherwise the given dict. The
-    PixelData carries (m, inv_T) of the gauss-mode amplitude prior, which the generator does not
-    use.
+    PixelData carries (m, inv_T) of the gauss-mode amplitude prior. amp_mode "template" (the
+    study): a_p = m_p 10^(0.1 N(0,1)), cmb ~ N(0, 70^2), so the gauss prior is misspecified in
+    mean and width; amp_mode "gauss": a_p ~ N(m_p, T_p) with T_p of amp_prior, so the gauss
+    likelihood is the exact marginal of the generative model (diagnostic of prior sensitivity).
     """
     N, Nb = hp.nside2npix(nside_d), hp.nside2npix(nside_beta)
     K = fld.basis.V.shape[1]
@@ -112,13 +115,18 @@ def simulate_template(nside_d: int, nside_beta: int, fld, hyper, rng, noise_scal
     z = rng.standard_normal(K)
     beta = th["mu"] + th["sigma"] * np.asarray(fld.S_times(th["rho"], z))
     m = simulate.templates(nside_d)
-    a = m * 10.0 ** (0.1 * rng.standard_normal(m.shape))
-    a[:, 0] = 70.0 * rng.standard_normal(N)
+    sqrt_T = amp_prior_sqrt_T(m, amp_prior)
+    if amp_mode == "template":
+        a = m * 10.0 ** (0.1 * rng.standard_normal(m.shape))
+        a[:, 0] = 70.0 * rng.standard_normal(N)
+    elif amp_mode == "gauss":
+        a = m + sqrt_T * rng.standard_normal(m.shape)
+    else:
+        raise ValueError(f"unknown amp_mode {amp_mode!r}")
     nu = simulate.BANDS_GHZ
     rms = simulate.noise_rms(nside_d, nu, noise_scale)
     M, _ = mixing(nu, beta[region], beta_d=beta_d, T_d=T_d)
     d = np.einsum("nbc,nc->nb", M, a) + rms * rng.standard_normal(rms.shape)
-    sqrt_T = amp_prior_sqrt_T(m, amp_prior)
     data = PixelData(nu=nu, d=d, inv_var=1.0 / rms ** 2, region=region, n_beta=Nb, beta_d=beta_d,
                      T_d=T_d, m=m, inv_T=1.0 / sqrt_T ** 2)
     return data, dict(theta=th, z=z, beta=beta, a=a)
@@ -166,7 +174,8 @@ def run_cell(job):
         theta = theta_from_values(hyper, mu, sigma, np.radians(rho_deg))
     rng_data = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale))])
     data, truth = simulate_template(cfg["nside_d"], cfg["nside_beta"], fld, hyper, rng_data,
-                                    noise_scale, theta, cfg["amp_prior"])
+                                    noise_scale, theta, cfg["amp_prior"],
+                                    amp_mode=cfg.get("amp_mode", "template"))
     snr_index, snr_pix = snr_proxy(data, truth["beta"])
     rng = np.random.default_rng([cfg["seed"], rep, int(round(1000 * noise_scale)),
                                  MODES.index(mode), 7])
@@ -237,6 +246,8 @@ def main(argv=None):
     ap.add_argument("--family", default="graph_laplacian", choices=["graph_laplacian", "harmonic"])
     ap.add_argument("--rho-prior", default="loguniform", choices=["loguniform", "pc"])
     ap.add_argument("--param", default="centred", choices=["centred", "noncentred"])
+    ap.add_argument("--amp-mode", default="template", choices=["template", "gauss"],
+                    help="generative amplitudes: template (study) or drawn from the gauss prior")
     ap.add_argument("--amp-prior", default="default", choices=["default", "wide"],
                     help="Gaussian amplitude prior of mode gauss")
     ap.add_argument("--theta-fixed", action="store_true",
@@ -263,7 +274,7 @@ def main(argv=None):
                theta_fixed=([args.mu, args.sigma, args.rho_deg] if args.theta_fixed else None),
                init=args.init, n_warmup=args.n_warmup, n_samples=args.n_samples,
                target_accept=args.target_accept, max_depth=args.max_depth, seed=args.seed,
-               amp_mode="template", out_dir=out_dir, overwrite=args.overwrite)
+               amp_mode=args.amp_mode, out_dir=out_dir, overwrite=args.overwrite)
     with open(os.path.join(out_dir, "config.json"), "w") as f:
         json.dump(to_py(dict(cfg, n_rep=args.n_rep, rep_start=args.rep_start, noise=args.noise,
                              modes=args.modes)), f, indent=1)

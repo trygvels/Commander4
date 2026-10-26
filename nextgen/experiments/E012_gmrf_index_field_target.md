@@ -392,6 +392,61 @@ behaviour.
 Listed under Reference 1e. The volume-term control for science is w = 1 versus w = 0 at low S/N in
 the coverage study.
 
+**Coverage study (Reference 3), `coverage/study_v1`, 2026-10-26: 12 replicates x noise scales
+0.3 / 1 / 3 x modes gauss / w0 / w1, nside_d 16, nside_beta 2 (48 index pixels), centred, NUTS
+500 + 1000, template amplitudes with 0.1 dex scatter, theta drawn from the hyperprior. 108 cells,
+4.0 h wall on 4 workers; 4 divergences in total (one gauss chain). Full table in
+`study_v1/coverage_summary.txt`. Bias z = (mean - truth) / sd of the index pixels, pooled over
+replicates, and 68 / 95 percent coverage:**
+
+| noise | mode | beta all pixels: z, cov68, cov95 | beta at S/N >= 15.6 | log sigma z | median min ESS |
+|---|---|---|---|---|---|
+| 0.3 | gauss | +14.3 +- 0.6, 0.10, 0.20 | +2.1 +- 0.1, 0.23, 0.45 | +13.8 | 172 |
+| 0.3 | w0 (ridge) | +1.1 +- 0.4, 0.65, 0.91 | +0.09 +- 0.06, 0.70, 0.96 | +4.6 | 33 |
+| 0.3 | w1 (flat marginal) | +166 +- 4, 0.06, 0.12 | +98 +- 6, 0.14, 0.29 | +15.6 | 24 |
+| 1 | gauss | +2.1 +- 0.1, 0.15, 0.45 | +1.2 +- 0.1, 0.39, 0.81 | +9.1 | 237 |
+| 1 | w0 | +4.7 +- 0.9, 0.44, 0.72 | +0.17 +- 0.11, 0.67, 0.91 | +20.3 | 5 |
+| 1 | w1 | +202 +- 3, 0.00, 0.00 | +163 +- 6, 0.00, 0.00 | -1.4 | 74 |
+| 3 | gauss | +0.60 +- 0.04, 0.59, 0.93 | (no pixels) | +0.2 | 10 |
+| 3 | w0 | +9.1 +- 1.2, 0.39, 0.62 | (no pixels) | +28.1 | 4 |
+| 3 | w1 | +291 +- 4, 0.00, 0.00 | (no pixels) | -5.2 | 72 |
+
+Reading, per mode:
+
+- **w1, the flat-prior marginal, is unusable for a spatially varying index at every S/N tested.**
+  Every index pixel is pulled to beta about -0.1 to -0.25 (median |error| 2.6 to 2.9 in beta,
+  posterior sd 0.01 to 0.015, z of 100 to 300, zero coverage); mu is off by 400 to 1400 sd. This is
+  the field version of F3 and is now quantified: it goes into FINDINGS as F12 (final).
+- **w0, the profile likelihood (ridge), is calibrated where the index pixel has S/N above about
+  15** (z +0.09 +- 0.06 and +0.17 +- 0.11, coverage 0.70 / 0.96 and 0.67 / 0.91 at noise 0.3 and
+  1) and degrades below: at S/N below 3 the pooled z is +5 to +13 with sd(z) 20 to 35 and
+  coverage 0.3 to 0.6 (68) and 0.6 (95), and the hyperparameter log sigma is biased by +5 to +28 sd
+  (the profile maxima of low-S/N regions scatter by about 2 in beta, which the hierarchy reads as
+  a large field sd, as the 2026-10-25 probe predicted). Its ESS is the lowest of the three (median
+  min ESS 4 to 6 at noise 1 and 3; 1200 to 1700 s per chain against 120 to 170 s for the others),
+  so the low-S/N w0 cells are also mixing-limited; the pre-registered rule reports them with their
+  ESS rather than rerunning them longer.
+- **gauss, the proper Gaussian amplitude prior, is biased in this study, and the bias grows as the
+  noise drops**: z +0.6 at noise 3 (coverage 0.59 / 0.93, nearly calibrated), +2.1 at noise 1,
+  +14 at noise 0.3 (median |error| 1.5 in beta, mu off by 67 sd). The study's generative amplitudes
+  are templates with 0.1 dex log-normal scatter, so the prior N(m_p, T_p) with T_p^(1/2) =
+  max(0.5 |m_p|, 20) is misspecified in width (0.5 |m| against the 0.23 |m| scatter) and the
+  sampler's prior mean is the scatter-free template. The SBC run (L2, 300 replicates, PASS) draws
+  the amplitudes from this prior and shows no bias, so the sampler is exact for its target; what
+  this table measures is the sensitivity of the index posterior to the amplitude-prior
+  specification. A diagnostic is running (`diag_gauss_wellspec`: amplitudes drawn from the prior,
+  so the gauss likelihood is the exact marginal of the generative model; `diag_gauss_wide`:
+  template amplitudes with the 10 |m| prior), 6 replicates each at noise 0.3 and 1. Until it
+  reports, the gauss column is "biased under a misspecified amplitude prior", not "wrong".
+
+Consequence for Q2 and the roadmap: among the prior-free options only the profile likelihood is
+usable, and only above a per-index-pixel S/N of order 10; below that the index posterior needs a
+proper amplitude prior, whose specification then matters at the level of several posterior sd.
+This argues for (i) the hierarchical field prior as the main regulariser of low-S/N regions with
+the amplitude prior kept wide, and (ii) choosing nside_beta from the S/N map so that index pixels
+stay above the w0 calibration threshold where no amplitude prior is wanted. Both go to OPEN_QUESTIONS
+Q2/Q3 and to the Paper A method section.
+
 ## Conclusion
 (partial, 2026-10-26) The hierarchical index-field sampler with the proper Gaussian amplitude prior
 passes L1 (exact targets) and L2 (SBC, 300 replicates, all quantities calibrated at the power of the
