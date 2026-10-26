@@ -208,7 +208,16 @@ and printed no tables for this directory; it now takes the list from `coverage.M
 study's summary is unchanged by this.
 
 ### SBC (L2)
-(running; see Setup)
+Smoke test of the non-centred path (2 replicates, 100 + 200 draws): tree depth 4.0, E-BFMI 1.04
+and 1.12, step 0.24 to 0.29, no divergences, 310 and 540 s under load (the centred smoke had step
+0.12 to 0.16). Full run launched 15:44 (300 replicates, 4 workers), `sbc_out/run_hier.log`.
+
+### Residual check (noise 1, Gaussian generative scatter)
+Launched 15:44: 12 noise-1 replicates with amp_mode "hier" (a_p = m_p (1.0269 + 0.2336 N), the
+Gaussian twin of the template generator), mode hier, output
+`checks/out/coverage/study_v1_hier_gaussgen/`. If the +0.3 sd bias at noise 1 disappears, it is
+the log-normal versus Gaussian misspecification; if it stays, the SBC decides whether it is the
+sampler.
 
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,

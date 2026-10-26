@@ -57,9 +57,10 @@ from indexfield.model import PixelData, mixing                   # noqa: E402
 
 DEFAULT_OUT = os.path.join(HERE, "checks", "out", "coverage")
 MODES = ("gauss", "w0", "w1", "hier", "hier_distort", "hier_scatter")
-# hier modes (E016): the hier posterior (either parameterization) with shape template g = templates ("hier"), templates times a
-# smooth 1 + 0.3 cos(theta) distortion ("hier_distort"), or templates times an independent
-# pixel-scale 10^(0.1 N(0,1)) scatter ("hier_scatter"), seeded by (seed, rep, noise, 11).
+# hier modes (E016): the hier posterior (either parameterization) with shape template
+# g = templates ("hier"), templates times a smooth 1 + 0.3 cos(theta) distortion ("hier_distort"),
+# or templates times an independent pixel-scale 10^(0.1 N(0,1)) scatter ("hier_scatter"), seeded
+# by (seed, rep, noise, 11).
 
 
 def shape_template(mode: str, nside_d: int, rng_g) -> np.ndarray:
@@ -119,7 +120,8 @@ def simulate_template(nside_d: int, nside_beta: int, fld, hyper, rng, noise_scal
     PixelData carries (m, inv_T) of the gauss-mode amplitude prior. amp_mode "template" (the
     study): a_p = m_p 10^(0.1 N(0,1)), cmb ~ N(0, 70^2), so the gauss prior is misspecified in
     mean and width; amp_mode "gauss": a_p ~ N(m_p, T_p) with T_p of amp_prior, so the gauss
-    likelihood is the exact marginal of the generative model (diagnostic of prior sensitivity).
+    likelihood is the exact marginal of the generative model (diagnostic of prior sensitivity);
+    amp_mode "hier": a_p = m_p (1.0269 + 0.2336 N(0,1)), the Gaussian-scatter twin of "template".
     """
     N, Nb = hp.nside2npix(nside_d), hp.nside2npix(nside_beta)
     K = fld.basis.V.shape[1]
@@ -134,6 +136,12 @@ def simulate_template(nside_d: int, nside_beta: int, fld, hyper, rng, noise_scal
         a[:, 0] = 70.0 * rng.standard_normal(N)
     elif amp_mode == "gauss":
         a = m + sqrt_T * rng.standard_normal(m.shape)
+    elif amp_mode == "hier":
+        # Gaussian relative scatter with the first two moments of the template mode's 10^(0.1 N):
+        # mean exp((0.1 ln 10)^2 / 2) = 1.0269, sd 0.2336. With g = m the hier target is then the
+        # exact marginal of the generator at (mu_c, s_c) = (1.0269, 0.2336) (E016 residual check).
+        a = m * (1.0269 + 0.2336 * rng.standard_normal(m.shape))
+        a[:, 0] = 70.0 * rng.standard_normal(N)
     else:
         raise ValueError(f"unknown amp_mode {amp_mode!r}")
     nu = simulate.BANDS_GHZ
@@ -275,8 +283,9 @@ def main(argv=None):
     ap.add_argument("--family", default="graph_laplacian", choices=["graph_laplacian", "harmonic"])
     ap.add_argument("--rho-prior", default="loguniform", choices=["loguniform", "pc"])
     ap.add_argument("--param", default="centred", choices=["centred", "noncentred"])
-    ap.add_argument("--amp-mode", default="template", choices=["template", "gauss"],
-                    help="generative amplitudes: template (study) or drawn from the gauss prior")
+    ap.add_argument("--amp-mode", default="template", choices=["template", "gauss", "hier"],
+                    help="generative amplitudes: template (study), gauss prior draws, or hier "
+                         "(Gaussian relative scatter, E016 residual check)")
     ap.add_argument("--amp-prior", default="default", choices=["default", "wide"],
                     help="Gaussian amplitude prior of mode gauss")
     ap.add_argument("--theta-fixed", action="store_true",
