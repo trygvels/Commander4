@@ -2,6 +2,46 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-27 (Mac mini, 10:55): E020 (M2.5 first cut) redesigned twice, timed, and launched; non-centred coordinates fail at nside 64 S/N
+
+**Learned**
+- E020 design passed two stats reviews (second verdict: correct, every should-fix taken). PySM
+  d1+s1+c1 at nside 64, 12 bands, noise 0.03 x E012 levels, fixed T_d, prior means offset from
+  the truth, 5-degree smoothed data-built templates floored at the 1st percentile; ten runs
+  (GMRF, iid and independent region priors at nside_beta 4, 8, 16, plus a single index); metrics
+  pre-registered incl. the GLS CMB at index draws with a true-SED floor and a paired block
+  bootstrap; the decision rule split into same-nside and cross-nside parts.
+- Profiled Fisher sd of a region index at nside_beta 16 on this sky spans 4e-3 to 0.61 (sync)
+  and 5e-4 to 1.16 (dust), a precision range of 5e6 (E020 Result). In the non-centred
+  coordinates the strongly informed regions are tied to mu and sigma and NUTS collapses (step
+  size 2e-5, state frozen over 40 iterations even with a finite-difference Hessian mass start).
+  The centred parameterization moves (step size 1e-2, 0 divergences after the first warm-up
+  transitions). Non-centred remains right for the weak-data regime (E016 to E018).
+- Two cost bugs fixed (same target): the graph-Laplacian eigenbasis (18 s per component at
+  nside_beta 16) was rebuilt every Gibbs iteration on every rank (36 s of each iteration); the
+  serving ranks computed the dense field-to-pixel maps for nothing. In-process gradient 47 ms at
+  4 threads (66 ms at 1); the finite-difference start costs 12304 gradients per chain.
+- New sampler options, all tested: `spectral_index_field: {type: iid | independent}`,
+  `nuts.init_inv_mass: fd_hessian`; slow L1 test of the independent prior against exact
+  per-region grids (PASS).
+
+**Running**
+- E020 production, sequential under nohup (`run_e020_prod.sh` in the session scratchpad; logs in
+  `/Users/trygvels/data/e020_d1s1/run_<tag>.log`): gmrf16 started 10:51, then iid16, indep16,
+  scalar, gmrf8, iid8, indep8, gmrf4, iid4, indep4; 2000 iterations each, two chains. The cost
+  per iteration after warm-up decides whether the 2000-iteration budget stands; a waiter reports
+  at chain-1 iteration 150.
+- E016 hier SBC (L2 gate for M2.4a): 166 of 300 replicas.
+
+**Next**
+- Read the gmrf16 budget; shorten the schedule if a run exceeds about 12 h; analyze with
+  `nextgen/scripts/e020_analyze.py`; second noise seed for the decisive pair; Result, Conclusion,
+  F21, Q3, ROADMAP M2.5.
+- SBC analysis when it finishes; E016 Conclusion; M2.4a done or withdrawn.
+
+**Needs Trygve**
+- Nothing new. Q15 (per-band zero levels) and the hier default (D003/D011) still open.
+
 ## 2026-10-27 (Mac mini, 05:40): M2.4 stage 1 validated at L3 (E018 PASS); M2.2 full-sky row done (E017); MAMS benchmarks nearly done
 
 **Learned**
