@@ -118,6 +118,7 @@ class NUTSSampler:
         self._dual = None
         self._window_ends = _warmup_windows(n_warmup)
         self._window_samples: list[NDArray] = []
+        self._floor_metric: NDArray | None = None   # inverse mass at the first warm-up step
 
     # ---------------------------------------------------------------- public interface
     def transition(self, theta: NDArray, logp_and_grad: LogpGrad) -> tuple[NDArray, TransitionInfo]:
@@ -137,6 +138,8 @@ class NUTSSampler:
 
     # ---------------------------------------------------------------- adaptation
     def _adapt(self, theta: NDArray, accept_stat: float) -> None:
+        if self._floor_metric is None:
+            self._floor_metric = np.array(self.inv_mass, dtype=float, copy=True)
         self.step_size = self._dual.update(accept_stat)
         n_init = 75 if self.n_warmup >= 150 else int(0.15 * self.n_warmup)
         if self._window_ends and n_init < self.iteration <= self._window_ends[-1]:
@@ -146,8 +149,13 @@ class NUTSSampler:
             n = len(samples)
             if n > 2:
                 var = samples.var(axis=0, ddof=1)
-                # Stan's regularization towards a small isotropic metric.
-                self.inv_mass = (n / (n + 5.0)) * var + 1e-3 * (5.0 / (n + 5.0))
+                # Stan's regularization, (n/(n+5)) var + 1e-3 (5/(n+5)), floors every
+                # coordinate's inverse mass at about 1e-4; here the floor is taken relative to
+                # the metric the warm-up started from (identical to Stan's from the default unit
+                # metric), so a scaled start (`fd_hessian`) keeps coordinates whose posterior
+                # variance is far below 1e-4 from being inflated, which would pin the step size.
+                self.inv_mass = ((n / (n + 5.0)) * var
+                                 + 1e-3 * (5.0 / (n + 5.0)) * self._floor_metric)
             self._window_samples = []
             self._dual.restart(self.step_size)
         if self.iteration == self.n_warmup:

@@ -149,3 +149,28 @@ def test_regional_spectral_indices_match_exact_per_region_posteriors():
         se = draws[:, r].std() / np.sqrt(_ess(draws[:, r]))
         assert abs(draws[:, r].mean() - mean) < 4 * se + 1e-3 * sd
         assert abs(draws[:, r].std() / sd - 1.0) < 0.2
+
+
+def test_window_floor_is_relative_to_the_metric_in_force():
+    """With a scaled starting metric (as `init_inv_mass: fd_hessian` gives), a coordinate whose
+    posterior variance is far below Stan's absolute floor (1e-3 * 5/(n+5)) keeps its small inverse
+    mass after a window update; from the unit metric the update is Stan's (floor 1e-3 * 5/(n+5)
+    with n the window length, the last window here holding 50 draws)."""
+    rng = np.random.default_rng(5)
+    scales = np.array([1e-4, 1e-4, 1.0, 1.0])
+
+    def logp_and_grad(x):
+        return -0.5 * float(np.sum((x / scales) ** 2)), -x / scales**2
+
+    sampler = NUTSSampler(4, rng, n_warmup=200)
+    sampler.inv_mass = scales**2
+    x = np.zeros(4)
+    for _ in range(200):
+        x, _ = sampler.transition(x, logp_and_grad)
+    assert np.all(sampler.inv_mass[:2] < 1e-6)
+    np.testing.assert_allclose(np.sqrt(sampler.inv_mass) / scales, 1.0, rtol=0.5)
+    unit = NUTSSampler(4, np.random.default_rng(6), n_warmup=200)
+    x = np.zeros(4)
+    for _ in range(200):
+        x, _ = unit.transition(x, logp_and_grad)
+    assert np.all(unit.inv_mass[:2] >= 1e-3 * 5.0 / (50 + 5.0) * 0.99)   # Stan's floor stands
