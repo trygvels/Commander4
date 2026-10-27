@@ -220,7 +220,24 @@ python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e020_d1s1
 Second seed for the decisive pair: `--dir /Users/trygvels/data/e020_d1s1_seed2 --seed 2028`.
 
 ## Result
-(pending)
+**Timing run 1, gmrf16, non-centred, fd_hessian (40 Gibbs iterations, 06:53 to 08:44):** not
+usable. The finite-difference start costs 12304 gradients (18 min per chain; Commander4 always
+runs two chains, so every run pays it twice) and gives an inverse-mass range 1.5e-8 to 2. The
+step size then collapses in the first ten transitions to 2e-5 to 1e-3 (chain 2 stays at 3e-5 to
+8e-5, chain 1 oscillates up to 3e-3), with 31 to 1023 gradients per transition and 40 to 90 s
+per iteration. The analyzer, run on the 35 post-burn iterations of chain 1 (this also exercised
+its HDF5 path for the first time; it ran without error), shows the state frozen: both field means
+equal to the prior start to four decimals, posterior sd per region 2e-4 to 4e-4, index RMSE 0.118
+(sync) and 0.071 (dust), the amplitude hyperparameters unchanged at mu 1, log s -1.2, and the
+GLS CMB residual 12.6 uK. Cause: with 0.03 x E012 noise, the profiled Fisher sd of a region index
+at nside_beta 16 spans 4e-3 to 0.61 (sync) and 5e-4 to 1.16 (dust), a precision range of about
+5e6, and in the non-centred coordinates z these strongly informed regions are tied to mu and
+sigma, which a diagonal mass cannot undo (the usual non-centred versus centred trade-off:
+non-centred is the right choice for weak data, E016 to E018, and the wrong one here). The same
+Fisher sd range is itself a finding: at this noise one third of the nside_beta 16 regions have an
+index precision better than the truth's own spread (0.063 / 0.037), the rest are prior-dominated.
+
+**Timing run 2, gmrf16, centred, fd_hessian (30 iterations):** (running)
 
 ## Negative control
 The single index is the control: its index RMSE must equal the sd of the truth map (0.063 for
