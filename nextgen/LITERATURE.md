@@ -7,11 +7,11 @@ link as `https://arxiv.org/abs/<id>`.
 ## Cosmoglobe, BeyondPlanck, Commander
 | arXiv | Takeaway |
 |---|---|
-| 2011.05609 | BeyondPlanck I: framework; tau = 0.066 +- 0.013 (2205.10104) with ~30% larger errors |
-| 2011.08503 | BeyondPlanck XV: beta_s in 4 regions; high latitude prior-dominated; widening the prior biases tau |
+| 2011.05609 | BeyondPlanck I: framework; tau = 0.066 +- 0.013 (2205.10104) with ~30% larger errors. Read in full to Sect. 9.1 (2026-10-27): 4 chains x 1000 samples, burn-in 200, 3200 retained, 1.3 wall h per sample, 670 000 CPU h; no Gelman-Rubin; intensity beta marginal over a (Eq. 118), polarization conditional on a (Eq. 119, Sect. 8.2) |
+| 2011.08503 | BeyondPlanck XV (journal XIV): beta_s in 4 regions; high latitude prior-dominated; widening the prior biases tau. Read in full (2026-10-27): Q/U chi^2 over LFI 30/44/70, WMAP Ka/Q/V, HFI 353; conditional on a (Eq. 26), region map smoothed 10 deg; priors N(-3.3, 0.1), Spur and Plane data-constrained (-3.17 +- 0.06, -3.03 +- 0.07), High Latitude and Galactic Centre prior draws; inner Metropolis steps per Gibbs iteration set so the lag-n correlation is below 0.1 (n not stated); 2 chains, about 500 ensemble samples, beta_s Gibbs correlation length 30 to 50 (Sect. 5.3.2); prior shift 0.5 moves the posterior by at most 0.1 |
 | 2201.03530 | BeyondPlanck XVI: polarized AME limit depends on the beta_s prior (<0.6% vs 2.5 +- 1.0%) |
-| 2201.08188 | BeyondPlanck XIII: amplitude-marginal likelihood (their Eq. 23) |
-| 2201.03509 | BeyondPlanck III: computational infrastructure; 170 CPU-h per Gibbs sample |
+| 2201.08188 | BeyondPlanck XIII: amplitude-marginal likelihood (their Eq. 23, with +1/2 ln det (A^T N^-1 A)^-1, i.e. the correct flat-prior sign; the code sign is the opposite, F10). Read in full (2026-10-27): intensity beta_s likelihood disabled (prior only), beta_d prior N(1.56, 0.03), nu_p the only data-constrained intensity spectral parameter, full sky, band monopoles re-estimated per proposal (marginalizing them widens the log-likelihood by 1.5 to 2); 2 chains x 750, burn-in 10, visual diagnostics only; band monopoles mutually correlated and anticorrelated with component monopoles (Sect. 6.2, Table 3) |
+| 2201.03509 | BeyondPlanck III: computational infrastructure; 170 CPU-h per Gibbs sample. Read in full (2026-10-27): TOD 96.9 h, amplitudes 23.9 h, spectral indices 40.3 h per sample (Table 2); one chain per 128-core node; CG capped at 100 iterations; no Markov convergence diagnostics; 300 000 CPU h total (BP I says 670 000) |
 | 2209.04437 | BeyondPlanck IV: Bayesian (constrained) vs frequentist simulations |
 | 2303.08095 | Cosmoglobe DR1 WMAP+LFI; 812 CPU-h per sample; dipole 2.5 sigma above BeyondPlanck |
 | 2310.13740 | DR1 polarized synchrotron model; beta_s = -3.07 +- 0.07 from T-T plots |
@@ -95,3 +95,5 @@ link as `https://arxiv.org/abs/<id>`.
 | 1901.11386 | SRoll2: ADC nonlinearity and polarization efficiency fitting |
 | 2011.08082, 2011.06650, 2201.03417, 2201.03478 | BeyondPlanck gain, noise, bandpass, sidelobes |
 | 2312.09001, 2506.22217 | LiteBIRD sidelobe and bandpass requirements |
+
+Full-read report with section references for the four BeyondPlanck papers above: `research/2026-10-27_beyondplanck_chain_lengths_and_index_sampling.md` (BP I Sects. 9.2 to 11 not reached: no accessible full text; BP XVI not yet read).

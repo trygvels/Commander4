@@ -213,8 +213,12 @@ in any index sampler at Planck resolution. Scope (added 2026-10-27): measured fo
 configuration only (full-sky intensity indices, 17 bands, nside 64, high S/N); the ratio already
 varies from 180 (beta_s) to 1.5 (beta_d) within it, so it does not transfer to other published
 configurations without measurement. In particular nothing is established about the mixing of the
-BeyondPlanck XV polarized beta_s step (four regions, K to 70 GHz, prior N(-3.3, 0.1)); that cell
-is a planned E014 follow-up.
+BeyondPlanck XV polarized beta_s step (four regions, LFI 30 to 70 plus WMAP Ka/Q/V and HFI 353 in
+Q/U, prior N(-3.3, 0.1)); that cell is a planned E014 follow-up. BP XV itself ran many Metropolis
+steps per Gibbs iteration at fixed amplitudes (lag-n correlation below 0.1) and reports a beta_s
+Gibbs correlation length of 30 to 50 over about 500 samples (2011.08503 Sect. 5.3.2), so its
+within-conditional mixing was handled and the amplitude-index Gibbs coupling was measured, not
+ignored; the open question is only whether 30 to 50 is the full coupling length.
 
 **F15. The joint posterior with flat amplitude priors has the collapsed flat-prior marginal (w1, with
 -1/2 ln det A) as its exact spectral-parameter marginal; a Gibbs sampler that draws amplitudes with
