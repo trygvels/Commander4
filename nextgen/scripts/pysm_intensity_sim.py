@@ -18,12 +18,52 @@ import numpy as np
 
 FREQS = [23.0, 30.0, 33.0, 41.0, 44.0, 61.0, 70.0, 94.0, 100.0, 143.0, 217.0, 353.0]
 RMS16 = [70.0, 60.0, 60.0, 55.0, 60.0, 60.0, 70.0, 40.0, 24.0, 16.0, 24.0, 80.0]  # uK_RJ at nside 16
-INDEX_PRIOR = {"sync": (-3.0, 0.3), "dust": (1.55, 0.3)}
-CMB_SD = 70.0
+# Index prior means offset from the PySM sky means (-3.000, 1.540) by more than one truth sd
+# (0.063, 0.037), so that shrinkage towards mu0 cannot reproduce the truth by construction
+# (stats review of E020, item 3); sd 0.3 covers both truth ranges.
+INDEX_PRIOR = {"sync": (-3.10, 0.3), "dust": (1.60, 0.3)}
+INDEP_SD = 1.0            # per-region prior sd of the 'independent' option (flat where data speak)
+CMB_SD = 100.0            # a_cmb ~ N(0, CMB_SD^2); the c1 map rms at nside 64 is 84 uK
+TEMPLATE_FWHM_DEG = 5.0   # smoothing of the data-built pseudo-templates
+TEMPLATE_FLOOR_PCT = 1.0  # floor at this percentile of the smoothed template
 RUNS = {"gmrf4": ("gmrf", 4), "gmrf8": ("gmrf", 8), "gmrf16": ("gmrf", 16),
+        "iid4": ("iid", 4), "iid8": ("iid", 8), "iid16": ("iid", 16),
         "indep4": ("independent", 4), "indep8": ("independent", 8),
         "indep16": ("independent", 16), "scalar": (None, 0)}
 H_OVER_K = 0.0479924466  # K / GHz
+
+
+def _dust_sed(nu, beta, T):
+    """(..., nband) ThermalDust mixing column at pivot 545 GHz for beta (...,) and scalar T."""
+    nu = np.asarray(nu, dtype=float)
+    beta = np.asarray(beta, dtype=float)
+    x, x0 = H_OVER_K * nu / T, H_OVER_K * 545.0 / T
+    return (nu / 545.0) ** (beta[..., None] + 1.0) * (np.expm1(x0) / np.expm1(x))
+
+
+def fisher_sd(a_true, dsed, rms, region, nreg):
+    """Per-region Fisher sd of an index with the amplitudes known: 1/sqrt(sum_{p in r} sum_b
+    (a_p dsed_pb / rms_b)^2)."""
+    f = np.sum((a_true[:, None] * dsed / rms[None, :]) ** 2, axis=1)
+    F = np.bincount(region, f, minlength=nreg)
+    with np.errstate(divide="ignore"):
+        return 1.0 / np.sqrt(F)
+
+
+def beta_eff_fixed_T(dust_bands, nu, rms, T_fixed, grid=np.linspace(1.0, 2.2, 601)):
+    """Noise-free best-fit dust index per pixel with T fixed (rms-weighted least squares over the
+    bands, amplitude profiled): the dust truth a one-MBB fixed-T model can at best recover."""
+    npix = dust_bands.shape[0]
+    out = np.empty(npix)
+    w = 1.0 / rms ** 2
+    for lo in range(0, npix, 4096):
+        d = dust_bands[lo:lo + 4096]                          # (n, B)
+        sed = _dust_sed(nu, grid, T_fixed)                    # (G, B)
+        num = d @ (sed * w[None, :]).T                        # (n, G): sum_b w d s
+        den = np.sum(sed ** 2 * w[None, :], axis=1)           # (G,)
+        chi2 = np.sum(d ** 2 * w[None, :], axis=1)[:, None] - num ** 2 / den[None, :]
+        out[lo:lo + 4096] = grid[np.argmin(chi2, axis=1)]
+    return out
 
 
 def _bb_ratio(nu, nu0, T):
@@ -50,11 +90,20 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
         u.uK_CMB, equivalencies=u.cmb_equivalencies(100.0 * u.GHz)).value
     T_fixed = float(T_d.mean())
     rms = np.array(RMS16) * (nside / 16.0) * noise_scale
+    nu_arr = np.array(FREQS)
+    # Truth amplitudes at the model pivots (uK_RJ) and the noise-free dust emission per band.
+    a_sync = sync.get_emission(30.0 * u.GHz)[0].to(
+        u.uK_RJ, equivalencies=u.cmb_equivalencies(30.0 * u.GHz)).value
+    a_dust = dust.get_emission(545.0 * u.GHz)[0].to(
+        u.uK_RJ, equivalencies=u.cmb_equivalencies(545.0 * u.GHz)).value
     sky = np.empty((npix, len(FREQS)))
+    dust_bands = np.empty((npix, len(FREQS)))
     for i, f in enumerate(FREQS):
         nu = f * u.GHz
         tot = fg.get_emission(nu)[0] + cmb.get_emission(nu)[0]
         sky[:, i] = tot.to(u.uK_RJ, equivalencies=u.cmb_equivalencies(nu)).value
+        dust_bands[:, i] = dust.get_emission(nu)[0].to(
+            u.uK_RJ, equivalencies=u.cmb_equivalencies(nu)).value
     data = sky + rms[None, :] * rng.standard_normal(sky.shape)
     for i, f in enumerate(FREQS):
         hp.write_map(f"{outdir}/band{int(f):03d}_map.fits", data[:, i],
@@ -63,23 +112,71 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
         hp.write_map(f"{outdir}/band{int(f):03d}_rms.fits", np.full(npix, rms[i]),
                      column_names=["TEMPERATURE"], column_units="uK_RJ", overwrite=True,
                      dtype=np.float64)
-    # Pseudo-templates from the data: 23 GHz scaled to 30 GHz with beta -3; 353 GHz scaled to
-    # 545 GHz with beta 1.55 and T_fixed. They carry CMB, noise, the other foreground and the
-    # wrong constant index; the hier prior learns their scale and scatter.
+    # Pseudo-templates from the data (not the truth): 23 GHz scaled to 30 GHz and 353 GHz scaled
+    # to 545 GHz with the prior-mean indices and T_fixed, smoothed to TEMPLATE_FWHM_DEG and
+    # floored at the TEMPLATE_FLOOR_PCT percentile of the smoothed map. They carry CMB, noise,
+    # the other foreground and a wrong constant index; the hier prior learns scale and scatter.
+    lmax = 3 * nside - 1
     g_sync = data[:, FREQS.index(23.0)] * (30.0 / 23.0) ** INDEX_PRIOR["sync"][0]
     g_dust = data[:, FREQS.index(353.0)] * (545.0 / 353.0) ** (INDEX_PRIOR["dust"][0] + 1.0) \
         * _bb_ratio(545.0, 353.0, T_fixed)
-    for name, g in (("template_sync_30GHz", g_sync), ("template_dust_545GHz", g_dust)):
-        hp.write_map(f"{outdir}/{name}.fits", g, overwrite=True, dtype=np.float64)
+    lat = hp.pix2ang(nside, np.arange(npix), lonlat=True)[1]
+    hi = np.abs(lat) > 20
+    report = []
+    templates = {}
+    for name, g, a_true in (("sync", g_sync, a_sync), ("dust", g_dust, a_dust)):
+        gs = hp.smoothing(g, fwhm=np.radians(TEMPLATE_FWHM_DEG), lmax=lmax, iter=3)
+        floor = float(np.percentile(gs, TEMPLATE_FLOOR_PCT))
+        floor = max(floor, 1e-3 * float(np.mean(np.abs(gs))))
+        gf = np.maximum(gs, floor)
+        templates[name] = gf
+        ratio = gf[hi] / a_true[hi]
+        report.append(f"template {name}: floor {floor:.3g} hits {np.mean(gs < floor) * 100:.1f} "
+                      f"percent of pixels ({np.mean(gs[hi] < floor) * 100:.1f} at |b| > 20); "
+                      f"g/true at |b| > 20 16/50/84 pct {np.percentile(ratio, 16):.3f}/"
+                      f"{np.percentile(ratio, 50):.3f}/{np.percentile(ratio, 84):.3f}")
+    hp.write_map(f"{outdir}/template_sync_30GHz.fits", templates["sync"], overwrite=True,
+                 dtype=np.float64)
+    hp.write_map(f"{outdir}/template_dust_545GHz.fits", templates["dust"], overwrite=True,
+                 dtype=np.float64)
+    beta_eff = beta_eff_fixed_T(dust_bands, nu_arr, rms, T_fixed)
+    # Fisher sd of the region indices with amplitudes known (lower bound on the posterior sd).
+    dsed_s = (nu_arr[None, :] / 30.0) ** beta_s[:, None] * np.log(nu_arr / 30.0)[None, :]
+    dsed_d = _dust_sed(nu_arr, beta_d, T_fixed) * np.log(nu_arr / 545.0)[None, :]
+    fisher = {}
+    for nb in (4, 8, 16):
+        region = hp.ud_grade(np.arange(12 * nb * nb).astype(float), nside, order_in="RING",
+                             order_out="RING").astype(int)
+        for name, a_true, dsed in (("sync", a_sync, dsed_s), ("dust", a_dust, dsed_d)):
+            sd = fisher_sd(a_true, dsed, rms, region, 12 * nb * nb)
+            fisher[f"{name}_{nb}"] = sd
+            report.append(f"Fisher sd {name} nside_beta {nb}: median {np.median(sd):.4f}, 16/84 "
+                          f"pct {np.percentile(sd, 16):.4f}/{np.percentile(sd, 84):.4f}, fraction "
+                          f"above 0.1: {np.mean(sd > 0.1) * 100:.0f} percent")
+    for name, a_true, dsed in (("sync", a_sync, dsed_s), ("dust", a_dust, dsed_d)):
+        report.append(f"Fisher sd {name} full sky: "
+                      f"{fisher_sd(a_true, dsed, rms, np.zeros(npix, int), 1)[0]:.5f}")
+    report.append(f"beta_eff (fixed T {T_fixed:.3f} K) minus beta_d: rms {np.std(beta_eff - beta_d):.4f}"
+                  f", mean {np.mean(beta_eff - beta_d):+.4f}, range {np.min(beta_eff - beta_d):+.3f}"
+                  f" to {np.max(beta_eff - beta_d):+.3f}")
+    for name, m in (("beta_s", beta_s), ("beta_d", beta_d), ("beta_eff", beta_eff), ("T_d", T_d)):
+        report.append(f"truth {name}: mean {m.mean():.4f} sd {m.std():.4f} (|b| > 20: {m[hi].mean():.4f}"
+                      f" / {m[hi].std():.4f}), range {m.min():.3f} to {m.max():.3f}")
     np.savez(f"{outdir}/truth.npz", beta_s=beta_s, beta_d=beta_d, T_d=T_d, T_fixed=T_fixed,
-             cmb=cmb_map, sky=sky, rms=rms, nu=np.array(FREQS), nside=nside,
-             noise_scale=noise_scale, seed=seed, g_sync=g_sync, g_dust=g_dust)
+             beta_eff=beta_eff, cmb=cmb_map, sky=sky, dust_bands=dust_bands, rms=rms, nu=nu_arr,
+             nside=nside, noise_scale=noise_scale, seed=seed, g_sync=templates["sync"],
+             g_dust=templates["dust"], a_sync=a_sync, a_dust=a_dust, index_prior_sync=INDEX_PRIOR["sync"],
+             index_prior_dust=INDEX_PRIOR["dust"], indep_sd=INDEP_SD, cmb_sd=CMB_SD,
+             **{f"fisher_sd_{k}": v for k, v in fisher.items()})
+    with open(f"{outdir}/sim_report.txt", "w") as f:
+        f.write("\n".join(report) + "\n")
+    print("\n".join(report))
     for tag, (kind, nside_beta) in RUNS.items():
         with open(f"{outdir}/param_{tag}.yml", "w") as f:
             f.write(param_file(outdir, tag, kind, nside_beta, nside, T_fixed, n_iter, n_warmup))
-    print(f"E020 sky written to {outdir}: nside {nside}, noise scale {noise_scale}, T_fixed "
-          f"{T_fixed:.3f} K; truth sd beta_s {beta_s.std():.4f}, beta_d {beta_d.std():.4f}, "
-          f"cmb rms {cmb_map.std():.1f} uK_CMB; {len(RUNS)} parameter files.")
+    print(f"E020 sky written to {outdir}: nside {nside}, noise scale {noise_scale} (rms per pixel "
+          f"{np.round(rms, 2).tolist()} uK_RJ), T_fixed {T_fixed:.3f} K, cmb rms "
+          f"{cmb_map.std():.1f} uK_CMB; {len(RUNS)} parameter files.")
 
 
 def _field_block(kind: str | None, nside_beta: int) -> str:
@@ -90,6 +187,12 @@ def _field_block(kind: str | None, nside_beta: int) -> str:
       spectral_index_nside: {nside_beta}
       spectral_index_field:
         type: independent"""
+    if kind == "iid":
+        return f"""
+      spectral_index_nside: {nside_beta}
+      spectral_index_field:
+        type: iid
+        sigma_scale: 0.3"""
     return f"""
       spectral_index_nside: {nside_beta}
       spectral_index_field:
@@ -124,6 +227,7 @@ def param_file(outdir: str, tag: str, kind: str | None, nside_beta: int, nside: 
 """
     lmax = 3 * nside - 1
     log_s0 = float(np.log(0.3))
+    prior_sd = INDEP_SD if kind == "independent" else INDEX_PRIOR["sync"][1]
     return f"""gibbs:
   num_iterations: {n_iter}
   seed: 7
@@ -199,7 +303,7 @@ components:
       spectral_index_prior:
         type: gaussian
         mean: {INDEX_PRIOR["sync"][0]}
-        rms: {INDEX_PRIOR["sync"][1]}{_field_block(kind, nside_beta)}
+        rms: {prior_sd}{_field_block(kind, nside_beta)}
       amp_prior:
         type: hier
         template: "{outdir}/template_sync_30GHz.fits"
@@ -222,7 +326,7 @@ components:
       spectral_index_prior:
         type: gaussian
         mean: {INDEX_PRIOR["dust"][0]}
-        rms: {INDEX_PRIOR["dust"][1]}{_field_block(kind, nside_beta)}
+        rms: {prior_sd}{_field_block(kind, nside_beta)}
       amp_prior:
         type: hier
         template: "{outdir}/template_dust_545GHz.fits"

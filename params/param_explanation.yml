@@ -613,9 +613,12 @@ components:
       # spectral_index_nside: 4
       # spectral_index_field:
       #   type: gmrf              # gmrf (default): hierarchical Matern GMRF, mean, scale and
-      #                           # correlation length inferred; independent: iid
-      #                           # N(spectral_index_prior) per region, no hyperparameters (the
-      #                           # fixed-nside ladder baseline). independent takes no other keys.
+      #                           # correlation length inferred; iid: beta = mu + sigma z with
+      #                           # the same hyperpriors on mu and sigma and no spatial coupling
+      #                           # (takes only sigma_scale); independent: iid
+      #                           # N(spectral_index_prior) per region, no index hyperparameters
+      #                           # (the fixed-nside ladder baseline). independent takes no other
+      #                           # keys.
       #   basis: graph
       #   alpha: 2.0
       #   sigma_scale: 0.3

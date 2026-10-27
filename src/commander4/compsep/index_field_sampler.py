@@ -72,7 +72,9 @@ def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
     the required `spectral_index_prior` (mu0, sd0). `type: gmrf` (default): `IndexFieldPrior`,
     basis graph, alpha 2, sigma_scale 0.3, rho prior log-uniform on [h, pi], (mu0, sd0) the
     hyperprior of the field mean. `type: independent`: `IndependentIndexPrior`, every region
-    index iid N(mu0, sd0^2), no hyperparameters (the fixed-nside ladder)."""
+    index iid N(mu0, sd0^2), no index hyperparameters (the fixed-nside ladder). `type: iid`:
+    `IndexFieldPrior` over an `IidField`, beta = mu 1 + sigma z with the GMRF hyperpriors on mu
+    and sigma and no spatial coupling (the exchangeable analogue of the GMRF)."""
     prior = _read_param(comp_params, "spectral_index_prior")
     if prior is None or _read_param(prior, "mean") is None or _read_param(prior, "rms") is None:
         raise ValueError("A spectral-index field needs 'spectral_index_prior' with 'mean' and "
@@ -86,9 +88,18 @@ def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
                              f"got {sorted(settings)}.")
         return gmrf_field.IndependentIndexPrior(nside_beta, float(prior["mean"]),
                                                 float(prior["rms"]))
+    if kind == "iid":
+        unknown = set(settings) - {"sigma_scale"}
+        if unknown:
+            raise ValueError(f"spectral_index_field type iid takes only sigma_scale; got "
+                             f"{sorted(unknown)}.")
+        hyper = gmrf_field.HyperPrior(mu0=float(prior["mean"]), s_mu=float(prior["rms"]),
+                                      sigma_scale=float(settings.get("sigma_scale", 0.3)))
+        return gmrf_field.IndexFieldPrior(gmrf_field.IidField(gmrf_field.IidBasis(nside_beta)),
+                                          hyper, centred=centred)
     if kind != "gmrf":
-        raise ValueError(f"spectral_index_field.type must be 'gmrf' or 'independent', got "
-                         f"{kind!r}.")
+        raise ValueError(f"spectral_index_field.type must be 'gmrf', 'iid' or 'independent', "
+                         f"got {kind!r}.")
     unknown = set(settings) - {"basis", "alpha", "sigma_scale", "rho_prior", "rho_max"}
     if unknown:
         raise ValueError(f"Unknown spectral_index_field settings {sorted(unknown)}.")

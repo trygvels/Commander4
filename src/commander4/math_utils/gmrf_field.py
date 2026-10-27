@@ -505,3 +505,56 @@ class IndependentIndexPrior:
         if not np.isfinite(lp):
             return -np.inf, np.zeros(self.dim)
         return lp, g - r / self.sd0
+
+
+class IidBasis:
+    """Identity basis on the HEALPix pixels at nside_beta: V = I, every pixel its own mode (the
+    constant mode is kept, so mu and the mean of the block are separated only by the priors)."""
+    kind = "iid"
+
+    def __init__(self, nside_beta: int):
+        nside_beta = int(nside_beta)
+        if nside_beta < 1 or not hp.isnsideok(nside_beta, nest=True):
+            raise ValueError(f"nside_beta must be a power of two >= 1, got {nside_beta}")
+        self.nside_beta = nside_beta
+        self.n_beta = hp.nside2npix(nside_beta)
+        self.K = self.n_beta
+        self.h = float(np.sqrt(4.0 * np.pi / self.n_beta))
+        self.V = np.eye(self.n_beta)
+        self.lam = np.zeros(self.n_beta)
+
+
+class IidField:
+    """Spatially uncorrelated field, the rho -> 0 limit of `MaternField`: S(rho) = I for every
+    rho, so beta = mu 1 + sigma z with z ~ N(0, I) (non-centred) or beta - mu 1 ~ N(0, sigma^2 I)
+    (centred). Same interface as `MaternField`; the range parameter u of `IndexFieldPrior` then
+    only carries its own prior and is independent of everything else (it is sampled and
+    ignored). This is the exchangeable hierarchical analogue of the GMRF: same hyperpriors on
+    mu and sigma, no spatial coupling."""
+
+    def __init__(self, basis: IidBasis):
+        self.basis = basis
+        self.alpha = float("nan")
+        self.n_beta = basis.n_beta
+        self.K = basis.K
+
+    def weights(self, rho: float):
+        return np.ones(self.K), np.zeros(self.K)
+
+    def S_times(self, rho: float, z: NDArray) -> NDArray:
+        return np.asarray(z, dtype=float).copy()
+
+    def ST_times(self, rho: float, g: NDArray) -> NDArray:
+        return np.asarray(g, dtype=float).copy()
+
+    def dS_dlogrho_times(self, rho: float, z: NDArray) -> NDArray:
+        return np.zeros(self.K)
+
+    def logdet_K(self, rho: float) -> float:
+        return 0.0
+
+    def Kinv_quadform(self, rho: float, v: NDArray) -> float:
+        return float(np.sum(np.asarray(v, dtype=float) ** 2))
+
+    def pixel_variances(self, rho: float) -> NDArray:
+        return np.ones(self.n_beta)

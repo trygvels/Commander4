@@ -271,3 +271,41 @@ def test_independent_target_equals_gmrf_likelihood_plus_iid_prior_and_fd_gradien
                 vals.append(like_i.logp_and_grad(xk)[0])
             fd[j] = (vals[0] - 8 * vals[1] + 8 * vals[2] - vals[3]) / (12 * h)
         np.testing.assert_allclose(g_i, fd, rtol=2e-5, atol=2e-4)
+
+
+def test_iid_field_prior_is_the_gmrf_prior_with_identity_structure() -> None:
+    """`type: iid`: beta = mu + sigma z; the prior density in the non-centred coordinates is
+    -1/2 z^T z plus the hyperprior terms of the GMRF, the gradient matches finite differences,
+    and the centred Jacobian is -K log sigma."""
+    comps = _components()
+    comps[1].comp_params.spectral_index_field = Bunch(type="iid", sigma_scale=0.2)
+    specs, _ = ifs.discover_index_specs(comps, None, centred=False)
+    fld = specs[0].field
+    assert isinstance(fld, gmrf_field.IndexFieldPrior)
+    assert isinstance(fld.field, gmrf_field.IidField) and fld.K == fld.n_beta == 12
+    assert fld.hyper.sigma_scale == 0.2 and fld.dim == 15
+    rng = np.random.default_rng(6)
+    z = rng.standard_normal(12)
+    x = fld.pack(z, -3.1, np.log(0.12), 0.4)
+    np.testing.assert_allclose(fld.beta(x), -3.1 + 0.12 * z)
+    lp, g = fld.prior_logp_and_grad(x)
+    lp_h = fld.hyper_terms(-3.1, np.log(0.12), 0.4)[0]
+    assert lp == pytest.approx(-0.5 * z @ z + lp_h)
+    fd = np.empty(fld.dim)
+    for j in range(fld.dim):
+        vals = []
+        for k in (-2, -1, 1, 2):
+            xk = x.copy()
+            xk[j] += k * 1e-5
+            vals.append(fld.prior_logp_and_grad(xk)[0])
+        fd[j] = (vals[0] - 8 * vals[1] + 8 * vals[2] - vals[3]) / (12e-5)
+    np.testing.assert_allclose(g, fd, rtol=1e-6, atol=1e-6)
+    assert fld.centred_log_jacobian(x) == pytest.approx(-12 * np.log(0.12))
+    # u is decoupled: the density depends on u only through its own prior.
+    x2 = fld.pack(z, -3.1, np.log(0.12), -1.3)
+    lp2 = fld.prior_logp_and_grad(x2)[0]
+    assert lp2 - lp == pytest.approx(fld.hyper_terms(-3.1, np.log(0.12), -1.3)[0] - lp_h)
+    bad = _component(Synchrotron, "sync", **_sync_params(
+        spectral_index_nside=1, spectral_index_field=Bunch(type="iid", alpha=2.0)))
+    with pytest.raises(ValueError, match="iid takes only"):
+        ifs.discover_index_specs([bad], None, centred=False)
