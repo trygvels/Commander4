@@ -256,6 +256,40 @@ pooled with the first 12, the 36-replicate mean z is +0.10 +- 0.07 with coverage
 noise 1 at the 0.1 sd level; the hier posterior is if anything slightly conservative (sd z 0.86,
 cov68 0.71 to 0.74 on the fresh replicates).
 
+**SBC of the hier target, non-centred (L2 gate; 15:44 to 22:43, 300 replicates, 4 workers,
+`sbc_out/hier_hier.jsonl`, analysis `hier_hier_summary.txt` and plots):** 300 of 300 replicates
+clean (0 divergences, 0 likelihood errors, min ESS median 619, min 403, E-BFMI median 0.96, mean
+1.31 attempts, median 848 s per replicate). Pre-registered battery over 16 distinct quantities
+(mu, log sigma, u, two bright and two faint index pixels, z^T z, log prior, log likelihood, two
+TARP distances, mu_sync, mu_dust, log s_sync, log s_dust): chi-square p-values 0.094 to 0.902,
+Bonferroni PASS (min p 0.094 against 0.00063); KS of the p-value set PASS (p 0.285); TARP 8 of 8
+curves inside; ECDF simultaneous 99 percent band: 15 quantities inside, `beta_faint1` OUTSIDE
+(max ECDF difference 0.107 against a band of about 0.10, ranks skewed high: rank mean 0.550
+against 0.5, se 0.017, that is +2.9 se; standardized error (truth minus posterior mean) / sd
++0.153 +- 0.058). **Verdict by the pre-registered rule: FAIL.**
+
+Diagnostics on the 300 records (2026-10-27 22:45): the `beta_faint1` rank has no correlation
+with any sampler covariate (attempts, min ESS, the pixel's own ESS, E-BFMI, step size, warm-up
+divergences: Spearman |rho| <= 0.06, p >= 0.28) nor with the truth hyperparameters (log sigma, u,
+log s_sync, mu_sync: |rho| <= 0.04); the deviation is present in both the low-sigma and high-sigma
+thirds of the replicates (z mean +0.29 +- 0.09 and +0.23 +- 0.08, not in the middle third:
+-0.13 +- 0.10). The paired pixel `beta_faint0` has the identical template amplitude (2.048, pixels
+0 and 189) and the same role in the model, and shows no deviation (rank mean 0.501, z mean
+-0.002 +- 0.066); the faint0-minus-faint1 difference is 1.9 se. Under the null the worst of 16
+quantities reaches 2.9 se with probability about 0.06, consistent with the band's own p of about
+0.1. Reading: more likely a fluctuation than a defect, since any target-generator mismatch would
+hit both faint pixels; but principle 8 applies and the rule is the rule.
+
+**Replication launched 22:47 (`run_sbc_hier_nc_rep2.sh`, seed 2027, 300 fresh replicates, same
+configuration, `sbc_out/hier_hier_seed2027.jsonl`).** Pre-registered decision: (i) the full
+battery on the fresh 300 must PASS by the same rule; (ii) one-sided test of the `beta_faint1`
+rank mean on the fresh replicates at alpha 0.05 (rank mean above 0.5 + 1.645 x 0.017 = 0.528
+rejects); power 0.75 against the first run's +0.15 sd shift. If (i) and (ii) pass, the first run's
+deviation is recorded as a fluctuation and the SBC is PASS on 600 replicates (pooled rank mean of
+`beta_faint1` reported too). If (ii) rejects, the hier target or the non-centred sampler has a
+small bias at prior-dominated pixels and F16 is withdrawn pending its cause. About 31 h at the
+current load (E020 shares the machine).
+
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,
 z +14 at noise 0.3). Mode "w1": known collapsed. Both run through the same analysis.

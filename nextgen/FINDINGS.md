@@ -232,7 +232,7 @@ amplitudes (which regularises the CMB/synchrotron direction but not synchrotron/
 and bounds, and index steps on smoothed data; what it does say is that "sample amplitudes with flat
 priors, then sample the index on chi2" is not a route around the prior question of Q2.
 
-**F16 (provisional until the E016 SBC passes). A hierarchical amplitude prior, with the per-component
+**F16 (provisional: the first E016 SBC, 300 replicates, fails the pre-registered ECDF band on one of 16 quantities at the band edge with every other test passing; a seeded replication of 300 decides, see E016). A hierarchical amplitude prior, with the per-component
 scale and relative scatter learned from the data, gives calibrated index-field posteriors on
 template data at every index-pixel S/N tested, including below S/N 1 where the profile is biased by
 5 to 13 sd and the fixed Gaussian prior by 0.6 to 14 sd** (E016 coverage study, same 108 replicates
