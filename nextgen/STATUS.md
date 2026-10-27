@@ -2,6 +2,49 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-27 (Mac mini, 22:55): E020 relaunched on a fixed Hessian metric; hier SBC borderline FAIL, replication running; BeyondPlanck papers read; monopole design decided
+
+**Learned**
+- E020 gmrf16 needed two fixes to run at all. Attempt 1: Stan's absolute mass-floor (1e-4)
+  inflated the mass of the 1e-8-variance bright-region coordinates after the Hessian start and
+  pinned the step size (fix 0e7c282: floor relative to the starting metric). Attempt 2: the warm-up
+  windows themselves replaced the Hessian metric by variance estimates from 25 to 200 correlated
+  draws over 6152 coordinates (precision range 5e6): 7 gradients per transition before the first
+  window, 1023 after, 1.6 min per iteration, 55 h per run. Fix: `nuts.adapt_mass: false` (fadec92,
+  b93592e; the Hessian metric is kept, only the step size adapts; stats review CONFIRMED, any
+  fixed metric leaves the target unchanged; `inv_mass` is now a copying property). Attempt 3
+  launched 22:26; first transitions on the metric take 1 to 7 gradients.
+- E016 hier SBC (300 replicates, all clean): Bonferroni, KS and TARP pass, but the ECDF
+  simultaneous band fails on one of 16 quantities, `beta_faint1` (+2.9 se rank mean, standardized
+  error +0.15 +- 0.06), at the band edge. No correlation with any sampler covariate; the paired
+  faint pixel with the same template amplitude is clean. FAIL by the pre-registered rule;
+  replication with seed 2027 (300 replicates) running with a pre-registered one-sided test
+  (rank mean above 0.528 rejects). F16 stays provisional.
+- BeyondPlanck I, III, XIII, XV read in full (research note with section references): BP XV
+  sampled beta_s conditionally on amplitudes with enough inner Metropolis steps for lag-n
+  correlation below 0.1 and reports a Gibbs correlation length of 30 to 50 over about 500 samples;
+  BP I ran 4 x 1000 samples with no Gelman-Rubin; BP XIII disabled the intensity beta_s likelihood
+  and sampled nu_p full-sky with band monopoles re-estimated per proposal. F14's scope is now
+  explicit: one intensity configuration, not transferable to BP XV without the planned E014 cell.
+  Paper A does not claim published results were under-mixed.
+- D013: per-band zero levels will be offset columns with Gaussian priors in the collapsed
+  per-pixel likelihood (M3.3), not a CG-step monopole component. Q15 item 2 closed.
+
+**Running**
+- E020 production attempt 3 (gmrf16 since 22:26, then nine more runs); waiter at chain-1
+  iteration 175 gives the per-run budget.
+- E016 SBC replication, seed 2027 (since 22:47, about 31 h).
+
+**Next**
+- E020 budget; shorten the schedule if a run exceeds about 12 h; analysis, second seed, Result,
+  Conclusion, F21, Q3, ROADMAP M2.5.
+- SBC replication verdict; E016 Conclusion; F16 final or withdrawn; M2.4a.
+- E014 BP XV cell (conditional-versus-collapsed width per region) before any statement about BP
+  mixing; BP XVI read; BP I Sects. 9.2 to 11 need the PDF.
+
+**Needs Trygve**
+- Nothing new. The hier default (D003/D011) stays open.
+
 ## 2026-10-27 (Mac mini, 10:55): E020 (M2.5 first cut) redesigned twice, timed, and launched; non-centred coordinates fail at nside 64 S/N
 
 **Learned**
