@@ -2,6 +2,42 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-27 (Mac mini, 05:40): M2.4 stage 1 validated at L3 (E018 PASS); M2.2 full-sky row done (E017); MAMS benchmarks nearly done
+
+**Learned**
+- E018 L3 PASS (F19): the 12-rank end-to-end Commander4 run with `likelihood: hier` (sync index
+  field at nside_beta 2, K 47, plus field and amplitude hyperparameters; 3000 Gibbs iterations)
+  agrees with the SBC-validated E016 prototype chain on the same maps in all 55 scalars: max 1.9
+  pooled SE, sd ratios 0.86 to 1.09, 0 divergences, 15 gradients per iteration (same as the
+  prototype), rms z against the simulation truth 1.10. Scalar configuration likewise (max 1.8 SE).
+  Negative control: the same comparison separates the hier chain from the exact profile posterior
+  by 19 MC SE and from the collapsed flat-prior grid by over 1000 sd. M2.4 stage 1 is validated at
+  L1 and L3; the L2 gate is the E016 SBC (134 of 300).
+- E017 final (F18, scalar index on template data): flat marginal biased +6 sd at full-sky S/N
+  680, +18 sd at 230, collapsed to the support edge in all replicates at S/N 68 and 23; fixed
+  Gaussian 4 to 10 sd off; profile unbiased everywhere but sd z 1.14 at S/N 68 and 1.90 at S/N 23
+  (coverage 0.56/0.93 and 0.33/0.66); hier unbiased (|z| <= 0.3) and calibrated at all four
+  scales, also with a 30 percent template distortion, hyperparameters recovered. Eight hier cells
+  that had collapsed at the unguarded log s floor (workers predated the guard) were rerun with the
+  guard; all healthy. The E014 marginal-minus-ridge gaps are this marginal-mode bias.
+- E019 (M2.3, Q4) so far: NUTS non-centred 0.034 to 0.046 ESS per gradient (worst index pixel),
+  flat in K; centred 10 to 60 times worse. MAMS non-centred 0.034 / 0.040 (nside_beta 2, noise 1 /
+  0.3), 0.009 / 0.048 (nside_beta 4); centred 0.001 to 0.008. So MAMS is within a factor 1 to 1.4
+  of NUTS on this target (one centred nside-4 cell left); no case for a second sampler yet.
+
+**Running:** E019 last MAMS cell (centred nside_beta 4, to about 06:00); E016 hier SBC (134 of
+300, about 5 per hour now that the machine is less loaded).
+
+**Next**
+1. E019 table and Conclusion, Q4 status, registry (when the last MAMS cell finishes).
+2. E016 SBC analysis when done: F16 final or withdrawn; then M2.4a declared done.
+3. Then M2.5 preparation (Q3: index resolution versus S/N on PySM skies) and the Q15 design note
+   for Trygve; Paper A outline gets the E017/E018 numbers.
+
+**Needs Trygve:** unchanged (Q15 per-band zero-level parameter design; hier stays non-default per
+D003/D011, with E017/E018 now the evidence for making it the default below full-sky S/N 100 if
+Trygve agrees).
+
 ## 2026-10-27 (Mac mini, 01:50): pass 3 and pass 4 grids done; M2.4 stage 1 code complete (commits 1 to 8, stats-reviewed)
 
 **Learned**
