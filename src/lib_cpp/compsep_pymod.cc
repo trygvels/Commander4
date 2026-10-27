@@ -73,6 +73,57 @@ void cholesky_solve(const vmav<double,2> &L, const vmav<double,1> &b, vmav<doubl
 }
 
 
+/** Shared body of the per-pixel amplitude draw (Py_solve_perpix and Py_solve_perpix_regions).
+ *
+ * Solves (M_p^T N^-1 M_p) x = M_p^T (N^-1 d + N^-1/2 eta) per pixel, where N^-1 is diagonal over
+ * the bands and holds the inverse noise variance, d is the sky map, eta are standard normal random
+ * numbers and M_p is the (nband, ncomp) mixing matrix of pixel p, given by `region_of(p)` (an index
+ * r >= 0, or r < 0 for a pixel to leave at zero) and `M(r, b, c)`. The arithmetic is the same
+ * for both callers, so a single region reproduces the scalar kernel bit for bit. Pixels where
+ * M_p^T N^-1 M_p is not positive definite (e.g. zero inverse variance in every band) get zero
+ * amplitudes.
+ */
+template<typename RegionOf, typename Mixing>
+void solve_perpix_body(const cmav<double,2> &map_sky, const cmav<double,2> &map_inv_var,
+                       const cmav<double,2> &rand, size_t ncomp, size_t nthreads,
+                       vmav<double,2> &comp_maps, RegionOf &&region_of, Mixing &&M){
+    const size_t nband = map_sky.shape(0), npix = map_sky.shape(1);
+    execStatic(npix, nthreads, 0, [&](Scheduler &sched){
+        // Per-thread workspace, reused for every pixel.
+        vmav<double,2> A({ncomp, ncomp});
+        vmav<double,1> rhs({ncomp}), x({ncomp});
+        while (auto rng = sched.getNext())
+            for (size_t ipix = rng.lo; ipix < rng.hi; ipix++){
+                const int64_t r = region_of(ipix);
+                if (r < 0){
+                    for (size_t c = 0; c < ncomp; c++)
+                        comp_maps(c, ipix) = 0.0;
+                    continue;
+                }
+                // A = M^T N^-1 M and rhs = M^T (N^-1 d + N^-1/2 eta).
+                for (size_t c1 = 0; c1 < ncomp; c1++){
+                    rhs(c1) = 0.0;
+                    for (size_t c2 = 0; c2 < ncomp; c2++)
+                        A(c1, c2) = 0.0;
+                }
+                for (size_t b = 0; b < nband; b++){
+                    const double inv_var = map_inv_var(b, ipix);
+                    const double weighted_d = inv_var * map_sky(b, ipix)
+                                            + rand(ipix, b) * std::sqrt(inv_var);
+                    for (size_t c1 = 0; c1 < ncomp; c1++){
+                        rhs(c1) += M(r, b, c1) * weighted_d;
+                        for (size_t c2 = 0; c2 < ncomp; c2++)
+                            A(c1, c2) += M(r, b, c1) * inv_var * M(r, b, c2);
+                    }
+                }
+                const bool success = solve_cholesky(A, rhs, x);
+                for (size_t c = 0; c < ncomp; c++)
+                    comp_maps(c, ipix) = success ? x(c) : 0.0;
+            }
+    });
+}
+
+
 /** Draws one sample of the component amplitudes per pixel, independently in each pixel.
  *
  * Solves (M^T N^-1 M) x = M^T (N^-1 d + N^-1/2 eta) per pixel, where N^-1 is diagonal over the
@@ -104,33 +155,57 @@ NpArr Py_solve_perpix(const CNpArr &map_sky_, const CNpArr &map_inv_var_, const 
 
     auto comp_maps_ = make_Pyarr<double>({ncomp, npix});
     auto comp_maps = to_vmav<double,2>(comp_maps_);
-    execStatic(npix, nthreads, 0, [&](Scheduler &sched){
-        // Per-thread workspace, reused for every pixel.
-        vmav<double,2> A({ncomp, ncomp});
-        vmav<double,1> rhs({ncomp}), x({ncomp});
-        while (auto rng = sched.getNext())
-            for (size_t ipix = rng.lo; ipix < rng.hi; ipix++){
-                // A = M^T N^-1 M and rhs = M^T (N^-1 d + N^-1/2 eta).
-                for (size_t c1 = 0; c1 < ncomp; c1++){
-                    rhs(c1) = 0.0;
-                    for (size_t c2 = 0; c2 < ncomp; c2++)
-                        A(c1, c2) = 0.0;
-                }
-                for (size_t b = 0; b < nband; b++){
-                    const double inv_var = map_inv_var(b, ipix);
-                    const double weighted_d = inv_var * map_sky(b, ipix)
-                                            + rand(ipix, b) * std::sqrt(inv_var);
-                    for (size_t c1 = 0; c1 < ncomp; c1++){
-                        rhs(c1) += M(b, c1) * weighted_d;
-                        for (size_t c2 = 0; c2 < ncomp; c2++)
-                            A(c1, c2) += M(b, c1) * inv_var * M(b, c2);
-                    }
-                }
-                const bool success = solve_cholesky(A, rhs, x);
-                for (size_t c = 0; c < ncomp; c++)
-                    comp_maps(c, ipix) = success ? x(c) : 0.0;
-            }
-    });
+    solve_perpix_body(map_sky, map_inv_var, rand, ncomp, nthreads, comp_maps,
+                      [](size_t) -> int64_t { return 0; },
+                      [&M](int64_t, size_t b, size_t c) { return M(b, c); });
+    return comp_maps_;
+}
+
+
+/** Per-pixel amplitude draw with a mixing matrix that is constant within regions.
+ *
+ * As Py_solve_perpix, with M_reg[region[p]] as the mixing matrix of pixel p: the amplitude draw
+ * conditional on spatially varying spectral indices (one index value per region). Pixels with
+ * region < 0 get zero amplitudes. With a single region (region = 0 everywhere, M_reg of shape
+ * (1, nband, ncomp)) the result equals Py_solve_perpix bit for bit, since the two share
+ * solve_perpix_body. Prior terms enter through pseudo-bands appended to the stream (see
+ * compsep/index_field.py): a Gaussian prior a_c ~ N(m, t^2) is a band with map m, inverse
+ * variance 1/t^2 and mixing row e_c, so the draw is N(A'^-1 b', A'^-1) with A' = A + T^-1 and
+ * b' = b + T^-1 m, the fluctuation of the pseudo-band being T^-1/2 eta.
+ *
+ * Args:
+ *   map_sky -- (nband, npix) sky maps.
+ *   map_inv_var -- (nband, npix) inverse noise variance maps (0 where unobserved).
+ *   region -- (npix,) int64 region index per pixel, -1 to leave the pixel at zero.
+ *   M_reg -- (nreg, nband, ncomp) mixing matrix per region.
+ *   rand -- (npix, nband) standard normal random numbers (pixel-major).
+ *   nthreads -- number of threads.
+ * Returns:
+ *   (ncomp, npix) component amplitude maps.
+ */
+NpArr Py_solve_perpix_regions(const CNpArr &map_sky_, const CNpArr &map_inv_var_,
+                              const CNpArr &region_, const CNpArr &M_reg_, const CNpArr &rand_,
+                              size_t nthreads){
+    auto map_sky = to_cmav<double,2>(map_sky_, "map_sky");
+    auto map_inv_var = to_cmav<double,2>(map_inv_var_, "map_inv_var");
+    auto region = to_cmav<int64_t,1>(region_, "region");
+    auto M_reg = to_cmav<double,3>(M_reg_, "M_reg");
+    auto rand = to_cmav<double,2>(rand_, "rand");
+    const size_t nband = map_sky.shape(0), npix = map_sky.shape(1);
+    const size_t nreg = M_reg.shape(0), ncomp = M_reg.shape(2);
+    MR_assert(map_inv_var.shape(0)==nband && map_inv_var.shape(1)==npix,
+              "map_inv_var and map_sky shapes differ");
+    MR_assert(region.shape(0)==npix, "region must have one entry per pixel");
+    MR_assert(M_reg.shape(1)==nband, "M_reg must have shape (nreg, nband, ncomp)");
+    MR_assert(rand.shape(0)==npix && rand.shape(1)==nband, "rand must have shape (npix, nband)");
+    for (size_t ipix = 0; ipix < npix; ipix++)
+        MR_assert(region(ipix) < int64_t(nreg), "region index out of range");
+
+    auto comp_maps_ = make_Pyarr<double>({ncomp, npix});
+    auto comp_maps = to_vmav<double,2>(comp_maps_);
+    solve_perpix_body(map_sky, map_inv_var, rand, ncomp, nthreads, comp_maps,
+                      [&region](size_t ipix) -> int64_t { return region(ipix); },
+                      [&M_reg](int64_t r, size_t b, size_t c) { return M_reg(r, b, c); });
     return comp_maps_;
 }
 
@@ -263,14 +338,20 @@ py::tuple Py_marginal_loglike_perpix(const CNpArr &map_sky_, const CNpArr &map_i
  *   nthreads -- number of threads.
  *   use_logdet -- marginal (true) or ridge (false) likelihood.
  *   want_grad -- whether to compute the gradient (skipped otherwise).
+ *   want_extras -- also return the per-pixel conditional mean x = A^-1 b (ncomp, npix), the
+ *                  diagonal of A^-1 (ncomp, npix) and the used-pixel mask (npix,), zeros / false
+ *                  for pixels that did not enter the sum (region < 0, fewer than ncomp observed
+ *                  bands, or A not positive definite). The trailing terms of a hierarchical
+ *                  amplitude prior must be summed over exactly this pixel set.
  * Returns:
  *   (loglike (nreg,), grad (nreg, ncomp), nskipped): per-region log likelihood, its gradient, and
- *   the number of observed, well-determined pixels skipped because A was not positive definite.
+ *   the number of observed, well-determined pixels skipped because A was not positive definite;
+ *   with want_extras, (loglike, grad, nskipped, x, diag_Ainv, used).
  */
 py::tuple Py_marginal_loglike_regions(const CNpArr &map_sky_, const CNpArr &map_inv_var_,
                                       const CNpArr &region_, const CNpArr &M_reg_,
                                       const CNpArr &dM_reg_, size_t nthreads, bool use_logdet,
-                                      bool want_grad){
+                                      bool want_grad, bool want_extras){
     auto map_sky = to_cmav<double,2>(map_sky_, "map_sky");
     auto map_inv_var = to_cmav<double,2>(map_inv_var_, "map_inv_var");
     auto region = to_cmav<int64_t,1>(region_, "region");
@@ -289,6 +370,22 @@ py::tuple Py_marginal_loglike_regions(const CNpArr &map_sky_, const CNpArr &map_
     // Per-thread accumulators, so threads never write to the same region entry.
     std::vector<double> ll_thr(nthr * nreg, 0.0), grad_thr(nthr * nreg * ncomp, 0.0);
     std::vector<size_t> skipped(nthr, 0);
+    // Extras (allocated at full size only when requested; otherwise empty placeholders).
+    const size_t npix_x = want_extras ? npix : 0;
+    auto x_out_ = make_Pyarr<double>({ncomp, npix_x});
+    auto diag_out_ = make_Pyarr<double>({ncomp, npix_x});
+    auto used_out_ = make_Pyarr<bool>({npix_x});
+    auto x_out = to_vmav<double,2>(x_out_);
+    auto diag_out = to_vmav<double,2>(diag_out_);
+    auto used_out = to_vmav<bool,1>(used_out_);
+    if (want_extras)
+        for (size_t ipix = 0; ipix < npix; ipix++){
+            used_out(ipix) = false;
+            for (size_t c = 0; c < ncomp; c++){
+                x_out(c, ipix) = 0.0;
+                diag_out(c, ipix) = 0.0;
+            }
+        }
     execStatic(npix, nthr, 0, [&](Scheduler &sched){
         const size_t ithr = sched.thread_num();
         double *ll = ll_thr.data() + ithr * nreg;
@@ -334,6 +431,16 @@ py::tuple Py_marginal_loglike_regions(const CNpArr &map_sky_, const CNpArr &map_
                     logdet += 2.0 * std::log(A(c, c));
                 }
                 ll[r] += use_logdet ? 0.5 * quad - 0.5 * logdet : 0.5 * quad;
+                if (want_extras){
+                    used_out(ipix) = true;
+                    for (size_t c = 0; c < ncomp; c++){
+                        x_out(c, ipix) = x(c);
+                        // diag(A^-1)_c = e_c^T A^-1 e_c through the Cholesky factor.
+                        for (size_t c1 = 0; c1 < ncomp; c1++) u(c1) = (c1 == c) ? 1.0 : 0.0;
+                        cholesky_solve(A, u, y);
+                        diag_out(c, ipix) = y(c);
+                    }
+                }
                 if (!want_grad) continue;
                 for (size_t b = 0; b < nband; b++){
                     double model = 0.0;
@@ -383,6 +490,8 @@ py::tuple Py_marginal_loglike_regions(const CNpArr &map_sky_, const CNpArr &map_
                 grad_out(r, c) += grad_thr[(t * nreg + r) * ncomp + c];
         }
     }
+    if (want_extras)
+        return py::make_tuple(ll_, grad_, nskip, x_out_, diag_out_, used_out_);
     return py::make_tuple(ll_, grad_, nskip);
 }
 
@@ -397,9 +506,18 @@ void add_compsep(py::module_ &msup)
         "Per-region marginal (or ridge) log likelihood and its gradient for a mixing matrix that "
         "is constant within regions: M_reg and dM_reg are (nreg, nband, ncomp), region is the "
         "(npix,) int64 region index (-1 excludes a pixel). Returns (loglike (nreg,), "
-        "grad (nreg, ncomp), nskipped).",
+        "grad (nreg, ncomp), nskipped); with want_extras also the per-pixel conditional mean x "
+        "(ncomp, npix), diag(A^-1) (ncomp, npix) and the used-pixel mask (npix,), zeros where a "
+        "pixel did not enter the sum.",
         "map_sky"_a, "map_inv_var"_a, "region"_a, "M_reg"_a, "dM_reg"_a, "nthreads"_a=1,
-        "use_logdet"_a=true, "want_grad"_a=true);
+        "use_logdet"_a=true, "want_grad"_a=true, "want_extras"_a=false);
+
+  m.def("solve_perpix_regions", Py_solve_perpix_regions,
+        "Sample component amplitudes (ncomp, npix) per pixel as solve_perpix, with the mixing "
+        "matrix M_reg[region[p]] of the pixel's region (M_reg (nreg, nband, ncomp), region (npix,) "
+        "int64, -1 gives zero amplitudes). Prior pseudo-bands appended to the stream make the "
+        "draw N(A'^-1 b', A'^-1).",
+        "map_sky"_a, "map_inv_var"_a, "region"_a, "M_reg"_a, "rand"_a, "nthreads"_a=1);
 
   m.def("marginal_loglike_perpix", Py_marginal_loglike_perpix,
         "Log marginal likelihood sum_pix [b^T A^-1 b / 2 - ln det A / 2] of the mixing matrix M "
