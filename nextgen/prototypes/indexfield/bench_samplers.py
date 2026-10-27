@@ -47,7 +47,13 @@ def run_nuts(post, rng, n_warmup, n_samples, **kw):
                             target_accept=kw.get("target_accept", 0.8))
 
 
-SAMPLERS = {"nuts": run_nuts}
+def run_mams(post, rng, n_warmup, n_samples, **kw):
+    from indexfield import mams
+    return mams.run_mams(post, rng, n_warmup, n_samples,
+                         target_accept=kw.get("target_accept_mams", mams.TARGET_ACCEPT))
+
+
+SAMPLERS = {"nuts": run_nuts, "mams": run_mams}
 
 
 def summarize(post, res, truth, seconds: float) -> dict:
@@ -76,6 +82,7 @@ def summarize(post, res, truth, seconds: float) -> dict:
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--sampler", default="nuts", choices=sorted(SAMPLERS))
+    ap.add_argument("--target-accept-mams", type=float, default=0.9)
     ap.add_argument("--nside-beta", type=int, default=2)
     ap.add_argument("--nside-d", type=int, default=16)
     ap.add_argument("--noise", type=float, default=1.0)
@@ -92,7 +99,8 @@ def main(argv=None):
     rng = np.random.default_rng(1000 + args.seed)
     t0 = time.time()
     res = SAMPLERS[args.sampler](post, rng, args.n_warmup, args.n_samples,
-                                 max_depth=args.max_depth, target_accept=args.target_accept)
+                                 max_depth=args.max_depth, target_accept=args.target_accept,
+                                 target_accept_mams=args.target_accept_mams)
     out = summarize(post, res, truth, time.time() - t0)
     out.update(sampler=args.sampler, nside_beta=args.nside_beta, nside_d=args.nside_d,
                noise=args.noise, seed=args.seed, parameterization=args.parameterization,
