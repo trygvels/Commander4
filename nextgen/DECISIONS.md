@@ -77,3 +77,15 @@ component's beta, sigma = sigma_scale / 2, rho mid-range) and the amplitude hype
 prior means; a restart from a field chain at the same nside resumes from the stored field (NUTS
 adaptation restarts). Reason: a deterministic start that warm-up leaves quickly, and no dependence
 on the parameter-file proposal widths the MH groups need.
+
+## D012 (2026-10-27): NUTS stays the production sampler for the index field; M2.3 closed for Phase 2
+E019 (F20) measured MAMS against our NUTS on the non-centred hierarchical index-field target at
+K 11 to 191 with a diagonal preconditioner and found parity in effective samples per gradient
+(0.9 to 1.2 at the median pixel, 0.3 to 1.1 at the worst pixel) with a 2 to 20 times dearer
+warm-up; the pre-registered threshold for adopting a second sampler was a factor 2. NUTS
+(`math_utils/nuts.py`, dual averaging, windowed diagonal mass adaptation) therefore remains the
+only index-field sampler in Commander4; the MAMS prototype stays in `nextgen/prototypes/indexfield/
+mams.py` with its self-test for the Q5 joint-target experiment, where d is 1e5 and above and the
+literature's gains are reported. Non-diagonal preconditioning (Fisher, low-rank) is deferred to
+the same experiment. Also fixed by E017/E018: the hier amplitude prior is the recommended option
+below full-sky S/N of order 100 (F18), but changing the default from ridge needs Trygve (D003).

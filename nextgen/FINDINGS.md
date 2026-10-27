@@ -285,3 +285,11 @@ simulation truth 1.10; the scalar configuration likewise (max 1.8 SE). Negative 
 comparison puts the Commander4 hier chain 19 MC SE (0.6 sd) from the exact profile posterior on
 the same data and over 1000 sd from the collapsed flat-prior grid. The L2 gate (E016 SBC of the
 prototype target) is still running; hier stays non-default (D003, D011).
+
+**F20. On the non-centred hierarchical index-field target (K 11 to 191 plus hyperparameters,
+diagonal preconditioning) MAMS and NUTS have the same effective samples per gradient** (E019:
+ratios 0.9 to 1.2 at the median index pixel in all five cells, 0.3 to 1.1 at the worst pixel,
+MAMS warm-up 2 to 20 times more gradients; both samplers 5 to 240 times worse on the centred
+funnel). The literature's 3 to 100 times gains for MAMS are reported at d of order 1e4 and above;
+at Phase 2 dimensions there is no case for a second sampler, and NUTS stays the production sampler
+(M2.3 closed; revisit for the joint amplitude-plus-index target of Q5).

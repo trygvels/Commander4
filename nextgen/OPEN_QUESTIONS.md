@@ -87,6 +87,11 @@ original numbering.
   NumPy port), with diagonal, Fisher and low-rank-plus-diagonal preconditioning; carry adaptation
   across Gibbs iterations.
 - **Decides:** the production sampler.
+- **Answer for Phase 2 (E019, 2026-10-27, F20):** on the non-centred hier target at K 11 to 191
+  MAMS equals NUTS in ESS per gradient (0.9 to 1.2 at the median pixel) with a 2 to 20 times
+  dearer warm-up; NUTS stays the production sampler. Reopen only for d above a few thousand (the
+  joint target of Q5, or nside_beta 16 and above), with the reference MAMS implementation and a
+  non-diagonal preconditioner.
 
 ## Q5. How to keep the collapse benefit when beams couple pixels?
 - **Why:** F5's 9 to 22x gain is for independent pixels. With CG amplitudes (beams, C_l prior), the
