@@ -1,0 +1,136 @@
+# E020: Index-field prior comparison on a PySM d1s1 sky: hierarchical GMRF with inferred smoothness against independent regions at a fixed nside and a single index (M2.5 first cut, Q3)
+
+- **Date started / finished:** 2026-10-27 /
+- **Branch and commit:** nextgen, a07f538
+- **Open question addressed:** Q3 (optimal spatially varying index model); ROADMAP M2.5
+- **Validation level:** L4 (misspecified realistic sky with known truth; the samplers themselves
+  are validated at L1 to L3 in E018)
+
+## Question
+On a realistic, model-misspecified sky (PySM d1 dust with spatially varying beta_d and T_d, s1
+synchrotron with spatially varying beta_s, c1 CMB) at nside 64 in intensity with Planck-like
+white noise, does the hierarchical GMRF index field with inferred mean, scale and correlation
+length recover the index maps and the CMB better than (a) independent indices per region at a
+fixed nside (the fgbuster-style ladder, here with the same collapsed likelihood and amplitude
+prior) and (b) a single full-sky index, and is the GMRF answer stable when nside_beta is refined
+from 8 to 16 (that is, does the inferred smoothness make nside_beta a nuisance choice)? If yes,
+the GMRF field is the Phase 2 index model and the remaining Q3 variants (alm GRF, clustering,
+heavy-tailed increments) are compared against it later; if the fixed ladder is as good, the
+field prior buys nothing at this S/N and the methods paper says so.
+
+## Target and priors
+Data: 12 bands at nu_b = 23, 30, 33, 41, 44, 61, 70, 94, 100, 143, 217, 353 GHz (delta bandpasses),
+intensity, nside 64 (N = 49152 pixels), d_p = sum_c M_pc(beta) a_pc + n_p, n_p ~ N(0, N_p)
+diagonal (white, known rms per band). Model components (the data are not drawn from this model):
+cmb (fixed SED, the thermodynamic-to-RJ conversion), synchrotron power law a_s (nu/30)^beta_s(p),
+thermal dust modified blackbody with pivot 545 GHz, beta_d(p), fixed T_d = 20.93 K (the mean of
+the d1 temperature map at nside 64; the true map runs from 14 to 31 K, so the dust model is
+misspecified by construction).
+
+Collapsed likelihood: amplitudes integrated out analytically per pixel under the amplitude prior
+of E018 (`likelihood: hier`): a_p,cmb ~ N(0, 70^2); a_p,c ~ N(mu_c g_p,c, (s_c g_p,c)^2) for c in
+{sync, dust} with the pseudo-templates g defined in Setup, hyperpriors mu_c ~ N(1, 0.5^2), log s_c ~
+N(log 0.3, 1^2), guard log s_c >= -8. For a state (beta, mu, s) the density is the E018 target
+(M2.4 plan section 1): prod_p N(d_p; 0, M_p T_p M_p^T + N_p) evaluated as 1/2 b'^T A'^-1 b' -
+1/2 log det A' - 1/2 m^T T^-1 m - 1/2 log det T summed over pixels, with A' = M^T N^-1 M + T^-1,
+b' = M^T N^-1 d + T^-1 m. Reviewed and validated in E018 (F19).
+
+Index priors compared, one per component c in {sync, dust}, sampled jointly with the amplitude
+hyperparameters by NUTS (E018 sampler, non-centred field coordinates):
+1. **GMRF field at nside_beta** in {4, 8, 16}: beta_c = mu_c 1 + sigma_c S(rho_c) z_c, z ~ N(0, I_K),
+   K = 12 nside_beta^2 - 1 (graph-Laplacian basis without the constant mode), Matern alpha 2 on the
+   HEALPix neighbour graph; mu_c ~ N(mu0_c, 0.3^2), sigma_c ~ half-N(0, 0.3^2), rho_c log-uniform on
+   [h, pi] through the logit-transformed u with its Jacobian. Exactly the E016/E018 prior.
+2. **Independent regions at nside_beta** in {4, 8, 16} (new option `spectral_index_field: {type:
+   independent}`): beta_c,r ~ N(mu0_c, 0.3^2) independently for every region r (the HEALPix pixel at
+   nside_beta), no hyperparameters. This is the fixed-nside ladder of fgbuster-style parametric
+   fits, with the same collapsed likelihood and amplitude prior so that only the spatial prior
+   differs; the N(mu0, 0.3^2) prior is weak against the data in every region (posterior sd of a
+   region index is 0.003 to 0.1 here).
+3. **Single index** (nside_beta 0): beta_c ~ N(mu0_c, 0.3^2), as in E017/E018.
+mu0_sync = -3.0, mu0_dust = 1.55 (the d1 and s1 sky means to two decimals; the hyperprior sd 0.3
+covers the full range of both truth maps, -3.28 to -2.74 and 1.26 to 1.79).
+
+Pseudo-templates for the amplitude prior (realistic: built from the data, not from the truth):
+g_sync = d(23 GHz) (30/23)^-3.0, g_dust = d(353 GHz) B(545, 20.93 K)/B(353, 20.93 K)
+(545/353)^1.55, each floored at 1e-3 of its mean. They carry CMB, noise and the other foreground,
+and the wrong constant index; mu_c and s_c absorb the scale and scatter (E016/E017 showed hier is
+calibrated with a 30 percent large-scale template distortion).
+
+## Setup
+Sky: `pysm3.Sky(nside=64, preset_strings=["d1", "s1", "c1"])`, emission at the 12 centre
+frequencies in uK_RJ (PySM evaluates the d1/s1 parameter maps degraded to nside 64; those
+degraded maps are the truth we recover against: `mbb_index`, `mbb_temperature`, `pl_index`, and
+the c1 CMB map). Noise: white, rms per band 4 x (70, 60, 60, 55, 60, 60, 70, 40, 24, 16, 24, 80)
+uK_RJ (the E012/E018 nside-16 levels scaled to nside 64 pixels) times a noise scale, scale 1 first
+(scale 3 if time allows), one noise realization (seed 2027). Writer:
+`nextgen/scripts/pysm_intensity_sim.py` (band maps, rms maps, pseudo-templates, truth.npz,
+parameter files). Mask for the summary statistics: none for the primary numbers; |b| > 20 as a
+secondary cut (the Galactic plane dominates the dust RMSE otherwise).
+
+Runs (Commander4 `nextgen`, 12 MPI ranks, maps-only, one per-pixel hier MCMC group with both
+indices, `nuts` max depth 10, target acceptance 0.8; 2000 Gibbs iterations, warm-up 500, burn 600):
+`gmrf4`, `gmrf8`, `gmrf16`, `indep4`, `indep8`, `indep16`, `scalar`. Cost estimate per run: about
+1 s per Gibbs iteration at nside 64 (15 gradients, 12 bands, two 2-pseudo-band components) so
+about 1 h each; 7 runs at scale 1.
+
+Metrics (defined before running; computed by `nextgen/scripts/e020_analyze.py` from the chain
+files, burn removed):
+- **Index error at the data pixels:** for each component, beta_hat(p) = posterior mean of the
+  region index of pixel p; RMSE_p = sqrt(mean_p (beta_hat(p) - beta_true(p))^2) over all pixels and
+  over |b| > 20. Reference scale: the sd of the truth map (what the single index cannot beat) and
+  the RMSE of the truth map's own region means (what a region model cannot beat at that nside).
+- **Index calibration at the region level:** z_r = (posterior mean - truth region mean) / posterior
+  sd with the truth region mean taken two ways, unweighted and weighted by the pixel S/N of the
+  component (sum over bands of (M a / rms)^2); fraction of regions with |z| < 1 and < 2. Reported,
+  not expected to be exactly 0.68 / 0.95: the truth is not drawn from any of the priors (L4).
+- **CMB recovery:** posterior mean of the per-pixel cmb amplitude draws minus the input c1 map:
+  RMS over all pixels and over |b| > 20, and the power spectrum of the residual map for l <= 100
+  compared with the input CMB spectrum (fraction of CMB power at l 2 to 30 and 30 to 100).
+- **Fit:** mean reduced chi^2 after burn; divergences; min ESS of the index pixels and the
+  hyperparameters; gradients per iteration and seconds per iteration (same machine, same load
+  class, so wall time is reported but not compared across models as an algorithmic statement).
+- **Hyperparameters:** posterior of (mu, sigma, rho) per GMRF component, and (mu_c, s_c) of the
+  amplitude prior, against the truth-map statistics (mean, sd, and the scale at which the truth
+  map's correlation drops to 1/e).
+
+Decision rule (stated now): the GMRF field is adopted as the Phase 2 index model if, at scale 1,
+(i) its index RMSE at nside_beta 16 is at or below the best independent-region RMSE for both
+components, (ii) its CMB residual RMS and l < 100 residual power are not worse than the best
+baseline, and (iii) its RMSE and CMB residual change by less than the posterior sd between
+nside_beta 8 and 16. If the independent ladder at some nside matches it on (i) and (ii), the field
+prior is not needed at this S/N and the result is recorded as such. If GMRF is worse than the
+ladder anywhere, that is a finding against the smoothness prior on this sky (edges), pointing to
+the heavy-tailed variants of Q3.
+
+## Reference
+Truth: the PySM parameter maps at nside 64 and the c1 CMB map, stored in truth.npz by the writer.
+No exact posterior reference exists at L4; the sampler's correctness for every option is from E018
+(GMRF, scalar) and from the L1 tests added with the independent option (its target is the E018
+target with the field prior replaced by iid normals; the test checks the gradient by finite
+differences in every block and the density against the GMRF code at matching states).
+
+## Command
+```bash
+python nextgen/scripts/pysm_intensity_sim.py --dir /Users/trygvels/data/e020_d1s1 --nside 64 --noise-scale 1
+for t in gmrf8 indep8 scalar gmrf16 indep16 gmrf4 indep4; do mpirun -n 12 commander4 -p /Users/trygvels/data/e020_d1s1/param_$t.yml; done
+python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e020_d1s1
+```
+
+## Result
+(pending)
+
+## Negative control
+The single index is the control: its index RMSE must equal the sd of the truth map (0.11 for
+beta_s, 0.08 for beta_d at nside 64) up to its own posterior sd, and its CMB residual must be the
+largest. A second control: `indep16` with 16 data pixels per region should be the noisiest index
+map (posterior sd per region 3 to 10 times the GMRF's where the GMRF shrinks); if it is not, the
+GMRF prior is not doing anything on this sky.
+
+## Conclusion
+(pending)
+
+## Follow-ups
+- Noise scale 3 and a polarization (QU) version once M2.4 stage 2 allows hier for QU streams.
+- The remaining Q3 variants: alm GRF with sampled C_l, heavy-tailed increments, clustering.
+- d10s5 and d12s7 skies; beams and bandpasses (L4 realism).
