@@ -7,7 +7,7 @@ import pytest
 from pixell.bunch import Bunch
 
 from commander4.sky.comp_list import CompList
-from commander4.sky.diffuse_components import CMB, ThermalDust
+from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust
 from commander4.sky.point_sources import PointSourcesComponent
 from commander4.math_utils.alm import gaussian_random_alm
 from commander4.math_utils.sht import alm_to_map
@@ -815,3 +815,102 @@ def test_the_amplitudes_own_beam_is_not_treated_as_too_sharp() -> None:
     sky = _sky_model_at_amp_fwhm(np.deg2rad(100.0/60))
 
     assert sky.get_sky_at_nu(100.0, 2, "I", fwhm=np.deg2rad(100.0/60)).shape == (1, 12*2**2)
+
+
+# --- spatially varying spectral index on diffuse components (M2.4 stage 1, commit 3) ---------
+
+def _sync_params(**overrides) -> Bunch:
+    params = Bunch(polarization="I", shortname="sync", spatially_varying_MM=False,
+                   Cl_prior_amplitude=None, lmax=2, beta=-3.1, nu_ref=30.0, units="uK_RJ")
+    for key, value in overrides.items():
+        params[key] = value
+    object.__setattr__(params, "_name", "sync")
+    return params
+
+
+def _index_components() -> list:
+    compsep = Bunch(nside=2, double_precision=True)
+    return [ThermalDust(_dust_params(polarization="I"), compsep, eval_pol="I", comp_name="dust"),
+            Synchrotron(_sync_params(), compsep, eval_pol="I", comp_name="sync")]
+
+
+def test_get_sed_with_beta_argument_broadcasts_and_matches_scalar() -> None:
+    """get_sed(nu, beta): the component's own beta reproduces get_sed(nu) exactly; an index array
+    (nreg,) with nu (nband,) gives (nreg, nband) built from the scalar formula; an index array
+    with a scalar nu gives (nreg,)."""
+    nu = np.array([30.0, 44.0, 70.0, 100.0, 353.0])
+    betas = np.array([-3.3, -2.9, 1.4, 1.7])
+    for comp in _index_components():
+        np.testing.assert_array_equal(comp.get_sed(nu, beta=comp.beta), comp.get_sed(nu))
+        sed = comp.get_sed(nu, beta=betas)
+        assert sed.shape == (4, 5)
+        for i, b in enumerate(betas):
+            comp_b = deepcopy(comp)
+            comp_b.beta = b
+            np.testing.assert_allclose(sed[i], comp_b.get_sed(nu), rtol=1e-14)
+        per_pixel = comp.get_sed(100.0, beta=betas)
+        assert per_pixel.shape == (4,)
+        np.testing.assert_allclose(per_pixel, sed[:, 3], rtol=1e-14)
+
+
+def test_get_dsed_dbeta_matches_finite_difference() -> None:
+    nu = np.array([30.0, 70.0, 143.0, 545.0])
+    betas = np.array([-3.0, 1.55])
+    for comp in _index_components():
+        h = 1e-5
+        fd = (comp.get_sed(nu, beta=betas + h) - comp.get_sed(nu, beta=betas - h)) / (2 * h)
+        np.testing.assert_allclose(comp.get_dsed_dbeta(nu, beta=betas), fd, rtol=1e-7)
+        # Default beta: the component's own, same shape as get_sed(nu).
+        fd0 = (comp.get_sed(nu, beta=comp.beta + h) - comp.get_sed(nu, beta=comp.beta - h)) / (2 * h)
+        np.testing.assert_allclose(comp.get_dsed_dbeta(nu), fd0, rtol=1e-7)
+        assert comp.get_dsed_dbeta(nu).shape == nu.shape
+
+
+def test_set_beta_map_sets_mean_index_and_varying_mixing_matrix() -> None:
+    dust, _ = _index_components()
+    assert dust.beta_map is None and dust.beta_nside == 0 and not dust.spatially_varying_MM
+    beta_map = 1.5 + 0.1 * np.arange(12)
+    dust.set_beta_map(beta_map, nside=1)
+    assert dust.beta_nside == 1 and dust.spatially_varying_MM
+    assert dust.beta == pytest.approx(beta_map.mean())
+    with pytest.raises(ValueError):
+        dust.set_beta_map(np.zeros(13), nside=1)
+    cmb = _make_comp_list("I")[0]
+    with pytest.raises(ValueError):  # the CMB has no spectral index
+        cmb.set_beta_map(np.zeros(12), nside=1)
+
+
+def test_get_sed_map_gives_each_child_pixel_its_parent_index() -> None:
+    _, sync = _index_components()
+    beta_map = -3.0 + 0.05 * np.arange(12)
+    sync.set_beta_map(beta_map, nside=1)
+    sed_map = sync.get_sed_map(70.0, nside=4)
+    assert sed_map.shape == (12 * 16,)
+    expected = sync.get_sed(70.0, beta=hp.ud_grade(beta_map, 4))
+    np.testing.assert_array_equal(sed_map, expected)
+    # Children of pixel 0 in nest order all carry its index.
+    children = hp.nest2ring(4, np.arange(16))
+    np.testing.assert_allclose(sed_map[children], (70.0 / 30.0)**beta_map[hp.nest2ring(1, 0)],
+                               rtol=1e-14)
+    np.testing.assert_array_equal(sync.get_sed_map(70.0, nside=1), sync.get_sed(70.0, beta=beta_map))
+
+
+def test_projections_with_constant_beta_map_match_the_scalar_varying_path() -> None:
+    """With beta_map constant and equal to beta, project_comp_to_band and eval_comp_from_band
+    reproduce the existing pixel-dependent branch with a scalar SED to round-off."""
+    from commander4.data_models.band import Band
+    rng = np.random.default_rng(5)
+    nside, lmax = 8, 2
+    for comp in _index_components():
+        comp.alms = gaussian_random_alm(lmax, lmax, 0, 1, rng).astype(np.complex128)
+        band_alms = gaussian_random_alm(lmax, lmax, 0, 1, rng).astype(np.complex128)
+        reference = deepcopy(comp)
+        reference.spatially_varying_MM = True
+        comp.set_beta_map(np.full(12, comp.beta), nside=1)
+        proj = comp.project_comp_to_band(Band(np.zeros_like(band_alms), 70.0, 0.0, nside))
+        proj_ref = reference.project_comp_to_band(Band(np.zeros_like(band_alms), 70.0, 0.0, nside))
+        np.testing.assert_allclose(proj, proj_ref, rtol=1e-12, atol=1e-14)
+        ev = comp.eval_comp_from_band(Band(band_alms.copy(), 70.0, 0.0, nside), inplace=False)
+        ev_ref = reference.eval_comp_from_band(Band(band_alms.copy(), 70.0, 0.0, nside),
+                                               inplace=False)
+        np.testing.assert_allclose(ev, ev_ref, rtol=1e-12, atol=1e-14)

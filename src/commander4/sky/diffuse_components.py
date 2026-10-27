@@ -93,6 +93,14 @@ class DiffuseComponent(Component):
         # Cached prior mean mu, filled from `amp_prior_mean_map` by CompList.load_amp_prior_means;
         # None means a zero-mean prior. See the amp_prior_mean property.
         self._amp_prior_mean_alms = None
+        # Spatially varying spectral index (M2.4): one index value per HEALPix pixel (ring order)
+        # at `beta_nside`, or None when the scalar `beta` applies everywhere. Set through
+        # `set_beta_map`, which keeps `beta` equal to the map mean and switches the mixing matrix
+        # to its pixel-dependent branch. Index-field components also carry `amp_prior`, the
+        # per-pixel amplitude prior of compsep/index_field.py (None: flat, today's behaviour).
+        self.beta_map = None
+        self.beta_nside = 0
+        self.amp_prior = None
         self._data = None  # Alm data is not allocated by default.
         if allocate_empty_alms:
             self.allocate_empty_alms()
@@ -372,8 +380,73 @@ class DiffuseComponent(Component):
         applied_fwhm = np.sqrt(max(target_fwhm**2 - self.amp_fwhm_rad**2, 0.0))
         return self.get_component_map(nside, applied_fwhm)*self.get_sed(nu)
     
-    def get_sed(self, nu):
+    def get_sed(self, nu, beta=None):
+        """SED scaling from the reference frequency to `nu` (GHz), unitless, for uK_RJ amplitudes.
+
+        `beta` overrides this component's spectral index for components that have one. A scalar
+        gives the shape of `nu`; an array (nreg,) with an array `nu` (nband,) gives (nreg, nband),
+        the per-region mixing column of the index-field likelihood; an array `beta` with a scalar
+        `nu` gives the shape of `beta` (the per-pixel SED of `get_sed_map`).
+        """
         raise NotImplementedError(f"{type(self).__name__}.get_sed() is not implemented.")
+
+    def get_dsed_dbeta(self, nu, beta=None):
+        """Derivative of `get_sed(nu, beta)` with respect to the spectral index, same shape."""
+        raise NotImplementedError(f"{type(self).__name__} has no spectral index to vary.")
+
+    @staticmethod
+    def _broadcast_nu_beta(nu, beta):
+        """Arrange `nu` and `beta` so that their product has the shape stated in `get_sed`."""
+        nu = np.asarray(nu, dtype=np.float64)
+        beta = np.asarray(beta, dtype=np.float64)
+        if beta.ndim == 1 and nu.ndim == 1:
+            return nu[None, :], beta[:, None]
+        return nu, beta
+
+    def set_beta_map(self, beta_map, nside: int) -> None:
+        """Give this component a per-pixel spectral index at HEALPix `nside` (ring order).
+
+        `beta` becomes the map mean (so chain output, `mixing/<band>` and the scalar code paths
+        see a representative value) and the mixing matrix becomes pixel-dependent, so the
+        projections below evaluate the SED per pixel through `get_sed_map`.
+        """
+        if not hasattr(self, "beta"):
+            raise ValueError(f"Component {self.comp_name!r} has no spectral index to vary.")
+        beta_map = np.asarray(beta_map, dtype=np.float64)
+        if beta_map.shape != (12 * nside * nside,):
+            raise ValueError(f"Component {self.comp_name!r}: beta_map has shape {beta_map.shape}, "
+                             f"expected ({12 * nside * nside},) for nside {nside}.")
+        self.beta_map = beta_map
+        self.beta_nside = int(nside)
+        self.beta = float(beta_map.mean())
+        self.spatially_varying_MM = True
+
+    def get_sed_map(self, nu, nside: int):
+        """The SED at `nu` per pixel of an nside map, from `beta_map` brought to that nside.
+
+        Going up in resolution (the usual case, nside >= beta_nside) every fine pixel takes the
+        index of its parent pixel, the region convention of the index-field likelihood; going down
+        averages the index over the children.
+        """
+        if self.beta_map is None:
+            raise ValueError(f"Component {self.comp_name!r} has no beta_map.")
+        beta = self.beta_map if nside == self.beta_nside else hp.ud_grade(self.beta_map, nside)
+        return self.get_sed(nu, beta=beta)
+
+    def _band_sed(self, band: Band):
+        """The mixing coefficient(s) at a band: a scalar, or a map at the band's nside when the
+        component has a `beta_map`."""
+        if self.beta_map is not None:
+            return self.get_sed_map(band.nu, band.nside)
+        return self.get_sed(band.nu)
+
+    @staticmethod
+    def _scale_map_inplace(pol_map, sed) -> None:
+        """Multiply one polarization map by a scalar or a per-pixel SED, in place."""
+        if np.ndim(sed) == 0:
+            inplace_scale(pol_map, sed)
+        else:
+            np.multiply(pol_map, sed, out=pol_map)
 
     # Overrides the base-class dot product: diffuse-component _data holds complex alms, whose inner
     # product must account for the m>0 coefficients each standing for two real degrees of freedom.
@@ -399,8 +472,9 @@ class DiffuseComponent(Component):
             comp_map = alm_to_map(alm_in_band_space, band.nside, band.lmax, spin=self.spin,
                                   nthreads=nthreads)
             # M Y a
+            sed = self._band_sed(band)
             for ipol in range(self.npol):
-                inplace_scale(comp_map[ipol], self.get_sed(band.nu)) 
+                self._scale_map_inplace(comp_map[ipol], sed)
             # Y^-1 M Y a
             band.alms = map_to_alm(comp_map, band.nside, band.lmax, spin=self.spin, out=band.alms,
                                    acc=True, nthreads=nthreads)
@@ -427,8 +501,9 @@ class DiffuseComponent(Component):
                                           nthreads=nthreads)
 
             # M^T Y^-1 B^T a
+            sed = self._band_sed(band)
             for ipol in range(self.npol):
-                inplace_scale(band_map[ipol], self.get_sed(band.nu))
+                self._scale_map_inplace(band_map[ipol], sed)
 
             # Y^T M^T Y^-1^T B^T a
             tmp_alm = alm_to_map_adjoint(band_map, band.nside, band.lmax, spin=self.spin, out=None,
@@ -523,18 +598,29 @@ class ThermalDust(DiffuseComponent):
         self.T = comp_params.T
         self.nu_ref = self._reference_frequency(comp_params)
 
-    def get_sed(self, nu):
+    def get_sed(self, nu, beta=None):
         """Calculates the spectral energy distribution (SED) for Thermal Dust emission.
            The result is unitless, but meant to be multiplied by a RJ brightness temperature.
         Args:
-            nu (float or np.ndarray): Frequency in GHz at which to evaluate the SED.            
+            nu (float or np.ndarray): Frequency in GHz at which to evaluate the SED.
+            beta (float or np.ndarray, optional): emissivity index instead of `self.beta`; see
+                `DiffuseComponent.get_sed` for the shapes.
         Returns:
             The SED scaling factor (float or np.ndarray).
         """
         # Modified blackbody, in uK_CMB
         x = (h_over_k*nu)/(self.T)
         x0 = (h_over_k*self.nu_ref)/(self.T)
-        return (nu / self.nu_ref)**(self.beta + 1.0) * np.expm1(x0) / np.expm1(x)
+        if beta is None:
+            return (nu / self.nu_ref)**(self.beta + 1.0) * np.expm1(x0) / np.expm1(x)
+        nu_b, beta_b = self._broadcast_nu_beta(nu, beta)
+        x = (h_over_k*nu_b)/(self.T)
+        return (nu_b / self.nu_ref)**(beta_b + 1.0) * np.expm1(x0) / np.expm1(x)
+
+    def get_dsed_dbeta(self, nu, beta=None):
+        """d sed / d beta = sed ln(nu / nu_ref) (the temperature is fixed)."""
+        nu_b, _ = self._broadcast_nu_beta(nu, self.beta if beta is None else beta)
+        return self.get_sed(nu, beta) * np.log(nu_b / self.nu_ref)
 
 
 class Synchrotron(DiffuseComponent):
@@ -557,15 +643,25 @@ class Synchrotron(DiffuseComponent):
         self.nu_ref = self._reference_frequency(comp_params)
         self.nside_comp_map = 512
 
-    def get_sed(self, nu):
+    def get_sed(self, nu, beta=None):
         """Calculates the spectral energy distribution (SED) for Synchrotron emission.
            The result is unitless, but meant to be multiplied by a RJ brightness temperature.
         Args:
-            nu (float or np.ndarray): Frequency in GHz at which to evaluate the SED.            
+            nu (float or np.ndarray): Frequency in GHz at which to evaluate the SED.
+            beta (float or np.ndarray, optional): spectral index instead of `self.beta`; see
+                `DiffuseComponent.get_sed` for the shapes.
         Returns:
             The SED scaling factor (float or np.ndarray).
         """
-        return (nu/self.nu_ref)**self.beta
+        if beta is None:
+            return (nu/self.nu_ref)**self.beta
+        nu_b, beta_b = self._broadcast_nu_beta(nu, beta)
+        return (nu_b/self.nu_ref)**beta_b
+
+    def get_dsed_dbeta(self, nu, beta=None):
+        """d sed / d beta = sed ln(nu / nu_ref)."""
+        nu_b, _ = self._broadcast_nu_beta(nu, self.beta if beta is None else beta)
+        return self.get_sed(nu, beta) * np.log(nu_b / self.nu_ref)
 
 
 class FreeFree(DiffuseComponent):
