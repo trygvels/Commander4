@@ -300,7 +300,7 @@ resources:
   tod:
     num_threads: 1
   compsep:
-    num_threads: 1
+    num_threads: 4
 output:
   dir: "{outdir}/chains_{tag}/"
   logging:
@@ -336,7 +336,7 @@ compsep:
         n_warmup: {n_warmup}
         target_accept: 0.8
         max_depth: 10
-        parameterization: noncentred
+        parameterization: centred
         init_inv_mass: fd_hessian
   bands:{bands}
 components:

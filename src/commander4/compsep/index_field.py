@@ -408,6 +408,7 @@ class RegionIndexLikelihood:
         self.n_rejected = 0
         self.nskipped_last = 0
         self._hier_defaults: dict[str, AmpPrior] = {}
+        self._fixed_sed: dict[tuple[int, int], NDArray] = {}
         for comp in self.active_comps:
             if not isinstance(comp, DiffuseComponent):
                 raise ValueError(f"The index-field likelihood does not support "
@@ -503,7 +504,10 @@ class RegionIndexLikelihood:
                         M_reg[:, :, c] = comp.get_sed(freqs, beta=betas[comp.comp_name])
                         dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, beta=betas[comp.comp_name])
                     else:
-                        M_reg[:, :, c] = comp.get_sed(freqs)[None, :]
+                        key = (id(freqs), c)
+                        if key not in self._fixed_sed:     # beta-independent SED, built once
+                            self._fixed_sed[key] = np.asarray(comp.get_sed(freqs), dtype=float)
+                        M_reg[:, :, c] = self._fixed_sed[key][None, :]
             if not (np.all(np.isfinite(M_reg)) and np.all(np.isfinite(dM_reg))):
                 return logL, g_beta, g_hyper, True   # zero density at this state
             sky_aug, w_aug = augment_stream(maps_sky, maps_inv_var, comps)
@@ -536,7 +540,9 @@ class RegionIndexLikelihood:
         hypers = layout.hypers(x)
         guard = any(log_s < HIER_LOGS_MIN for _, log_s in hypers.values())
         rejected = guard or not np.all(np.isfinite(x))
-        if rejected:
+        if rejected or not self.is_solver_root:
+            # Only the solver root evaluates the data terms; the other ranks contribute zeros
+            # to the allreduce and skip the (dense) field-to-pixel maps.
             betas = {}
         else:
             with np.errstate(over="ignore", invalid="ignore"):
