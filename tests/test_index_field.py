@@ -66,8 +66,19 @@ def test_amp_prior_pseudo_bands() -> None:
     m, w = prior.pseudo_band(3)
     np.testing.assert_allclose(m, 1.5 * g)
     np.testing.assert_allclose(w, 1.0 / (0.25 * g)**2)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):          # not a HEALPix map: cannot be regridded
         prior.pseudo_band(4)
+    # A template at another nside is ud_graded to the stream (children take the parent value).
+    g12 = 1.0 + np.arange(12.0)
+    prior = ifd.AmpPrior("hier", template=g12, mu=1.0, log_s=0.0)
+    m, w = prior.pseudo_band(48)
+    np.testing.assert_allclose(m, hp.ud_grade(g12, 2))
+    np.testing.assert_allclose(w, 1.0 / hp.ud_grade(g12, 2)**2)
+    used = np.ones(48, dtype=bool)
+    grad = prior.hyper_grad(np.ones(48), np.zeros(48), used)
+    assert np.isfinite(grad).all()
+    m48, w48 = ifd.AmpPrior("gaussian", mean=g12, rms=g12).pseudo_band(48)
+    np.testing.assert_allclose(m48, hp.ud_grade(g12, 2))
 
 
 def test_amp_prior_trailing_terms_and_hyperprior() -> None:

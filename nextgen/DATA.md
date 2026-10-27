@@ -384,3 +384,20 @@ is shown at 70 GHz. The BeyondPlanck dust file `BP_dust_IQU_n1024_v2.fits` carri
 header (545) against a parameter file saying 857, so the release script writes 545 regardless. The
 other DR1 component headers (synchrotron 0.408 / 30, free-free 40, AME 22 GHz) match the parameter
 file. Anyone evaluating the DR1 dust SED from the header will be off by about 11x at 857 GHz.
+
+## Zero-level conventions of the E014 inputs (2026-10-27, E014 passes 2 to 4, F17, Q15)
+
+Three generations of nside-64 intensity inputs exist under `~/data/`: `q1_inputs/` (pass 2: WMAP
+and LFI with the |b| > 30 median removed, HFI referenced to the DR1 CMB plus the DR1 dust template,
+17 bands with NPIPE A-split 353 and PR3 100), `q1_inputs_pass3/` (pass 3: same conventions, all
+six PR4 HFI bands, 20 bands) and `q1_inputs_pass4/` plus `q1_inputs_pass4_hdip/` (pass 4: one
+convention for all 20 bands, offset_b = mean over |b| > 30 of map_b minus the DR1 sky model at
+band b, `nextgen/scripts/dr1_model_zero_levels.py`; the `_hdip` variant also removes the 3.4 K
+non-solar dipole of the Haslam map toward (l, b) = (12, -13)). Each directory holds
+`zero_levels.txt` with the offsets applied and the FITS headers carry MONOSUB / DIPSUB / ZLMETHOD.
+The DR1 CMB map with its dipole removed has mean +28.6 uK at |b| > 30 (+41.9 at |b| > 60); the DR1
+frequency maps are not consistent with the DR1 CMB either (70 GHz minus CMB: -17 uK at |b| > 30),
+because the DR1 per-band monopoles (chain component `md`, 7.0 to 10.4 K for Haslam, 8 to 15 uK
+scatter for the Planck bands) are not removed in the released maps. The Haslam map sits 9.2 K
+above the DR1 sky at |b| > 30. Use pass 4 for any new run (D011); pass 2 and 3 inputs are kept
+for the method comparisons already recorded.

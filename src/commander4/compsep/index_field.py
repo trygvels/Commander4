@@ -19,7 +19,7 @@ The target distribution is stated in nextgen/plans/M2.4_commander4_index_field.m
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 import healpy as hp
 import numpy as np
@@ -63,6 +63,9 @@ class AmpPrior:
     log_s: float = HIER_LOG_S_PRIOR[0]
     mu_prior: tuple[float, float] = HIER_MU_PRIOR
     log_s_prior: tuple[float, float] = HIER_LOG_S_PRIOR
+    # Maps regridded to the stream's pixel count, by (name, npix); the configured maps may be at
+    # another nside than the data (ud_grade keeps a positive template positive).
+    _regrid: dict = field(default_factory=dict, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if self.type not in AMP_PRIOR_TYPES:
@@ -80,6 +83,25 @@ class AmpPrior:
                 raise ValueError("The hier amp_prior template must be a strictly positive 1-D "
                                  "map at the data nside.")
 
+    def _map_at(self, name: str, npix: int) -> NDArray:
+        """The map attribute `name` (scalar or 1-D map) as an (npix,) array, ud_graded when its
+        pixel count differs from npix."""
+        arr = np.asarray(getattr(self, name), dtype=np.float64)
+        if arr.ndim == 0:
+            return np.broadcast_to(arr, (npix,))
+        if arr.shape == (npix,):
+            return arr
+        key = (name, npix)
+        if key not in self._regrid:
+            try:
+                nside_out = hp.npix2nside(npix)
+                hp.npix2nside(arr.size)
+            except (ValueError, TypeError) as error:
+                raise ValueError(f"amp_prior {name} has {arr.size} pixels, the stream {npix}; "
+                                 "both must be HEALPix maps.") from error
+            self._regrid[key] = hp.ud_grade(arr, nside_out)
+        return self._regrid[key]
+
     @property
     def is_flat(self) -> bool:
         return self.type == "none"
@@ -94,12 +116,10 @@ class AmpPrior:
         if self.type == "none":
             return np.zeros(npix), np.zeros(npix)
         if self.type == "gaussian":
-            m = np.broadcast_to(np.asarray(self.mean, dtype=np.float64), (npix,)).copy()
-            t = np.broadcast_to(np.asarray(self.rms, dtype=np.float64), (npix,))
+            m = self._map_at("mean", npix).copy()
+            t = self._map_at("rms", npix)
             return m, 1.0 / t**2
-        g = self.template
-        if g.shape != (npix,):
-            raise ValueError(f"hier template has shape {g.shape}, expected ({npix},).")
+        g = self._map_at("template", npix)
         return self.mu * g, 1.0 / (np.exp(self.log_s) * g)**2
 
     def trailing_terms(self, used: NDArray) -> float:
@@ -123,7 +143,7 @@ class AmpPrior:
             raise ValueError("hyper_grad is defined for the hier prior only.")
         m, P = self.pseudo_band(used.size)
         dx = (x - m)[used]
-        P, g = P[used], self.template[used]
+        P, g = P[used], self._map_at("template", used.size)[used]
         return (float(np.sum(P * g * dx)),
                 float(np.sum(P * dx**2 + P * diag_Ainv[used]) - np.count_nonzero(used)))
 
