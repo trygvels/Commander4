@@ -7,6 +7,7 @@ from pixell.bunch import Bunch
 
 from commander4.compsep import index_field as ifd
 from commander4.compsep import index_field_sampler as ifs
+from commander4.math_utils import gmrf_field
 from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust
 
 NSIDE, NSIDE_BETA = 4, 1
@@ -158,3 +159,115 @@ def test_sampling_group_runs_transitions_and_keeps_state_across_iterations() -> 
     assert unpacked["sync"]["index_field"]["beta_map"].shape == (12,)
     assert set(unpacked["dust"]) == {"amp_prior"}
     ifs.reset_sampler_states()
+
+
+def _independent_components(nside_beta=NSIDE_BETA):
+    comps = _components(nside_beta)
+    comps[1].comp_params.spectral_index_field = Bunch(type="independent")
+    return comps
+
+
+def test_independent_field_prior_parsing_and_errors() -> None:
+    comps = _independent_components()
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    fld = specs[0].field
+    assert isinstance(fld, gmrf_field.IndependentIndexPrior)
+    assert fld.dim == fld.n_beta == 12 * NSIDE_BETA**2 and specs[0].nside_beta == NSIDE_BETA
+    assert (fld.mu0, fld.sd0) == (-3.0, 0.2)
+    layout = ifd.StateLayout(specs, ["sync", "dust"])
+    assert layout.dim == 12 * NSIDE_BETA**2 + 4 and layout.nreg == 12 * NSIDE_BETA**2
+    bad = _component(Synchrotron, "sync", **_sync_params(
+        spectral_index_nside=1, spectral_index_field=Bunch(type="independent", alpha=2.0)))
+    with pytest.raises(ValueError, match="independent takes no other settings"):
+        ifs.discover_index_specs([bad], None, centred=False)
+    bad = _component(Synchrotron, "sync", **_sync_params(
+        spectral_index_nside=1, spectral_index_field=Bunch(type="markov")))
+    with pytest.raises(ValueError, match="gmrf.*independent"):
+        ifs.discover_index_specs([bad], None, centred=False)
+    with pytest.raises(ValueError):
+        gmrf_field.IndependentIndexPrior(0, -3.0, 0.2)
+    with pytest.raises(ValueError):
+        gmrf_field.IndependentIndexPrior(1, -3.0, 0.0)
+
+
+def test_independent_prior_density_gradient_and_rejection() -> None:
+    """Prior alone: iid normal density and gradient; with a likelihood: the sum; raising or
+    non-finite likelihoods give zero density."""
+    fld = gmrf_field.IndependentIndexPrior(1, -3.0, 0.2)
+    rng = np.random.default_rng(5)
+    x = -3.0 + 0.3 * rng.standard_normal(12)
+    lp, g = fld.prior_logp_and_grad(x)
+    r = (x + 3.0) / 0.2
+    assert lp == pytest.approx(-0.5 * r @ r) and np.allclose(g, -r / 0.2)
+    np.testing.assert_array_equal(fld.beta(x), x)
+    lp2, g2 = fld.logp_and_grad(x, loglike=lambda b: (float(b.sum()), np.ones(12)))
+    assert lp2 == pytest.approx(lp + x.sum()) and np.allclose(g2, g + 1.0)
+
+    def raising(_b):
+        raise np.linalg.LinAlgError("singular")
+
+    assert fld.logp_and_grad(x, loglike=raising)[0] == -np.inf
+    assert fld.logp_and_grad(x, loglike=lambda b: (np.nan, np.zeros(12)))[0] == -np.inf
+    with pytest.raises(ValueError):
+        fld.beta(np.zeros(11))
+
+
+def test_independent_initial_state_restart_and_apply() -> None:
+    comps = _independent_components()
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    layout = ifd.StateLayout(specs, ["sync", "dust"])
+    priors = {"sync": comps[1].amp_prior, "dust": comps[2].amp_prior}
+    x0 = ifs.initial_state(layout, views, priors)
+    np.testing.assert_array_equal(layout.betas(x0)["sync"], -3.0)
+    beta_map = -3.0 + 0.2 * np.random.default_rng(3).standard_normal(12)
+    comps[1].set_beta_map(beta_map, NSIDE_BETA)
+    x1 = ifs.initial_state(layout, views, priors)
+    np.testing.assert_array_equal(layout.betas(x1)["sync"], beta_map)
+    x1[layout.hier_slices["dust"]] = (1.1, -1.5)
+    ifs.apply_state(x1, layout, views, {"sync": [comps[1]], "dust": [comps[2]]})
+    np.testing.assert_array_equal(comps[1].beta_map, beta_map)
+    assert (comps[2].amp_prior.mu, comps[2].amp_prior.log_s) == (1.1, -1.5)
+
+
+def test_independent_target_equals_gmrf_likelihood_plus_iid_prior_and_fd_gradient() -> None:
+    """The independent-regions target minus its iid prior equals the centred GMRF target minus
+    its field prior at the same beta (the collapsed likelihood is shared), and the gradient
+    matches 4th-order finite differences in every block."""
+    ifs.reset_sampler_states()
+    comps_i = _independent_components()
+    comps_g = _components()
+    maps_sky, inv_var, _ = _data(comps_i)
+    specs_i, _ = ifs.discover_index_specs(comps_i, None, centred=False)
+    specs_g, _ = ifs.discover_index_specs(comps_g, None, centred=True)
+    layout_i = ifd.StateLayout(specs_i, ["sync", "dust"])
+    layout_g = ifd.StateLayout(specs_g, ["sync", "dust"])
+    like_i = ifd.RegionIndexLikelihood.from_arrays(NU, maps_sky, inv_var, comps_i, layout_i,
+                                                   NSIDE)
+    like_g = ifd.RegionIndexLikelihood.from_arrays(NU, maps_sky, inv_var, comps_g, layout_g,
+                                                   NSIDE)
+    rng = np.random.default_rng(11)
+    fld_g = specs_g[0].field
+    for _ in range(3):
+        beta = -3.0 + 0.2 * rng.standard_normal(12)
+        hyp = {"sync": (1.0 + 0.1 * rng.standard_normal(), np.log(0.3) + 0.2 * rng.standard_normal()),
+               "dust": (1.0 + 0.1 * rng.standard_normal(), np.log(0.3) + 0.2 * rng.standard_normal())}
+        x_i = layout_i.pack({"sync": beta}, hyp)
+        mu = float(beta.mean())
+        y = fld_g.basis.V.T @ (beta - mu)
+        x_g = layout_g.pack({"sync": fld_g.pack(y, mu, np.log(0.2), 0.3)}, hyp)
+        np.testing.assert_allclose(layout_g.betas(x_g)["sync"], beta, atol=1e-10)
+        lp_i, g_i = like_i.logp_and_grad(x_i)
+        lp_g, _ = like_g.logp_and_grad(x_g)
+        prior_i = specs_i[0].field.prior_logp_and_grad(beta)[0]
+        prior_g = fld_g.prior_logp_and_grad(fld_g.pack(y, mu, np.log(0.2), 0.3))[0]
+        assert lp_i - prior_i == pytest.approx(lp_g - prior_g, rel=1e-9, abs=1e-6)
+        fd = np.empty_like(x_i)
+        for j in range(x_i.size):
+            h = 1e-4
+            vals = []
+            for k in (-2, -1, 1, 2):
+                xk = x_i.copy()
+                xk[j] += k * h
+                vals.append(like_i.logp_and_grad(xk)[0])
+            fd[j] = (vals[0] - 8 * vals[1] + 8 * vals[2] - vals[3]) / (12 * h)
+        np.testing.assert_allclose(g_i, fd, rtol=2e-5, atol=2e-4)

@@ -48,8 +48,11 @@ hyperparameters by NUTS (E018 sampler, non-centred field coordinates):
    differs; the N(mu0, 0.3^2) prior is weak against the data in every region (posterior sd of a
    region index is 0.003 to 0.1 here).
 3. **Single index** (nside_beta 0): beta_c ~ N(mu0_c, 0.3^2), as in E017/E018.
-mu0_sync = -3.0, mu0_dust = 1.55 (the d1 and s1 sky means to two decimals; the hyperprior sd 0.3
-covers the full range of both truth maps, -3.28 to -2.74 and 1.26 to 1.79).
+mu0_sync = -3.0, mu0_dust = 1.55 (the s1 and d1 sky means to two decimals: -3.000 and 1.540; the
+hyperprior sd 0.3 covers the full range of both truth maps, -3.28 to -2.74 and 1.26 to 1.79, whose
+sd are only 0.063 and 0.037: the s1 index map is the Miville-Deschenes 2008 model at about 7
+degrees, the d1 maps the Planck 2015 Commander fits at 1 degree, see
+`research/2026-10-27_index_field_recovery_prior_art.md`).
 
 Pseudo-templates for the amplitude prior (realistic: built from the data, not from the truth):
 g_sync = d(23 GHz) (30/23)^-3.0, g_dust = d(353 GHz) B(545, 20.93 K)/B(353, 20.93 K)
@@ -121,9 +124,10 @@ python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e020_d1s1
 (pending)
 
 ## Negative control
-The single index is the control: its index RMSE must equal the sd of the truth map (0.11 for
-beta_s, 0.08 for beta_d at nside 64) up to its own posterior sd, and its CMB residual must be the
-largest. A second control: `indep16` with 16 data pixels per region should be the noisiest index
+The single index is the control: its index RMSE must equal the sd of the truth map (0.063 for
+beta_s, 0.037 for beta_d at nside 64; the region-mean RMSE floors are 0.037 / 0.024 / 0.013 for
+beta_s and 0.028 / 0.024 / 0.019 for beta_d at nside_beta 4 / 8 / 16) up to its own posterior
+sd, and its CMB residual must be the largest. A second control: `indep16` with 16 data pixels per region should be the noisiest index
 map (posterior sd per region 3 to 10 times the GMRF's where the GMRF shrinks); if it is not, the
 GMRF prior is not doing anything on this sky.
 

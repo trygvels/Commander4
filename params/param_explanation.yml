@@ -612,6 +612,10 @@ components:
       # the chain as index_field/beta_map; sed/beta stays its mean. At most nside 16.
       # spectral_index_nside: 4
       # spectral_index_field:
+      #   type: gmrf              # gmrf (default): hierarchical Matern GMRF, mean, scale and
+      #                           # correlation length inferred; independent: iid
+      #                           # N(spectral_index_prior) per region, no hyperparameters (the
+      #                           # fixed-nside ladder baseline). independent takes no other keys.
       #   basis: graph
       #   alpha: 2.0
       #   sigma_scale: 0.3

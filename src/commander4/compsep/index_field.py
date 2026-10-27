@@ -28,7 +28,7 @@ from numpy.typing import NDArray
 
 from commander4.backend import compsep as cpp_compsep
 from commander4.data_models.detector_map import DetectorMap
-from commander4.math_utils.gmrf_field import IndexFieldPrior
+from commander4.math_utils.gmrf_field import IndependentIndexPrior, IndexFieldPrior
 from commander4.sky.diffuse_components import DiffuseComponent
 
 logger = logging.getLogger(__name__)
@@ -267,12 +267,13 @@ def mixing_regions(freqs: NDArray, comps: list[DiffuseComponent], nreg: int,
 @dataclass
 class IndexSpec:
     """One sampled spectral index: the component (by `comp_name`, shared by its I and QU views),
-    its field prior (`IndexFieldPrior` at spectral_index_nside > 0) or None for a single index,
+    its spatial prior (`IndexFieldPrior`, or `IndependentIndexPrior` for iid region indices, at
+    spectral_index_nside > 0) or None for a single index,
     and the Gaussian index prior (mu0, sd0) of `spectral_index_prior`, which for a field is the
     hyperprior on the field mean (already inside `field.hyper`) and for a scalar is the prior on
     the index itself."""
     comp_name: str
-    field: IndexFieldPrior | None
+    field: IndexFieldPrior | IndependentIndexPrior | None
     prior_mean: float
     prior_sd: float
 

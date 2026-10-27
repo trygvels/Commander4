@@ -67,15 +67,28 @@ def _read_param(container, key: str, default=None):
 
 
 def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
-                            ) -> gmrf_field.IndexFieldPrior:
-    """The `IndexFieldPrior` of a component from its `spectral_index_field` block and the
-    required `spectral_index_prior` (mu0, sd0): basis graph, alpha 2, sigma_scale 0.3, rho prior
-    log-uniform on [h, pi] by default."""
+                            ) -> gmrf_field.IndexFieldPrior | gmrf_field.IndependentIndexPrior:
+    """The spatial prior of a component's index field from its `spectral_index_field` block and
+    the required `spectral_index_prior` (mu0, sd0). `type: gmrf` (default): `IndexFieldPrior`,
+    basis graph, alpha 2, sigma_scale 0.3, rho prior log-uniform on [h, pi], (mu0, sd0) the
+    hyperprior of the field mean. `type: independent`: `IndependentIndexPrior`, every region
+    index iid N(mu0, sd0^2), no hyperparameters (the fixed-nside ladder)."""
     prior = _read_param(comp_params, "spectral_index_prior")
     if prior is None or _read_param(prior, "mean") is None or _read_param(prior, "rms") is None:
         raise ValueError("A spectral-index field needs 'spectral_index_prior' with 'mean' and "
-                         "'rms' (the hyperprior of the field mean).")
+                         "'rms' (the hyperprior of the field mean, or the per-region prior of "
+                         "an independent field).")
     settings = dict(_read_param(comp_params, "spectral_index_field", {}) or {})
+    kind = str(settings.pop("type", "gmrf"))
+    if kind == "independent":
+        if settings:
+            raise ValueError(f"spectral_index_field type independent takes no other settings; "
+                             f"got {sorted(settings)}.")
+        return gmrf_field.IndependentIndexPrior(nside_beta, float(prior["mean"]),
+                                                float(prior["rms"]))
+    if kind != "gmrf":
+        raise ValueError(f"spectral_index_field.type must be 'gmrf' or 'independent', got "
+                         f"{kind!r}.")
     unknown = set(settings) - {"basis", "alpha", "sigma_scale", "rho_prior", "rho_max"}
     if unknown:
         raise ValueError(f"Unknown spectral_index_field settings {sorted(unknown)}.")
@@ -240,8 +253,16 @@ def initial_state(layout: StateLayout, views: dict[str, list[DiffuseComponent]],
             blocks[spec.comp_name] = np.array([float(comp.beta)])
             continue
         fld = spec.field
-        hyper = fld.hyper
         beta_map = getattr(comp, "beta_map", None)
+        if isinstance(fld, gmrf_field.IndependentIndexPrior):
+            # Independent regions: the state is beta itself; restart from the stored map, else
+            # the constant start at the component's beta.
+            if beta_map is not None and beta_map.shape == (fld.n_beta,):
+                blocks[spec.comp_name] = np.asarray(beta_map, dtype=float).copy()
+            else:
+                blocks[spec.comp_name] = np.full(fld.n_beta, float(comp.beta))
+            continue
+        hyper = fld.hyper
         if beta_map is not None and beta_map.shape == (fld.n_beta,):
             mu = float(beta_map.mean())
             resid = beta_map - mu
@@ -385,6 +406,10 @@ class IndexFieldSamplingGroup:
             block = x[self.layout.index_slices[spec.comp_name]]
             if spec.field is None:
                 out[spec.comp_name] = {"beta": float(block[0])}
+            elif isinstance(spec.field, gmrf_field.IndependentIndexPrior):
+                out[spec.comp_name] = {"index_field": {
+                    "beta_map": betas[spec.comp_name], "beta_nside": self.layout.nside_beta,
+                    "parameterization": "independent"}}
             else:
                 fld = spec.field
                 x_nc = fld.to_noncentred(block) if fld.centred else block

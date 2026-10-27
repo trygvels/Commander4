@@ -429,3 +429,79 @@ class IndexFieldPrior:
             dls = sigma * float(Sz @ g) + dls_h
             du = sigma * float((dw * z) @ Vtg) * float(self.transform.dlogrho_du(u)) + du_h
         return float(lp), self.pack(dblock, dmu, dls, du)
+
+
+class _RegionGrid:
+    """The HEALPix pixelization of an index field without a basis: `nside_beta`, `n_beta`, `h`."""
+
+    def __init__(self, nside_beta: int):
+        self.nside_beta = int(nside_beta)
+        self.n_beta = 12 * self.nside_beta ** 2
+        self.h = float(np.sqrt(4.0 * np.pi / self.n_beta))
+
+
+class _IndependentHyper:
+    """(mu0, s_mu) holder so that `IndexSpec` can check its prior against the field's."""
+
+    def __init__(self, mu0: float, s_mu: float):
+        self.mu0 = float(mu0)
+        self.s_mu = float(s_mu)
+
+
+class IndependentIndexPrior:
+    """Independent region indices at nside_beta: the fixed-nside ladder of parametric fits.
+
+    Target in the sampled coordinates x = beta (n_beta,):
+        log pi = log L(beta) + sum_r [-1/2 ((beta_r - mu0) / sd0)^2]
+        d/dbeta_r = dlog L/dbeta_r - (beta_r - mu0) / sd0^2,
+    no hyperparameters, no spatial coupling. Same interface as `IndexFieldPrior` where the
+    sampler needs it (`dim`, `n_beta`, `K`, `basis.nside_beta`, `hyper.mu0/s_mu`, `beta`,
+    `logp_and_grad`, `prior_logp_and_grad`); `centred` is False (beta itself is sampled).
+    """
+
+    centred = False
+
+    def __init__(self, nside_beta: int, mu0: float, sd0: float):
+        if nside_beta < 1:
+            raise ValueError("IndependentIndexPrior needs nside_beta >= 1")
+        if not sd0 > 0.0:
+            raise ValueError("IndependentIndexPrior needs sd0 > 0")
+        self.basis = _RegionGrid(nside_beta)
+        self.n_beta = self.basis.n_beta
+        self.K = self.n_beta
+        self.hyper = _IndependentHyper(mu0, sd0)
+        self.mu0 = float(mu0)
+        self.sd0 = float(sd0)
+
+    @property
+    def dim(self) -> int:
+        return self.n_beta
+
+    def beta(self, x: NDArray) -> NDArray:
+        x = np.asarray(x, dtype=float)
+        if x.shape != (self.dim,):
+            raise ValueError(f"x must have shape ({self.dim},)")
+        return x.copy()
+
+    def prior_logp_and_grad(self, x: NDArray):
+        return self.logp_and_grad(x, loglike=None)
+
+    def logp_and_grad(self, x: NDArray, loglike=None):
+        """Log posterior density and gradient; loglike(beta) -> (log L, dlog L/dbeta) or None for
+        the prior alone. Non-finite values and raising likelihoods give (-inf, zeros)."""
+        beta = self.beta(x)
+        if loglike is None:
+            logL, g = 0.0, np.zeros(self.n_beta)
+        else:
+            try:
+                logL, g = loglike(beta)
+            except (ValueError, np.linalg.LinAlgError):
+                return -np.inf, np.zeros(self.dim)
+            if not np.isfinite(logL):
+                return -np.inf, np.zeros(self.dim)
+            logL, g = float(logL), np.asarray(g, dtype=float)
+        r = (beta - self.mu0) / self.sd0
+        lp = logL - 0.5 * float(r @ r)
+        if not np.isfinite(lp):
+            return -np.inf, np.zeros(self.dim)
+        return lp, g - r / self.sd0
