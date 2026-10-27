@@ -171,4 +171,11 @@ it, and what the answer decides. Mark an entry RESOLVED with the experiment ID w
   matrix). (3) Propagate the zero-level uncertainty into the index posterior (prior width per band).
 - **Decides:** whether real-data spectral-index results from this fork can be reported at all;
   the design of the mixing-matrix offset column (ties into M2.4).
-- **Status (2026-10-26):** found; pass-4 inputs in preparation; grid sensitivity next.
+- **Status (2026-10-27):** sensitivity measured (E014 pass 4, exact grids on the same 20 maps):
+  one DR1-model convention for all bands moves the ridge beta_s from -2.9103 (mixed conventions)
+  to -2.8755 (260 posterior sd) and beta_d from 1.4150 to 1.3991 (460 sd); removing the 3.4 K
+  non-solar Haslam dipole moves beta_s by a further +0.011 (80 sd). The convention is the
+  dominant systematic of a full-sky index (F17). Pass 4 (`dr1_model_zero_levels.py`) is the
+  working convention for E014-style inputs (D011); item (2), a per-band offset parameter with a
+  prior in the collapsed likelihood, is the open design question for Trygve; item (3) depends on
+  it.

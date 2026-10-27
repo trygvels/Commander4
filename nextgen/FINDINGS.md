@@ -244,3 +244,17 @@ coverage 0.48 / 0.86, the same as the profile there. This is the
 first mode in this programme usable below index-pixel S/N 15 without a hand-set amplitude prior;
 it answers the Q2 design question in favour of learning the amplitude prior rather than fixing it or
 removing it (F12).
+
+**F17. On real low-resolution maps the full-sky spectral indices are set by the zero-level
+(monopole) convention of the input maps, at the 0.03 to 0.4 level, hundreds of posterior sd**
+(E014 passes 2 to 4, exact 2D grids of the ridge target, nside 64, |b| > 30 chisq mask, 17 or 20
+bands). With the WMAP/LFI maps median-subtracted at high latitude and the HFI maps referenced to
+the DR1 CMB plus dust (two conventions in one run) the ridge beta_s is -3.3424 (17 bands) or
+-2.9103 (20 bands); with one convention for all 20 bands (offset = mean over |b| > 30 of map minus
+the DR1 sky model, `nextgen/scripts/dr1_model_zero_levels.py`) it is -2.8755 and beta_d moves from
+1.4150 to 1.3991; removing the 3.4 K non-solar dipole of the Haslam map moves beta_s by a further
++0.011. The posterior sd is 1e-4 (beta_s) and 3e-5 (beta_d), so the statistical error of a full-sky
+index on these maps is irrelevant next to the convention. Commander4 has no monopole sampling; until a
+per-band zero level with a prior is part of the model (Q15), spectral indices from maps-only runs on
+real data are convention-dependent and are not science results. The method results of E014 (chain
+against exact grid on identical inputs) are unaffected.

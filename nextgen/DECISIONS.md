@@ -62,3 +62,18 @@ half of Q14. Q1's remaining items (IQU, nside 128 scaling, HFI full set) are fol
 blockers. The `conditional` Gibbs mode is dropped from real-data comparisons (F14: conditional sd
 2e-6 against marginal 3.6e-4; of order 3e4 iterations per independent sample); it stays in the code
 as a documented option. No default changes.
+
+## D011 (2026-10-27): zero-level convention for real-map inputs; `hier` is an option, not a default; NUTS start state
+Real-map inputs for E014-style runs use one zero-level convention for every band: offset_b = mean
+over |b| > 30 of (map_b minus the DR1 sky model evaluated at band b), `dr1_model_zero_levels.py`
+(pass 4), with the Haslam non-solar dipole left in by default and removed as a documented variant.
+This is a working convention for comparing methods on identical inputs, not a claim that it is
+right (F17, Q15); a per-band zero-level parameter in the model is the proper fix and waits for
+Trygve's decision. The M2.4 stage-1 index-field sampler enters Commander4 as `likelihood: hier`, a
+non-default MCMC group option with its own `nuts` block and component keys (`spectral_index_nside`,
+`spectral_index_field`, `amp_prior`); `auto` still resolves to ridge (D003) and no existing run
+changes. A hier group without a restart state starts the field at its mean (z = 0, mu = the
+component's beta, sigma = sigma_scale / 2, rho mid-range) and the amplitude hyperparameters at their
+prior means; a restart from a field chain at the same nside resumes from the stored field (NUTS
+adaptation restarts). Reason: a deterministic start that warm-up leaves quickly, and no dependence
+on the parameter-file proposal widths the MH groups need.

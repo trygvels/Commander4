@@ -390,5 +390,11 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   (about 460 sd). Against pass 2: +0.47 / +0.034. Marginal minus ridge on pass 4: +22.7 sd in
   beta_s, +2.9 sd in beta_d (pass 3: +16.1 / +2.1; pass 2: +56 / +5.5). So a consistent
   zero-level convention moves the full-sky indices by hundreds of statistical sd and the
-  flat-prior volume shift itself is data-set dependent; the Haslam-dipole variant (pass4hdip)
-  is running.
+  flat-prior volume shift itself is data-set dependent.
+  **Pass-4 Haslam-dipole variant (pass4hdip, 01:40 to 02:11):** ridge (-2.86425 +- 0.00014,
+  1.39937 +- 0.00003), marginal (-2.86117, 1.39947). Removing the 3.4 K non-solar dipole from the
+  Haslam map moves beta_s by +0.011 (about 80 sd) and beta_d by +0.0002 (7 sd) relative to
+  pass 4. Summary of the zero-level ladder for the ridge beta_s: pass 2 -3.3424 (mixed
+  conventions, 17 bands), pass 3 -2.9103 (mixed, 20 bands), pass 4 -2.8755 (one DR1-model
+  convention), pass4hdip -2.8642 (plus Haslam dipole removed); beta_d 1.3654 / 1.4150 / 1.3991 /
+  1.3994. Everything from pass 3 on uses the same 20 maps.
