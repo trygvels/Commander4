@@ -172,11 +172,14 @@ def run_mams(post, rng: np.random.Generator, n_warmup: int, n_samples: int, x0=N
                 sd = w.std(axis=0)
                 sig = np.where(sd > 0, sd, 1.0)
             if L is None and w.shape[0] >= 100:
-                # ALBA L from the window, floored at 0.3 sqrt(d) (a short window overestimates
-                # ESS and would collapse L to one step, which the paper's sqrt(d) start forbids).
+                # ALBA rule (Eq. 12 to 14): L = 0.3 times the distance travelled per effective
+                # sample. The paper measures that distance on the unadjusted chain as eps times the
+                # autocorrelation time in steps; here the window is a chain of adjusted transitions
+                # of length Lc each, so the distance is Lc times the autocorrelation time in
+                # transitions (N / ESS). Floored at 0.3 sqrt(d) and capped at 500 steps.
                 ess = ess_geyer(w / sig)
                 ess = np.where(np.isfinite(ess) & (ess > 0), ess, 1.0)
-                Lc = float(alba_factor * eps * np.mean(w.shape[0] / ess))
+                Lc = float(alba_factor * Lc * np.mean(w.shape[0] / ess))
                 Lc = min(max(Lc, 0.3 * np.sqrt(d)), 500 * eps)
             da = _DualAveraging(eps, target_accept)
         if progress and (it + 1) % max(1, n_warmup // 5) == 0:
