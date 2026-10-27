@@ -89,3 +89,24 @@ mams.py` with its self-test for the Q5 joint-target experiment, where d is 1e5 a
 literature's gains are reported. Non-diagonal preconditioning (Fisher, low-rank) is deferred to
 the same experiment. Also fixed by E017/E018: the hier amplitude prior is the recommended option
 below full-sky S/N of order 100 (F18), but changing the default from ridge needs Trygve (D003).
+
+## D013 (2026-10-27): per-band zero levels enter the collapsed per-pixel likelihood as offset columns with Gaussian priors
+Commander4 gets per-band zero-level (monopole) parameters for maps-only runs on real intensity
+data, implemented as one linear offset column per band in the per-pixel mixing matrix of the
+collapsed likelihood, with a Gaussian prior per band (M3.3). Not as a separate monopole component
+sampled in the CG step (the Commander3 `md` design). Reasons: (1) the offset is linear in the data,
+so it is profiled or marginalized by the same kernel as the amplitudes at no sampling cost, and the
+index posterior then carries the zero-level uncertainty instead of inheriting an input convention
+(F17: the convention moves a full-sky index by hundreds of posterior sd); (2) with spatially
+constant SEDs, n_component directions of the n_band offsets are exactly degenerate with the sky
+mean of each component amplitude and can only come from priors, while the remaining n_band minus
+n_component directions are data-constrained; a spatially varying index weakens even the first
+set, which is why zero levels and indices are coupled in the first place, so they must be sampled
+jointly; (3) the CG path is not in the collapse yet (Q5, M3.1), and putting the offsets in the
+collapsed step keeps Phase 2 and Phase 3 results comparable. Prior centres come from a stated
+convention per band (HI cross-correlation at high latitude for the dust-dominated HFI bands, the
+DR1 sky model or a masked monopole fit for WMAP and LFI); prior widths from the measured
+disagreement between conventions (E014 passes 2 to 4), never zero. Polarization has no monopole,
+so Paper B's synchrotron field does not depend on this; every intensity result does. Trygve asked
+for the choice to be made here (2026-10-27) rather than deferred to him. Q15 item (2) is closed by
+this entry; item (3), propagating the prior widths, follows the implementation.

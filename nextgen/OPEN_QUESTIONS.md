@@ -191,6 +191,6 @@ original numbering.
   to -2.8755 (260 posterior sd) and beta_d from 1.4150 to 1.3991 (460 sd); removing the 3.4 K
   non-solar Haslam dipole moves beta_s by a further +0.011 (80 sd). The convention is the
   dominant systematic of a full-sky index (F17). Pass 4 (`dr1_model_zero_levels.py`) is the
-  working convention for E014-style inputs (D011); item (2), a per-band offset parameter with a
-  prior in the collapsed likelihood, is the open design question for Trygve; item (3) depends on
-  it.
+  working convention for E014-style inputs (D011); item (2) decided 2026-10-27 (D013): per-band
+  offset columns with Gaussian priors in the collapsed per-pixel likelihood, implemented at M3.3;
+  item (3) follows the implementation.
