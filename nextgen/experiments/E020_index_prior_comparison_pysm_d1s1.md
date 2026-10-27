@@ -248,6 +248,19 @@ and prove only that the centred parameterization is usable here; the production 
 `parameterization: centred` (a sampler coordinate choice, same target, E018 L1 covers both
 parameterizations).
 
+**Production attempt 1, gmrf16, centred (10:51 to 16:24, stopped at chain-1 iteration 160;
+output kept in `chains_gmrf16_floorbug/`):** every transition after iteration 10 saturated
+max_depth (1023 gradients, step size 4e-3 to 2e-2, mean accept 0.15 to 1.00), 75 s per
+transition, both chains. Cause found in the NUTS warm-up: the Stan-style window update
+regularizes the inverse mass towards 1e-3 x 5/(n+5), an absolute floor of about 1e-4 per
+coordinate. The bright-region indices have posterior variance down to 1e-8 (Fisher sd 5e-4), so
+after the first window (iteration 100) their inverse mass rose from 1e-8 to 1e-4, the
+leapfrog stability limit became 2 / sqrt(H x inv_mass) = 2 / sqrt(1e8 x 1e-4) = 0.02 (the
+observed step size), and the weakly constrained coordinates then needed more than 1023 steps
+of 0.02 to U-turn. Fix (commit 0e7c282, same target, warm-up only): the floor is taken relative
+to the metric the warm-up started from, which is identical to Stan's formula from the default
+unit metric and keeps the finite-difference scaling otherwise; test added. Relaunched 16:24.
+
 **Profile of a Gibbs iteration (from the centred log):** 36 s of every iteration went into
 rebuilding the graph-Laplacian eigenbasis (dense eigh of 3072^2, 18 s per component, on every
 rank, every iteration); fixed by caching the basis per process (commit cba5c33, same target).
