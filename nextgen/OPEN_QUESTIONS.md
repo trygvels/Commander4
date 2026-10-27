@@ -3,6 +3,12 @@
 Ranked by how much the answer changes what we build next. Each entry: why it matters, how to answer
 it, and what the answer decides. Mark an entry RESOLVED with the experiment ID when answered.
 
+**Ranking (2026-10-27):** Q2 (prior calibration; E016 done, E017 closing, hier SBC as the L2 gate),
+then Q3/Q4 (index-field model and sampler; M2.4 stage 1 implemented, E018 in validation), then Q15
+(zero levels: blocks any real-data index result and is a model-design question for Trygve), then
+the second half of Q14 and Q5 (CG amplitudes). Q1 is answered (E014). The entries below keep their
+original numbering.
+
 ## Q1. Does the legacy acceptance matter on real-data configurations? (ANSWERED at nside 64, E014)
 - **Answer (2026-10-26):** yes. On DR1 WMAP + LFI, NPIPE 353 / 857, PR3 100 and Haslam at nside 64
   with the dx12 mask, the legacy `resolve_chisq` index posterior is 16 to 17x too wide and the dust

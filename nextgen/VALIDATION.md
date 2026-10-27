@@ -13,6 +13,11 @@ Small problems where the target is known exactly: analytic Gaussians, 1D/2D grid
 log posterior computed independently of the code under test, or an independent valid sampler.
 Pass: means within 4 MC standard errors (using ESS), widths within ~15 to 20%. Include at least one
 negative control (a known-wrong method must fail the same test, as `resolve_chisq` does).
+Chain-length L1 tests live in the pytest suite behind `C4_SLOW_TESTS=1` (they take minutes; e.g.
+`tests/test_index_field_l1.py`, E018) and are run explicitly when the experiment record says so.
+A reference sampler is only a reference where it mixes: check its ESS and, when a parameter has a
+funnel (a scale with a long tail towards zero), compare where the data identify it or use a
+sampler that reaches the tail (E018 L1 note).
 
 ## L2: simulation-based calibration
 Draw parameters from the prior, simulate data from the model, sample, record the rank of the truth
@@ -23,8 +28,9 @@ hundred replicates. Required for every prior choice in Q2/Q3.
 
 ## L3: end-to-end Commander4 runs on model-consistent simulations
 Full Commander4 (MPI, real I/O and chain writing) on simulations drawn from the model being sampled,
-compared to the exact or independently computed target. Harness: `aux/validate_mcmc_likelihood.py`.
-Mind F7/F8: per-pixel runs need common-resolution smoothing, and smoothed noise is not white.
+compared to the exact or independently computed target. Harness: `aux/validate_mcmc_likelihood.py`
+(MH likelihood modes; `--mode hier_field` for the index field with a hierarchical amplitude prior,
+E018). Mind F7/F8: per-pixel runs need common-resolution smoothing, and smoothed noise is not white.
 
 ## L4: misspecified realistic skies
 PySM 3 skies of increasing complexity (d1s1, d9s4, d10s5, d12s7, and the PEGS skies of 2502.20452),
