@@ -125,7 +125,8 @@ def test_apply_state_writes_components() -> None:
     assert (comps[2].amp_prior.mu, comps[2].amp_prior.log_s) == (1.1, -1.5)
 
 
-def test_sampling_group_runs_transitions_and_keeps_state_across_iterations() -> None:
+@pytest.mark.parametrize("init_inv_mass", ["ones", "fd_hessian"])
+def test_sampling_group_runs_transitions_and_keeps_state_across_iterations(init_inv_mass) -> None:
     ifs.reset_sampler_states()
     comps = _components()
     maps_sky, inv_var, beta_true = _data(comps)
@@ -135,7 +136,8 @@ def test_sampling_group_runs_transitions_and_keeps_state_across_iterations() -> 
     priors = {"sync": comps[1].amp_prior, "dust": comps[2].amp_prior}
     group = ifs.IndexFieldSamplingGroup(MPI.COMM_SELF, like, layout, views,
                                         {"sync": [comps[1]], "dust": [comps[2]]}, priors,
-                                        ifs.NUTSConfig(n_warmup=8, max_depth=6))
+                                        ifs.NUTSConfig(n_warmup=8, max_depth=6,
+                                                       init_inv_mass=init_inv_mass))
     stats1 = group.run(numstep=4, chain=1, group_name="g", rng=np.random.default_rng(5))
     stats2 = group.run(numstep=4, chain=1, group_name="g", rng=np.random.default_rng(6))
     for stats in (stats1, stats2):
@@ -309,3 +311,25 @@ def test_iid_field_prior_is_the_gmrf_prior_with_identity_structure() -> None:
         spectral_index_nside=1, spectral_index_field=Bunch(type="iid", alpha=2.0)))
     with pytest.raises(ValueError, match="iid takes only"):
         ifs.discover_index_specs([bad], None, centred=False)
+
+
+def test_fd_inverse_mass_recovers_gaussian_variances_and_handles_bad_curvature() -> None:
+    var = np.array([1e-6, 1e-2, 1.0, 50.0])
+    rng = np.random.default_rng(8)
+    A = rng.normal(size=(4, 4)) * 0.0 + np.diag(1.0 / var)   # diagonal precision
+
+    def logp_and_grad(x):
+        return -0.5 * x @ A @ x, -A @ x
+
+    inv = ifs.fd_inverse_mass(logp_and_grad, np.zeros(4))
+    np.testing.assert_allclose(inv, np.minimum(var, ifs.FD_MASS_MAX), rtol=1e-6)
+
+    def concave_up(x):   # negative curvature in coordinate 1: left at the prior scale 1
+        return 0.5 * x[1] ** 2 - 0.5 * x[0] ** 2 * 4.0, np.array([-4.0 * x[0], x[1]])
+
+    inv = ifs.fd_inverse_mass(concave_up, np.zeros(2))
+    np.testing.assert_allclose(inv, [0.25, 1.0])
+    cfg = ifs.NUTSConfig.from_block(Bunch(init_inv_mass="fd_hessian"))
+    assert cfg.init_inv_mass == "fd_hessian"
+    with pytest.raises(ValueError, match="init_inv_mass"):
+        ifs.NUTSConfig.from_block(Bunch(init_inv_mass="identity"))

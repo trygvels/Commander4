@@ -46,17 +46,22 @@ class NUTSConfig:
     target_accept: float = 0.8
     max_depth: int = 10
     parameterization: str = "noncentred"
+    init_inv_mass: str = "ones"
 
     @classmethod
     def from_block(cls, block: Bunch | dict | None) -> "NUTSConfig":
         values = dict(block) if block else {}
-        unknown = set(values) - {"n_warmup", "target_accept", "max_depth", "parameterization"}
+        unknown = set(values) - {"n_warmup", "target_accept", "max_depth", "parameterization",
+                                 "init_inv_mass"}
         if unknown:
             raise ValueError(f"Unknown nuts settings {sorted(unknown)}.")
         cfg = cls(**values)
         if cfg.parameterization not in ("noncentred", "centred"):
             raise ValueError(f"nuts.parameterization must be 'noncentred' or 'centred', got "
                              f"{cfg.parameterization!r}.")
+        if cfg.init_inv_mass not in ("ones", "fd_hessian"):
+            raise ValueError(f"nuts.init_inv_mass must be 'ones' or 'fd_hessian', got "
+                             f"{cfg.init_inv_mass!r}.")
         if cfg.n_warmup < 0 or not 0.0 < cfg.target_accept < 1.0 or cfg.max_depth < 1:
             raise ValueError("nuts: n_warmup >= 0, 0 < target_accept < 1, max_depth >= 1.")
         return cfg
@@ -64,6 +69,32 @@ class NUTSConfig:
 
 def _read_param(container, key: str, default=None):
     return container[key] if key in container else default
+
+
+FD_MASS_STEP = 1e-3
+FD_MASS_MAX = 10.0
+
+
+def fd_inverse_mass(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
+                    cap: float = FD_MASS_MAX) -> NDArray:
+    """Initial diagonal inverse mass from a central finite-difference estimate of the diagonal
+    of the negative Hessian at x: inv_mass_j = 1 / H_jj where H_jj = -(g_j(x + h e_j) - g_j(x -
+    h e_j)) / 2h > 0, else 1 (the prior scale of the non-centred blocks), capped at `cap`.
+    This only sets the starting point of the mass adaptation; the target is unchanged. Costs
+    2 dim gradient evaluations."""
+    x = np.asarray(x, dtype=float)
+    diag = np.empty(x.size)
+    for j in range(x.size):
+        xp, xm = x.copy(), x.copy()
+        xp[j] += h
+        xm[j] -= h
+        gp = logp_and_grad(xp)[1][j]
+        gm = logp_and_grad(xm)[1][j]
+        diag[j] = -(gp - gm) / (2.0 * h)
+    inv = np.ones(x.size)
+    ok = np.isfinite(diag) & (diag > 0.0)
+    inv[ok] = np.minimum(1.0 / diag[ok], cap)
+    return inv
 
 
 def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
@@ -243,6 +274,7 @@ class IndexSamplerState:
     sampler: NUTSSampler
     x: NDArray
     n_transitions: int = 0
+    mass_initialized: bool = False
 
 
 _STATES: dict[tuple[int, str], IndexSamplerState] = {}
@@ -378,6 +410,15 @@ class IndexFieldSamplingGroup:
             x = st.x
             infos = []
             try:
+                if not st.mass_initialized and self.nuts.init_inv_mass == "fd_hessian":
+                    # Serving ranks are in _serve() by now; every evaluation below is collective.
+                    inv = fd_inverse_mass(self._logp_and_grad_root, x)
+                    st.sampler.inv_mass = inv
+                    logger.info(f"Index-field group {group_name!r}: initial inverse mass from "
+                                f"the finite-difference Hessian, {2 * x.size} gradients, range "
+                                f"{inv.min():.3g} to {inv.max():.3g}, "
+                                f"{int(np.sum(inv == 1.0))} coordinates left at 1")
+                st.mass_initialized = True
                 for _ in range(numstep):
                     x, info = st.sampler.transition(x, self._logp_and_grad_root)
                     infos.append(info)

@@ -423,6 +423,10 @@ compsep:
       #   target_accept: 0.8
       #   max_depth: 10
       #   parameterization: noncentred   # or centred; same target, different geometry.
+      #   init_inv_mass: ones  # or fd_hessian: start the diagonal inverse mass at 1/H_jj from a
+      #                       # central finite-difference Hessian at the start state (2 dim
+      #                       # gradients). Same target; avoids the step-size collapse when the
+      #                       # hyperparameters are far stiffer than the field coefficients.
       # chisq_bands: [Planck30GHz, WMAPKa, WMAPQ1]
                               # Restrict the accept/reject chi^2 to these bands. Absent or
                               # null = every band in the run.
