@@ -78,7 +78,27 @@ python -m pytest -q -p no:cacheprovider tests/test_index_field_l1.py
 ```
 
 ## Result
-(pending)
+**L1 (tests/test_index_field_l1.py, 2026-10-27 02:05, C4_SLOW_TESTS=1, 141 s): PASS.** (a) The
+scalar chain (300 + 2000) against the reference grid: mean within 4 MC SE and width within 10
+percent (ESS > 200, no divergences). (b) The nside-1 field (K 11) with the synchrotron 30 times
+brighter than the template (per-pixel index error 0.2 against a field scatter of 0.15): all 12
+beta means, mu, log sigma and log rho within 4 pooled SE of the centred Gibbs reference (20000
+iterations, 5000 burn), sd ratios within 0.8 to 1.25. Diagnostic chains behind the test (same
+data, 500 + 6000 NUTS, Gibbs 20000): log sigma -1.675 +- 0.014 (non-centred NUTS, ESS 1485),
+-1.653 +- 0.029 (centred NUTS, ESS 263), -1.660 +- 0.035 (reference Gibbs, ESS 198); mu -3.0736
++- 0.0010 / -3.0730 / -3.0695 +- 0.0025; log rho +0.581 / +0.571 / +0.582 (+- 0.004); beta_0
+-3.0758 / -3.0702 / -3.0706 (+- 0.004). At the template brightness (sync 30 times fainter) the
+same comparison fails on log sigma only: the posterior of log sigma has a long tail towards small
+sigma (sd 1.1 in the log), the non-centred NUTS chain gives -1.83 +- 0.02 while the centred
+reference gives -1.31 (6000 iterations, ESS 84) drifting to -1.52 (20000, ESS 110), i.e. the
+centred MH-within-Gibbs reference does not reach the funnel; beta, mu and log rho agree there
+too. The centred target itself was checked against the reference's density pieces
+(`loglike_pixel_loops` + `hyper_conditional_logdensity` + `_lp_mu`) at five states: constant
+offset to 6e-12. So (b) is a sampler-mixing limitation of the reference at low S/N, not a
+discrepancy of the target; the test is run where the reference mixes.
+
+**L3:** chains started 02:14 (hier_field, 12 ranks, about 5 s per Gibbs iteration under load;
+hier_scalar follows). (pending)
 
 ## Negative control
 The same hier_field analysis applied to a chain run with `likelihood: ridge` on the scalar
