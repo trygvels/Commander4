@@ -267,6 +267,21 @@ rank, every iteration); fixed by caching the basis per process (commit cba5c33, 
 The finite-difference start costs 12304 gradients per chain, 21 min at 2 solver threads, that is
 about 98 ms per gradient in the MPI run (two chains per run, so 42 min fixed cost per run).
 
+**Production attempt 2, gmrf16, centred, relative mass floor (16:24 to 22:26, stopped at
+chain-1 iteration 180; output in `chains_gmrf16_windowbug/`, log `run_gmrf16_windowbug.log`):**
+the first 75 transitions on the finite-difference Hessian metric took 7 gradients each at
+acceptance 1.00 (step size 0.009 to 0.016, 2 s per transition). From the first window end at
+iteration 100 (25 correlated draws replace the metric) every transition saturated at 1023
+gradients; after the window at 150 the step size fell to 6e-4 to 4e-3 and the saturation
+continued. Chain 1 reached iteration 100 at 19:56, 150 at 21:28, 175 at 22:18 (1.6 min per
+iteration), 55 h per run. Cause: Stan's windowed variance estimates from 25 to 200 strongly
+autocorrelated draws over 6152 coordinates with a precision range of 5e6 are far worse than the
+Hessian metric they replace; the relative floor (attempt 1's fix) was necessary but not
+sufficient. Fix: `nuts.adapt_mass: false` (commit fadec92; keeps the Hessian metric for the
+whole run and adapts the step size only; any fixed metric leaves the target unchanged; exact-target
+test added; stats review requested). All ten parameter files set; production relaunched 22:26:52
+(attempt 3, gmrf16 first).
+
 ## Negative control
 The single index is the control: its index RMSE must equal the sd of the truth map (0.063 for
 beta_s, 0.037 for beta_d at nside 64; the region-mean RMSE floors are 0.037 / 0.024 / 0.013 for
