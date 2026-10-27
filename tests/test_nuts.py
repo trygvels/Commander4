@@ -174,3 +174,33 @@ def test_window_floor_is_relative_to_the_metric_in_force():
     for _ in range(200):
         x, _ = unit.transition(x, logp_and_grad)
     assert np.all(unit.inv_mass[:2] >= 1e-3 * 5.0 / (50 + 5.0) * 0.99)   # Stan's floor stands
+
+
+def test_fixed_metric_matches_exact_target_and_is_never_updated():
+    """``adapt_mass=False``: the inverse mass given at construction survives the whole warm-up
+    (no window updates) and the sampler still reproduces an exact target."""
+    scales = np.array([1e-3, 1.0, 30.0])
+    prec = np.diag(1.0 / scales**2)
+    mean = np.array([0.5, -2.0, 10.0])
+
+    def f(theta):
+        d = theta - mean
+        return -0.5 * d @ prec @ d, -prec @ d
+
+    rng = np.random.default_rng(7)
+    sampler = NUTSSampler(3, rng, n_warmup=300, inv_mass=scales**2, adapt_mass=False)
+    theta = mean.copy()
+    draws, grads = [], []
+    for it in range(300 + 3000):
+        theta, info = sampler.transition(theta, f)
+        if it >= 300:
+            draws.append(theta.copy())
+            grads.append(info.n_leapfrog)
+    draws = np.array(draws)
+    np.testing.assert_array_equal(sampler.inv_mass, scales**2)
+    assert sampler._window_ends == []
+    for j in range(3):
+        se = scales[j] / np.sqrt(_ess(draws[:, j]))
+        assert abs(draws[:, j].mean() - mean[j]) < 4 * se
+    np.testing.assert_allclose(draws.std(axis=0), scales, rtol=0.15)
+    assert np.mean(grads) < 16   # a matched metric needs short trajectories

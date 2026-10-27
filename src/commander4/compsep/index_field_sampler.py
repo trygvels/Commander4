@@ -47,12 +47,13 @@ class NUTSConfig:
     max_depth: int = 10
     parameterization: str = "noncentred"
     init_inv_mass: str = "ones"
+    adapt_mass: bool = True
 
     @classmethod
     def from_block(cls, block: Bunch | dict | None) -> "NUTSConfig":
         values = dict(block) if block else {}
         unknown = set(values) - {"n_warmup", "target_accept", "max_depth", "parameterization",
-                                 "init_inv_mass"}
+                                 "init_inv_mass", "adapt_mass"}
         if unknown:
             raise ValueError(f"Unknown nuts settings {sorted(unknown)}.")
         cfg = cls(**values)
@@ -64,6 +65,8 @@ class NUTSConfig:
                              f"{cfg.init_inv_mass!r}.")
         if cfg.n_warmup < 0 or not 0.0 < cfg.target_accept < 1.0 or cfg.max_depth < 1:
             raise ValueError("nuts: n_warmup >= 0, 0 < target_accept < 1, max_depth >= 1.")
+        if not isinstance(cfg.adapt_mass, bool):
+            raise ValueError(f"nuts.adapt_mass must be true or false, got {cfg.adapt_mass!r}.")
         return cfg
 
 
@@ -383,7 +386,8 @@ class IndexFieldSamplingGroup:
             x0 = self.comm.bcast(x0, root=self.root)
             sampler = NUTSSampler(self.layout.dim, rng, n_warmup=self.nuts.n_warmup,
                                   target_accept=self.nuts.target_accept,
-                                  max_depth=self.nuts.max_depth)
+                                  max_depth=self.nuts.max_depth,
+                                  adapt_mass=self.nuts.adapt_mass)
             _STATES[key] = IndexSamplerState(sampler, x0)
         return _STATES[key]
 

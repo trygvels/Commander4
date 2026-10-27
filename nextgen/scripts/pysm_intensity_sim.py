@@ -338,6 +338,7 @@ compsep:
         max_depth: 10
         parameterization: centred
         init_inv_mass: fd_hessian
+        adapt_mass: false
   bands:{bands}
 components:
   CMB:

@@ -102,11 +102,15 @@ class NUTSSampler:
         inv_mass: Initial diagonal inverse mass matrix (the parameter variances); ones if None.
         target_accept: Dual-averaging target of the mean acceptance statistic.
         max_depth: Maximum tree depth (at most 2**max_depth - 1 leapfrog steps per transition).
+        adapt_mass: Re-estimate the diagonal inverse mass from the warm-up windows (Stan's
+            schedule). False keeps ``inv_mass`` fixed and adapts the step size only; the target
+            is the same for any fixed metric. Use False when ``inv_mass`` comes from a Hessian
+            and the windows would replace it by short-window variance estimates.
     """
 
     def __init__(self, dim: int, rng: np.random.Generator, n_warmup: int = 500,
                  step_size: float | None = None, inv_mass: NDArray | None = None,
-                 target_accept: float = 0.8, max_depth: int = 10):
+                 target_accept: float = 0.8, max_depth: int = 10, adapt_mass: bool = True):
         self.dim = dim
         self.rng = rng
         self.n_warmup = n_warmup
@@ -114,9 +118,10 @@ class NUTSSampler:
         self.inv_mass = np.ones(dim) if inv_mass is None else np.asarray(inv_mass, dtype=float)
         self.target_accept = target_accept
         self.max_depth = max_depth
+        self.adapt_mass = adapt_mass
         self.iteration = 0
         self._dual = None
-        self._window_ends = _warmup_windows(n_warmup)
+        self._window_ends = _warmup_windows(n_warmup) if adapt_mass else []
         self._window_samples: list[NDArray] = []
         self._floor_metric: NDArray | None = None   # inverse mass at the first warm-up step
 

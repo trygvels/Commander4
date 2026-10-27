@@ -427,6 +427,10 @@ compsep:
       #                       # central finite-difference Hessian at the start state (2 dim
       #                       # gradients). Same target; avoids the step-size collapse when the
       #                       # hyperparameters are far stiffer than the field coefficients.
+      #   adapt_mass: true    # false: keep the initial inverse mass for the whole run and adapt
+      #                       # the step size only (same target for any fixed metric). Use with
+      #                       # fd_hessian when the warm-up windows (25 to 200 correlated draws)
+      #                       # would replace the Hessian metric by noisy variance estimates.
       # chisq_bands: [Planck30GHz, WMAPKa, WMAPQ1]
                               # Restrict the accept/reject chi^2 to these bands. Absent or
                               # null = every band in the run.
