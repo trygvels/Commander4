@@ -333,6 +333,14 @@ class DiffuseComponent(Component):
             value = getattr(self, param_name)
             if value is not None:
                 group[f"Cl_prior/{param_name}"] = value
+        # Spatially varying index (M2.4): the per-pixel map beside the scalar `sed/beta` (its
+        # mean), and the sampled hyperparameters of a hierarchical amplitude prior.
+        if self.beta_map is not None:
+            group["index_field/beta_map"] = self.beta_map
+            group["index_field/beta_nside"] = self.beta_nside
+        if self.amp_prior is not None and self.amp_prior.is_hier:
+            group["amp_prior/mu"] = self.amp_prior.mu
+            group["amp_prior/log_s"] = self.amp_prior.log_s
 
     def read_chain(self, group: h5py.Group) -> None:
         """Restore the shared sampled state (see `Component.read_chain`), plus this view's alms.
@@ -350,6 +358,25 @@ class DiffuseComponent(Component):
             return
         view_alms = project_alms(np.ascontiguousarray(stored_alms[rows]), self.lmax)
         self.alms = view_alms.astype(self.dtype, copy=False)
+        # Sampled index field and hier hyperparameters, gated like `beta` (restored only when the
+        # sampler that changes them is on). A field chain read into a scalar run is ignored; a
+        # scalar chain read into a field run leaves `beta_map` unset, so the field starts
+        # constant at the restored `beta` (index_field_sampler.initial_state).
+        sampling = "sample_spectral_index" in self.comp_params \
+            and bool(self.comp_params.sample_spectral_index)
+        nside_beta = int(self.comp_params.spectral_index_nside) \
+            if "spectral_index_nside" in self.comp_params \
+            and self.comp_params.spectral_index_nside else 0
+        if sampling and nside_beta > 0 and "index_field" in group:
+            stored_nside = int(group["index_field/beta_nside"][()])
+            if stored_nside == nside_beta:
+                self.set_beta_map(np.asarray(group["index_field/beta_map"][()]), nside_beta)
+            else:
+                logger.warning(f"Component {self.comp_name!r}: chain index field at nside "
+                               f"{stored_nside}, run asks for {nside_beta}; starting constant.")
+        if self.amp_prior is not None and self.amp_prior.is_hier and "amp_prior" in group:
+            self.amp_prior.mu = float(group["amp_prior/mu"][()])
+            self.amp_prior.log_s = float(group["amp_prior/log_s"][()])
 
     def _realize_alms_as_map(self, component_alms, nside: int, fwhm: float = 0):
         """Realize component alms as a map.

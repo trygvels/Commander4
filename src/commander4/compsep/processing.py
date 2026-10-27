@@ -16,7 +16,7 @@ from numbers import Integral, Real
 from mpi4py import MPI
 from numpy.typing import NDArray
 from pixell.bunch import Bunch
-from typing import Self
+from typing import Any, Self
 
 from commander4.data_models.detector_map import DetectorMap
 from commander4.sky.comp_list import CompList
@@ -26,6 +26,8 @@ from commander4.compsep.cg_solver import CompSepSolver
 from commander4.compsep.chisq import ChisqResult, collect_fit_diagnostics, evaluate_chi2
 from commander4.compsep.mcmc import MCMC_LIKELIHOODS, resolve_chisq_mask
 from commander4.compsep.perpix_solver import PerPixelMarginalLikelihood, solve_compsep_perpix
+from commander4.compsep import index_field as ifd
+from commander4.compsep import index_field_sampler as ifs
 from commander4.compsep.spectral_index import SpectralIndexSamplingGroup
 from commander4.file_io import paths
 from commander4.file_io.chain_restart import ChainStart
@@ -136,8 +138,12 @@ class MCMCSamplingGroupConfig(SamplingGroupConfig):
     chisq_mask: str | None = None
     # What the MH acceptance is computed from: "marginal", "ridge", "conditional",
     # "resolve_chisq", or "auto" (ridge where available, else conditional). See
-    # `MCMCSamplingGroup.run` and `_resolve_mcmc_likelihoods`.
+    # `MCMCSamplingGroup.run` and `_resolve_mcmc_likelihoods`. "hier" is not an MH group: it
+    # samples the index fields and amplitude hyperparameters jointly with NUTS
+    # (`index_field_sampler.IndexFieldSamplingGroup`); `numstep` is then the number of NUTS
+    # transitions per Gibbs iteration and `nuts` holds its settings.
     likelihood: str = "auto"
+    nuts: Any = None
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -147,6 +153,14 @@ class MCMCSamplingGroupConfig(SamplingGroupConfig):
         if self.likelihood not in ("auto",) + MCMC_LIKELIHOODS:
             raise ValueError(f"MCMC sampling group {self.name!r} likelihood must be one of "
                              f"{('auto',) + MCMC_LIKELIHOODS}, got {self.likelihood!r}.")
+        if self.nuts is not None and self.likelihood != "hier":
+            raise ValueError(f"MCMC sampling group {self.name!r} sets 'nuts' but its likelihood is "
+                             f"{self.likelihood!r}; 'nuts' applies to likelihood: hier only.")
+        if self.likelihood == "hier":
+            try:
+                object.__setattr__(self, "nuts_config", ifs.NUTSConfig.from_block(self.nuts))
+            except (ValueError, TypeError) as error:
+                raise ValueError(f"MCMC sampling group {self.name!r}: {error}") from error
         if not isinstance(self.numstep, int) or isinstance(self.numstep, bool) or self.numstep < 1:
             raise ValueError(f"MCMC sampling group {self.name!r} numstep must be at least 1.")
         if self.chisq_mask is not None and not isinstance(self.chisq_mask, str):
@@ -347,6 +361,28 @@ def _validate_mcmc_sampled_components(mcmc_groups: dict[str, MCMCSamplingGroupCo
                              "and will do nothing.")
 
 
+def _validate_index_fields(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
+                           resolved: dict[str, str], comp_list: CompList) -> None:
+    """A component with `spectral_index_nside` > 0 (a spatially varying index) must be sampled by
+    exactly one MCMC group with `likelihood: hier`; any other likelihood is an error at startup,
+    since the MH groups propose a single index."""
+    field_comps = {comp.comp_name for comp in comp_list.joined()
+                   if hasattr(comp, "beta") and "spectral_index_nside" in comp.comp_params
+                   and comp.comp_params.spectral_index_nside}
+    for name in sorted(field_comps):
+        samplers = [g.name for g in mcmc_groups.values()
+                    if name in _sampled_component_names(g, comp_list)]
+        if not samplers:
+            raise ValueError(f"Component {name!r} sets spectral_index_nside but no enabled MCMC "
+                             "group samples it (set sample_spectral_index: true and name it in a "
+                             "group with likelihood: hier).")
+        for g in samplers:
+            if resolved[g] != "hier":
+                raise ValueError(f"Component {name!r} has a spectral-index field "
+                                 f"(spectral_index_nside) but MCMC group {g!r} samples it with "
+                                 f"likelihood: {resolved[g]}; a field needs likelihood: hier.")
+
+
 def _sampled_component_names(group: MCMCSamplingGroupConfig, comp_list: CompList) -> set[str]:
     """Names of the components whose spectral index this MCMC group proposes."""
     names = set()
@@ -409,7 +445,7 @@ def _resolve_mcmc_likelihoods(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
     resolved = {}
     for name, group in mcmc_groups.items():
         reason = _marginal_unavailable_reason(group, amplitude_groups, amplitude_method, comp_list)
-        if group.likelihood in ("marginal", "ridge") and reason is not None:
+        if group.likelihood in ("marginal", "ridge", "hier") and reason is not None:
             raise ValueError(f"MCMC sampling group {name!r} asks for likelihood: "
                              f"{group.likelihood}, but that is unavailable because {reason}. Use "
                              "'conditional' instead.")
@@ -566,6 +602,7 @@ def init_compsep_processing(mpi_info: Bunch, params: Bunch, start: ChainStart)\
     mcmc_likelihoods = _resolve_mcmc_likelihoods(
         mcmc_groups, amplitude_groups, amplitude_method, comp_list,
         report=mpi_info.compsep.rank == mpi_info.compsep.master)
+    _validate_index_fields(mcmc_groups, mcmc_likelihoods, comp_list)
     # Read the MCMC groups' chi-squared masks once here, rather than on every Gibbs iteration when
     # the sampling groups are rebuilt.
     chisq_masks = _read_chisq_masks(mpi_info.compsep.comm, mcmc_groups)
@@ -596,6 +633,7 @@ def init_compsep_processing(mpi_info: Bunch, params: Bunch, start: ChainStart)\
     # lists start globally consistent.
     with benchmark("fileread-compsep"):
         comp_list.load_amp_prior_means()
+        ifs.load_amp_priors(comp_list, amplitude_method)
         comp_lists_by_chain = {}
         for chain in (1, 2):
             chain_file = None
@@ -725,6 +763,56 @@ def _make_marginal_loglike(mpi_info: Bunch, compsep_state: CompSepState,
     return marginal
 
 
+def _run_hier_group(mpi_info: Bunch, compsep_state: CompSepState, detector_data: DetectorMap,
+                    comp_list: CompList, group: MCMCSamplingGroupConfig,
+                    amplitude_groups: dict[str, SamplingGroupConfig], chain: int,
+                    rng: np.random.Generator) -> dict:
+    """One Gibbs step of a `likelihood: hier` group: `numstep` NUTS transitions of the joint
+    index-field / amplitude-hyperparameter target (collective on CompSep), the state applied to
+    every rank's component views. Returns the NUTS diagnostics and the unpacked state on the
+    master, {} elsewhere. The caller redraws the coupled amplitudes afterwards."""
+    compsep = mpi_info.compsep
+    amp_group = amplitude_groups[group.update_amplitude_groups[0]]
+    nuts = group.nuts_config
+    specs, views = ifs.discover_index_specs(comp_list, group.comps,
+                                            centred=nuts.parameterization == "centred")
+    if not specs:
+        if compsep.rank == compsep.master:
+            logger.verbose(f"MCMC group {group.name!r} (hier) has nothing to sample; skipping.")
+        return {}
+    hier_names = ifs.hier_component_names(comp_list, amp_group.comps)
+    layout = ifd.StateLayout(specs, hier_names)
+    band_is_active = _sampling_group_selects_band(
+        amp_group.bands, compsep_state.band_name, compsep_state.band_identifier)
+    active_sublist = _filter_sampling_group_components(
+        comp_list.split_for_eval_pol(compsep_state.target_pol), amp_group.comps)
+    takes_part = band_is_active and len(active_sublist) > 0
+    solver_comm = compsep.subcomm.Split(0 if takes_part else MPI.UNDEFINED, key=compsep.rank)
+    residual, keep = None, None
+    if takes_part:
+        residual = _build_conditional_residual(
+            detector_data, comp_list, compsep_state.target_pol, active_sublist)
+        keep = resolve_chisq_mask(compsep_state.chisq_masks.get(group.name), detector_data.nside)
+    likelihood = ifd.RegionIndexLikelihood(
+        compsep.comm, solver_comm if takes_part else None, residual, list(active_sublist),
+        layout, keep, compsep_state.num_threads)
+    if takes_part:
+        solver_comm.Free()
+    # The hier hyperparameters live on the intensity views (a QU view of the same component
+    # carries the flat prior, see index_field_sampler.load_amp_priors).
+    hier_views = {name: [c for c in comp_list
+                         if c.comp_name == name and ifd.component_prior(c).is_hier]
+                  for name in hier_names}
+    hier_priors = {name: hier_views[name][0].amp_prior for name in hier_names}
+    sampler = ifs.IndexFieldSamplingGroup(compsep.comm, likelihood, layout, views, hier_views,
+                                          hier_priors, nuts, root=compsep.master)
+    stats = sampler.run(numstep=group.numstep, chain=chain, group_name=group.name, rng=rng)
+    if stats:
+        x = stats.pop("x")
+        stats = {"nuts": stats, "state": sampler.unpacked(x)}
+    return stats
+
+
 def process_compsep(mpi_info: Bunch, compsep_state: CompSepState,
                     detector_data: DetectorMap, iter: int, chain: int,
                     params: Bunch, comp_list: CompList, rng: np.random.Generator) -> SkyModel:
@@ -781,14 +869,25 @@ def process_compsep(mpi_info: Bunch, compsep_state: CompSepState,
                     mpi_info, compsep_state, detector_data, comp_list,
                     amplitude_groups[group_name], rng)
 
+        likelihood = getattr(compsep_state, "mcmc_likelihoods", {}).get(
+            group.name, "resolve_chisq")
+        if likelihood == "hier":
+            with benchmark(f"mcmc-{group.name}"):
+                hier_stats = _run_hier_group(mpi_info, compsep_state, detector_data, comp_list,
+                                             group, amplitude_groups, chain, rng)
+            if hier_stats:
+                sampler_stats.setdefault("mcmc", {})[group.name] = hier_stats
+            # The amplitude Gibbs draw conditional on the new indices and hyperparameters
+            # (collective; `solve_compsep_perpix` is prior- and region-aware).
+            resolve_amplitudes()
+            fit = evaluate(f"MCMC group {group.name!r}")
+            continue
         chisq_active = _sampling_group_selects_band(
             group.chisq_bands, compsep_state.band_name, compsep_state.band_identifier)
         sampler = SpectralIndexSamplingGroup(
             compsep.comm, detector_data, comp_list, target_pol=compsep_state.target_pol,
             selected_comps=group.comps, chisq_active=chisq_active,
             chisq_mask=compsep_state.chisq_masks.get(group.name), root=compsep.master)
-        likelihood = getattr(compsep_state, "mcmc_likelihoods", {}).get(
-            group.name, "resolve_chisq")
         marginal_loglike = None
         if likelihood in ("marginal", "ridge") and sampler.has_parameters():
             marginal_loglike = _make_marginal_loglike(

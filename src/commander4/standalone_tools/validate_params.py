@@ -116,11 +116,11 @@ def _validate_components(params) -> None:
         diffuse_fields = {
             "lmax", "spatially_varying_MM", "Cl_prior_amplitude", "Cl_prior_beta",
             "Cl_prior_FWHM", "Cl_prior_l_pivot", "Cl_prior_l_apod", "units", "init_from",
-            "amp_prior_mean_map",
+            "amp_prior_mean_map", "amp_prior",
         }
         spectral_index_fields = {
             "sample_spectral_index", "spectral_index_bounds", "spectral_index_prior",
-            "spectral_index_proposal_sigma",
+            "spectral_index_proposal_sigma", "spectral_index_nside", "spectral_index_field",
         }
         class_fields = {
             CMB: {"nu_ref"},

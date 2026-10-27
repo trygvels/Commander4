@@ -23,7 +23,7 @@ from commander4.diagnostics.performance import benchmark
 logger = logging.getLogger(__name__)
 
 # What an MH step's acceptance ratio is computed from; see `MCMCSamplingGroup.run`.
-MCMC_LIKELIHOODS = ("marginal", "ridge", "conditional", "resolve_chisq")
+MCMC_LIKELIHOODS = ("marginal", "ridge", "conditional", "resolve_chisq", "hier")
 
 
 def resolve_chisq_mask(mask_map: NDArray | None, nside: int) -> NDArray[np.bool_] | None:
@@ -196,6 +196,10 @@ class MCMCSamplingGroup(ABC):
         if likelihood not in MCMC_LIKELIHOODS:
             raise ValueError(f"Unknown MCMC likelihood {likelihood!r}; expected one of "
                              f"{MCMC_LIKELIHOODS}.")
+        if likelihood == "hier":
+            raise ValueError("The 'hier' likelihood is sampled by NUTS "
+                             "(compsep.index_field_sampler.IndexFieldSamplingGroup), not by this "
+                             "Metropolis-Hastings group.")
         if likelihood in ("marginal", "ridge") and marginal_loglike is None:
             raise ValueError(f"The {likelihood!r} MCMC likelihood needs a marginal_loglike "
                              "callable.")

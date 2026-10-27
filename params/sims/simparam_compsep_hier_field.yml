@@ -1,0 +1,334 @@
+# Example: spatially varying synchrotron index (GMRF field at nside 2) with a hierarchical
+# amplitude prior, sampled by NUTS (likelihood: hier) on top of the per-pixel amplitude
+# solver. Derived from simparam_compsep_only_perpix.yml; see params/param_explanation.yml
+# and nextgen/plans/M2.4_commander4_index_field.md.
+# Commander4: per-pixel amplitude solver on the same simulation as the CG amplitude test.
+# Analyses `simgen/params/param_compsep.yml`; no separate per-pixel simulation is needed because
+# `compsep.common_res_fwhm` brings the six native-resolution band maps to one common beam.
+#
+# 18 tasks = 6 TOD + 6 CompSep-I + 6 CompSep-QU.
+
+# ----------------------------------------
+# GIBBS
+# ----------------------------------------
+gibbs:
+  num_iterations: 10
+
+  seed: 1995
+
+# ----------------------------------------
+# RESOURCES
+# ----------------------------------------
+resources:
+  tod:
+    num_threads: 1
+
+  compsep:
+    num_threads: 1
+
+# ----------------------------------------
+# OUTPUT
+# ----------------------------------------
+output:
+  dir: "../c4_chains/simgen_compsep_only_perpix/"
+
+  logging:
+    console:
+      level: 'info'
+    file:
+      level: 'info'
+
+  profiling: False
+
+  chains:
+    write: [1,]
+    interval:
+      bands: 1
+      compsep: 1
+      maps: 2
+    maps_nside: 64
+    include:
+      orbital_dipole_maps: False
+      corr_noise_maps: False
+      sky_model_maps: True
+
+# ----------------------------------------
+# TOD PROCESSING
+# ----------------------------------------
+tod_processing:
+  cg_mapmaker:
+    max_iter: 10
+    err_tol: 1.0e-10
+
+  abs_gain:
+    enabled: false
+    from_iter: 2
+    gap_fill_method: wn
+    downsample_time: 1.0
+
+  rel_gain:
+    enabled: false
+    from_iter: 3
+    gap_fill_method: wn
+    downsample_time: 1.0
+
+  temporal_gain:
+    enabled: false
+    from_iter: 4
+    gap_fill_method: wn
+    downsample_time: 1.0
+
+  corr_noise:
+    enabled: False
+    from_iter: 1
+    sample_psd_params: False
+    sample_sigma0: True
+    nomono: False
+    onlymono: False
+    sigma0_decimation: 1
+    psd_fit_nu_min: 0.0
+    psd_fit_nu_max: 2.0
+    psd_bin: False
+    sigma0_method: pairwise
+    cg:
+      max_iter: 60
+      err_tol: 1.0e-4
+
+  data_selection:
+    enabled: false
+
+# ----------------------------------------
+# COMPONENT SEPARATION
+# ----------------------------------------
+compsep:
+  double_precision: false
+
+  # Must be at least the broadest band beam (120' at 30 GHz). Every band is smoothed to this on
+  # read, which is what makes the beam-free per-pixel solver valid.
+  common_res_fwhm: 120.0
+
+  # Mutually exclusive with `cg_sampling_groups`, which is why that block is empty.
+  cg_sampling_groups: {}
+
+  per_pixel_sampling_groups:
+    sample_amps_perpix:
+      enabled: true
+      comps: [CMB, Synchrotron, ThermalDust]
+      bands: [Band30GHz, Band44GHz, Band70GHz, Band100GHz, Band217GHz, Band353GHz]
+
+  mcmc_sampling_groups:
+    sample_index_fields:
+      enabled: true
+      parameters: spectral_indices
+      comps: [Synchrotron]
+      update_amplitude_groups: [sample_amps_perpix]
+      likelihood: hier          # NUTS over the synchrotron index field and the hier
+      numstep: 1                # amplitude hyperparameters, one transition per iteration.
+      nuts:
+        n_warmup: 500
+        target_accept: 0.8
+        max_depth: 10
+        parameterization: noncentred
+
+  bands:
+    Band30GHz:
+      get_from: SimSat
+      enabled: true
+      polarization: "IQU"
+    Band44GHz:
+      get_from: SimSat
+      enabled: true
+      polarization: "IQU"
+    Band70GHz:
+      get_from: SimSat
+      enabled: true
+      polarization: "IQU"
+    Band100GHz:
+      get_from: SimSat
+      enabled: true
+      polarization: "IQU"
+    Band217GHz:
+      get_from: SimSat
+      enabled: true
+      polarization: "IQU"
+    Band353GHz:
+      get_from: SimSat
+      enabled: true
+      polarization: "IQU"
+
+# ----------------------------------------
+# COMPONENTS
+# ----------------------------------------
+components:
+  CMB:
+    enabled: true
+    component_class: "CMB"
+    params:
+      polarization: "IQU"
+      longname: "CMB"
+      shortname: "cmb"
+      Cl_prior_amplitude: [1.0e+6, 1.0e+4]  # D_l at l_pivot [I, QU]; uK_RJ^2 (~uK_CMB^2 at 1 GHz)
+      Cl_prior_beta: [0.0, -0.5]
+      Cl_prior_l_pivot: 20
+      units: "uK_RJ"
+      lmax: 191
+      spatially_varying_MM: False
+      amp_prior:
+        type: gaussian                      # a_p ~ N(0, 70^2) uK_RJ, fixed
+        mean: 0.0
+        rms: 70.0
+
+  ThermalDust:
+    enabled: true
+    component_class: "ThermalDust"
+    params:
+      polarization: "IQU"
+      longname: "Thermal-Dust"
+      shortname: "dust"
+      Cl_prior_amplitude: [1.0e+8, 1.0e+6]  # D_l at l_pivot [I, QU]; uK_RJ^2 at nu_ref
+      Cl_prior_l_pivot: 50
+      beta: 1.54                            # simulated truth
+      T: 20
+      nu_ref: 353
+      units: "uK_RJ"
+      lmax: 191
+      spatially_varying_MM: False
+
+  Synchrotron:
+    enabled: true
+    component_class: "Synchrotron"
+    params:
+      polarization: "IQU"
+      longname: "Synchrotron"
+      shortname: "sync"
+      Cl_prior_amplitude: [1.0e+8, 1.0e+6]  # D_l at l_pivot [I, QU]; uK_RJ^2 at nu_ref
+      Cl_prior_l_pivot: 50
+      Cl_prior_FWHM: 30.0                   # arcmin
+      beta: -3.1                            # simulated truth; the start of the field mean
+      nu_ref: 30
+      units: "uK_RJ"
+      lmax: 191
+      spatially_varying_MM: False
+      sample_spectral_index: True
+      spectral_index_prior:
+        type: gaussian
+        mean: -3.1
+        rms: 0.3
+      spectral_index_nside: 2               # one index per nside-2 pixel (48), a GMRF field
+      spectral_index_field:
+        basis: graph
+        alpha: 2.0
+        sigma_scale: 0.3
+        rho_prior: loguniform
+      amp_prior:
+        type: hier                          # a_p ~ N(mu g_p, (s g_p)^2), g the template below
+        template: "/path/to/sync_template_uKRJ_at_30GHz.fits"
+        mu_prior: [1.0, 0.5]
+        log_s_prior: [-1.204, 1.0]
+
+# ----------------------------------------
+# EXPERIMENTS
+# ----------------------------------------
+experiments:
+  SimSat:
+    enabled: true
+    experiment_id: "general"
+    bad_data_bitmask: 6111232  # Flag bits that mark a sample unusable (simgen's standard).
+    mapmaker: "bin"
+    bands:
+      # The band FWHMs must match the simulation's: they are what `common_res_fwhm` smooths from.
+      Band30GHz:
+        enabled: true
+        band_weight: 1
+        eval_nside: 64
+        fwhm: 120.0
+        freq: 30.0
+        band_unit: "uK_RJ"
+        polarization: "IQU"
+        initial_noise_params: [60.0, 0.1, -1.0]
+        filelist: "../c4_sims/simgen_compsep/Band30GHz/filelist.txt"
+        detectors:
+          det30_a: {gain: 1.0}
+          det30_b: {gain: 1.0}
+          det30_c: {gain: 1.0}
+          det30_d: {gain: 1.0}
+
+      Band44GHz:
+        enabled: true
+        band_weight: 1
+        eval_nside: 64
+        fwhm: 100.0
+        freq: 44.0
+        band_unit: "uK_RJ"
+        polarization: "IQU"
+        initial_noise_params: [60.0, 0.1, -1.0]
+        filelist: "../c4_sims/simgen_compsep/Band44GHz/filelist.txt"
+        detectors:
+          det44_a: {gain: 1.0}
+          det44_b: {gain: 1.0}
+          det44_c: {gain: 1.0}
+          det44_d: {gain: 1.0}
+
+      Band70GHz:
+        enabled: true
+        band_weight: 1
+        eval_nside: 64
+        fwhm: 80.0
+        freq: 70.0
+        band_unit: "uK_RJ"
+        polarization: "IQU"
+        initial_noise_params: [60.0, 0.1, -1.0]
+        filelist: "../c4_sims/simgen_compsep/Band70GHz/filelist.txt"
+        detectors:
+          det70_a: {gain: 1.0}
+          det70_b: {gain: 1.0}
+          det70_c: {gain: 1.0}
+          det70_d: {gain: 1.0}
+
+      Band100GHz:
+        enabled: true
+        band_weight: 1
+        eval_nside: 64
+        fwhm: 65.0
+        freq: 100.0
+        band_unit: "uK_RJ"
+        polarization: "IQU"
+        initial_noise_params: [60.0, 0.1, -1.0]
+        filelist: "../c4_sims/simgen_compsep/Band100GHz/filelist.txt"
+        detectors:
+          det100_a: {gain: 1.0}
+          det100_b: {gain: 1.0}
+          det100_c: {gain: 1.0}
+          det100_d: {gain: 1.0}
+
+      Band217GHz:
+        enabled: true
+        band_weight: 1
+        eval_nside: 64
+        fwhm: 50.0
+        freq: 217.0
+        band_unit: "uK_RJ"
+        polarization: "IQU"
+        initial_noise_params: [60.0, 0.1, -1.0]
+        filelist: "../c4_sims/simgen_compsep/Band217GHz/filelist.txt"
+        detectors:
+          det217_a: {gain: 1.0}
+          det217_b: {gain: 1.0}
+          det217_c: {gain: 1.0}
+          det217_d: {gain: 1.0}
+
+      Band353GHz:
+        enabled: true
+        band_weight: 1
+        eval_nside: 64
+        fwhm: 40.0
+        freq: 353.0
+        band_unit: "uK_RJ"
+        polarization: "IQU"
+        initial_noise_params: [60.0, 0.1, -1.0]
+        filelist: "../c4_sims/simgen_compsep/Band353GHz/filelist.txt"
+        detectors:
+          det353_a: {gain: 1.0}
+          det353_b: {gain: 1.0}
+          det353_c: {gain: 1.0}
+          det353_d: {gain: 1.0}

@@ -405,7 +405,24 @@ compsep:
                               #                drawn amplitudes. Does NOT sample the posterior
                               #                (too wide and biased); kept for comparison.
                               #   auto         ridge where available, else conditional.
-      numstep: 1              # MH steps taken per Gibbs iteration.
+                              #   hier         not an MH group: NUTS over the joint posterior
+                              #                of the sampled indices (scalar, or a field per
+                              #                component with `spectral_index_nside`) and the
+                              #                hyperparameters of the components' hierarchical
+                              #                amplitude priors (`amp_prior: {type: hier}`),
+                              #                with the amplitudes integrated out exactly (log
+                              #                det kept). Needs the same per-pixel amplitude
+                              #                group structure as ridge/marginal, an intensity
+                              #                stream for hier priors, and `spectral_index_prior`
+                              #                on every sampled component. With no field and
+                              #                flat amplitude priors it is the marginal target.
+      numstep: 1              # MH steps (or NUTS transitions, for hier) per Gibbs iteration.
+      # nuts:                 # likelihood: hier only. NUTS settings (math_utils/nuts.py).
+      #   n_warmup: 500       # Adapting transitions (step size, diagonal mass), counted
+      #                       # across Gibbs iterations.
+      #   target_accept: 0.8
+      #   max_depth: 10
+      #   parameterization: noncentred   # or centred; same target, different geometry.
       # chisq_bands: [Planck30GHz, WMAPKa, WMAPQ1]
                               # Restrict the accept/reject chi^2 to these bands. Absent or
                               # null = every band in the run.
@@ -587,6 +604,32 @@ components:
       #   type: gaussian
       #   mean: 1.56
       #   rms: 0.1
+      # Spatially varying index (likelihood: hier only): one index per HEALPix pixel at this
+      # nside (0 or absent = one index for the sky), modelled as a Gaussian Markov random
+      # field beta = mu + sigma S(rho) z on the graph-Laplacian basis (Matern alpha 2, constant
+      # mode dropped), with mu ~ spectral_index_prior (required), sigma ~ half-normal
+      # (sigma_scale), rho log-uniform on [pixel spacing, pi]. The per-pixel map is written to
+      # the chain as index_field/beta_map; sed/beta stays its mean. At most nside 16.
+      # spectral_index_nside: 4
+      # spectral_index_field:
+      #   basis: graph
+      #   alpha: 2.0
+      #   sigma_scale: 0.3
+      #   rho_prior: loguniform
+
+      # Per-pixel amplitude prior (per-pixel amplitude solver only), in uK_RJ at nu_ref.
+      # Enters the amplitude draw and the hier likelihood as an extra pseudo-band per
+      # component. Absent = flat (today's behaviour).
+      # amp_prior:
+      #   type: gaussian          # a_p ~ N(mean, rms^2), fixed
+      #   mean: 0.0
+      #   rms: 70.0
+      # amp_prior:
+      #   type: hier              # a_p ~ N(mu g_p, (s g_p)^2), g a template map (field 0,
+      #   template: "/path/to/dust_template_uKRJ_at_nu_ref.fits"   # uK_RJ at nu_ref)
+      #   template_floor: 1.0     # g floored here (default 1e-3 of its mean), g must be > 0
+      #   mu_prior: [1.0, 0.5]    # mu ~ N(mean, sd^2); log s ~ N(mean, sd^2); mu and log s
+      #   log_s_prior: [-1.204, 1.0]   # are sampled by the hier group. Intensity only.
 
       # Mean mu of the Gaussian amplitude prior (C3 COMP_AMP_PRIOR_MAP). Where the data
       # constrain nothing -- outside a survey patch, say -- the solution is pulled to this
