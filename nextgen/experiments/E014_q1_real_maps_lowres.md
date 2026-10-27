@@ -384,3 +384,11 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   monopoles for WMAP/LFI scatter by 8 to 15 uK between samples; the pass-4 offsets are within one
   sd of their means. Next: exact 2D grids on pass 4 and the variant (queued after the pass-3
   grid), compared with the pass-2 grid (-3.3424 / 1.3654) and the pass-3 grid.
+  **Pass-4 exact grids (01:09 to 01:40, `q1_grid_pass4.log`):** ridge (-2.87545 +- 0.00014,
+  1.39914 +- 0.00003), marginal (-2.87236 +- 0.00013, 1.39924 +- 0.00003). Against pass 3 (same
+  20 maps, only the zero levels changed): beta_s +0.035 (about 260 pass-3 sd), beta_d -0.016
+  (about 460 sd). Against pass 2: +0.47 / +0.034. Marginal minus ridge on pass 4: +22.7 sd in
+  beta_s, +2.9 sd in beta_d (pass 3: +16.1 / +2.1; pass 2: +56 / +5.5). So a consistent
+  zero-level convention moves the full-sky indices by hundreds of statistical sd and the
+  flat-prior volume shift itself is data-set dependent; the Haslam-dipole variant (pass4hdip)
+  is running.
