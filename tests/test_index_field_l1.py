@@ -172,3 +172,39 @@ def test_field_nuts_matches_centred_gibbs_reference(ref) -> None:
     # The field is recovered where the data constrain it (sanity, single realization).
     z = (betas.mean(0) - beta_true) / betas.std(0)
     assert np.all(np.abs(z) < 4.5)
+
+
+def test_independent_regions_nuts_matches_per_region_grids(ref) -> None:
+    """`type: independent` at nside_beta 1 with fixed Gaussian amplitude priors: the posterior
+    factorizes over the 12 regions into 1-D posteriors, each an exact grid (E020 design review,
+    item 9); the joint NUTS chain must reproduce every region's mean and width."""
+    sd0 = 1.0
+    # Bright synchrotron so that every region is data-dominated (posterior sd 0.01 to 0.06
+    # against the prior sd 1; the faint default sky leaves the posterior equal to the prior).
+    comps, d, inv_var, region, n_beta, m, inv_T, _ = _dataset(seed=47, nside_beta=1, beta_sd=0.1,
+                                                              sync_boost=300.0)
+    field = gmrf_field.IndependentIndexPrior(1, MU0, sd0)
+    layout = ifd.StateLayout([ifd.IndexSpec("sync", field, MU0, sd0)], [])
+    like = ifd.RegionIndexLikelihood.from_arrays(NU, d.T.copy(), inv_var.T.copy(), comps, layout,
+                                                 NSIDE)
+    grid = np.linspace(-4.0, -2.0, 4001)
+    means, sds = np.empty(n_beta), np.empty(n_beta)
+    for r in range(n_beta):
+        sel = region == r
+        data = ref.from_arrays(NU, d[sel], inv_var[sel], np.zeros(sel.sum(), dtype=np.int64), 1,
+                               beta_d=1.6, T_d=20.0, m=m[sel], inv_T=inv_T[sel])
+        lp = ref.grid_1d(data, "gauss", grid, theta_fixed=(MU0, sd0))
+        p = np.exp(lp - lp.max())
+        p /= p.sum()
+        means[r] = np.sum(p * grid)
+        sds[r] = np.sqrt(np.sum(p * (grid - means[r])**2))
+        assert 5 * (grid[1] - grid[0]) < sds[r] < 0.1, sds[r]
+    chain, n_div = _run_nuts(like, np.full(n_beta, MU0), np.random.default_rng(48), 300, 3000)
+    ess = np.array([_ess(chain[:, r]) for r in range(n_beta)])
+    # Divergence budget as in E018 (below 1 percent); the 12 regions span prior sd 1 to posterior
+    # sd 0.01, so an isolated divergent trajectory early in sampling is not evidence of bias.
+    assert n_div <= 15 and ess.min() > 200, (n_div, ess.min())
+    z = (chain.mean(axis=0) - means) / (sds / np.sqrt(ess))
+    ratio = chain.std(axis=0) / sds
+    assert np.all(np.abs(z) < 4), (z, ratio)
+    assert np.all((ratio > 0.9) & (ratio < 1.1)), (z, ratio)
