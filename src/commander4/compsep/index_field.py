@@ -18,13 +18,20 @@ The target distribution is stated in nextgen/plans/M2.4_commander4_index_field.m
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import logging
+from dataclasses import dataclass, replace
 
 import healpy as hp
 import numpy as np
+from mpi4py import MPI
 from numpy.typing import NDArray
 
+from commander4.backend import compsep as cpp_compsep
+from commander4.data_models.detector_map import DetectorMap
+from commander4.math_utils.gmrf_field import IndexFieldPrior
 from commander4.sky.diffuse_components import DiffuseComponent
+
+logger = logging.getLogger(__name__)
 
 # Hyperprior defaults of the hier prior (E016): mu ~ N(1, 0.5^2), log s ~ N(log 0.3, 1^2), and
 # the guard below which log s has zero density (E017: the prior precision 1/(s g)^2 swamps
@@ -231,3 +238,366 @@ def mixing_regions(freqs: NDArray, comps: list[DiffuseComponent], nreg: int,
     if with_derivative:
         return M_reg, dM_reg
     return M_reg
+
+
+# ----------------------------------------------------------------------------------------------
+# The joint target over index fields and amplitude hyperparameters (plan section 1)
+# ----------------------------------------------------------------------------------------------
+
+@dataclass
+class IndexSpec:
+    """One sampled spectral index: the component (by `comp_name`, shared by its I and QU views),
+    its field prior (`IndexFieldPrior` at spectral_index_nside > 0) or None for a single index,
+    and the Gaussian index prior (mu0, sd0) of `spectral_index_prior`, which for a field is the
+    hyperprior on the field mean (already inside `field.hyper`) and for a scalar is the prior on
+    the index itself."""
+    comp_name: str
+    field: IndexFieldPrior | None
+    prior_mean: float
+    prior_sd: float
+
+    def __post_init__(self) -> None:
+        # For a field the (mu0, sd0) live in field.hyper; the spec's copy must agree, so that one
+        # source of configuration cannot drift from the other.
+        if self.field is not None and (self.prior_mean != self.field.hyper.mu0
+                                       or self.prior_sd != self.field.hyper.s_mu):
+            raise ValueError(f"IndexSpec {self.comp_name!r}: prior ({self.prior_mean}, "
+                             f"{self.prior_sd}) differs from the field hyperprior "
+                             f"({self.field.hyper.mu0}, {self.field.hyper.s_mu}).")
+
+    @property
+    def dim(self) -> int:
+        return self.field.dim if self.field is not None else 1
+
+    @property
+    def n_beta(self) -> int:
+        return self.field.n_beta if self.field is not None else 1
+
+    @property
+    def nside_beta(self) -> int:
+        return self.field.basis.nside_beta if self.field is not None else 0
+
+
+class StateLayout:
+    """Packing of the sampled vector x = (index block of every IndexSpec in order, then (mu, log
+    s) of every hier component in `hier_names` order). The index block of a field spec is the
+    IndexFieldPrior state (field block, mu, log sigma, u); of a scalar spec the index itself."""
+
+    def __init__(self, specs: list[IndexSpec], hier_names: list[str]):
+        if len({s.comp_name for s in specs}) != len(specs):
+            raise ValueError("Each component may carry one sampled index.")
+        self.specs = list(specs)
+        self.hier_names = list(hier_names)
+        self.index_slices: dict[str, slice] = {}
+        self.hier_slices: dict[str, slice] = {}
+        pos = 0
+        for spec in self.specs:
+            self.index_slices[spec.comp_name] = slice(pos, pos + spec.dim)
+            pos += spec.dim
+        for name in self.hier_names:
+            self.hier_slices[name] = slice(pos, pos + 2)
+            pos += 2
+        self.dim = pos
+        nsides = {s.nside_beta for s in self.specs if s.nside_beta > 0}
+        if len(nsides) > 1:
+            raise ValueError(f"All index fields of one group must share spectral_index_nside; "
+                             f"got {sorted(nsides)}.")
+        self.nside_beta = nsides.pop() if nsides else 0
+        self.nreg = 12 * self.nside_beta**2 if self.nside_beta > 0 else 1
+
+    def spec(self, comp_name: str) -> IndexSpec:
+        return next(s for s in self.specs if s.comp_name == comp_name)
+
+    def betas(self, x: NDArray) -> dict[str, NDArray]:
+        """The index per region (nreg,) of every sampled component at state x (a scalar index is
+        broadcast over the regions)."""
+        out = {}
+        for spec in self.specs:
+            block = x[self.index_slices[spec.comp_name]]
+            if spec.field is None:
+                out[spec.comp_name] = np.full(self.nreg, float(block[0]))
+            else:
+                out[spec.comp_name] = spec.field.beta(block)
+        return out
+
+    def hypers(self, x: NDArray) -> dict[str, tuple[float, float]]:
+        """(mu, log s) of every hier component at state x."""
+        return {name: (float(x[sl][0]), float(x[sl][1])) for name, sl in self.hier_slices.items()}
+
+    def pack(self, index_blocks: dict[str, NDArray], hypers: dict[str, tuple[float, float]]
+             ) -> NDArray:
+        x = np.empty(self.dim)
+        for spec in self.specs:
+            x[self.index_slices[spec.comp_name]] = np.atleast_1d(index_blocks[spec.comp_name])
+        for name in self.hier_names:
+            x[self.hier_slices[name]] = hypers[name]
+        return x
+
+
+class RegionIndexLikelihood:
+    """Log density and gradient of the joint target over index fields and amplitude
+    hyperparameters, with the per-pixel amplitudes integrated out (plan section 1):
+
+        log p(x | d) = sum_streams sum_p [1/2 b'^T A'^-1 b' - 1/2 log det A']
+                       + sum_{hier c} [-1/2 sum_p m^T T^-1 m - 1/2 sum_p log det T + log p(mu_c)
+                                       + log p(log s_c)]
+                       + sum_{field specs} [log N(z; 0, I) or the centred equivalent
+                                            + hyperpriors and Jacobians]
+                       + sum_{scalar specs} log N(beta; mu0, sd0^2),
+
+    where the pixel sums run over the pixels the kernel used (region >= 0 under the chisq mask,
+    at least ncomp observed bands counting the proper pseudo-bands) and A' = A + T^-1,
+    b' = b + T^-1 m with the amplitude priors as pseudo-bands (module docstring). That pixel set
+    is state independent; a state at which A' fails to be positive definite in some used pixel
+    has zero density (below), it is never dropped from the sum. With proper priors, pixels
+    observed in fewer than ncomp data bands enter the sum (their proper marginal exists), unlike
+    in `PerPixelMarginalLikelihood`, whose flat-prior marginal excludes them. The log det term
+    is always kept. The hier prior is intensity-only: a QU view of a hier component carries the
+    flat prior (index_field_sampler.load_amp_priors), the hyperparameters are shared through the
+    component name and their terms come from the intensity stream alone. The
+    gradient with respect to the index of region r and component c is the kernel's analytic
+    gradient; the chain rule to the field coordinates and the field prior are those of
+    `IndexFieldPrior.logp_and_grad`; the (mu, log s) gradients are `AmpPrior.hyper_grad`.
+
+    Construction is collective over ``compsep_comm`` and mirrors `PerPixelMarginalLikelihood`: the
+    residual band maps are gathered once to the root of ``solver_comm``, which then holds this
+    rank's polarization streams. `logp_and_grad` is also collective: every rank evaluates its
+    streams, the likelihood value and its gradients are summed over ``compsep_comm``, and every
+    rank then adds the prior terms, so all ranks return the same (logp, grad). A state at which
+    any kernel skipped a pixel (A' not positive definite) or produced a non-finite value, or with
+    log s below `HIER_LOGS_MIN`, has zero density: (-inf, zeros), the NUTS contract.
+
+    Args:
+        compsep_comm, solver_comm, residual_data, active_comps, keep_mask, nthreads: as for
+            `PerPixelMarginalLikelihood`.
+        layout: the `StateLayout` of the sampled vector; sampled components are matched to the
+            active components by `comp_name` (an I and a QU view share one index).
+    """
+
+    def __init__(self, compsep_comm: MPI.Comm, solver_comm: MPI.Comm | None,
+                 residual_data: DetectorMap | None, active_comps: list[DiffuseComponent],
+                 layout: StateLayout, keep_mask: NDArray | None, nthreads: int):
+        self.compsep_comm = compsep_comm
+        self.layout = layout
+        self.active_comps = list(active_comps)
+        self.nthreads = nthreads
+        self.is_solver_root = solver_comm is not None and solver_comm.Get_rank() == 0
+        self.streams: list[tuple[NDArray, NDArray, NDArray]] = []
+        self.region = None
+        self.n_rejected = 0
+        self.nskipped_last = 0
+        self._hier_defaults: dict[str, AmpPrior] = {}
+        for comp in self.active_comps:
+            if not isinstance(comp, DiffuseComponent):
+                raise ValueError(f"The index-field likelihood does not support "
+                                 f"{type(comp).__name__} components.")
+        names = [c.comp_name for c in self.active_comps]
+        for spec in layout.specs:
+            if spec.comp_name in names and not hasattr(
+                    self.active_comps[names.index(spec.comp_name)], "beta"):
+                raise ValueError(f"Component {spec.comp_name!r} has no spectral index to sample.")
+        for name in layout.hier_names:
+            if name in names:
+                view = self.active_comps[names.index(name)]
+                if view.eval_pol == "I" and not component_prior(view).is_hier:
+                    raise ValueError(f"Component {name!r} is in the hier block but its intensity "
+                                     "view has no hier amp_prior.")
+        if solver_comm is None:
+            return
+        inv_var = np.array(residual_data.map_inv_var, dtype=np.float64, copy=True)
+        all_freq = solver_comm.gather(residual_data.nu, root=0)
+        all_map_sky = solver_comm.gather(residual_data.map_sky, root=0)
+        all_inv_var = solver_comm.gather(inv_var, root=0)
+        if not self.is_solver_root:
+            return
+        nside = residual_data.nside
+        if residual_data.npol > 1 and any(component_prior(c).is_hier for c in self.active_comps):
+            raise ValueError("The hier amp_prior is intensity-only in this version (its template "
+                             "must be strictly positive; Q and U are signed). Give the QU view "
+                             "amp_prior none or gaussian.")
+        self.region = region_map(layout.nside_beta, nside, keep_mask)
+        for ipol in range(residual_data.npol):
+            freqs, maps_sky, maps_inv_var = [], [], []
+            for iband in range(len(all_freq)):
+                if all_map_sky[iband][ipol] is not None:
+                    freqs.append(all_freq[iband])
+                    maps_sky.append(all_map_sky[iband][ipol])
+                    maps_inv_var.append(all_inv_var[iband][ipol])
+            self.streams.append((np.array(freqs, dtype=np.float64),
+                                 np.array(maps_sky, dtype=np.float64),
+                                 np.array(maps_inv_var, dtype=np.float64)))
+
+    # -- likelihood part on this rank's streams ----------------------------------------------
+
+    def _hier_views(self, hypers: dict[str, tuple[float, float]]) -> list[int]:
+        """Indices of this rank's active views that carry a hier prior with sampled hypers."""
+        return [c for c, comp in enumerate(self.active_comps)
+                if comp.comp_name in hypers and component_prior(comp).is_hier]
+
+    def _set_hypers(self, hypers: dict[str, tuple[float, float]]) -> dict[int, tuple]:
+        """Write the evaluated (mu, log s) into the hier priors; returns the previous values so the
+        caller can restore them (the components must not keep a rejected trajectory point)."""
+        previous = {}
+        for c in self._hier_views(hypers):
+            prior = self.active_comps[c].amp_prior
+            previous[c] = (prior.mu, prior.log_s)
+            prior.mu, prior.log_s = hypers[self.active_comps[c].comp_name]
+        return previous
+
+    def _restore_hypers(self, previous: dict[int, tuple]) -> None:
+        for c, (mu, log_s) in previous.items():
+            self.active_comps[c].amp_prior.mu, self.active_comps[c].amp_prior.log_s = mu, log_s
+
+    def _local_terms(self, betas: dict[str, NDArray], hypers: dict[str, tuple[float, float]]
+                     ) -> tuple[float, dict[str, NDArray], dict[str, NDArray], bool]:
+        """(log L, dlog L/dbeta per sampled component (nreg,), (dF/dmu, dF/dlog s) per hier
+        component, rejected) summed over this rank's streams."""
+        layout = self.layout
+        logL = 0.0
+        g_beta = {name: np.zeros(layout.nreg) for name in layout.index_slices}
+        g_hyper = {name: np.zeros(2) for name in layout.hier_names}
+        rejected = False
+        self.nskipped_last = 0
+        if not self.is_solver_root:
+            return logL, g_beta, g_hyper, rejected
+        previous = self._set_hypers(hypers)
+        try:
+            return self._stream_terms(betas, hypers, logL, g_beta, g_hyper)
+        finally:
+            self._restore_hypers(previous)
+
+    def _stream_terms(self, betas, hypers, logL, g_beta, g_hyper):
+        layout = self.layout
+        comps = self.active_comps
+        ncomp = len(comps)
+        hier_cols = self._hier_views(hypers)
+        any_hier = bool(hier_cols)
+        for freqs, maps_sky, maps_inv_var in self.streams:
+            nband = freqs.size
+            M_reg = np.empty((layout.nreg, nband, ncomp))
+            dM_reg = np.zeros_like(M_reg)
+            with np.errstate(over="ignore", invalid="ignore"):
+                for c, comp in enumerate(comps):
+                    if comp.comp_name in betas:
+                        M_reg[:, :, c] = comp.get_sed(freqs, beta=betas[comp.comp_name])
+                        dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, beta=betas[comp.comp_name])
+                    else:
+                        M_reg[:, :, c] = comp.get_sed(freqs)[None, :]
+            if not (np.all(np.isfinite(M_reg)) and np.all(np.isfinite(dM_reg))):
+                return logL, g_beta, g_hyper, True   # zero density at this state
+            sky_aug, w_aug = augment_stream(maps_sky, maps_inv_var, comps)
+            M_aug, dM_aug = augment_mixing(M_reg, dM_reg)
+            out = cpp_compsep.marginal_loglike_regions(
+                sky_aug, w_aug, self.region, M_aug, dM_aug, self.nthreads, True, True, any_hier)
+            ll_reg, grad_reg, nskipped = out[0], out[1], out[2]
+            self.nskipped_last += int(nskipped)
+            if nskipped or not np.all(np.isfinite(ll_reg)) or not np.all(np.isfinite(grad_reg)):
+                return logL, g_beta, g_hyper, True
+            logL += float(ll_reg.sum())
+            for c, comp in enumerate(comps):
+                if comp.comp_name in betas:
+                    g_beta[comp.comp_name] += grad_reg[:, c]
+            if any_hier:
+                x_cond, diag_Ainv, used = out[3], out[4], out[5]
+                for c in hier_cols:
+                    prior = comps[c].amp_prior
+                    logL += prior.trailing_terms(used)
+                    g_hyper[comps[c].comp_name] += prior.hyper_grad(x_cond[c], diag_Ainv[c], used)
+        return logL, g_beta, g_hyper, False
+
+    # -- the collective evaluation -------------------------------------------------------------
+
+    def logp_and_grad(self, x: NDArray) -> tuple[float, NDArray]:
+        layout = self.layout
+        x = np.asarray(x, dtype=np.float64)
+        if x.shape != (layout.dim,):
+            raise ValueError(f"x must have shape ({layout.dim},), got {x.shape}")
+        hypers = layout.hypers(x)
+        guard = any(log_s < HIER_LOGS_MIN for _, log_s in hypers.values())
+        rejected = guard or not np.all(np.isfinite(x))
+        if rejected:
+            betas = {}
+        else:
+            with np.errstate(over="ignore", invalid="ignore"):
+                betas = layout.betas(x)
+            rejected = not all(np.all(np.isfinite(b)) for b in betas.values())
+        if rejected:
+            logL, g_beta, g_hyper = 0.0, {n: np.zeros(layout.nreg) for n in layout.index_slices}, \
+                {n: np.zeros(2) for n in layout.hier_names}
+        else:
+            logL, g_beta, g_hyper, rejected = self._local_terms(betas, hypers)
+        # One allreduce: [rejected flag, log L, g_beta blocks..., g_hyper blocks...].
+        local = np.concatenate([[1.0 if rejected else 0.0, logL]]
+                               + [g_beta[s.comp_name] for s in layout.specs]
+                               + [g_hyper[n] for n in layout.hier_names])
+        total = np.empty_like(local)
+        self.compsep_comm.Allreduce(local, total, op=MPI.SUM)
+        if total[0] > 0.0 or not np.isfinite(total[1]):
+            self.n_rejected += 1
+            return -np.inf, np.zeros(layout.dim)
+        logp = float(total[1])
+        grad = np.zeros(layout.dim)
+        pos = 2
+        for spec in layout.specs:
+            g = total[pos:pos + layout.nreg]
+            pos += layout.nreg
+            sl = layout.index_slices[spec.comp_name]
+            if spec.field is None:
+                r = (float(x[sl][0]) - spec.prior_mean) / spec.prior_sd
+                logp += -0.5 * r * r
+                grad[sl] = g.sum() - r / spec.prior_sd
+            else:
+                # Field prior, hyperpriors, Jacobians and the chain rule from dlog L/dbeta to the
+                # sampled coordinates, with the likelihood value already counted above.
+                lp_f, g_f = spec.field.logp_and_grad(x[sl], loglike=lambda _b, g=g: (0.0, g))
+                if not np.isfinite(lp_f):
+                    self.n_rejected += 1
+                    return -np.inf, np.zeros(layout.dim)
+                logp += lp_f
+                grad[sl] = g_f
+        for name in layout.hier_names:
+            sl = layout.hier_slices[name]
+            # A copy carrying the evaluated hyperparameters: the component's own prior keeps
+            # its state (a trajectory point is not a sample).
+            prior = replace(self._hier_prior(name), mu=hypers[name][0], log_s=hypers[name][1])
+            lp_h = prior.log_hyperprior()
+            if not np.isfinite(lp_h):
+                self.n_rejected += 1
+                return -np.inf, np.zeros(layout.dim)
+            logp += lp_h
+            grad[sl] = total[pos:pos + 2] + np.array(prior.log_hyperprior_grad())
+            pos += 2
+        if not np.isfinite(logp):
+            self.n_rejected += 1
+            return -np.inf, np.zeros(layout.dim)
+        return logp, grad
+
+    def _hier_prior(self, name: str) -> AmpPrior:
+        """The hier prior object of a component by name, with its hyperparameters at the state
+        being evaluated. Ranks without that component's view evaluate the hyperprior through a
+        stand-in carrying the same hyperprior settings, which every rank must be given."""
+        for comp in self.active_comps:
+            if comp.comp_name == name and component_prior(comp).is_hier:
+                return comp.amp_prior
+        return self._hier_defaults[name]
+
+    def set_hier_defaults(self, defaults: dict[str, AmpPrior]) -> None:
+        """Hier prior objects (hyperprior settings only) for components this rank does not hold,
+        so the hyperprior terms can be evaluated on every rank; their (mu, log s) are set from the
+        state before use."""
+        self._hier_defaults = dict(defaults)
+
+    @classmethod
+    def from_arrays(cls, freqs: NDArray, maps_sky: NDArray, maps_inv_var: NDArray,
+                    comps: list[DiffuseComponent], layout: StateLayout, nside: int,
+                    keep_mask: NDArray | None = None, nthreads: int = 1,
+                    comm: MPI.Comm = MPI.COMM_SELF) -> "RegionIndexLikelihood":
+        """In-process construction from one intensity stream (nband, npix) already gathered, for
+        tests and the L1 harness; the evaluation is the same as in the MPI run."""
+        obj = cls(comm, None, None, comps, layout, keep_mask, nthreads)
+        obj.is_solver_root = True
+        obj.region = region_map(layout.nside_beta, nside, keep_mask)
+        obj.streams = [(np.asarray(freqs, dtype=np.float64),
+                        np.asarray(maps_sky, dtype=np.float64),
+                        np.asarray(maps_inv_var, dtype=np.float64))]
+        return obj
