@@ -50,7 +50,13 @@ model component rather than a preprocessing choice.
   times too wide and beta_d shifted 3 sd on real maps (F1, E009, E014 pass 2). Commander3: the
   BeyondPlanck-era samplers do not have the bug, but `marginal` has the volume problem (F10, E010).
 - The exact alternatives: ridge and marginal chains reproduce independent grid targets to 0.1 sd
-  on 17 and 20 bands (E014). The Gibbs conditional step cannot mix for a full-sky index (F14).
+  on 17 and 20 bands (E014). The Gibbs conditional step cannot mix for a full-sky intensity index
+  on these maps (F14; ratio 180 for beta_s, 1.5 for beta_d). Do not generalize this to published
+  BeyondPlanck or DR1 results: their samplers are valid conditional steps (E009, E010), their
+  configurations differ (polarization, regions, prior-dominated), and the conditional-to-collapsed
+  ratio for the BP XV configuration is unmeasured (planned E014 cell). The published BP chain
+  lengths and diagnostics are being read from BP I, III, XIII, XV (lit-scout report
+  `research/2026-10-27_beyondplanck_chain_lengths_and_index_sampling.md`).
 - Figure 1: chain against exact grid for the four modes (E014 pass 2 and 3 tables).
 
 ## 4. The prior-volume problem

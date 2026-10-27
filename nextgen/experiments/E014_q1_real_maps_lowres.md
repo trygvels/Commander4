@@ -398,3 +398,9 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   conventions, 17 bands), pass 3 -2.9103 (mixed, 20 bands), pass 4 -2.8755 (one DR1-model
   convention), pass4hdip -2.8642 (plus Haslam dipole removed); beta_d 1.3654 / 1.4150 / 1.3991 /
   1.3994. Everything from pass 3 on uses the same 20 maps.
+- Planned (2026-10-27): BP XV configuration cell for F14's scope. Polarized beta_s on WMAP K, Ka,
+  Q and LFI 30, 44, 70 Q/U at nside 64 (or the BP low-resolution surrogate), four BP XV regions,
+  prior N(-3.3, 0.1) per region, amplitudes held fixed at the collapsed-posterior draw: measure the
+  conditional sd of beta_s per region against the collapsed (ridge and hier) sd, and the
+  prior-to-posterior width ratio. Decides whether the conditional Gibbs mixing issue has any
+  bearing on BP XV's reported uncertainties. Before any statement about BP mixing is written.

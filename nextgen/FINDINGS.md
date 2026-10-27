@@ -209,7 +209,12 @@ so Gibbs with an MH step on chi2 at fixed amplitudes needs of order 3e4 iteratio
 beta_s sample. The Commander4 `conditional` chain with proposals of 0.002 stayed at its start value
 for 2000 iterations. The collapsed (`ridge`, `marginal`) chains mix in tens of iterations on the
 same data. This is F5 measured on real data and is the quantitative case for collapsing amplitudes
-in any index sampler at Planck resolution.
+in any index sampler at Planck resolution. Scope (added 2026-10-27): measured for one
+configuration only (full-sky intensity indices, 17 bands, nside 64, high S/N); the ratio already
+varies from 180 (beta_s) to 1.5 (beta_d) within it, so it does not transfer to other published
+configurations without measurement. In particular nothing is established about the mixing of the
+BeyondPlanck XV polarized beta_s step (four regions, K to 70 GHz, prior N(-3.3, 0.1)); that cell
+is a planned E014 follow-up.
 
 **F15. The joint posterior with flat amplitude priors has the collapsed flat-prior marginal (w1, with
 -1/2 ln det A) as its exact spectral-parameter marginal; a Gibbs sampler that draws amplitudes with
