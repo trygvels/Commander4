@@ -237,7 +237,22 @@ non-centred is the right choice for weak data, E016 to E018, and the wrong one h
 Fisher sd range is itself a finding: at this noise one third of the nside_beta 16 regions have an
 index precision better than the truth's own spread (0.063 / 0.037), the rest are prior-dominated.
 
-**Timing run 2, gmrf16, centred, fd_hessian (30 iterations):** (running)
+**Timing run 2, gmrf16, centred, fd_hessian (30 iterations, 08:47 to 10:26):** the chain moves.
+Step size 2e-3 to 3e-2 throughout (three divergent transitions in the first ten, none after),
+gradients per transition 1 to 1023 (chain 1 saturates max_depth 10 from iteration 15 on, chain 2
+stays at 3 to 255; both still in the first warm-up window, so the windowed mass adaptation has
+not acted yet). The analyzer on the 20 post-burn iterations: region z median/MAD -0.30/1.13
+(sync) and +1.86/1.51 (dust), posterior sd 0.13/0.03, both field means and all four amplitude
+hyperparameters moving, index RMSE 0.34/0.09, GLS CMB residual 7.1 uK. These are warm-up numbers
+and prove only that the centred parameterization is usable here; the production runs use
+`parameterization: centred` (a sampler coordinate choice, same target, E018 L1 covers both
+parameterizations).
+
+**Profile of a Gibbs iteration (from the centred log):** 36 s of every iteration went into
+rebuilding the graph-Laplacian eigenbasis (dense eigh of 3072^2, 18 s per component, on every
+rank, every iteration); fixed by caching the basis per process (commit cba5c33, same target).
+The finite-difference start costs 12304 gradients per chain, 21 min at 2 solver threads, that is
+about 98 ms per gradient in the MPI run (two chains per run, so 42 min fixed cost per run).
 
 ## Negative control
 The single index is the control: its index RMSE must equal the sd of the truth map (0.063 for
