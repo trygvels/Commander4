@@ -177,30 +177,45 @@ def test_window_floor_is_relative_to_the_metric_in_force():
 
 
 def test_fixed_metric_matches_exact_target_and_is_never_updated():
-    """``adapt_mass=False``: the inverse mass given at construction survives the whole warm-up
-    (no window updates) and the sampler still reproduces an exact target."""
-    scales = np.array([1e-3, 1.0, 30.0])
-    prec = np.diag(1.0 / scales**2)
-    mean = np.array([0.5, -2.0, 10.0])
+    """``adapt_mass=False``: an inverse mass assigned after construction (the fd_hessian path)
+    survives the whole warm-up untouched, including a caller that later edits its own array, and
+    the sampler reproduces an exact non-Gaussian target even with a metric that is wrong by a
+    factor 3 to 10 in every coordinate."""
+    # Target: x0 = log of a Gamma(3) variable (mean digamma(3) = 0.92278, variance trigamma(3)
+    # = 0.39493) times a rho 0.8 Gaussian in (x1, x2) with variances 1 and 9.
+    cov = np.array([[1.0, 0.8 * 3.0], [0.8 * 3.0, 9.0]])
+    prec = np.linalg.inv(cov)
+    true_var = np.array([0.39493407, 1.0, 9.0])
 
     def f(theta):
-        d = theta - mean
-        return -0.5 * d @ prec @ d, -prec @ d
+        x, y = theta[0], theta[1:]
+        logp = 3.0 * x - np.exp(x) - 0.5 * y @ prec @ y
+        return logp, np.concatenate([[3.0 - np.exp(x)], -prec @ y])
 
     rng = np.random.default_rng(7)
-    sampler = NUTSSampler(3, rng, n_warmup=300, inv_mass=scales**2, adapt_mass=False)
-    theta = mean.copy()
-    draws, grads = [], []
-    for it in range(300 + 3000):
+    sampler = NUTSSampler(3, rng, n_warmup=400, adapt_mass=False)
+    metric = np.array([0.13, 3.0, 0.9])     # 3x too small, 3x too large, 10x too small
+    sampler.inv_mass = metric
+    metric_at_start = metric.copy()
+    theta = np.array([np.log(3.0), 0.0, 0.0])
+    draws, steps = [], []
+    for it in range(400 + 6000):
         theta, info = sampler.transition(theta, f)
-        if it >= 300:
+        if it == 10:
+            metric[:] = 1e6                  # a caller editing its array must not reach the kernel
+        if it >= 400:
             draws.append(theta.copy())
-            grads.append(info.n_leapfrog)
+            steps.append(info.step_size)
     draws = np.array(draws)
-    np.testing.assert_array_equal(sampler.inv_mass, scales**2)
+    np.testing.assert_array_equal(sampler.inv_mass, metric_at_start)
     assert sampler._window_ends == []
+    assert len(set(steps)) == 1              # one fixed post-warm-up kernel
+    means = np.array([0.92278434, 0.0, 0.0])
     for j in range(3):
-        se = scales[j] / np.sqrt(_ess(draws[:, j]))
-        assert abs(draws[:, j].mean() - mean[j]) < 4 * se
-    np.testing.assert_allclose(draws.std(axis=0), scales, rtol=0.15)
-    assert np.mean(grads) < 16   # a matched metric needs short trajectories
+        ess = _ess(draws[:, j])
+        assert ess > 300
+        assert abs(draws[:, j].mean() - means[j]) < 4 * np.sqrt(true_var[j] / ess)
+        # Var of the sample variance is about 2 var^2 / ess for a Gaussian; 4 se.
+        assert abs(draws[:, j].var() - true_var[j]) < 4 * true_var[j] * np.sqrt(2.0 / ess)
+    emp = np.corrcoef(draws[:, 1], draws[:, 2])[0, 1]
+    assert abs(emp - 0.8) < 0.05

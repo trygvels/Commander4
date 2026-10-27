@@ -279,7 +279,7 @@ autocorrelated draws over 6152 coordinates with a precision range of 5e6 are far
 Hessian metric they replace; the relative floor (attempt 1's fix) was necessary but not
 sufficient. Fix: `nuts.adapt_mass: false` (commit fadec92; keeps the Hessian metric for the
 whole run and adapts the step size only; any fixed metric leaves the target unchanged; exact-target
-test added; stats review requested). All ten parameter files set; production relaunched 22:26:52
+test added; stats review 2026-10-27 CONFIRMED: slice-sampling NUTS with a fixed diagonal metric is invariant for the target for any positive metric, verified also with a deliberately mismatched metric on a non-Gaussian target; its should-fix items applied: `inv_mass` is now a copying, validating property so a caller's array cannot alias the kernel, and the test uses a mismatched metric on a log-Gamma times correlated-Gaussian target with 4-se bounds). All ten parameter files set; production relaunched 22:26:52
 (attempt 3, gmrf16 first).
 
 ## Negative control

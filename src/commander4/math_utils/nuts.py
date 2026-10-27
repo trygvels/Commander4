@@ -92,7 +92,9 @@ def _warmup_windows(n_warmup: int) -> list[int]:
 
 
 class NUTSSampler:
-    """NUTS with a diagonal mass matrix, adapting step size and mass matrix during warmup.
+    """NUTS (slice-sampling variant, Hoffman and Gelman 2014 Algorithm 6) with a diagonal mass
+    matrix; the step size adapts during warm-up, the mass matrix too unless ``adapt_mass`` is
+    False.
 
     Args:
         dim: Number of parameters.
@@ -115,7 +117,7 @@ class NUTSSampler:
         self.rng = rng
         self.n_warmup = n_warmup
         self.step_size = step_size
-        self.inv_mass = np.ones(dim) if inv_mass is None else np.asarray(inv_mass, dtype=float)
+        self.inv_mass = np.ones(dim) if inv_mass is None else inv_mass
         self.target_accept = target_accept
         self.max_depth = max_depth
         self.adapt_mass = adapt_mass
@@ -124,6 +126,19 @@ class NUTSSampler:
         self._window_ends = _warmup_windows(n_warmup) if adapt_mass else []
         self._window_samples: list[NDArray] = []
         self._floor_metric: NDArray | None = None   # inverse mass at the first warm-up step
+
+    @property
+    def inv_mass(self) -> NDArray:
+        """Diagonal inverse mass matrix (parameter variances). Set from any array-like; the
+        sampler keeps its own copy so a caller editing its array cannot change the kernel."""
+        return self._inv_mass
+
+    @inv_mass.setter
+    def inv_mass(self, value) -> None:
+        value = np.array(value, dtype=float, copy=True)
+        if value.shape != (self.dim,) or not np.all(np.isfinite(value)) or np.any(value <= 0):
+            raise ValueError("inv_mass must be a finite positive array of length dim.")
+        self._inv_mass = value
 
     # ---------------------------------------------------------------- public interface
     def transition(self, theta: NDArray, logp_and_grad: LogpGrad) -> tuple[NDArray, TransitionInfo]:
