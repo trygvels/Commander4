@@ -258,3 +258,30 @@ index on these maps is irrelevant next to the convention. Commander4 has no mono
 per-band zero level with a prior is part of the model (Q15), spectral indices from maps-only runs on
 real data are convention-dependent and are not science results. The method results of E014 (chain
 against exact grid on identical inputs) are unaffected.
+
+**F18. For one full-sky spectral index on template data the flat-prior marginal is biased or
+collapsed at every S/N, the profile is unbiased but up to two times too narrow below full-sky S/N
+100, and the hierarchical amplitude prior is unbiased and calibrated at every S/N tested** (E017,
+nside 16, 12 bands, three components, 96 profile and 24 other replicates per noise scale, exact 1D
+grids for the three non-hier modes). Flat marginal: z +6.0 sd at S/N 680, +17.7 at 230, and at the
+upper edge of the support in all 48 replicates at S/N 68 and 23. Fixed Gaussian with the E012
+misspecified template: +5.2 / +10.1 / +4.4 / +0.4 sd. Profile: z within 0.1 +- 0.1 at all scales,
+sd z 0.93 / 0.89 / 1.14 / 1.90, coverage 0.72/0.98, 0.72/0.98, 0.56/0.93, 0.33/0.66. Hier: z
++0.10 / +0.31 / -0.12 / -0.07 (+- 0.2), sd z 0.8 to 1.1, coverage 0.50 to 0.83 / 0.88 to 1.00, the
+same with a 30 percent large-scale template distortion, hyperparameters recovered where detected;
+hier minus profile mean within 0.3 profile sd. Eight hier chains that had collapsed at the
+unguarded log s floor were rerun with the guard. The marginal-mode gaps of E014 (54 sd, 16 to 23
+sd) are this bias; with hier or ridge the real-data index would agree to a fraction of a sd.
+
+**F19. Commander4's `likelihood: hier` (index field at nside_beta plus hierarchical amplitude
+priors, NUTS over MPI) samples its stated target at L1 and L3** (E018). L1: exact-target tests in
+process (scalar chain against a grid; nside-1 field against an independent centred Gibbs
+reference). L3: a 12-rank end-to-end run (nside 16, 12 bands, synchrotron index field at nside_beta
+2 with K 47 non-centred coefficients, mu, log sigma, log rho, and hier hyperparameters for sync and
+dust; 3000 Gibbs iterations) agrees with the SBC-validated E016 prototype chain on the same maps
+in all 55 scalars: max 1.9 pooled SE (rms 0.75 over the 48 index pixels), sd ratios 0.86 to 1.09,
+0 divergences, 15 gradients per Gibbs iteration (prototype 15 per sample), rms z against the
+simulation truth 1.10; the scalar configuration likewise (max 1.8 SE). Negative control: the same
+comparison puts the Commander4 hier chain 19 MC SE (0.6 sd) from the exact profile posterior on
+the same data and over 1000 sd from the collapsed flat-prior grid. The L2 gate (E016 SBC of the
+prototype target) is still running; hier stays non-default (D003, D011).

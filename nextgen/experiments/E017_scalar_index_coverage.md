@@ -1,6 +1,6 @@
 # E017: Scalar (full-sky) spectral index: coverage of profile, flat-prior marginal, fixed Gaussian and hierarchical amplitude priors on template data (M2.2)
 
-- **Date started / finished:** 2026-10-26 /
+- **Date started / finished:** 2026-10-26 / 2026-10-27
 - **Branch and commit:** nextgen, b3113aa
 - **Open question addressed:** Q2 (prior calibration), ROADMAP M2.2 "full-sky" row
 - **Validation level:** L2 (frequentist coverage against known truth; exact 1D grids for three of
@@ -132,13 +132,60 @@ E016 SBC (42 replicates by then, all with 0 divergences) runs the unguarded code
 not have acted on any of them. Rerun of rep 4 with the guard: z +0.32, sd 0.074, ESS min 294,
 0 divergences, E-BFMI 0.97, log s_dust -1.39 (113 s).
 
+**Final table (2026-10-27 05:30, all 768 cells: 96 w0, 24 each of the other modes per noise
+scale; `scalar_summary.txt`).** Eight hier cells (3 at noise 1, 5 at noise 3, six of them
+hier_distort) had collapsed at the unguarded log s floor (log s_dust or log s_sync at -18 to -20,
+step sizes 1e-14 to 1e-16, posterior sd 1e-13): the study workers had been started at 19:38, before
+the guard of 20:30, so they ran the old code. The collapsed records were moved to
+`study_v1/collapsed_unguarded/` and the eight cells rerun with the guarded code on the same seeded
+data (same truth to 1e-12); all eight came back healthy (0 or 1 divergence, E-BFMI 0.87 to 1.13,
+ESS 176 to 745, log s -1.1 to -2.3). The hier rows below use the reruns.
+
+| noise (S/N) | w0 z, sd z, cov68/95 (n 96) | w1 z, shift/w0 sd | gauss z, shift/w0 sd, cov68/95 | hier z, sd z, cov68/95, shift/w0 sd | hier_distort z, cov68/95 |
+|---|---|---|---|---|---|
+| 0.1 (680) | +0.09 +- 0.09, 0.93, 0.72/0.98 | +6.0, +5.8 | +5.2, +4.9, 0.00/0.00 | +0.10 +- 0.17, 0.82, 0.75/1.00, -0.02 | +0.08, 0.71/1.00 |
+| 0.3 (230) | +0.08 +- 0.09, 0.89, 0.72/0.98 | +17.7, +16.2 | +10.1, +8.6, 0.00/0.00 | +0.31 +- 0.19, 0.92, 0.50/1.00, -0.04 | +0.31, 0.58/1.00 |
+| 1 (68) | -0.09 +- 0.12, 1.14, 0.56/0.93 | at edge (all 24), +19.7 | +4.4, +3.5, 0.00/0.00 | -0.12 +- 0.16, 0.78, 0.83/1.00, +0.09 | -0.13, 0.79/1.00 |
+| 3 (23) | +0.02 +- 0.19, 1.90, 0.33/0.66 | at edge (all 24), +10.0 | +0.4, +0.7, 0.46/0.88 | -0.07 +- 0.23, 1.13, 0.67/0.88, +0.29 | -0.06, 0.67/0.88 |
+
+Binomial SE of the coverages: 0.05 (w0), 0.10 (others). Hier amplitude hyperparameters, mean over
+replicates (generator mu 1.027, log s -1.45): mu_sync 1.03 / 1.03 / 1.02 / 1.03, mu_dust 1.02 /
+1.03 / 1.03 / 0.98, log s_sync -1.42 / -1.42 / -1.44 / -1.65, log s_dust -1.44 / -1.42 / -1.84 /
+-1.57 at noise 0.1 / 0.3 / 1 / 3; at the two noisy scales dust is barely detected and the log s
+posteriors are prior-dominated (median sd 0.6 to 0.8). Cost: hier 83 to 100 s per chain (500 +
+1000 NUTS, median ESS 340 to 1200), the grids 1 to 2 s.
+
 ## Negative control
 `w1` on template data: E012/F12/F15 predict a bias from the flat-prior volume term that does not
 shrink with S/N in sd units (E014: 54 sd on real data); `gauss` with the misspecified fixed prior
 is the second control.
 
 ## Conclusion
-(pending)
+For a single full-sky index on template data (F18):
+- The flat-prior marginal (`marginal` in Commander4) is biased at every S/N: +6 sd at full-sky S/N
+  680, +18 sd at 230, and below S/N about 70 the posterior collapses to the upper edge of the
+  support (every replicate at noise 1 and 3), the scalar version of the F12/F15 collapse. It is
+  the mechanism behind the 54 sd (pass 2) and 16 to 23 sd (passes 3 and 4) marginal-minus-ridge
+  gaps of E014.
+- The fixed Gaussian prior with a misspecified template is 4 to 10 sd off wherever the index is
+  well measured and only looks acceptable (z +0.4, coverage 0.46 / 0.88) where its width is
+  irrelevant.
+- The profile (ridge, Commander4's default per D003) is unbiased at every S/N (|z| < 0.1 +- 0.1 to
+  0.2) and calibrated at S/N 680 and 230, but its posterior is 15 percent too narrow at S/N 68
+  (coverage 0.56 / 0.93) and about two times too narrow at S/N 23 (sd z 1.90, coverage 0.33 /
+  0.66): the profile ignores the amplitude uncertainty that feeds the index.
+- The hierarchical prior is unbiased at every S/N (|z| <= 0.31 +- 0.2), with sd z 0.8 to 1.1 and
+  coverage 0.50 to 0.83 / 0.88 to 1.00 (binomial SE 0.10; the 0.50 at noise 0.3 is a 1.8 sigma low
+  and comes with 95 percent coverage 1.00), the same with a 30 percent large-scale template
+  distortion, and it recovers the amplitude hyperparameters where they are detected. Its mean is
+  within 0.3 w0 sd of the profile mean, so on real data (E014) hier and ridge would agree closely
+  while marginal does not.
+So for scalar indices the ridge default is justified at high S/N and the hier prior is the
+candidate wherever the full-sky S/N drops below about 100 or widths matter; this answers the
+full-sky row of M2.2. The prior-dependence of real-data indices (E014, F17) is a marginal-mode
+artefact plus the zero-level convention, not a property of the profile. Caveat: one template
+family (the E012 smooth templates with log-normal scatter), 24 replicates per cell for the
+non-profile modes.
 
 ## Follow-ups
 - Same table with the real-data configuration of E014 (17 bands, nside 64 mask) once the

@@ -55,9 +55,13 @@ original numbering.
   template wrong by 30 percent on large scales or 23 percent per pixel. Pending: the SBC of the
   hier target (sampler correctness; running), the scalar-index version (M2.2, E017 running), and
   the real-data step (which template, and the Commander4 implementation).
-  Next experiment: a hierarchical amplitude prior (m and T learned from the data, e.g. a smoothness
-  prior on the amplitude maps with sampled scale) in the collapsed likelihood, coverage-tested on
-  template data; and the index-resolution rule from the S/N map for the profile option (Q3).
+- **Scalar index (E017, 2026-10-27, F18):** flat marginal biased 6 to 18 sd and collapsed to the
+  support edge below full-sky S/N 70; fixed Gaussian 4 to 10 sd off; profile unbiased but 15
+  percent too narrow at S/N 68 and two times at S/N 23; hier unbiased and calibrated at all four
+  S/N, also with a distorted template. Answer for Q2: learn the amplitude prior (hier); ridge is
+  acceptable only where the index S/N is high (full-sky S/N above a few hundred, index-pixel S/N
+  above 15). In Commander4 since E018 (F19). Remaining for Q2: the hier SBC (L2 gate, running), the
+  template choice on real data, and the index-resolution rule from the S/N map (Q3).
 
 ## Q3. What is the optimal spatially varying index model?
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather

@@ -1,6 +1,6 @@
 # E018: Commander4 index field with a hierarchical amplitude prior (likelihood: hier) against the prototype and independent references (M2.4 stage 1, L1 and L3)
 
-- **Date started / finished:** 2026-10-27 /
+- **Date started / finished:** 2026-10-27 / 2026-10-27
 - **Branch and commit:** nextgen, 2e3fa1b (commits 1 to 8 of the M2.4 stage-1 plan)
 - **Open question addressed:** Q2 (prior calibration), Q3 (spatially varying indices in Commander4); ROADMAP M2.4
 - **Validation level:** L1 (exact-target tests in process) and L3 (end-to-end 12-rank Commander4 run on a model-consistent simulation)
@@ -97,19 +97,60 @@ too. The centred target itself was checked against the reference's density piece
 offset to 6e-12. So (b) is a sampler-mixing limitation of the reference at low S/N, not a
 discrepancy of the target; the test is run where the reference mixes.
 
-**L3:** chains started 02:14 (hier_field, 12 ranks, about 5 s per Gibbs iteration under load;
-hier_scalar follows). (pending)
+**L3 (end-to-end Commander4, 12 ranks, 2026-10-27): PASS on both configurations.** hier_field
+(nside 16, 12 bands, synchrotron index field at nside_beta 2 with K 47 plus mu, log sigma, u, and
+hier amplitude hyperparameters for sync and dust; 3000 Gibbs iterations, 02:14 to 03:51 under load
+8 to 20) and hier_scalar (same data, one index; 03:51 to 05:08). Burn 600, 2400 samples compared
+with the E016 prototype (`HierNonCentredPosterior` / `ScalarHierPosterior`, `sampler.run_nuts`,
+500 warm-up, 2400 samples) on the same maps:
+
+| run | block | n | max abs diff / pooled SE | rms | sd ratio range | ESS C4 min | ESS proto min | rms z(truth) |
+|---|---|---|---|---|---|---|---|---|
+| hier_field | beta (48 pixels) | 48 | 1.91 | 0.75 | 0.896 to 1.087 | 1488 | 1427 | 1.10 |
+| hier_field | mu | 1 | 0.39 | | 0.935 | 2179 | 1720 | 0.65 |
+| hier_field | log sigma | 1 | 1.38 | | 0.956 | 1112 | 944 | 0.86 |
+| hier_field | u (log rho logit) | 1 | 1.23 | | 1.060 | 2400 | 1806 | |
+| hier_field | mu_s, mu_d | 2 | 1.07, 0.39 | | 0.978, 0.942 | 2400 | 1919 | 0.93, 0.10 |
+| hier_field | log s_s, log s_d | 2 | 0.37, 1.29 | | 1.029, 0.864 | 1247 | 782 | 0.67, 1.06 |
+| hier_scalar | beta | 1 | 1.32 | | 0.987 | 827 | 1070 | 0.63 |
+| hier_scalar | mu_s, mu_d | 2 | 0.06, 0.21 | | 0.972, 1.008 | 875 | 1006 | 0.91, 0.14 |
+| hier_scalar | log s_s, log s_d | 2 | 1.80, 1.11 | | 0.948, 0.860 | 491 | 359 | 0.69, 1.08 |
+
+Criteria (all |diff| < 4 pooled SE, sd ratios within 0.85 to 1.15, divergences below 1 percent)
+met everywhere. Commander4 NUTS: 0 divergences in both runs; mean 15.0 gradients per Gibbs
+iteration at step 0.31 and acceptance 0.90 (field), 5.6 gradients at step 0.51 and acceptance
+0.92 (scalar); the prototype used 36008 and 12746 gradients for the same 2400 samples, i.e. the
+same cost per sample within the adaptation noise. The 48 z(truth) values of the field have rms
+1.10: the posterior covers the truth of the simulation (one replicate; the frequentist statement
+is E016). Analysis: `/Users/trygvels/data/c4val_hier/analysis_hier_field.json`. A chain-reader
+bug (state keyed by component class name, not shortname) was fixed in the analyzer before the
+first successful analysis; it did not touch the runs.
 
 ## Negative control
-The same hier_field analysis applied to a chain run with `likelihood: ridge` on the scalar
-configuration (profile likelihood, no amplitude prior) must disagree with the hier prototype
-chain by many sd (different target; E017 shows the profile is 0.1 to 1 sd off the hier mean at
-these S/N and has no hyperparameters), and the field run started from a constant field must leave
-the constant start (sigma moves away from its 0.15 initial value only if the data demand it: the
-truth has sigma 0.15, so the posterior of log sigma must cover log 0.15).
+As planned: (a) the posterior of log sigma in the hier_field run must cover log 0.15 = -1.90, the
+truth, having started from the constant field (sigma 0.075, z 0): it does, z(truth) 0.86 (table
+above), and u and mu moved off their start values. (b) A chain with a different target must be
+told apart by the same comparison. Run cheaply on the hier_scalar data with the exact prototype
+grids (`scalar_coverage.grid_posterior`, index prior N(-3, 0.3^2) as in the run, scratch script
+`e018_negctrl.py`): the Commander4 hier chain gives beta -2.9549 +- 0.0717 (ESS 827, MC SE 0.0025);
+the profile (ridge, w0) grid gives -2.9081 +- 0.0768, so the hier chain sits 0.61 grid sd (19 MC
+SE) below the profile posterior; the flat-prior marginal (w1) grid collapses to the upper edge of
+the support (-1.501, the F12/F15 collapse at this full-sky S/N), 1237 grid sd away. The same hier
+chain agrees with the prototype hier sampler to 1.32 pooled SE. So the comparison distinguishes
+the profile target from the hier target at 19 MC SE on these data, and the agreement with the hier
+prototype is not an artefact of a loose criterion.
 
 ## Conclusion
-(pending)
+Commander4's `likelihood: hier` samples its stated target. L1: exact-target tests in process pass
+(scalar chain against a grid; nside-1 field against an independent centred Gibbs reference, where
+the reference mixes). L3: a 12-rank end-to-end run with a synchrotron index field at nside_beta 2
+and learned amplitude hyperparameters for two components agrees with the SBC-validated prototype
+chain on the same data in every block (max 1.9 pooled SE over 55 scalars, sd ratios 0.86 to 1.09,
+0 divergences), at the same gradient cost per sample, and differs from the profile target on the
+same data by 19 MC SE. M2.4 stage 1 is validated at L1 and L3; the L2 gate (E016 prototype SBC, 300
+replicates) is still running and is a property of the target, not of this implementation. Open:
+the real-data configuration waits on Q15 (zero levels), and the hier option stays non-default
+(D003, D011).
 
 ## Follow-ups
 - L2 gate: the prototype hier SBC (E016, 300 replicates) must pass before M2.4a is declared done.

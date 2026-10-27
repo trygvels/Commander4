@@ -1,44 +1,44 @@
 scalar-index coverage study: indexfield/checks/out/scalar/study_v1
-654 cells; noise scales [0.1, 0.3, 1.0, 3.0]; modes ['w0', 'w1', 'gauss', 'hier', 'hier_distort']
+768 cells; noise scales [0.1, 0.3, 1.0, 3.0]; modes ['w0', 'w1', 'gauss', 'hier', 'hier_distort']
 
 noise x0.1
   mode            n    S/N         mean z   sd z          cov68          cov95    med sd  med |err|   shift/w0 sd    ESS
   w0             96    679   +0.09 +- 0.09   0.93   0.72 +- 0.05   0.98 +- 0.01  8.21e-03   5.47e-03                
   w1             24    678   +5.99 +- 0.17   0.85   0.00 +- 0.00   0.00 +- 0.00  8.07e-03   4.74e-02   +5.78 +- 0.03
   gauss          24    678   +5.16 +- 0.17   0.84   0.00 +- 0.00   0.00 +- 0.00  8.02e-03   4.07e-02   +4.93 +- 0.03
-  hier           10    682   +0.26 +- 0.26   0.81   0.90 +- 0.09   1.00 +- 0.00  8.42e-03   5.99e-03   -0.02 +- 0.02   1194
-  hier_distort   10    682   +0.25 +- 0.25   0.78   0.80 +- 0.13   1.00 +- 0.00  8.21e-03   5.71e-03   -0.04 +- 0.03   1105
-    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.028, 1.029, -1.43, -1.41), median post. sd (0.008, 0.011, 0.03, 0.04); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 1.05, 88 s per chain
-    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.024, 1.025, -1.42, -1.40), median post. sd (0.008, 0.011, 0.03, 0.04); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 1.03, 91 s per chain
+  hier           24    678   +0.10 +- 0.17   0.82   0.75 +- 0.09   1.00 +- 0.00  8.24e-03   5.12e-03   -0.02 +- 0.02   1211
+  hier_distort   24    678   +0.08 +- 0.17   0.81   0.71 +- 0.09   1.00 +- 0.00  8.12e-03   4.90e-03   -0.04 +- 0.02   1177
+    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.030, 1.024, -1.42, -1.44), median post. sd (0.008, 0.011, 0.03, 0.04); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 1.00, 83 s per chain
+    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.026, 1.020, -1.41, -1.43), median post. sd (0.009, 0.011, 0.03, 0.04); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.97, 83 s per chain
 
 noise x0.3
   mode            n    S/N         mean z   sd z          cov68          cov95    med sd  med |err|   shift/w0 sd    ESS
   w0             96    226   +0.08 +- 0.09   0.89   0.72 +- 0.05   0.98 +- 0.01  2.45e-02   1.37e-02                
   w1             24    230  +17.71 +- 0.24   1.16   0.00 +- 0.00   0.00 +- 0.00  2.24e-02   4.01e-01  +16.16 +- 0.24
   gauss          24    230  +10.10 +- 0.21   1.05   0.00 +- 0.00   0.00 +- 0.00  2.15e-02   2.22e-01   +8.58 +- 0.06
-  hier           10    219   +0.32 +- 0.35   1.11   0.30 +- 0.14   1.00 +- 0.00  2.38e-02   2.63e-02   +0.01 +- 0.08    675
-  hier_distort   10    219   +0.29 +- 0.35   1.10   0.50 +- 0.16   1.00 +- 0.00  2.42e-02   2.57e-02   -0.00 +- 0.10    726
-    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.031, 1.021, -1.40, -1.46), median post. sd (0.014, 0.021, 0.04, 0.10); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 1.00, 89 s per chain
-    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.030, 1.019, -1.40, -1.46), median post. sd (0.014, 0.020, 0.04, 0.10); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.95, 90 s per chain
+  hier           24    230   +0.31 +- 0.19   0.92   0.50 +- 0.10   1.00 +- 0.00  2.42e-02   1.97e-02   -0.04 +- 0.05    724
+  hier_distort   24    230   +0.31 +- 0.19   0.92   0.58 +- 0.10   1.00 +- 0.00  2.41e-02   1.84e-02   -0.04 +- 0.06    767
+    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.030, 1.027, -1.42, -1.42), median post. sd (0.013, 0.021, 0.04, 0.10); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.99, 83 s per chain
+    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.028, 1.026, -1.41, -1.42), median post. sd (0.013, 0.020, 0.04, 0.10); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.95, 83 s per chain
 
 noise x1
   mode            n    S/N         mean z   sd z          cov68          cov95    med sd  med |err|   shift/w0 sd    ESS
   w0             96     68   -0.09 +- 0.12   1.14   0.56 +- 0.05   0.93 +- 0.03  7.64e-02   6.27e-02                
   w1             24     67  +1217.02 +- 21.59  105.77   0.00 +- 0.00   0.00 +- 0.00  1.19e-03   1.46e+00  +19.66 +- 0.67
   gauss          24     67   +4.38 +- 0.18   0.87   0.00 +- 0.00   0.00 +- 0.00  5.73e-02   2.59e-01   +3.47 +- 0.15
-  hier           10     67   -0.32 +- 0.20   0.63   0.80 +- 0.13   1.00 +- 0.00  7.47e-02   2.27e-02   +0.33 +- 0.21    347
-  hier_distort    9     68   -0.30 +- 0.22   0.66   0.78 +- 0.14   1.00 +- 0.00  7.56e-02   2.05e-02   +0.27 +- 0.22    382
-    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.016, 1.007, -1.41, -1.87), median post. sd (0.027, 0.054, 0.09, 0.61); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.97, 103 s per chain
-    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.011, 1.004, -1.43, -1.87), median post. sd (0.026, 0.054, 0.09, 0.59); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.94, 103 s per chain
+  hier           24     67   -0.12 +- 0.16   0.78   0.83 +- 0.08   1.00 +- 0.00  7.48e-02   3.48e-02   +0.09 +- 0.13    339
+  hier_distort   24     67   -0.13 +- 0.16   0.79   0.79 +- 0.08   1.00 +- 0.00  7.44e-02   3.67e-02   +0.07 +- 0.13    351
+    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.021, 1.025, -1.44, -1.84), median post. sd (0.027, 0.053, 0.09, 0.61); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.86, 94 s per chain
+    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.020, 1.024, -1.44, -1.85), median post. sd (0.026, 0.053, 0.09, 0.61); generator (1.027, 1.027, -1.45, -1.45); divergences 1, min E-BFMI 0.87, 90 s per chain; CHAINS WITH DIVERGENCES OR E-BFMI < 0.3 (rows above include them): reps [14]
 
 noise x3
   mode            n    S/N         mean z   sd z          cov68          cov95    med sd  med |err|   shift/w0 sd    ESS
   w0             96     23   +0.02 +- 0.19   1.90   0.33 +- 0.05   0.66 +- 0.05  1.53e-01   2.33e-01                
   w1             24     22  +1519.20 +- 40.93  200.52   0.00 +- 0.00   0.00 +- 0.00  9.64e-04   1.46e+00  +10.01 +- 0.34
   gauss          24     22   +0.38 +- 0.27   1.31   0.46 +- 0.10   0.88 +- 0.07  1.23e-01   1.24e-01   +0.66 +- 0.30
-  hier           10     23   +0.04 +- 0.29   0.91   0.80 +- 0.13   0.90 +- 0.09  1.44e-01   6.92e-02   +0.28 +- 0.56    484
-  hier_distort    9     23   +0.06 +- 0.33   0.98   0.78 +- 0.14   0.89 +- 0.10  1.45e-01   8.57e-02   +0.64 +- 0.47    505
-    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.012, 0.986, -1.87, -1.55), median post. sd (0.050, 0.127, 0.54, 0.81); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.94, 113 s per chain
-    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.011, 0.975, -1.91, -1.52), median post. sd (0.050, 0.129, 0.53, 0.77); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.89, 115 s per chain
+  hier           24     22   -0.07 +- 0.23   1.13   0.67 +- 0.10   0.88 +- 0.07  1.42e-01   9.08e-02   +0.29 +- 0.30    494
+  hier_distort   24     22   -0.06 +- 0.23   1.12   0.67 +- 0.10   0.88 +- 0.07  1.44e-01   9.19e-02   +0.29 +- 0.30    493
+    hier: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.028, 0.980, -1.65, -1.57), median post. sd (0.051, 0.128, 0.50, 0.78); generator (1.027, 1.027, -1.45, -1.45); divergences 3, min E-BFMI 0.93, 101 s per chain; CHAINS WITH DIVERGENCES OR E-BFMI < 0.3 (rows above include them): reps [11, 20, 23]
+    hier_distort: (mu_sync, mu_dust, log s_sync, log s_dust) mean over replicates (1.028, 0.981, -1.66, -1.56), median post. sd (0.052, 0.129, 0.48, 0.78); generator (1.027, 1.027, -1.45, -1.45); divergences 0, min E-BFMI 0.89, 101 s per chain
 
 columns: n = replicates; S/N = median full-sky S/N proxy; mean z = mean (post. mean - truth) / post. sd with its SE over replicates; sd z = sd of z (1 if calibrated); cov68, cov95 = fraction of truths inside the central intervals with binomial SE; med sd = median posterior sd; med |err| = median |post. mean - truth|; shift/w0 sd = mean over replicates of (mode mean - w0 mean) / w0 sd on the same data; ESS = median Geyer ESS of beta (hier modes; grid modes are exact).

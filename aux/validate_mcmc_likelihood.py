@@ -522,17 +522,17 @@ def _hf_read_chain(outdir: str, tag: str) -> dict | None:
         with h5py.File(fn, "r") as f:
             st = f[f"mcmc/{HF_GROUP}/state"]
             nuts = f[f"mcmc/{HF_GROUP}/nuts"]
-            if "index_field" in st["sync"]:
-                fld = st["sync/index_field"]
+            if "index_field" in st["Synchrotron"]:
+                fld = st["Synchrotron/index_field"]
                 out["beta"].append(np.asarray(fld["beta_map"][()]))
                 for k in ("mu", "log_sigma", "u"):
                     out[k].append(float(fld[k][()]))
             else:
-                out["beta"].append(np.atleast_1d(np.asarray(st["sync/beta"][()])))
-            out["mu_s"].append(float(st["sync/amp_prior/mu"][()]))
-            out["log_s_s"].append(float(st["sync/amp_prior/log_s"][()]))
-            out["mu_d"].append(float(st["dust/amp_prior/mu"][()]))
-            out["log_s_d"].append(float(st["dust/amp_prior/log_s"][()]))
+                out["beta"].append(np.atleast_1d(np.asarray(st["Synchrotron/beta"][()])))
+            out["mu_s"].append(float(st["Synchrotron/amp_prior/mu"][()]))
+            out["log_s_s"].append(float(st["Synchrotron/amp_prior/log_s"][()]))
+            out["mu_d"].append(float(st["ThermalDust/amp_prior/mu"][()]))
+            out["log_s_d"].append(float(st["ThermalDust/amp_prior/log_s"][()]))
             for k in ("divergent", "n_leapfrog", "step_size", "accept_stat"):
                 out[k].append(float(nuts[k][()]))
     return {k: np.array(v) for k, v in out.items() if len(v)}
