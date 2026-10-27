@@ -14,6 +14,7 @@ from pixell import curvedsky
 from commander4.sky.component import Component
 from commander4.sky.diffuse_components import DiffuseComponent
 from commander4.backend import compsep as cpp_compsep
+from commander4.compsep import index_field
 from commander4.data_models.detector_map import DetectorMap
 from commander4.diagnostics.performance import benchmark
 
@@ -28,6 +29,11 @@ def solve_compsep_perpix(proc_comm: MPI.Comm, detector_data: DetectorMap,
         arriving at differing resolutions are silently mixed; a warning is logged below.
         The per-pixel solves run on the master rank only, with ``nthreads`` threads, and draw
         their fluctuation terms from the master's ``rng``.
+
+        Components with a `beta_map` (spatially varying index) or a non-flat `amp_prior` route the
+        draw through `index_field.solve_perpix_with_priors`: the mixing matrix is per region and
+        the priors enter as pseudo-bands, so the draw is N(A'^-1 b', A'^-1), the exact amplitude
+        conditional under the stated priors. Without either, this is today's flat draw.
     """
     for component in comp_list:
         if not isinstance(component, DiffuseComponent):
@@ -87,16 +93,23 @@ def solve_compsep_perpix(proc_comm: MPI.Comm, detector_data: DetectorMap,
             maps_sky = np.array(maps_sky)
             maps_inv_var = np.array(maps_inv_var)
             nband = len(freqs)
-            M = np.empty((nband, ncomp))
-            for icomp in range(ncomp):
-                M[:, icomp] = comp_list[icomp].get_sed(freqs)
-            rand = rng.standard_normal((npix, nband))
+            comps = list(comp_list)
             # TODO: Should scale M to make solution more well-conditioned, and then adjust
             # solution with the scaling factor used.
             with benchmark("perpix-solve"):
-                comp_maps[ipol] = cpp_compsep.solve_perpix(
-                    maps_sky.astype(np.float64, copy=False),
-                    maps_inv_var.astype(np.float64, copy=False), M, rand, nthreads)
+                if index_field.needs_region_solver(comps):
+                    comp_maps[ipol] = solve_perpix_with_priors(
+                        freqs, maps_sky.astype(np.float64, copy=False),
+                        maps_inv_var.astype(np.float64, copy=False), comps, nside, rng,
+                        nthreads)
+                else:
+                    M = np.empty((nband, ncomp))
+                    for icomp in range(ncomp):
+                        M[:, icomp] = comp_list[icomp].get_sed(freqs)
+                    rand = rng.standard_normal((npix, nband))
+                    comp_maps[ipol] = cpp_compsep.solve_perpix(
+                        maps_sky.astype(np.float64, copy=False),
+                        maps_inv_var.astype(np.float64, copy=False), M, rand, nthreads)
             logger.info(f"Finished pixel-by-pixel component separation in {time.time()-t0:.2f}s "\
                         f"for polarization {ipol+1} of {npol}.")
 
@@ -115,6 +128,28 @@ def solve_compsep_perpix(proc_comm: MPI.Comm, detector_data: DetectorMap,
             comp_list[icomp].amp_fwhm_rad = detector_data.fwhm_rad
 
     return comp_list
+
+
+def solve_perpix_with_priors(freqs: np.ndarray, maps_sky: np.ndarray, maps_inv_var: np.ndarray,
+                             comps: list[DiffuseComponent], nside: int,
+                             rng: np.random.Generator, nthreads: int) -> np.ndarray:
+    """One polarization stream of the per-pixel amplitude draw with per-region mixing matrices
+    and the components' amplitude priors as pseudo-bands.
+
+    Draws a_p ~ N(A'^-1 b', A'^-1) with A' = M_r^T N^-1 M_r + T^-1 and b' = M_r^T N^-1 d + T^-1 m
+    in every pixel p of region r (`index_field.region_map`, nreg = 1 without any field), through
+    `solve_perpix_regions` on the augmented stream (nband + ncomp rows, one standard normal per
+    row and pixel). Pixels with zero inverse variance in every band and a flat prior get zero
+    amplitudes, as in `solve_perpix`. Returns (ncomp, npix).
+    """
+    nside_beta = index_field.field_nside(comps)
+    region = index_field.region_map(nside_beta, nside)
+    nreg = int(region.max()) + 1
+    M_reg = index_field.mixing_regions(freqs, comps, nreg)
+    sky_aug, inv_var_aug = index_field.augment_stream(maps_sky, maps_inv_var, comps)
+    M_aug = index_field.augment_mixing(M_reg)
+    rand = rng.standard_normal((sky_aug.shape[1], sky_aug.shape[0]))
+    return cpp_compsep.solve_perpix_regions(sky_aug, inv_var_aug, region, M_aug, rand, nthreads)
 
 
 class PerPixelMarginalLikelihood:
