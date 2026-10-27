@@ -327,8 +327,20 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   index is dominated by the data set (zero levels, which HFI bands enter, bandpass and CO
   treatment), not by the noise; its statistical error is meaningless at the 1e-4 level. Which of
   the two HFI sets is closer to the truth is not decided by this; the 100 GHz zero level (above) is
-  the first suspect for pass 3, and the pass-2 PR3 100 GHz map was a stopgap. The marginal chain
-  and the grid check are running (23:16 onward).
+  the first suspect for pass 3, and the pass-2 PR3 100 GHz map was a stopgap.
+  **Pass-3 marginal chain and exact grids (marginal 23:16 to 00:38, grid 00:38 to 01:08, analysis
+  with burn 400, `summary_q1_pr4tuned.json`):** marginal beta_s = -2.9086 +- 0.0001 (ESS 84),
+  beta_d = 1.4150 +- 0.00003 (ESS 241), acceptance 0.04. Exact 2D grids on the same inputs: ridge
+  (-2.91026, 1.41496), marginal (-2.90858, 1.41504), sd 1.0e-4 and 3.5e-5 in both modes. Chain
+  minus grid in grid sd: ridge sync -0.09 [se 0.10], dust +0.03 [0.06], sd ratios 1.05 and 0.99;
+  marginal sync -0.03 [0.12], dust -0.02 [0.06], sd ratios 1.06 and 0.99. Both chains sample their
+  stated targets on 20 bands as they did on 17. Marginal minus ridge on the same data: +16.1 +- 0.1
+  ridge sd in beta_s (+0.0017) and +2.1 +- 0.1 in beta_d (+0.00008), against +56.1 and +5.5 sd on
+  the pass-2 inputs. The flat-prior volume term still moves beta_s by many sd, but by a third of
+  the pass-2 amount: the two sets differ in zero levels and in which HFI maps enter (below), and
+  the shift is data-set dependent, as the volume term -1/2 log det A depends on the noise levels
+  and the mixing matrix through all bands. Reduced chi-square after burn-in 15509 to 15512 for both
+  modes.
   **Zero-level conventions are inconsistent across the bands (found 23:40, after the ridge
   chain).** Measured on the inputs: the DR1 WMAP and LFI maps in `q1_inputs/` had the median over
   |b| > 30 deg subtracted (`prep_q1_inputs.py`; 40.9 uK_CMB at 30 GHz, 78.3 at K band), the HFI maps
