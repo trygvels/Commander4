@@ -35,11 +35,13 @@ def cmb_sed(nu: np.ndarray) -> np.ndarray:
 
 
 def gls_cmb(d: np.ndarray, rms: np.ndarray, nu: np.ndarray, beta_s: np.ndarray,
-            beta_d: np.ndarray, T: float) -> np.ndarray:
+            beta_d: np.ndarray, T: float, dust_col: np.ndarray | None = None) -> np.ndarray:
     """Flat-prior generalized-least-squares CMB amplitude per pixel at the given indices:
-    the cmb row of (M^T N^-1 M)^-1 M^T N^-1 d, the standard parametric-fit CMB map."""
-    M = np.stack([np.broadcast_to(cmb_sed(nu), d.shape), sed("sync", nu, beta_s, T),
-                  sed("dust", nu, beta_d, T)], axis=2)              # (npix, B, 3)
+    the cmb row of (M^T N^-1 M)^-1 M^T N^-1 d, the standard parametric-fit CMB map. `dust_col`
+    (npix, B) replaces the fixed-T dust column (used for the true-SED floor)."""
+    dcol = sed("dust", nu, beta_d, T) if dust_col is None else dust_col
+    M = np.stack([np.broadcast_to(cmb_sed(nu), d.shape), sed("sync", nu, beta_s, T), dcol],
+                 axis=2)                                             # (npix, B, 3)
     w = 1.0 / rms ** 2
     A = np.einsum("pbi,b,pbj->pij", M, w, M)
     b = np.einsum("pbi,b,pb->pi", M, w, d)
@@ -79,7 +81,13 @@ def read_run(outdir: str, tag: str, burn: int) -> dict | None:
                     out["nside_beta"] = int(fld["beta_nside"][()])
                     kind = fld["parameterization"][()]
                     kind = kind.decode() if isinstance(kind, bytes) else str(kind)
-                    out["kind"] = "independent" if kind == "independent" else "gmrf"
+                    if kind == "independent":
+                        out["kind"] = "independent"
+                    elif "field_type" in fld:
+                        ft = fld["field_type"][()]
+                        out["kind"] = ft.decode() if isinstance(ft, bytes) else str(ft)
+                    else:
+                        out["kind"] = "gmrf"
                     if "mu" in fld:
                         out["hyper"][c].append([float(fld["mu"][()]), float(fld["log_sigma"][()]),
                                                 float(fld["u"][()])])
@@ -132,14 +140,17 @@ def analyze_run(run: dict, truth: dict, data: np.ndarray, nside: int, hi_mask: n
            "gradients_per_iteration": float(np.mean(run["n_leapfrog"])),
            "seconds_per_iteration": seconds_per_iteration(run["times"])}
     truths = {"sync": {"pysm": truth["beta_s"]},
-              "dust": {"pysm": truth["beta_d"], "fixedT": truth["beta_eff"]}}
+              "dust": {"pysm": truth["beta_d"], "fixedT": truth["beta_eff"],
+                       "fixedT3": truth["beta_eff3"]}}
+    block = region_map(BLOCK_NSIDE, nside)                   # bootstrap blocks (nside 4)
+    nblock = 12 * BLOCK_NSIDE ** 2
     for c in COMPS:
         a_true = truth["a_sync"] if c == "sync" else truth["a_dust"]
         bt = truths[c]["pysm"]
         chain = run["beta"][c]                       # (n, nreg)
         mean_r, sd_r = chain.mean(axis=0), chain.std(axis=0)
         beta_hat = mean_r[region]
-        snr_w = np.sum((a_true[:, None] * sed(c, nu, bt, T_fixed) / rms[None, :]) ** 2, axis=1)
+        snr_w = index_fisher_weight(c, a_true, bt, nu, rms, T_fixed)
         counts = np.bincount(region, minlength=nreg)
         tm_unw = np.bincount(region, bt, minlength=nreg) / counts
         tm_w = np.bincount(region, bt * snr_w, minlength=nreg) / np.bincount(region, snr_w,
@@ -164,6 +175,7 @@ def analyze_run(run: dict, truth: dict, data: np.ndarray, nside: int, hi_mask: n
              "rmse_draw_mean": float(rmse_draws.mean()), "rmse_draw_sd": float(rmse_draws.std()),
              "region_floor_unweighted": float(np.sqrt(np.mean((tm_unw[region] - bt) ** 2))),
              "region_floor_weighted": float(np.sqrt(np.mean((tm_w[region] - bt) ** 2)))}
+        r["block_sq_err"] = {}
         for tname, tmap in truths[c].items():
             err = beta_hat - tmap
             r[f"rmse_{tname}_all"] = float(np.sqrt(np.mean(err ** 2)))
@@ -171,6 +183,11 @@ def analyze_run(run: dict, truth: dict, data: np.ndarray, nside: int, hi_mask: n
             r[f"bias_{tname}_all"] = float(np.mean(err))
             r[f"truth_{tname}_sd_all"] = float(tmap.std())
             r[f"truth_{tname}_sd_hi"] = float(tmap[hi_mask].std())
+            # Mean squared error per nside-4 block, for paired bootstrap comparisons of runs.
+            r["block_sq_err"][tname] = (np.bincount(block, err ** 2, minlength=nblock)
+                                        / np.bincount(block, minlength=nblock)).tolist()
+        r["amp_ess_min"] = float(min(_ess(run["amp"][c][:, j]) for j in range(2)))
+        r["beta_map_mean"] = [float(mean_r.mean()), float(np.sqrt(np.mean(sd_r ** 2)))]
         edges = snr_bin_edges[c]
         which = np.clip(np.digitize(snr_w, edges) - 1, 0, SNR_BINS - 1)
         r["rmse_pysm_by_snr_bin"] = [float(np.sqrt(np.mean((beta_hat - bt)[which == k] ** 2)))
@@ -186,14 +203,24 @@ def analyze_run(run: dict, truth: dict, data: np.ndarray, nside: int, hi_mask: n
             r["field_rho_deg"] = [float(np.degrees(rho).mean()), float(np.degrees(rho).std())]
             r["ess_hyper_min"] = float(min(_ess(h[:, j]) for j in range(3)))
         res[c] = r
-    # CMB, primary: flat-prior GLS estimate at thinned index draws, averaged, against the input.
+    # CMB, primary: flat-prior GLS estimate at thinned index draws, averaged (a plug-in
+    # posterior-predictive estimate: index uncertainty enters through the average), against the
+    # input; the per-draw metrics give the spread.
     n = len(run["chi2"])
     idx = np.unique(np.linspace(0, n - 1, min(N_CMB_DRAWS, n)).astype(int))
-    cmb_gls = np.mean([gls_cmb(data, rms, nu, run["beta"]["sync"][k][region],
-                               run["beta"]["dust"][k][region], T_fixed) for k in idx], axis=0)
     cmb_in = truth["cmb"]
+    maps = [gls_cmb(data, rms, nu, run["beta"]["sync"][k][region],
+                    run["beta"]["dust"][k][region], T_fixed) for k in idx]
+    cmb_gls = np.mean(maps, axis=0)
     res["cmb"] = cmb_metrics(cmb_gls - cmb_in, cmb_in, hi_mask)
+    per_draw = [cmb_metrics(m - cmb_in, cmb_in, hi_mask) for m in maps[::max(1, len(maps) // 12)]]
+    for key in ("resid_rms_all", "resid_power_frac_l2_30", "resid_power_frac_l30_100"):
+        vals = np.array([pd[key] for pd in per_draw])
+        res["cmb"][f"{key}_draw_mean"] = float(vals.mean())
+        res["cmb"][f"{key}_draw_sd"] = float(vals.std())
     res["cmb"]["estimator"] = f"GLS at {idx.size} thinned index draws, averaged"
+    res["cmb"]["block_sq_err"] = (np.bincount(block, (cmb_gls - cmb_in) ** 2, minlength=nblock)
+                                  / np.bincount(block, minlength=nblock)).tolist()
     # CMB, secondary: the chain's own (prior-shrunk) amplitude alms.
     alms = np.mean(np.array(run["cmb_alms"]), axis=0)
     lmax = hp.Alm.getlmax(alms.size)
@@ -205,13 +232,39 @@ def analyze_run(run: dict, truth: dict, data: np.ndarray, nside: int, hi_mask: n
     return res
 
 
+BLOCK_NSIDE = 4
+
+
+def index_fisher_weight(c: str, a_true: np.ndarray, bt: np.ndarray, nu: np.ndarray,
+                        rms: np.ndarray, T: float) -> np.ndarray:
+    """Per-pixel Fisher weight of the index with the amplitude known: sum_b (a dsed/dbeta /
+    rms)^2 with dsed/dbeta = sed log(nu/nu_ref)."""
+    nu_ref = 30.0 if c == "sync" else 545.0
+    dsed = sed(c, nu, bt, T) * np.log(nu / nu_ref)[None, :]
+    return np.sum((a_true[:, None] * dsed / rms[None, :]) ** 2, axis=1)
+
+
+def paired_bootstrap(sq_a: np.ndarray, sq_b: np.ndarray, rng: np.random.Generator,
+                     n_boot: int = 2000) -> tuple[float, float]:
+    """RMSE(a) - RMSE(b) from per-block mean squared errors, with its block-bootstrap SE
+    (blocks resampled with replacement, the same blocks in both runs)."""
+    sq_a, sq_b = np.asarray(sq_a), np.asarray(sq_b)
+    nb = sq_a.size
+    diff = np.sqrt(sq_a.mean()) - np.sqrt(sq_b.mean())
+    idx = rng.integers(0, nb, size=(n_boot, nb))
+    boots = np.sqrt(sq_a[idx].mean(axis=1)) - np.sqrt(sq_b[idx].mean(axis=1))
+    return float(diff), float(boots.std())
+
+
 def cmb_metrics(resid: np.ndarray, cmb_in: np.ndarray, hi_mask: np.ndarray) -> dict:
     """RMS of the residual, residual power over input power and the regression coefficient of
     the estimate on the input (1 + cross/in) in l 2 to 30 and 30 to 100."""
     lmax = 100
-    cl_res = hp.anafast(resid, lmax=lmax)
-    cl_in = hp.anafast(cmb_in, lmax=lmax)
-    cl_x = hp.anafast(resid, cmb_in, lmax=lmax)
+    ell = np.arange(lmax + 1)
+    wl = 2.0 * ell + 1.0
+    cl_res = hp.anafast(resid, lmax=lmax) * wl
+    cl_in = hp.anafast(cmb_in, lmax=lmax) * wl
+    cl_x = hp.anafast(resid, cmb_in, lmax=lmax) * wl
     out = {"resid_rms_all": float(resid.std()), "resid_rms_hi": float(resid[hi_mask].std())}
     for name, sl in (("l2_30", slice(2, 31)), ("l30_100", slice(30, 101))):
         out[f"resid_power_frac_{name}"] = float(cl_res[sl].sum() / cl_in[sl].sum())
@@ -225,7 +278,7 @@ def snr_bin_edges(truth: dict) -> dict:
     edges = {}
     for c, a, bt in (("sync", truth["a_sync"], truth["beta_s"]),
                      ("dust", truth["a_dust"], truth["beta_d"])):
-        w = np.sum((a[:, None] * sed(c, nu, bt, T) / rms[None, :]) ** 2, axis=1)
+        w = index_fisher_weight(c, a, bt, nu, rms, T)
         edges[c] = np.quantile(w, np.linspace(0, 1, SNR_BINS + 1))
     return edges
 
@@ -247,24 +300,29 @@ def main(argv=None) -> int:
                             if "timing" not in d)
     # Reference: GLS CMB at the true indices (the noise floor no index model can beat) and at
     # the fixed-T effective dust index.
-    ref = {"gls_at_truth": cmb_metrics(gls_cmb(data, truth["rms"], nu, truth["beta_s"],
-                                               truth["beta_d"], float(truth["T_fixed"]))
-                                       - truth["cmb"], truth["cmb"], hi),
-           "gls_at_fixedT_truth": cmb_metrics(gls_cmb(data, truth["rms"], nu, truth["beta_s"],
-                                                      truth["beta_eff"], float(truth["T_fixed"]))
-                                              - truth["cmb"], truth["cmb"], hi)}
+    T_fixed = float(truth["T_fixed"])
+    true_dust_col = truth["dust_bands"] / truth["a_dust"][:, None]
+    ref = {}
+    for name, bd, dcol in (("gls_true_sed", truth["beta_d"], true_dust_col),
+                           ("gls_at_truth_fixedT", truth["beta_d"], None),
+                           ("gls_at_beta_eff", truth["beta_eff"], None),
+                           ("gls_at_beta_eff3", truth["beta_eff3"], None)):
+        m = gls_cmb(data, truth["rms"], nu, truth["beta_s"], bd, T_fixed, dust_col=dcol)
+        ref[name] = cmb_metrics(m - truth["cmb"], truth["cmb"], hi)
+        blk = region_map(BLOCK_NSIDE, nside)
+        ref[name]["block_sq_err"] = (np.bincount(blk, (m - truth["cmb"]) ** 2,
+                                                 minlength=12 * BLOCK_NSIDE ** 2)
+                                     / np.bincount(blk, minlength=12 * BLOCK_NSIDE ** 2)).tolist()
     summary = {"reference": ref, "runs": {}}
     lines = [f"E020 analysis of {a.dir} (burn {a.burn}; nside {nside}; truth sd beta_s "
              f"{truth['beta_s'].std():.4f}, beta_d {truth['beta_d'].std():.4f}, beta_eff "
              f"{truth['beta_eff'].std():.4f}; beta_eff - beta_d rms "
              f"{np.std(truth['beta_eff'] - truth['beta_d']):.4f})",
-             f"reference GLS CMB at the true indices: rms {ref['gls_at_truth']['resid_rms_all']:.2f}"
-             f" / {ref['gls_at_truth']['resid_rms_hi']:.2f} uK, residual power fraction "
-             f"{ref['gls_at_truth']['resid_power_frac_l2_30']:.4f} (l 2-30) "
-             f"{ref['gls_at_truth']['resid_power_frac_l30_100']:.4f} (l 30-100); at beta_eff: "
-             f"rms {ref['gls_at_fixedT_truth']['resid_rms_all']:.2f}, fractions "
-             f"{ref['gls_at_fixedT_truth']['resid_power_frac_l2_30']:.4f} / "
-             f"{ref['gls_at_fixedT_truth']['resid_power_frac_l30_100']:.4f}", "",
+             "reference GLS CMB residuals (rms all / hi uK; power fractions l 2-30, 30-100): "
+             + "; ".join(f"{k}: {v['resid_rms_all']:.2f} / {v['resid_rms_hi']:.2f}, "
+                         f"{v['resid_power_frac_l2_30']:.4f}, {v['resid_power_frac_l30_100']:.4f}"
+                         for k, v in ref.items())
+             + " (gls_true_sed is the noise floor; the fixed-T ones carry the dust misfit)", "",
              f"{'run':<8s} {'n':>5s} {'rmse_s all/hi':>15s} {'rmse_d all/hi':>15s} "
              f"{'rmse_d(fixT)':>12s} {'floor_s/d':>13s} {'rmse draw s/d':>19s} "
              f"{'sd_s/sd_d':>13s} {'z_s med/mad':>12s} {'z_d med/mad':>12s} "
@@ -298,14 +356,43 @@ def main(argv=None) -> int:
                      f"{' '.join(f'{v:.4f}' for v in d['truth_sd_by_snr_bin'])}); |z_w|<1,<2: sync "
                      f"{s['frac_abs_z_w_lt1']:.2f}/{s['frac_abs_z_w_lt2']:.2f}, dust "
                      f"{d['frac_abs_z_w_lt1']:.2f}/{d['frac_abs_z_w_lt2']:.2f}")
+        lines.append(f"    dust rmse against beta_eff3 {d['rmse_fixedT3_all']:.4f}/"
+                     f"{d['rmse_fixedT3_hi']:.4f}; cmb per-draw rms {c['resid_rms_all_draw_mean']:.2f}"
+                     f" +- {c['resid_rms_all_draw_sd']:.2f}; amp-hyper ESS min {s['amp_ess_min']:.0f}"
+                     f"/{d['amp_ess_min']:.0f}")
         for cname in ("sync", "dust"):
             if "field_mu" in r[cname]:
                 f = r[cname]
+                rho = (f" rho {f['field_rho_deg'][0]:.1f} +- {f['field_rho_deg'][1]:.1f} deg,"
+                       if r["kind"] == "gmrf" else " (iid: rho decoupled),")
                 lines.append(f"    {cname} field: mu {f['field_mu'][0]:.4f} +- {f['field_mu'][1]:.4f},"
-                             f" sigma {f['field_sigma'][0]:.4f} +- {f['field_sigma'][1]:.4f}, rho "
-                             f"{f['field_rho_deg'][0]:.1f} +- {f['field_rho_deg'][1]:.1f} deg; amp "
+                             f" field mean {f['beta_map_mean'][0]:.4f}, sigma "
+                             f"{f['field_sigma'][0]:.4f} +- {f['field_sigma'][1]:.4f},{rho} amp "
                              f"mu {f['amp_mu_mean']:.3f} log s {f['amp_log_s_mean']:.2f}; ESS hyper"
                              f" min {f['ess_hyper_min']:.0f}")
+    # Paired comparisons: RMSE differences with block-bootstrap SE, against the best run per
+    # metric (sync vs PySM, dust vs beta_eff3, GLS CMB).
+    rng = np.random.default_rng(2020)
+    runs = summary["runs"]
+    if len(runs) > 1:
+        lines.append("")
+        lines.append("paired differences (run minus best, block bootstrap SE over 192 nside-4 "
+                     "blocks): sync RMSE vs PySM | dust RMSE vs beta_eff3 | GLS CMB residual rms")
+        picks = {"sync": lambda r: r["sync"]["block_sq_err"]["pysm"],
+                 "dust": lambda r: r["dust"]["block_sq_err"]["fixedT3"],
+                 "cmb": lambda r: r["cmb"]["block_sq_err"]}
+        best = {k: min(runs, key=lambda t: np.mean(f(runs[t]))) for k, f in picks.items()}
+        summary["paired"] = {}
+        for tag in runs:
+            cells = []
+            for k, f in picks.items():
+                diff, se = paired_bootstrap(f(runs[tag]), f(runs[best[k]]), rng)
+                summary["paired"].setdefault(tag, {})[k] = {"vs": best[k], "diff": diff, "se": se}
+                cells.append(f"{diff:+.4f} +- {se:.4f} (vs {best[k]})")
+            lines.append(f"  {tag:<8s} " + " | ".join(cells))
+        diff, se = paired_bootstrap(runs[best["cmb"]]["cmb"]["block_sq_err"],
+                                    ref["gls_true_sed"]["block_sq_err"], rng)
+        lines.append(f"  best cmb run minus the true-SED GLS floor: {diff:+.3f} +- {se:.3f} uK")
     lines += ["", "columns: rmse = posterior-mean index at the data pixels minus the PySM truth, "
               "all sky / |b| > 20; rmse_d(fixT) = dust against the fixed-T effective index "
               "beta_eff; floor = RMSE of the truth's own region means (unbeatable by a region "

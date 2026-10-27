@@ -469,7 +469,9 @@ class IndexFieldSamplingGroup:
                 out[spec.comp_name] = {"index_field": {
                     "beta_map": betas[spec.comp_name], "beta_nside": self.layout.nside_beta,
                     "mu": mu, "log_sigma": ls, "u": u, "z": z.copy(),
-                    "parameterization": "centred" if fld.centred else "noncentred"}}
+                    "parameterization": "centred" if fld.centred else "noncentred",
+                    "field_type": "iid" if isinstance(fld.field, gmrf_field.IidField)
+                    else "gmrf"}}
         for name, (mu, log_s) in self.layout.hypers(x).items():
             out.setdefault(name, {})["amp_prior"] = {"mu": mu, "log_s": log_s}
         return out

@@ -50,9 +50,27 @@ def fisher_sd(a_true, dsed, rms, region, nreg):
         return 1.0 / np.sqrt(F)
 
 
+def fisher_sd_profiled(M, dM, rms, region, nreg):
+    """Per-region Fisher sd of (beta_s, beta_d) with the three per-pixel amplitudes profiled
+    out: per pixel the 5 x 5 Fisher of (a_cmb, a_s, a_d, beta_s, beta_d) at the truth, Schur
+    complement onto the two indices, summed over the region, inverted. M (npix, B, 3) is the
+    mixing at the truth, dM (npix, B, 2) the derivative columns a_c dsed_c/dbeta_c."""
+    w = 1.0 / rms ** 2
+    J = np.concatenate([M, dM], axis=2)                       # (npix, B, 5)
+    F = np.einsum("pbi,b,pbj->pij", J, w, J)                  # (npix, 5, 5)
+    Faa, Fab, Fbb = F[:, :3, :3], F[:, :3, 3:], F[:, 3:, 3:]
+    S = Fbb - np.einsum("pij,pjk->pik", np.transpose(Fab, (0, 2, 1)), np.linalg.solve(Faa, Fab))
+    Sr = np.zeros((nreg, 2, 2))
+    np.add.at(Sr, region, S)
+    out = np.full((nreg, 2), np.inf)
+    ok = np.linalg.det(Sr) > 0
+    out[ok] = np.sqrt(np.diagonal(np.linalg.inv(Sr[ok]), axis1=1, axis2=2))
+    return out[:, 0], out[:, 1]
+
+
 def beta_eff_fixed_T(dust_bands, nu, rms, T_fixed, grid=np.linspace(1.0, 2.2, 601)):
     """Noise-free best-fit dust index per pixel with T fixed (rms-weighted least squares over the
-    bands, amplitude profiled): the dust truth a one-MBB fixed-T model can at best recover."""
+    bands, dust amplitude profiled, dust emission alone): the two-parameter effective index."""
     npix = dust_bands.shape[0]
     out = np.empty(npix)
     w = 1.0 / rms ** 2
@@ -64,6 +82,37 @@ def beta_eff_fixed_T(dust_bands, nu, rms, T_fixed, grid=np.linspace(1.0, 2.2, 60
         chi2 = np.sum(d ** 2 * w[None, :], axis=1)[:, None] - num ** 2 / den[None, :]
         out[lo:lo + 4096] = grid[np.argmin(chi2, axis=1)]
     return out
+
+
+def beta_eff_fixed_T_3comp(sky, nu, rms, beta_s, T_fixed, cmb_col,
+                           grid=np.linspace(1.0, 2.2, 601)):
+    """Noise-free best-fit dust index per pixel with T fixed and the cmb, sync and dust
+    amplitudes profiled (three-column GLS at the true beta_s on the full noiseless sky): the
+    effective index the model fit actually converges to (E020 review 2, item 4)."""
+    npix = sky.shape[0]
+    w = 1.0 / rms ** 2
+    sync_col = (nu[None, :] / 30.0) ** beta_s[:, None]
+    best = np.full(npix, np.inf)
+    out = np.empty(npix)
+    cmb_b = np.broadcast_to(cmb_col, (npix, nu.size))
+    for b in grid:
+        dust_col = np.broadcast_to(_dust_sed(nu, np.array([b]), T_fixed), (npix, nu.size))
+        M = np.stack([cmb_b, sync_col, dust_col], axis=2)
+        A = np.einsum("pbi,b,pbj->pij", M, w, M)
+        rhs = np.einsum("pbi,b,pb->pi", M, w, sky)
+        a = np.linalg.solve(A, rhs[..., None])[..., 0]
+        resid = sky - np.einsum("pbi,pi->pb", M, a)
+        chi2 = np.sum(resid ** 2 * w[None, :], axis=1)
+        better = chi2 < best
+        best[better] = chi2[better]
+        out[better] = b
+    return out
+
+
+def cmb_sed(nu):
+    """uK_CMB to uK_RJ conversion per band (the CMB mixing column)."""
+    x = H_OVER_K * np.asarray(nu, dtype=float) / 2.7255
+    return x ** 2 * np.exp(x) / np.expm1(x) ** 2
 
 
 def _bb_ratio(nu, nu0, T):
@@ -140,30 +189,46 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
     hp.write_map(f"{outdir}/template_dust_545GHz.fits", templates["dust"], overwrite=True,
                  dtype=np.float64)
     beta_eff = beta_eff_fixed_T(dust_bands, nu_arr, rms, T_fixed)
-    # Fisher sd of the region indices with amplitudes known (lower bound on the posterior sd).
-    dsed_s = (nu_arr[None, :] / 30.0) ** beta_s[:, None] * np.log(nu_arr / 30.0)[None, :]
-    dsed_d = _dust_sed(nu_arr, beta_d, T_fixed) * np.log(nu_arr / 545.0)[None, :]
+    beta_eff3 = beta_eff_fixed_T_3comp(sky, nu_arr, rms, beta_s, T_fixed, cmb_sed(nu_arr))
+    # Fisher sd of the region indices: amplitudes known (lower bound) and amplitudes profiled
+    # (the 5-parameter per-pixel Fisher reduced to the two indices by Schur complement).
+    sed_s = (nu_arr[None, :] / 30.0) ** beta_s[:, None]
+    sed_d = _dust_sed(nu_arr, beta_d, T_fixed)
+    dsed_s = sed_s * np.log(nu_arr / 30.0)[None, :]
+    dsed_d = sed_d * np.log(nu_arr / 545.0)[None, :]
+    M_true = np.stack([np.broadcast_to(cmb_sed(nu_arr), sed_s.shape), sed_s, sed_d], axis=2)
+    dM_true = np.stack([a_sync[:, None] * dsed_s, a_dust[:, None] * dsed_d], axis=2)
     fisher = {}
     for nb in (4, 8, 16):
         region = hp.ud_grade(np.arange(12 * nb * nb).astype(float), nside, order_in="RING",
                              order_out="RING").astype(int)
-        for name, a_true, dsed in (("sync", a_sync, dsed_s), ("dust", a_dust, dsed_d)):
+        prof = fisher_sd_profiled(M_true, dM_true, rms, region, 12 * nb * nb)
+        for name, a_true, dsed, sdp in (("sync", a_sync, dsed_s, prof[0]),
+                                        ("dust", a_dust, dsed_d, prof[1])):
             sd = fisher_sd(a_true, dsed, rms, region, 12 * nb * nb)
             fisher[f"{name}_{nb}"] = sd
-            report.append(f"Fisher sd {name} nside_beta {nb}: median {np.median(sd):.4f}, 16/84 "
-                          f"pct {np.percentile(sd, 16):.4f}/{np.percentile(sd, 84):.4f}, fraction "
-                          f"above 0.1: {np.mean(sd > 0.1) * 100:.0f} percent")
+            fisher[f"{name}_{nb}_profiled"] = sdp
+            tsd = (beta_s if name == "sync" else beta_d).std()
+            report.append(f"Fisher sd {name} nside_beta {nb}: amplitudes known median "
+                          f"{np.median(sd):.4f} (16/84 pct {np.percentile(sd, 16):.4f}/"
+                          f"{np.percentile(sd, 84):.4f}); amplitudes profiled median "
+                          f"{np.median(sdp):.4f} (16/84 pct {np.percentile(sdp, 16):.4f}/"
+                          f"{np.percentile(sdp, 84):.4f}), fraction above the truth sd "
+                          f"{tsd:.3f}: {np.mean(sdp > tsd) * 100:.0f} percent")
     for name, a_true, dsed in (("sync", a_sync, dsed_s), ("dust", a_dust, dsed_d)):
         report.append(f"Fisher sd {name} full sky: "
                       f"{fisher_sd(a_true, dsed, rms, np.zeros(npix, int), 1)[0]:.5f}")
-    report.append(f"beta_eff (fixed T {T_fixed:.3f} K) minus beta_d: rms {np.std(beta_eff - beta_d):.4f}"
-                  f", mean {np.mean(beta_eff - beta_d):+.4f}, range {np.min(beta_eff - beta_d):+.3f}"
-                  f" to {np.max(beta_eff - beta_d):+.3f}")
-    for name, m in (("beta_s", beta_s), ("beta_d", beta_d), ("beta_eff", beta_eff), ("T_d", T_d)):
+    report.append(f"beta_eff (fixed T {T_fixed:.3f} K, dust only) minus beta_d: rms "
+                  f"{np.std(beta_eff - beta_d):.4f}, mean {np.mean(beta_eff - beta_d):+.4f}, range "
+                  f"{np.min(beta_eff - beta_d):+.3f} to {np.max(beta_eff - beta_d):+.3f}; "
+                  f"three-component beta_eff3 minus beta_d: rms {np.std(beta_eff3 - beta_d):.4f}, "
+                  f"beta_eff3 minus beta_eff rms {np.std(beta_eff3 - beta_eff):.4f}")
+    for name, m in (("beta_s", beta_s), ("beta_d", beta_d), ("beta_eff", beta_eff),
+                    ("beta_eff3", beta_eff3), ("T_d", T_d)):
         report.append(f"truth {name}: mean {m.mean():.4f} sd {m.std():.4f} (|b| > 20: {m[hi].mean():.4f}"
                       f" / {m[hi].std():.4f}), range {m.min():.3f} to {m.max():.3f}")
     np.savez(f"{outdir}/truth.npz", beta_s=beta_s, beta_d=beta_d, T_d=T_d, T_fixed=T_fixed,
-             beta_eff=beta_eff, cmb=cmb_map, sky=sky, dust_bands=dust_bands, rms=rms, nu=nu_arr,
+             beta_eff=beta_eff, beta_eff3=beta_eff3, cmb=cmb_map, sky=sky, dust_bands=dust_bands, rms=rms, nu=nu_arr,
              nside=nside, noise_scale=noise_scale, seed=seed, g_sync=templates["sync"],
              g_dust=templates["dust"], a_sync=a_sync, a_dust=a_dust, index_prior_sync=INDEX_PRIOR["sync"],
              index_prior_dust=INDEX_PRIOR["dust"], indep_sd=INDEP_SD, cmb_sd=CMB_SD,
@@ -272,6 +337,7 @@ compsep:
         target_accept: 0.8
         max_depth: 10
         parameterization: noncentred
+        init_inv_mass: fd_hessian
   bands:{bands}
 components:
   CMB:
