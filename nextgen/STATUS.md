@@ -2,6 +2,45 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-27 (Mac mini, 01:50): pass 3 and pass 4 grids done; M2.4 stage 1 code complete (commits 1 to 8, stats-reviewed)
+
+**Learned**
+- E014 pass 3 (20 bands): both chains exact against their grids (ridge -0.09 / +0.03 sd, marginal
+  -0.03 / -0.02 sd, widths within 6 percent). Marginal minus ridge +16.1 +- 0.1 sd in beta_s and
+  +2.1 in beta_d, against +56 / +5.5 on the pass-2 inputs: the flat-prior volume shift is itself
+  data-set dependent.
+- E014 pass 4 (one DR1-model zero-level convention for all 20 bands, grids only): ridge
+  (-2.87545, 1.39914), marginal (-2.87236, 1.39924); against pass 3 the zero levels alone move
+  beta_s by +0.035 (260 sd) and beta_d by -0.016 (460 sd). Marginal minus ridge +22.7 / +2.9 sd.
+  Real-data full-sky indices are set by the zero-level convention at the 0.03 to 0.4 level, far
+  above the statistical error; Q15 stands (per-band monopole parameter needed).
+- M2.4 stage 1 implemented on nextgen, 8 commits, full suite 932 tests green: C++
+  `solve_perpix_regions` and `want_extras` (bitwise parity with `solve_perpix`); array-valued
+  SEDs and `beta_map` on the components; `AmpPrior` (none / gaussian / hier) as pseudo-bands and
+  the prior- and region-aware amplitude draw; `RegionIndexLikelihood` (joint target over index
+  fields and hier hyperparameters; stats review 2026-10-27 CONFIRMED against an independent
+  covariance-form marginal, FD gradients in every block, 4-rank MPI reduction; its five findings
+  applied); `IndexFieldSamplingGroup` (NUTS over MPI, state across Gibbs iterations);
+  `likelihood: hier` with a `nuts` block, component keys `spectral_index_nside`,
+  `spectral_index_field`, `amp_prior`; chain output `index_field/*`, `amp_prior/*`,
+  `mcmc/<group>/{nuts,state}`; restart. Example `params/sims/simparam_compsep_hier_field.yml`.
+  Not yet validated end to end (L1 to L3 below); the hier SBC of the prototype (L2 gate) is at
+  86 of 300 replicates.
+
+**Running:** pass-4 Haslam-dipole variant grid (01:40 to about 02:10); E017 hier modes (71 of 96
+cells); E016 hier SBC (86 of 300, about 2.5 per hour: it will take another day on this machine).
+
+**Next**
+1. M2.4 commit 9: `aux/validate_mcmc_likelihood.py make --mode hier_field` (L3, 7 ranks, scalar +
+   ridge must reproduce today's numbers; nside_beta 2 + hier against the prototype chain and
+   per-region grids), the L1 in-process test, E018 record; stats-reviewer on the harness.
+2. pass4hdip grid into E014 and Q15; FINDINGS entry on the zero-level dependence (F18); DECISIONS
+   entry on the pass-4 convention and on the M2.4 start-state choice.
+3. E017 table and Conclusion when the hier modes finish; E016 SBC result when done.
+
+**Needs Trygve:** unchanged (Q15 per-band zero-level parameter; hier as a non-default likelihood
+option is in, ridge stays the default per D003).
+
 ## 2026-10-26 (Mac mini, night): pass-3 ridge on 20 bands; zero-level inconsistency found (Q15); M2.4 plan drafted
 
 **Learned**
