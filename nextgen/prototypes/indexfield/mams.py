@@ -171,11 +171,13 @@ def run_mams(post, rng: np.random.Generator, n_warmup: int, n_samples: int, x0=N
             if preconditioning and sigma is None:
                 sd = w.std(axis=0)
                 sig = np.where(sd > 0, sd, 1.0)
-            if L is None:
+            if L is None and w.shape[0] >= 100:
+                # ALBA L from the window, floored at 0.3 sqrt(d) (a short window overestimates
+                # ESS and would collapse L to one step, which the paper's sqrt(d) start forbids).
                 ess = ess_geyer(w / sig)
                 ess = np.where(np.isfinite(ess) & (ess > 0), ess, 1.0)
                 Lc = float(alba_factor * eps * np.mean(w.shape[0] / ess))
-                Lc = min(max(Lc, eps), 500 * eps)
+                Lc = min(max(Lc, 0.3 * np.sqrt(d)), 500 * eps)
             da = _DualAveraging(eps, target_accept)
         if progress and (it + 1) % max(1, n_warmup // 5) == 0:
             print(f"    mams warmup {it + 1}/{n_warmup} eps={eps:.3g} L={Lc:.3g}")
