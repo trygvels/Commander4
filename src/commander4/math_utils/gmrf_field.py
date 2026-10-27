@@ -129,6 +129,19 @@ class GraphLaplacianBasis(Basis):
         self.graph_eigenvalues = evals[1:].copy()
 
 
+_BASIS_CACHE: dict[int, "GraphLaplacianBasis"] = {}
+
+
+def graph_laplacian_basis(nside_beta: int) -> "GraphLaplacianBasis":
+    """`GraphLaplacianBasis(nside_beta)` built once per process and shared afterwards (the dense
+    eigh takes 18 s at nside_beta 16; the sampler asks for the basis every Gibbs iteration on
+    every rank). The basis is read-only after construction."""
+    key = int(nside_beta)
+    if key not in _BASIS_CACHE:
+        _BASIS_CACHE[key] = GraphLaplacianBasis(key)
+    return _BASIS_CACHE[key]
+
+
 class MaternField:
     """Matern spectrum in a Basis with range parameter rho (radians).
 

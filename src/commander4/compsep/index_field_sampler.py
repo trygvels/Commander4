@@ -139,7 +139,7 @@ def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
     if nside_beta > NSIDE_BETA_MAX:
         raise ValueError(f"spectral_index_nside {nside_beta} exceeds {NSIDE_BETA_MAX} (dense "
                          "eigendecomposition).")
-    basis = gmrf_field.GraphLaplacianBasis(nside_beta)
+    basis = gmrf_field.graph_laplacian_basis(nside_beta)
     fld = gmrf_field.MaternField(basis, alpha=float(settings.get("alpha", 2.0)))
     hyper = gmrf_field.HyperPrior(mu0=float(prior["mean"]), s_mu=float(prior["rms"]),
                                   sigma_scale=float(settings.get("sigma_scale", 0.3)),
