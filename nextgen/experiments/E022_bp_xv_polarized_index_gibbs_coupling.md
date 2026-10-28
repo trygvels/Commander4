@@ -323,7 +323,15 @@ effect this cell does not determine (candidates: pixel averaging of the model, n
 T_d, across the plane's strong gradients; region re-assignment at the plane boundary; a CMB
 prior too tight for a flat-spectrum residual there; the flat-CMB profile moves 0.16 too).
 This is the reviewer's toy reproduced on the real data (toy: pinned from 16 elements per
-nside-16 pixel; data: pinned at 16 per pixel for the Spur). Caveats for nside 32 and 64: the
+nside-16 pixel; data: pinned at 16 per pixel for the Spur). Second follow-up (12:36,
+`resolution/result_n{16,32,64}_allpriors.json`): zero-mean Gaussian priors on all three
+amplitudes, the CMB at the Planck-EE rms and synchrotron and dust at the sky rms of the BP
+release maps at each nside (13 to 15 and 12.6 to 13.7 uK_RJ): collapsed means with prior
+Spur -3.182, -3.197, -3.200; High Latitude -3.252, -3.199, -3.140; Galactic Center -3.176,
+-3.222, -3.190; Plane -3.302, -3.170, -2.909 over nside 16, 32, 64; tau 1.2 to 1.6
+everywhere. Spur and Galactic Center are stable to 0.05, High Latitude to 0.11, and the Plane
+still moves 0.39 with every amplitude prior in place, which confirms that its movement is
+not a volume term. Caveats for nside 32 and 64: the
 noise is white and diagonal although the 60 arcmin smoothing correlates neighbours (about
 0.3 at nside 64), and the regions are re-assigned per nside, so each resolution is a
 different data set and the extrapolation to nside 1024 is a direction, not a value. Inference, labelled as such
@@ -398,10 +406,11 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   gone (tau 1.2 to 1.6) and the collapsed means move by 0.03 (Spur), 0.07 (Galactic Center),
   0.16 (High Latitude; profile stable, the synchrotron volume term) and 0.41 (Plane; the
   profile moves too, a resolution-dependent likelihood effect this cell does not explain)
-  over nside 16 to 64. That amplitude priors on every component with a data-set scale (the
-  E016 hierarchical form) or the profile give a resolution-stable target is the hypothesis
-  the listed follow-up tests; this cell supports it for the synchrotron volume term and not
-  for the Plane.
+  over nside 16 to 64. With zero-mean data-scaled priors on all three amplitudes the Spur
+  and Galactic Center are stable to 0.05 and High Latitude to 0.11, so priors on every
+  component with a data-set scale (the E016 hierarchical form is the proper version) give a
+  resolution-stable target where the volume term is the cause; the Plane still moves 0.39
+  with all priors in place, a likelihood effect this cell does not explain.
 - Limits: diagonal noise in the collapsed target (the dense WMAP covariance changes the
   conditional width by under 5 percent); delta bandpasses; NPIPE A split at 353; unsmoothed
   WMAP r4 maps; regions recovered from the smoothed release map; nside 16 instead of
@@ -413,9 +422,9 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   `beta_pixreg_proplen` and `nprop` of 6e-4 and 1000 belong to the intensity row).
 
 ## Follow-ups
-- Resolution scaling with the hierarchical amplitude prior (E016 form) on all three components
-  at nside 16 to 64: the direct test that the data-scaled prior removes the resolution
-  dependence in the Plane as well.
+- The Plane's resolution dependence (collapsed, profile and all-priors targets all move by
+  0.4 from nside 16 to 64): test region assignment (nside-16 labels upgraded against
+  re-assignment per nside) and the pixel averaging of the T_d-dependent dust model.
 - A longer or differently started polarized beta_s chain is the only way to settle the
   movement question; it is not in the release.
 - Dense WMAP covariance in the collapsed target (18432-amplitude Gaussian marginal per beta

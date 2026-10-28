@@ -37,7 +37,7 @@ def mbb_rj(nu, beta_d, T):
 
 
 class Surrogate:
-    def __init__(self, path, lfi_noise="bp", cmb_prior_sd=0.0):
+    def __init__(self, path, lfi_noise="bp", cmb_prior_sd=0.0, synch_prior_sd=0.0, dust_prior_sd=0.0):
         z = np.load(os.path.join(path, "surrogate.npz"), allow_pickle=True)
         self.d = z["d"]; self.sigma = z["sigma"].copy(); self.nu = z["freqs"]; self.bands = [str(b) for b in z["bands"]]
         if lfi_noise == "white":
@@ -46,6 +46,13 @@ class Surrogate:
         # Gaussian per-pixel prior N(0, sd^2) on the CMB amplitude (uK_CMB); 0 means flat
         self.prior_prec = np.zeros(3); self.cmb_prior_sd = float(cmb_prior_sd)
         if cmb_prior_sd > 0: self.prior_prec[2] = 1.0 / cmb_prior_sd**2
+        # optional zero-mean Gaussian priors on the synchrotron (uK_RJ at 30 GHz) and dust (uK_RJ at
+        # 353 GHz) amplitudes; "rms" takes the sky rms of the BP release map at this nside
+        amp0 = z["amp"]
+        for i, v in ((0, synch_prior_sd), (1, dust_prior_sd)):
+            if isinstance(v, str) and v == "rms": v = float(np.sqrt(np.mean(amp0[i] ** 2)))
+            if v and float(v) > 0: self.prior_prec[i] = 1.0 / float(v) ** 2
+        self.amp_prior_sd = [float(np.sqrt(1 / q)) if q > 0 else 0.0 for q in self.prior_prec]
         self.amp = z["amp"]; self.T_d = z["T_d"]; self.beta_d = float(z["beta_d"]); self.region = z["region"]
         self.nb, _, self.npix = self.d.shape
         self.w = 1.0 / self.sigma**2
@@ -186,16 +193,18 @@ def main():
     ap.add_argument("--lfi-noise", choices=("bp", "white"), default="bp", help="LFI noise sd: BP nside-16 simulated rms, or white-noise propagation")
     ap.add_argument("--cmb-prior-sd", type=float, default=0.0, help="Gaussian per-pixel prior sd on the CMB Q/U amplitude in uK_CMB (0: flat)")
     ap.add_argument("--tag", default="")
+    ap.add_argument("--synch-prior-sd", default="0", help="zero-mean Gaussian prior sd on the synchrotron amplitude (uK_RJ at 30 GHz), or 'rms'")
+    ap.add_argument("--dust-prior-sd", default="0", help="same for dust (uK_RJ at 353 GHz), or 'rms'")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
-    sur = Surrogate(a.dir, lfi_noise=a.lfi_noise, cmb_prior_sd=a.cmb_prior_sd)
+    sur = Surrogate(a.dir, lfi_noise=a.lfi_noise, cmb_prior_sd=a.cmb_prior_sd, synch_prior_sd=a.synch_prior_sd, dust_prior_sd=a.dust_prior_sd)
     tag = a.tag or f"{a.lfi_noise}_cmb{a.cmb_prior_sd:g}"
-    print(f"variant {tag}: LFI noise {a.lfi_noise}, CMB prior sd {a.cmb_prior_sd:g} uK_CMB")
+    print(f"variant {tag}: LFI noise {a.lfi_noise}, amplitude prior sds (synch, dust, cmb) {sur.amp_prior_sd}")
     print(f"bands {sur.bands}, pixels used {sur.ok.sum()} of {sur.npix}; region sizes",
           [int(((sur.region == r) & sur.ok).sum()) for r in range(4)])
     grid = np.linspace(-4.5, -1.5, 2001)
     amp0 = sur.amp
-    res = {"bands": sur.bands, "regions": {}, "variant": {"lfi_noise": a.lfi_noise, "cmb_prior_sd": a.cmb_prior_sd, "iters": a.iters}}
+    res = {"bands": sur.bands, "regions": {}, "variant": {"lfi_noise": a.lfi_noise, "cmb_prior_sd": a.cmb_prior_sd, "amp_prior_sd": sur.amp_prior_sd, "iters": a.iters}}
     # T2 first (independent of amplitudes), then T1 at amplitude draws consistent with the data
     for r, name in enumerate(REGIONS):
         t0 = time.time()
