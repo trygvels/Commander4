@@ -151,4 +151,4 @@ metric is a valid kernel; the step size restarts as at a Stan window end), so th
 one reviewed for E018 and E020; the E021 Result records it and the stats review of the E021
 sampler configuration is run while the production is going, not after.
 
-**Amendment (08:20):** `adapt_mass: false` for the E021 production, so the last refreshed Hessian (transition 200) is the metric for the rest of the run; with the windows on, the one ending at 250 would have replaced it by a 50-sample variance estimate (stats review of c707a34, note 3). Review items on the refresh (terminal buffer, once-per-count firing) applied before the restart.
+**Amendment (07:17):** `adapt_mass: false` for the E021 production, so the last refreshed Hessian (transition 200) is the metric for the rest of the run; with the windows on, the one ending at 250 would have replaced it by a 50-sample variance estimate (stats review of c707a34, note 3). Review items on the refresh (terminal buffer, once-per-count firing) applied before the restart.

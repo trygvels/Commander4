@@ -165,8 +165,8 @@ fires once at the first Gibbs iteration that reaches it (numstep need not divide
 `adapt_mass: true` the window ending at 250 would have replaced the refreshed Hessian by a
 50-sample variance estimate, so the production runs `adapt_mass: false` (the metric is the
 Hessian at transition 200 for the rest of the run, the setting the 136-gradient diagnostic
-measured). The first two-lane attempt (07:10 to 08:20, `adapt_mass: true`, kept as
-`chains_{gmrf16,iid16}_windows_attempt2/`) was restarted with that setting at 08:20. The MC inflation of the
+measured). The first two-lane attempt (07:10 to 07:16, `adapt_mass: true`, stopped inside the Hessian
+start, kept as `chains_{gmrf16,iid16}_windows_attempt2/`) was restarted with that setting at 07:17. The MC inflation of the
 RMSE (above) decides whether 700 samples suffice for each comparison; a run is extended if not.
 
 ## Negative control
