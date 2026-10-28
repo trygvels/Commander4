@@ -48,15 +48,28 @@ class NUTSConfig:
     parameterization: str = "noncentred"
     init_inv_mass: str = "ones"
     adapt_mass: bool = True
+    refresh_inv_mass_at: tuple = ()
 
     @classmethod
     def from_block(cls, block: Bunch | dict | None) -> "NUTSConfig":
         values = dict(block) if block else {}
         unknown = set(values) - {"n_warmup", "target_accept", "max_depth", "parameterization",
-                                 "init_inv_mass", "adapt_mass"}
+                                 "init_inv_mass", "adapt_mass", "refresh_inv_mass_at"}
         if unknown:
             raise ValueError(f"Unknown nuts settings {sorted(unknown)}.")
+        if "refresh_inv_mass_at" in values:
+            at = values["refresh_inv_mass_at"]
+            at = [at] if isinstance(at, (int, np.integer)) and not isinstance(at, bool) else at
+            if not isinstance(at, (list, tuple)) or not all(
+                    isinstance(v, (int, np.integer)) and not isinstance(v, bool) and v > 0
+                    for v in at):
+                raise ValueError("nuts.refresh_inv_mass_at must be a list of positive integers "
+                                 "(transition counts during warm-up).")
+            values["refresh_inv_mass_at"] = tuple(int(v) for v in at)
         cfg = cls(**values)
+        if any(v >= cfg.n_warmup for v in cfg.refresh_inv_mass_at):
+            raise ValueError("nuts.refresh_inv_mass_at entries must be below n_warmup (the "
+                             "metric can only be reset during warm-up).")
         if cfg.parameterization not in ("noncentred", "centred"):
             raise ValueError(f"nuts.parameterization must be 'noncentred' or 'centred', got "
                              f"{cfg.parameterization!r}.")
@@ -423,6 +436,18 @@ class IndexFieldSamplingGroup:
                                 f"{inv.min():.3g} to {inv.max():.3g}, "
                                 f"{int(np.sum(inv == 1.0))} coordinates left at 1")
                 st.mass_initialized = True
+                if (st.n_transitions in self.nuts.refresh_inv_mass_at
+                        and st.sampler.iteration < st.sampler.n_warmup):
+                    # Warm-up only: a fresh finite-difference Hessian at the current state
+                    # replaces the metric (the start-state Hessian is stale once the chain has
+                    # left the transient), and the step size is re-found; same target.
+                    inv = fd_inverse_mass(self._logp_and_grad_root, x)
+                    st.sampler.reset_metric(inv, x, self._logp_and_grad_root)
+                    logger.info(f"Index-field group {group_name!r}: inverse mass refreshed from "
+                                f"the finite-difference Hessian at transition "
+                                f"{st.n_transitions}, {2 * x.size} gradients, range "
+                                f"{inv.min():.3g} to {inv.max():.3g}, step size "
+                                f"{st.sampler.step_size:.3g}")
                 for _ in range(numstep):
                     x, info = st.sampler.transition(x, self._logp_and_grad_root)
                     infos.append(info)

@@ -219,3 +219,47 @@ def test_fixed_metric_matches_exact_target_and_is_never_updated():
         assert abs(draws[:, j].var() - true_var[j]) < 4 * true_var[j] * np.sqrt(2.0 / ess)
     emp = np.corrcoef(draws[:, 1], draws[:, 2])[0, 1]
     assert abs(emp - 0.8) < 0.05
+
+
+def test_reset_metric_during_warmup_replaces_metric_and_keeps_target():
+    """``reset_metric`` (the fd_hessian refresh): a metric that is wrong by 3 to 10x is replaced
+    at transition 30 by the true variances; the step size is re-found and the adaptation
+    restarted; the post-warm-up kernel then reproduces the exact target, and the call is refused
+    after warm-up."""
+    cov = np.array([[1.0, 0.8 * 3.0], [0.8 * 3.0, 9.0]])
+    prec = np.linalg.inv(cov)
+    true_var = np.array([0.39493407, 1.0, 9.0])
+
+    def f(theta):
+        x, y = theta[0], theta[1:]
+        logp = 3.0 * x - np.exp(x) - 0.5 * y @ prec @ y
+        return logp, np.concatenate([[3.0 - np.exp(x)], -prec @ y])
+
+    rng = np.random.default_rng(11)
+    sampler = NUTSSampler(3, rng, n_warmup=400, adapt_mass=False)
+    sampler.inv_mass = np.array([0.13, 3.0, 0.9])
+    theta = np.array([np.log(3.0), 0.0, 0.0])
+    draws, steps = [], []
+    for it in range(400 + 6000):
+        if it == 30:
+            old_step = sampler.step_size
+            sampler.reset_metric(true_var, theta, f)
+            np.testing.assert_array_equal(sampler.inv_mass, true_var)
+            assert sampler._window_samples == []
+            assert sampler.step_size != old_step
+        theta, info = sampler.transition(theta, f)
+        if it >= 400:
+            draws.append(theta.copy())
+            steps.append(info.step_size)
+    draws = np.array(draws)
+    np.testing.assert_array_equal(sampler.inv_mass, true_var)
+    assert len(set(steps)) == 1
+    means = np.array([0.92278434, 0.0, 0.0])
+    for j in range(3):
+        ess = _ess(draws[:, j])
+        assert ess > 300
+        assert abs(draws[:, j].mean() - means[j]) < 4 * np.sqrt(true_var[j] / ess)
+        assert abs(draws[:, j].var() - true_var[j]) < 4 * true_var[j] * np.sqrt(2.0 / ess)
+    assert abs(np.corrcoef(draws[:, 1], draws[:, 2])[0, 1] - 0.8) < 0.05
+    with pytest.raises(ValueError, match="warm-up"):
+        sampler.reset_metric(true_var, theta, f)

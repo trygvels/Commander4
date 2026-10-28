@@ -141,6 +141,23 @@ class NUTSSampler:
         self._inv_mass = value
 
     # ---------------------------------------------------------------- public interface
+    def reset_metric(self, inv_mass, theta: NDArray, logp_and_grad: LogpGrad) -> None:
+        """Replace the inverse mass during warm-up and restart the step-size adaptation from a
+        fresh heuristic step size at ``theta`` (Hoffman and Gelman Algorithm 4), as Stan does at
+        a window end. Warm-up only: the window sample buffer is cleared and the floor metric of
+        the later windows becomes the new metric. The target is unchanged (any positive metric
+        is valid); only the adaptation state changes."""
+        if self.iteration >= self.n_warmup:
+            raise ValueError("reset_metric is a warm-up operation; the sampler has finished "
+                             "its warm-up.")
+        self.inv_mass = inv_mass
+        self._floor_metric = np.array(self.inv_mass, dtype=float, copy=True)
+        self._window_samples = []
+        self.step_size = self._find_reasonable_step_size(np.asarray(theta, dtype=float),
+                                                         logp_and_grad)
+        if self._dual is not None:
+            self._dual.restart(self.step_size)
+
     def transition(self, theta: NDArray, logp_and_grad: LogpGrad) -> tuple[NDArray, TransitionInfo]:
         """One NUTS transition from ``theta``; adapts while within the warmup."""
         theta = np.asarray(theta, dtype=float)

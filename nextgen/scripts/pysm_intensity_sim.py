@@ -124,7 +124,8 @@ def _bb_ratio(nu, nu0, T):
 
 def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int,
              n_warmup: int, sky_mode: str = "pysm", nside_truth: int = 16,
-             template_scatter: float = 0.3, adapt_mass: bool = True) -> None:
+             template_scatter: float = 0.3, adapt_mass: bool = True,
+             refresh_mass_at: int = 50) -> None:
     """`sky_mode` "pysm": the PySM d1 s1 c1 sky as it is (E020; T_d varies, indices vary per nside
     pixel, templates built from the data). "consistent" (E021): a sky drawn from the model class
     Commander4 fits: indices constant per nside_truth region (the PySM region means), one modified
@@ -280,7 +281,7 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
     for tag, (kind, nside_beta) in RUNS.items():
         with open(f"{outdir}/param_{tag}.yml", "w") as f:
             f.write(param_file(outdir, tag, kind, nside_beta, nside, T_fixed, n_iter, n_warmup,
-                               adapt_mass))
+                               adapt_mass, refresh_mass_at))
     print(f"{sky_mode} sky written to {outdir}: nside {nside}, noise scale {noise_scale} (rms per pixel "
           f"{np.round(rms, 2).tolist()} uK_RJ), T_fixed {T_fixed:.3f} K, cmb rms "
           f"{cmb_map.std():.1f} uK_CMB; {len(RUNS)} parameter files.")
@@ -311,7 +312,8 @@ def _field_block(kind: str | None, nside_beta: int) -> str:
 
 
 def param_file(outdir: str, tag: str, kind: str | None, nside_beta: int, nside: int,
-               T_fixed: float, n_iter: int, n_warmup: int, adapt_mass: bool = True) -> str:
+               T_fixed: float, n_iter: int, n_warmup: int, adapt_mass: bool = True,
+               refresh_mass_at: int = 50) -> str:
     fwhm = 2.0 * hp.nside2resol(nside, arcmin=True)
     bands = ""
     for f in FREQS:
@@ -380,6 +382,7 @@ compsep:
         max_depth: 10
         parameterization: centred
         init_inv_mass: fd_hessian
+        refresh_inv_mass_at: [{refresh_mass_at}]
         adapt_mass: {str(adapt_mass).lower()}
   bands:{bands}
 components:
@@ -461,12 +464,14 @@ def main(argv=None) -> int:
                     help="consistent sky: nside of the region-constant true indices")
     ap.add_argument("--template-scatter", type=float, default=0.3,
                     help="consistent sky: iid relative scatter of the true amplitudes about the templates")
+    ap.add_argument("--refresh-mass-at", type=int, default=50,
+                    help="warm-up transition at which the Hessian metric is recomputed (E021)")
     ap.add_argument("--no-adapt-mass", action="store_true",
                     help="write nuts.adapt_mass: false (keep the Hessian metric for the whole run)")
     a = ap.parse_args(argv)
     simulate(a.dir, a.nside, a.noise_scale, a.seed, a.n_iter, a.n_warmup, sky_mode=a.sky,
              nside_truth=a.nside_truth, template_scatter=a.template_scatter,
-             adapt_mass=not a.no_adapt_mass)
+             adapt_mass=not a.no_adapt_mass, refresh_mass_at=a.refresh_mass_at)
     return 0
 
 

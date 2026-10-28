@@ -427,6 +427,11 @@ compsep:
       #                       # central finite-difference Hessian at the start state (2 dim
       #                       # gradients). Same target; avoids the step-size collapse when the
       #                       # hyperparameters are far stiffer than the field coefficients.
+      #   refresh_inv_mass_at: []  # transition counts (during warm-up, below n_warmup) at which the
+      #                            # diagonal inverse mass is recomputed from the finite-difference
+      #                            # Hessian at the current state and the step size re-found (the
+      #                            # start-state Hessian is stale once the warm-up transient is over;
+      #                            # 2 dim gradients each; same target). E021 uses [50].
       #   adapt_mass: true    # false: keep the initial inverse mass for the whole run and adapt
       #                       # the step size only (same target for any fixed metric). Use with
       #                       # fd_hessian when the warm-up windows (25 to 200 correlated draws)
