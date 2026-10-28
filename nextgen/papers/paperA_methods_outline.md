@@ -94,6 +94,14 @@ model component rather than a preprocessing choice.
 - Validation ladder: exact-target checks (E012 L1), SBC at K 192 (E012; hier SBC E016 L2,
   pending), coverage with a misspecified template (E016: a 30 percent large-scale distortion or 23
   percent scatter of the template leaves z within 0.3 sd and coverage 0.64 to 0.75 / 0.92 to 0.98).
+- Template-error law (F23, E021 attempt 1, stats review pending): the collapsed hier marginal is
+  exact for its own law a | g ~ N(mu g, (s g)^2) and not for template errors of the same size
+  with a different conditional law. With g = a / r (r a 30 percent iid scatter) the exact target
+  at the true index field prefers the faint-sky dust index 0.114 above the truth (21 sd of the
+  common mode; the determinant term against the chi-square term) and the amplitude
+  hyperparameters 2 percent low; the data-dominated regions are untouched and the CMB prior
+  width is irrelevant. The point for real data: where the prior dominates, the index posterior
+  reports the template-error model, so the model needs a stated template law (Q16).
 - Sampler: NUTS with dual averaging and windowed diagonal mass adaptation; efficiency per gradient;
   the funnel at low S/N (E018 L1 diagnostic: the centred reference chain does not reach the
   small-sigma tail where NUTS in non-centred coordinates does). MAMS comparison (M2.3, pending).
