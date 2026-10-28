@@ -404,3 +404,5 @@ Not established: anything about polarization, the 143/217 bands, or the plane (m
   conditional sd of beta_s per region against the collapsed (ridge and hier) sd, and the
   prior-to-posterior width ratio. Decides whether the conditional Gibbs mixing issue has any
   bearing on BP XV's reported uncertainties. Before any statement about BP mixing is written.
+  Done as E022 (2026-10-28): ratio 2.1 to 2.35, Gibbs coupling length 7 to 11 on an nside-16
+  surrogate with the released flat CMB prior; F22.

@@ -2,6 +2,48 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-28 (Mac mini, 11:50): E022 (BP XV polarized beta_s Gibbs coupling) done on a surrogate, stats-reviewed; Q7 data point; E021 running serialized
+
+**Learned**
+- E022 (F22, draft until the re-check): on an nside-16 surrogate of the BeyondPlanck XV
+  polarization data (LFI 30 to 70, WMAP Ka/Q/V nine-year nside-16 maps with their dense
+  covariances fetched from LAMBDA, NPIPE 353, the four BP XV regions, prior N(-3.3, 0.1)) the
+  collapsed-to-conditional sd ratio of beta_s is 2.1 to 2.35 (Spur, Plane) with the released
+  configuration's flat CMB amplitude prior, and a two-block Gibbs sampler with exact
+  conditional draws has autocorrelation times of 7 to 11 (Gaussian prediction 8 to 10; lag-1
+  equals the exact identity to 0.005). With a Gaussian CMB prior of the size the Planck EE
+  spectrum implies (0.19 uK) the coupling vanishes (ratio 1.02 to 1.04). BP XV's reported 30 to
+  50 does not understate this coupling; F14's ratio 180 does not transfer to polarization at
+  this S/N (synchrotron S/N 2 to 3 per pixel). The flat-prior marginal is shifted from the
+  profile by +0.27 (Spur) and runs to the flattest allowed index in the High Latitude region;
+  the C_l-sized CMB prior removes the runaway: the prior-volume effect on real data, carried by
+  the free per-pixel CMB amplitude. Stats review CONFIRMED WITH ITEMS; all must-fix and
+  should-fix items applied (CMB-prior and noise variants, MC errors, lag-1 identity);
+  re-check requested.
+- Q7 data point: BP's simulated LFI noise rms at nside 16 and 60 arcmin is 1.6 times white-noise
+  propagation in all three bands (ratio 1.4 to 1.9 across the sky); a white per-pixel
+  likelihood there overstates index precision by 1.6.
+- The released BP chain files store the per-region index per sample compactly; a reader over
+  HTTP range requests (no download of the 1.8 TB file) is fetching BP XV's actual beta_s chain
+  for its autocorrelation.
+
+**Running**
+- E021 gmrf16 alone (chain-1 iteration 160 at 10:56, about 20 s per iteration, ends about
+  17:30 with the refresh at 200), then iid16 (paused at 80), then the other eight in start
+  order (serializer).
+- BP chain-1 beta_s reader; E022 re-check by the stats-reviewer; E016 hier SBC replication
+  (about 19 h left).
+
+**Next**
+- E022: BP chain autocorrelation against 30 to 50 and against 7 to 11; close the record and
+  F22 after the re-check. Follow-up on the resolution scaling of the volume term (nside 32, 64)
+  for Paper A Sect. 4.
+- E021 analysis once the nside-16 pair is in; SBC verdict; E014 BP XV cell is E022 now
+  (E014 Follow-ups to be pointed there); M2.6 (Q7 partly measured, Q8); Paper A outline update.
+
+**Needs Trygve**
+- Nothing new. The hier default question (D003/D011) stands.
+
 ## 2026-10-28 (Mac mini, 10:40): E021 production on the refreshed metric; two lanes give no throughput, jobs serialized
 
 **Learned**
