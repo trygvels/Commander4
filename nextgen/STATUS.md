@@ -13,11 +13,14 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   11 from lag-1 (a slow component); 23 to 59 effective samples per chain. Both
   likelihood-sampled regions drift towards flatter indices in both chains (+0.065 to +0.092
   per 1000 samples, 1.5 to 2.0 sigma per chain-region, none in the prior-only regions), the
-  direction of the flat-prior volume pull. The reported sds (0.06, 0.07) are the spread of
-  unsettled chains; the stationary flat-prior target lies at flatter indices by an amount not
-  determined here (E022, F22; stats review: targets, code, inputs CONFIRMED, conclusion
-  rewritten per the re-check, final check requested). Chains 3 and 4 are being read to
-  double the drift statistics.
+  direction of the flat-prior volume pull, but the four tests share a start and pair within
+  chains, and chain 1's movement is a last-quarter joint excursion: consistent with an
+  unsettled chain and with a transient, establishing neither (third review round). The
+  reported sds (0.06, 0.07) are the spread of chains with 23 to 59 effective samples that
+  cannot be shown to have settled; that the flat-prior target lies at flatter indices is an
+  expectation from the surrogate and a toy, not a chain measurement (E022, F22; stats review
+  in three rounds: targets, code, inputs and chain numbers CONFIRMED). Chains 3 and 4, if
+  started elsewhere, are the test; being read.
 - Method point for Paper A Sect. 4: the coupling and the runaway are carried by the free
   per-pixel CMB amplitude (0.19 uK of signal against 1.5 to 2 uK of noise); a C_l-sized CMB
   prior removes both on the surrogate.
@@ -31,8 +34,9 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   scaling of the volume term (nside 32, 64) for Paper A Sect. 4; Q8; Paper A outline update.
 
 **Needs Trygve**
-- How to present the E022 BP XV chain diagnostics (unsettled flat-prior chains, drift towards
-  flatter indices, 23 to 59 effective samples) in Paper A, given BP XV is his paper: as a
+- How to present the E022 BP XV chain diagnostics (23 to 59 effective samples per chain,
+  chains that cannot be shown to have settled, movement towards flatter indices from a common
+  start) in Paper A, given BP XV is his paper: as a
   worked example of the prior-volume effect with the numbers above, or only as the method
   recommendation (C_l-sized CMB prior or profile) with the diagnostics in an appendix. The
   record and F22 hold the numbers either way; nothing is published without his decision.
