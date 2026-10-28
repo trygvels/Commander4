@@ -54,10 +54,12 @@ model component rather than a preprocessing choice.
   on these maps (F14; ratio 180 for beta_s, 1.5 for beta_d). Do not generalize this to published
   BeyondPlanck or DR1 results: their samplers are valid conditional steps (E009, E010), their
   configurations differ (polarization, regions, prior-dominated), and the conditional-to-collapsed
-  ratio for the BP XV polarization configuration is 2.1 to 2.35 with Gibbs coupling lengths of 7
-  to 11 on an nside-16 surrogate, carried by the free CMB amplitude and gone with a C_l-sized CMB
-  prior (E022, F22): the paper's 30 to 50 does not understate it, and the claim is restricted to
-  intensity at Planck resolution. The published BP chain
+  ratio for the BP XV polarization configuration is 2.1 to 2.35 on an nside-16 surrogate, carried
+  by the free CMB amplitude and gone with a C_l-sized CMB prior; the released BP chains show the
+  same per-step coupling (r 2.4 / 1.75, lag-1 0.83 / 0.67), 23 to 59 effective samples per chain
+  and a drift towards flatter indices in both chains (E022, F22). The intensity claim (ratio 180)
+  is restricted to Planck resolution; the polarization statement is about unsettled flat-prior
+  chains, not about the per-step coupling. The published BP chain
   lengths and diagnostics are being read from BP I, III, XIII, XV (lit-scout report
   `research/2026-10-27_beyondplanck_chain_lengths_and_index_sampling.md`).
 - Figure 1: chain against exact grid for the four modes (E014 pass 2 and 3 tables).

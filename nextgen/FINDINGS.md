@@ -326,20 +326,26 @@ attempt was the funnel climb of this runaway, not a mass-matrix defect (the rela
 `adapt_mass` switch are correct, tested and kept, but were not the fix). Scope: one sky, one noise
 level, intensity only.
 
-**F22. The amplitude-index Gibbs coupling in the BeyondPlanck XV polarized beta_s configuration
-is modest and is carried by the free CMB amplitude; F14 does not transfer** (E022, nside-16
-surrogate of the BP XV data: LFI 30 to 70, WMAP Ka/Q/V with the dense nine-year covariances,
-NPIPE 353, the four BP XV regions, prior N(-3.3, 0.1)): with the released configuration's flat
-per-pixel CMB prior the collapsed posterior sd of beta_s is 2.35 (Spur) and 2.11 (Plane) times
-the conditional sd at amplitudes drawn from their conditional, and a two-block Gibbs sampler
-with exact conditional draws has integrated autocorrelation times of 7 to 11 (two chains per
-variant, 6000 iterations; the Gaussian formula 2 r^2 - 1 gives 8 to 10 and the measured lag-1
-equals 1 - E[var_cond]/var to 0.005), for both LFI noise models (BP's simulated nside-16 rms or
-white propagation, which changes the widths by 1.3 and the ratio by under 2 percent). With a
-Gaussian CMB prior sized from the Planck EE spectrum (0.19 uK at this resolution) the ratio is
-1.02 to 1.04 and tau 1.1. The polarized synchrotron amplitude per nside-16 pixel has S/N of 2
-to 3, against hundreds in the F14 intensity case. BP XV's reported correlation length of 30 to
-50 therefore does not understate this coupling. On the same surrogate the flat-prior marginal
-is shifted from the profile by +0.27 (Spur) and +0.13 (Plane) and runs to the flattest allowed
-index in the High Latitude region (2194 pixels at S/N below 1); the C_l-sized CMB prior removes
-the runaway. Stats review CONFIRMED WITH ITEMS (items applied; re-check pending).
+**F22. BeyondPlanck XV's polarized beta_s chains carry the amplitude-index coupling an nside-16
+surrogate predicts, and had not settled** (E022). (a) Surrogate (LFI 30 to 70, WMAP Ka/Q/V
+nine-year nside-16 maps with dense covariances, NPIPE 353, four BP XV regions, prior
+N(-3.3, 0.1), flat per-pixel CMB prior as in the released configuration): collapsed-to-
+conditional sd ratio 2.35 (Spur) and 2.11 (Plane), two-block Gibbs autocorrelation time 7 to
+11 (lag-1 equals 1 - E[var_cond]/var to 0.005), for either LFI noise model; with a Gaussian
+CMB prior sized from the Planck EE spectrum (0.19 uK at this resolution) the ratio is 1.02 to
+1.04. The coupling is carried by the free CMB amplitude (polarized synchrotron S/N per pixel 2
+to 3, against hundreds in the F14 intensity case); the volume term and stationary
+distribution grow with the number of amplitude elements, so the surrogate bounds BP's
+native-resolution coupling from below. (b) The released chains (two chains, 1001 samples each,
+read over HTTP from the 1.8 TB files): per-step coupling from the exact increment identity
+r = 2.4 / 1.75 and lag-1 0.83 / 0.67 (Spur / Plane) in both chains, matching the surrogate;
+IPS tau 17 to 43 (the paper's 30 to 50) against 5 to 11 from lag-1, so a slow component
+exists; 23 to 59 effective samples per chain; both likelihood-sampled regions drift towards
+flatter indices in both chains (+0.065 to +0.092 per 1000 samples, 1.5 to 2.0 sigma each,
+absent in the prior-only regions), the direction of the flat-prior volume pull. The reported
+sds of 0.06 and 0.07 are the spread of unsettled chains with 23 to 59 effective samples, and
+the stationary flat-prior target lies at flatter indices by an undetermined amount. On the
+surrogate the flat-prior marginal is shifted from the profile by +0.27 (Spur) and +0.13
+(Plane) and runs to the flattest allowed index in the High Latitude region; the C_l-sized CMB
+prior removes the runaway. Stats-reviewed (targets, code, inputs CONFIRMED; conclusion
+rewritten per the re-check).

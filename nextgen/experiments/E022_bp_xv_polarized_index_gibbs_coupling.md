@@ -1,6 +1,6 @@
 # E022: BeyondPlanck XV polarized beta_s: amplitude-index Gibbs coupling on a low-resolution surrogate
 
-- **Date started / finished:** 2026-10-28 /
+- **Date started / finished:** 2026-10-28 / 2026-10-28
 - **Branch and commit:** nextgen, 90720f1
 - **Open question addressed:** F14 scope (planned E014 follow-up); feeds Paper A Sect. 3. No Q
   number of its own; it bounds what Paper A may say about BeyondPlanck XV.
@@ -224,28 +224,40 @@ polarized step ran the alm sampler on native-resolution bands with per-pixel rms
 prior -3.3; WMAP bands 012 to 014 are the r4 maps with the `QUcov` dense N^-1 used here;
 353 excluded from the index chi2 by `COMP_BETA_NU_MAX02 = 80`). For a two-block scheme
 var(delta beta)/2 = E[var_cond] exactly, so the conditional width, r and lag-1 follow from
-the chain without any surrogate. Chain 1, burn 10:
+the chain without any surrogate. Both chains, burn 10 (half-chain difference in units of the
+MC error of a half mean times sqrt 2; trend from a linear fit with n_eff = n / tau):
 
-| Region | mean | sd | sd_cond from increments | r | lag-1 (identity / measured) | tau IPS | AR(1) tau from lag-1 | ESS | half-chain means (diff in MC err) | acf at lags 5, 10, 20, 50, 100 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 0 (prior-only) | -3.303 | 0.104 | 0.103 | 1.01 | 0.03 / 0.03 | 1.1 | 1.1 | 939 | -3.302 / -3.305 (-0.6) | 0 within 0.04 |
-| 1 (Spur) | -3.152 | 0.069 | 0.029 | 2.43 | 0.83 / 0.83 | 22.5 +- 11 | 10.8 | 44 | -3.168 / -3.136 (+2.2) | 0.44, 0.24, 0.17, 0.10, 0.07 |
-| 2 (prior-only) | -3.296 | 0.102 | 0.103 | 0.98 | -0.03 / -0.03 | 1.0 | 0.9 | 991 | -3.292 / -3.301 (-1.9) | 0 within 0.04 |
-| 3 (Plane) | -2.984 | 0.075 | 0.043 | 1.75 | 0.67 / 0.67 | 43 +- 28 | 5.1 | 23 | -2.999 / -2.969 (+1.4) | 0.46, 0.37, 0.33, 0.17, 0.02 |
+| Chain, region | mean | sd (detrended) | sd_cond from increments | r | lag-1 (identity / measured) | tau IPS | AR(1) tau from lag-1 | ESS | half-chain diff (MC err) | trend per 1000 samples | acf at lags 5, 10, 20, 50, 100 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1, 0 (prior-only) | -3.303 | 0.104 (0.104) | 0.103 | 1.01 | 0.03 / 0.03 | 1.1 | 1.1 | 939 | -0.003 (-0.4) | -0.006 +- 0.012 | 0 within 0.04 |
+| 1, 1 (Spur) | -3.152 | 0.069 (0.066) | 0.029 | 2.43 | 0.83 / 0.83 | 22.5 +- 11 | 10.8 | 44 | +0.032 (+1.5) | +0.073 +- 0.037 | 0.44, 0.24, 0.17, 0.10, 0.07 |
+| 1, 2 (prior-only) | -3.296 | 0.102 (0.102) | 0.103 | 0.98 | -0.03 / -0.03 | 1.0 | 0.9 | 991 | -0.009 (-1.3) | -0.014 +- 0.011 | 0 within 0.04 |
+| 1, 3 (Plane) | -2.984 | 0.075 (0.071) | 0.043 | 1.75 | 0.67 / 0.67 | 43 +- 28 | 5.1 | 23 | +0.031 (+1.0) | +0.080 +- 0.054 | 0.46, 0.37, 0.33, 0.17, 0.02 |
+| 2, 0 (prior-only) | -3.297 | 0.102 (0.102) | 0.102 | 0.99 | -0.02 / -0.02 | 1.0 | 1.0 | 991 | -0.007 (-1.1) | -0.008 +- 0.011 | 0 within 0.06 |
+| 2, 1 (Spur) | -3.167 | 0.070 (0.067) | 0.029 | 2.40 | 0.83 / 0.83 | 16.9 +- 9 | 10.5 | 59 | +0.027 (+1.5) | +0.065 +- 0.032 | 0.40, 0.09, 0.08, 0.02, -0.03 |
+| 2, 2 (prior-only) | -3.304 | 0.096 (0.096) | 0.094 | 1.02 | 0.03 / 0.03 | 1.2 | 1.1 | 848 | +0.002 (+0.4) | +0.006 +- 0.012 | 0 within 0.05 |
+| 2, 3 (Plane) | -3.022 | 0.074 (0.069) | 0.043 | 1.74 | 0.67 / 0.67 | 40 +- 28 | 5.0 | 25 | +0.027 (+0.9) | +0.092 +- 0.052 | 0.42, 0.34, 0.27, 0.17, 0.04 |
 
-The two prior-only regions behave as independent N(-3.3, 0.1) draws (negative control
-passed). The Spur and Plane reproduce the paper (means -3.15 and -2.98 against -3.17 and
--3.03, sds 0.069 and 0.075 against 0.06 and 0.07; the paper's correlation length 30 to 50 is
-the IPS tau of 22 and 43 here). The chain-implied r is 2.43 (Spur) and 1.75 (Plane), the
-lag-1 0.83 and 0.67, against the surrogate's flat-CMB r of 2.35 and 2.11 and lag-1 0.82 and
-0.78; the chain-implied conditional widths 0.029 and 0.043 are 1.4 and 2.3 times the
-surrogate's 0.020 and 0.018. Beyond lag 10 the chain autocorrelation decays slower than the
-AR(1) implied by lag-1 (0.10 at lag 50 for the Spur, 0.17 for the Plane), which is why the
-IPS tau is 2 to 8 times the AR(1) value: a slow component exists that the surrogate's
-two-block coupling does not produce. Both likelihood-sampled regions have a second-half mean
-0.03 above the first-half mean (2.2 and 1.4 MC errors; the prior-only regions show -0.6 and
--1.9), a weak indication of drift towards flatter indices. Chain 2 (being read) decides
-whether the drift is systematic.
+The two prior-only regions behave as independent N(-3.3, 0.1) draws in both chains (negative
+control passed: sd 0.096 to 0.104, lag-1 within 0.03 of zero, trends within 1.3 sigma of
+zero). The Spur and Plane reproduce the paper (means -3.15 / -3.17 and -2.98 / -3.02 in the
+two chains against the paper's -3.17 and -3.03; sds 0.069 to 0.075 against 0.06 and 0.07; the
+paper's correlation length 30 to 50 is the IPS tau of 17 to 43 here, with 40 to 65 percent
+errors). The chain-implied per-step coupling is the same in both chains: r 2.43 / 2.40
+(Spur) and 1.75 / 1.74 (Plane), lag-1 0.83 and 0.67, against the surrogate's flat-CMB r of
+2.35 and 2.11 and lag-1 0.82 and 0.78; the chain-implied conditional widths 0.029 and 0.043
+are 1.4 and 2.3 times the surrogate's 0.020 and 0.018 (the BP step samples bandpasses and
+gains as well and weights 353 out). Beyond lag 10 the autocorrelation decays slower than the
+AR(1) implied by lag-1 (0.10 to 0.17 at lag 50 in three of the four likelihood-sampled
+chain-regions), which is why the IPS tau is 2 to 8 times the AR(1) value: a slow component
+exists that the surrogate's two-block coupling does not produce. All four likelihood-sampled
+chain-regions trend towards flatter indices, +0.065 to +0.092 per 1000 samples (1.5 to 2.0
+sigma each with n_eff = n / tau; same sign in all four, none of the four prior-only
+chain-regions beyond 1.3 sigma); the trend adds little to the sds (detrended 0.066 to 0.071
+against 0.069 to 0.075). Taken together (same per-step coupling and same drift in two
+independent chains) this is a chain that had not reached the stationary distribution of its
+flat-amplitude-prior target, moving in the direction the volume term pulls, at a rate of
+about one reported sd per 1000 samples.
 
 Surrogate consistency: the conditional at the BP release posterior-mean amplitudes pins at
 the grid edge -1.5 in every region (chi2 prefers the flattest synchrotron allowed), so the
@@ -265,45 +277,49 @@ prior draws by construction) are the negative control for the chain analysis: th
 sd 0.10 and no autocorrelation, and do (Result).
 
 ## Conclusion
-(stats review 2026-10-28: targets and code CONFIRMED; the first conclusion NOT CONFIRMED on
-the resolution point, rewritten below; final wording after chain 2)
-- On an nside-16 surrogate of the BP XV polarization configuration, with the released
+(stats review 2026-10-28: targets, code and inputs CONFIRMED; the resolution point of the
+re-check incorporated; the chain analysis below is the evidence the reviewer asked for)
+- On an nside-16 surrogate of the BP XV polarization configuration with the released
   configuration's flat per-pixel CMB prior, the collapsed posterior sd of beta_s is 2.1 to
   2.35 times the conditional sd for the two likelihood-sampled regions and a two-block Gibbs
-  sampler with exact conditional draws has integrated autocorrelation times of 7 to 11 (the
-  measured lag-1 equals the exact identity 1 - E[var_cond]/var), for either LFI noise model.
-  A C_l-sized Gaussian CMB prior removes the coupling (ratio 1.02 to 1.04). The coupling at
-  this resolution is carried by the free CMB amplitude, not by the synchrotron amplitude
-  (per-pixel S/N 2 to 3), which is why F14's ratio of 180 (intensity, S/N in the hundreds)
-  does not appear here.
-- These surrogate numbers are lower bounds for the flat-prior Gibbs coupling at BP's native
-  resolution, not estimates of it: the flat-prior volume term and the stationary distribution
-  scale with the number of free amplitude elements (reviewer's toy: pinned at the prior edge
-  from 16 elements per surrogate pixel; BP has about 50 and 4000 times more synchrotron and CMB
-  elements). What the released chain shows directly: lag-1 of 0.83 (Spur) and 0.67 (Plane),
-  r of 2.4 and 1.8 from the exact increment identity, IPS tau of 22 and 43 (the paper's 30 to
-  50), effective samples 44 and 23 out of 1000 per chain, a slow autocorrelation component
-  beyond lag 10 that the two-block coupling does not produce, and a weak (1.4 to 2.2 MC error)
-  upward drift of both likelihood-sampled regions between the chain halves. Whether BP XV's
-  chain is stationary is therefore not settled by chain 1 alone; chain 2 is being read, and the
-  conclusion about the reported uncertainties waits for it.
+  sampler with exact conditional draws has integrated autocorrelation times of 7 to 11 (lag-1
+  equals the exact identity 1 - E[var_cond]/var), for either LFI noise model; a C_l-sized
+  Gaussian CMB prior removes the coupling (ratio 1.02 to 1.04). The coupling is carried by the
+  free CMB amplitude, not by the synchrotron amplitude (per-pixel S/N 2 to 3), which is why
+  F14's ratio of 180 (intensity, S/N in the hundreds) does not appear. The surrogate's volume
+  term and stationary distribution scale with the number of amplitude elements and are lower
+  bounds for BP's native resolution.
+- The released BP chains (two chains, 1001 samples each, read from the 1.8 TB files) show the
+  per-step amplitude-index coupling the surrogate predicts: from the exact increment identity
+  r = 2.4 (Spur) and 1.75 (Plane) and lag-1 0.83 and 0.67 in both chains, against the
+  surrogate's 2.35 / 2.11 and 0.82 / 0.78. The paper's correlation length of 30 to 50 is the
+  IPS tau of 17 to 43 measured here; it exceeds the AR(1) value from lag-1 (5 to 11) because of
+  a slow component, and the chains have 23 to 59 effective samples each. Both likelihood-sampled
+  regions drift towards flatter indices in both chains (+0.065 to +0.092 per 1000 samples, 1.5
+  to 2.0 sigma per chain-region, same sign in all four, absent in the prior-only regions),
+  the direction in which the flat-prior volume term pulls. The reported sds (0.06 and 0.07)
+  are the spread of chains with 23 to 59 effective samples (10 to 15 percent Monte Carlo
+  uncertainty on an sd) that had not settled; the stationary distribution of the flat-prior
+  target lies at flatter indices than the reported means by an amount this experiment does
+  not determine (the reviewer's toy puts it at the prior boundary for 16 or more elements per
+  surrogate pixel). The amplitude-index coupling per Gibbs step is not a hidden factor beyond
+  the reported 30 to 50; the unsettled drift is. How to present this in Paper A is Trygve's
+  call (STATUS).
 - The flat-amplitude-prior marginal is shifted from the profile by +0.27 (Spur) and +0.13
   (Plane) on the surrogate and runs to the flattest allowed index in the High Latitude region;
   a C_l-sized CMB prior removes the runaway and moves the Spur to -3.20. This is the
   prior-volume effect of Paper A Sect. 4 on real polarization data, carried by the free
-  per-pixel CMB amplitude at S/N below 0.2, and it grows with resolution.
+  per-pixel CMB amplitude at S/N below 0.2, and it grows with resolution. A C_l-sized CMB
+  prior (or the profile) gives a resolution-stable target; that is the method recommendation.
 - Limits: diagonal noise in the collapsed target (the dense WMAP covariance changes the
   conditional width by under 5 percent); delta bandpasses; NPIPE A split at 353; unsmoothed
   WMAP r4 maps; regions recovered from the smoothed release map; nside 16 instead of
-  multi-resolution. The signal part of the conditional precision is resolution-independent for
-  white noise and smooth signals; the volume term and the stationary distribution are not, so
-  the surrogate bounds the coupling from below.
+  multi-resolution; the drift in the BP chains is a 1.5 to 2.0 sigma effect per chain-region
+  (chains 3 and 4 would double the statistics).
 
 ## Follow-ups
-- The released BP chain files store the per-region index values per sample
-  (`<sample>/synch/beta_pixreg_val`); `nextgen/scripts/bp_chain_beta_s.py` reads them over HTTP
-  range requests from the 1.8 TB chain without downloading it. Lag-1, tau and ESS of the actual
-  BP XV beta_s chain against the 30 to 50 of the paper and the 7 to 11 of this cell.
+- Chains 3 and 4 of the release (same reader, 12 minutes each) would double the drift
+  statistics; the drift test is at 1.5 to 2.0 sigma per chain-region now.
 - Resolution scaling of the flat-prior volume term: repeat T2 at nside 32 and 64 (LFI and 353
   only, WMAP excluded) to measure how the collapsed means move with the number of amplitude
   pixels; this is the quantitative link to BP's native-resolution amplitude step and to Paper A
