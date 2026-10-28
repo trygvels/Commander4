@@ -2,7 +2,10 @@
 synchrotron index on the BP XV low-resolution surrogate (see E022 Target and priors).
 
 Targets per region r (separable; 1-D in beta_r):
-  T1 conditional at fixed amplitudes a (BP release means): -chi2_r(beta)/2 + log prior
+  T1 conditional at fixed amplitudes a: -chi2_r(beta)/2 + log prior, evaluated at amplitudes
+     drawn from P(a | beta*, d) (beta* = T2 mean with prior for Spur and Plane, the prior mean
+     for the prior-only regions), averaged over draws; the same at the BP release posterior-mean
+     amplitudes is reported as a consistency diagnostic of the surrogate only
   T2 collapsed, flat amplitude prior: sum_{p,s} [ b^T M^-1 b / 2 - log det M / 2 ] + log prior,
      M = A^T N^-1 A, b = A^T N^-1 d (3 x 3 per pixel and Stokes); profile variant drops log det
   T3 two-block Gibbs: a | beta, d (per pixel 3-D Gaussian) and beta_r | a, d (exact inverse-CDF
@@ -182,58 +185,71 @@ def main():
     grid = np.linspace(-4.5, -1.5, 2001)
     amp0 = sur.amp
     res = {"bands": sur.bands, "regions": {}}
-    beta_mode = np.zeros(4)
+    # T2 first (independent of amplitudes), then T1 at amplitude draws consistent with the data
     for r, name in enumerate(REGIONS):
         t0 = time.time()
-        c_np = sur.cond_logp(grid, amp0, r, prior=False); c_p = sur.cond_logp(grid, amp0, r, prior=True)
         m_np = sur.collapsed_logp(grid, r, prior=False); m_p = sur.collapsed_logp(grid, r, prior=True)
         pr_np = sur.collapsed_logp(grid, r, prior=False, logdet=False); pr_p = sur.collapsed_logp(grid, r, prior=True, logdet=False)
+        c_bp = sur.cond_logp(grid, amp0, r, prior=True)
         rr = {}
-        for key, lp in (("cond", c_np), ("cond_prior", c_p), ("marg", m_np), ("marg_prior", m_p), ("prof", pr_np), ("prof_prior", pr_p)):
-            mean, sd, _ = moments(grid, lp); rr[key] = {"mean": mean, "sd": sd}
-        beta_mode[r] = grid[np.argmax(c_p)]
-        rr["ratio_prior"] = rr["marg_prior"]["sd"] / rr["cond_prior"]["sd"]
-        rr["ratio_noprior"] = rr["marg"]["sd"] / rr["cond"]["sd"]
-        rr["tau_gauss_prior"] = 2 * rr["ratio_prior"] ** 2 - 1
-        rr["prior_to_post_width"] = PRIOR_SD / rr["marg_prior"]["sd"]
+        for key, lp in (("marg", m_np), ("marg_prior", m_p), ("prof", pr_np), ("prof_prior", pr_p), ("cond_bpmean_prior", c_bp)):
+            mean, sd, _ = moments(grid, lp); rr[key] = {"mean": mean, "sd": sd, "at_edge": bool(abs(mean - grid[0]) < 0.01 or abs(mean - grid[-1]) < 0.01)}
         rr["npix"] = int(((sur.region == r) & sur.ok).sum())
         res["regions"][name] = rr
-        print(f"{name:16s} n={rr['npix']:4d} cond {rr['cond']['mean']:.4f}+-{rr['cond']['sd']:.5f} (prior {rr['cond_prior']['sd']:.5f}) | "
-              f"marg {rr['marg']['mean']:.4f}+-{rr['marg']['sd']:.4f} (prior {rr['marg_prior']['mean']:.4f}+-{rr['marg_prior']['sd']:.4f}) | "
-              f"prof {rr['prof']['mean']:.4f}+-{rr['prof']['sd']:.4f} | ratio {rr['ratio_prior']:.1f} -> tau_gauss {rr['tau_gauss_prior']:.0f} [{time.time()-t0:.1f}s]")
+        print(f"{name:16s} n={rr['npix']:4d} marg {rr['marg']['mean']:.4f}+-{rr['marg']['sd']:.4f} (prior {rr['marg_prior']['mean']:.4f}+-{rr['marg_prior']['sd']:.4f}) | "
+              f"prof {rr['prof']['mean']:.4f}+-{rr['prof']['sd']:.4f} (prior {rr['prof_prior']['mean']:.4f}+-{rr['prof_prior']['sd']:.4f}) | "
+              f"cond at BP means {rr['cond_bpmean_prior']['mean']:.4f}+-{rr['cond_bpmean_prior']['sd']:.5f}{' EDGE' if rr['cond_bpmean_prior']['at_edge'] else ''} [{time.time()-t0:.1f}s]")
+    beta_star = np.array([PRIOR_MEAN, res["regions"]["Spur"]["marg_prior"]["mean"], PRIOR_MEAN, res["regions"]["Plane"]["marg_prior"]["mean"]])
+    rng = np.random.default_rng(a.seed + 1)
+    ndraw = 20; sds = np.zeros((ndraw, 4, 2)); means = np.zeros((ndraw, 4, 2)); dense_sd = np.zeros((min(ndraw, 5), 4))
+    for k in range(ndraw):
+        amp = sur.draw_amp(beta_star, rng)
+        for r in range(4):
+            for j, pr in enumerate((False, True)):
+                means[k, r, j], sds[k, r, j], _ = moments(grid, sur.cond_logp(grid, amp, r, prior=pr))
+            if not a.no_dense and k < dense_sd.shape[0] and any(b.startswith("W") for b in sur.bands):
+                _, dense_sd[k, r], _ = moments(grid, dense_wmap_cond(sur, amp, beta_star, grid, r))
+    print("T1 at amplitude draws from P(a | beta*, d), beta* =", np.round(beta_star, 4))
+    for r, name in enumerate(REGIONS):
+        rr = res["regions"][name]
+        rr["cond"] = {"mean": float(means[:, r, 0].mean()), "sd": float(sds[:, r, 0].mean()), "sd_spread": float(sds[:, r, 0].std()), "mean_spread": float(means[:, r, 0].std())}
+        rr["cond_prior"] = {"mean": float(means[:, r, 1].mean()), "sd": float(sds[:, r, 1].mean()), "sd_spread": float(sds[:, r, 1].std()), "mean_spread": float(means[:, r, 1].std())}
+        rr["ratio_prior"] = rr["marg_prior"]["sd"] / rr["cond_prior"]["sd"]; rr["ratio_noprior"] = rr["marg"]["sd"] / rr["cond"]["sd"]
+        rr["tau_gauss_prior"] = 2 * rr["ratio_prior"] ** 2 - 1
+        rr["prior_to_post_width"] = PRIOR_SD / rr["marg_prior"]["sd"]
+        if not a.no_dense: rr["cond_prior_denseWMAP"] = {"sd": float(dense_sd[:, r].mean()), "sd_spread": float(dense_sd[:, r].std())}
+        print(f"  {name:16s} cond {rr['cond']['mean']:.4f}+-{rr['cond']['sd']:.4f} (sd spread over draws {rr['cond']['sd_spread']:.4f}, mean spread {rr['cond']['mean_spread']:.4f}); "
+              f"with prior sd {rr['cond_prior']['sd']:.4f}" + (f"; dense-WMAP sd {rr['cond_prior_denseWMAP']['sd']:.4f}" if not a.no_dense else "") +
+              f" | ratio marg/cond {rr['ratio_prior']:.2f} (no prior {rr['ratio_noprior']:.2f}) -> Gaussian tau {rr['tau_gauss_prior']:.1f}; prior/posterior width {rr['prior_to_post_width']:.2f}")
     np.savez(os.path.join(a.out, "grids.npz"), grid=grid)
 
-    if not a.no_dense and any(b.startswith("W") for b in sur.bands):
-        print("T1 with dense WMAP N^-1 (other regions at their conditional modes):")
+    # T3 Gibbs: BP XV scheme (High Latitude and Galactic Center from the prior), then all four
+    # regions from the likelihood (what the flat-prior marginal does to the prior-dominated regions)
+    def run_chain(prior_only, tag, start):
+        rng = np.random.default_rng(a.seed)
+        beta = np.array(start, dtype=float); chain = np.empty((a.iters, 4)); t0 = time.time()
+        for it in range(a.iters):
+            amp = sur.draw_amp(beta, rng)
+            for r in range(4):
+                if r in prior_only: beta[r] = PRIOR_MEAN + PRIOR_SD * rng.standard_normal()
+                else: beta[r] = draw_from_grid(grid, sur.cond_logp(grid, amp, r, prior=True), rng)
+            chain[it] = beta
+        np.save(os.path.join(a.out, f"gibbs_chain_{tag}.npy"), chain)
+        burn = a.iters // 10; out = {}
         for r, name in enumerate(REGIONS):
-            lp = dense_wmap_cond(sur, amp0, beta_mode, grid, r)
-            mean, sd, _ = moments(grid, lp)
-            res["regions"][name]["cond_prior_denseWMAP"] = {"mean": mean, "sd": sd}
-            print(f"  {name:16s} {mean:.4f}+-{sd:.5f} (diagonal: {res['regions'][name]['cond_prior']['sd']:.5f})")
-
-    # T3 Gibbs
-    rng = np.random.default_rng(a.seed)
-    beta = np.array([PRIOR_MEAN, -3.17, PRIOR_MEAN, -3.0])
-    chain = np.empty((a.iters, 4)); t0 = time.time()
-    for it in range(a.iters):
-        amp = sur.draw_amp(beta, rng)
-        for r in range(4):
-            if r in PRIOR_ONLY:
-                beta[r] = PRIOR_MEAN + PRIOR_SD * rng.standard_normal()
-            else:
-                beta[r] = draw_from_grid(grid, sur.cond_logp(grid, amp, r, prior=True), rng)
-        chain[it] = beta
-        if it % 500 == 0: print(f"  gibbs it {it} beta {np.round(beta, 3)} [{time.time()-t0:.0f}s]")
-    np.save(os.path.join(a.out, "gibbs_chain.npy"), chain)
-    burn = a.iters // 10
-    for r, name in enumerate(REGIONS):
-        if r in PRIOR_ONLY: continue
-        x = chain[burn:, r]; tau, err = tau_ips(x)
-        rr = res["regions"][name]
-        rr["gibbs"] = {"mean": float(x.mean()), "sd": float(x.std(ddof=1)), "tau": tau, "tau_err": err, "n": int(x.size),
-                       "ess": float(x.size / tau)}
-        print(f"{name:16s} Gibbs: mean {x.mean():.4f} sd {x.std(ddof=1):.4f} (T2 with prior: {rr['marg_prior']['mean']:.4f}+-{rr['marg_prior']['sd']:.4f}); "
-              f"tau {tau:.1f} +- {err:.1f} (Gaussian prediction {rr['tau_gauss_prior']:.1f}); ESS {x.size/tau:.0f} of {x.size}")
+            if r in prior_only: continue
+            x = chain[burn:, r]; tau, err = tau_ips(x)
+            out[name] = {"mean": float(x.mean()), "sd": float(x.std(ddof=1)), "tau": tau, "tau_err": err, "n": int(x.size), "ess": float(x.size / tau),
+                         "at_edge": bool(np.mean(x > grid[-1] - 0.02) > 0.05 or np.mean(x < grid[0] + 0.02) > 0.05)}
+            rr = res["regions"][name]
+            print(f"  [{tag}] {name:16s} Gibbs mean {x.mean():.4f} sd {x.std(ddof=1):.4f} (T2 with prior {rr['marg_prior']['mean']:.4f}+-{rr['marg_prior']['sd']:.4f}); "
+                  f"tau {tau:.1f}+-{err:.1f} (Gaussian prediction {rr['tau_gauss_prior']:.1f}); ESS {x.size/tau:.0f} of {x.size}{' EDGE' if out[name]['at_edge'] else ''}")
+        print(f"  [{tag}] {a.iters} iterations in {time.time()-t0:.0f}s")
+        return out
+    res["gibbs_bp_scheme"] = run_chain(PRIOR_ONLY, "bp", [PRIOR_MEAN, -3.17, PRIOR_MEAN, -3.0])
+    res["gibbs_all_regions"] = run_chain((), "all", [PRIOR_MEAN, -3.17, PRIOR_MEAN, -3.0])
+    for name in REGIONS:
+        if name in res["gibbs_bp_scheme"]: res["regions"][name]["gibbs"] = res["gibbs_bp_scheme"][name]
     with open(os.path.join(a.out, "result.json"), "w") as f: json.dump(res, f, indent=1)
     print("written", os.path.join(a.out, "result.json"))
 

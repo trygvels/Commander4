@@ -325,3 +325,19 @@ scatter, and T_d sampled or marginalized (Q16); the 1023-gradient saturation see
 attempt was the funnel climb of this runaway, not a mass-matrix defect (the relative floor and the
 `adapt_mass` switch are correct, tested and kept, but were not the fix). Scope: one sky, one noise
 level, intensity only.
+
+**F22. The amplitude-index Gibbs coupling in the BeyondPlanck XV polarized beta_s configuration
+is weak; F14 does not transfer** (E022, nside-16 surrogate of the BP XV data: LFI 30 to 70,
+WMAP Ka/Q/V with the dense nine-year covariances, NPIPE 353, four BP XV regions, prior
+N(-3.3, 0.1)): the collapsed posterior sd of beta_s is 2.35 (Spur) and 2.11 (Plane) times the
+conditional sd at amplitudes drawn from their conditional (0.047 against 0.020 and 0.039
+against 0.018), and a two-block Gibbs sampler with exact conditional draws has integrated
+autocorrelation times 14.0 +- 1.8 and 8.1 +- 0.8 (second chain 10.2 +- 1.1 and 7.0 +- 0.6),
+matching the Gaussian two-block prediction 2 r^2 - 1 of 10 and 8. The per-pixel polarized
+synchrotron S/N at nside 16 is 2 to 3 at 30 GHz, against hundreds for the F14 intensity case.
+BP XV's reported correlation length of 30 to 50 therefore does not understate this coupling.
+On the same surrogate the flat-amplitude-prior marginal is shifted from the profile by +0.27
+(Spur) and +0.13 (Plane) and runs to the flattest allowed index in the High Latitude region
+(2194 pixels at S/N below 1), the prior-volume effect (F3-type) on real polarization data.
+Draft until the E022 stats review is in.
+

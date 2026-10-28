@@ -32,8 +32,14 @@ separable over regions, so each is a 1-D distribution per region.
 
 - **T1, conditional (the BP XV index step):** P(beta_r | d, a) propto exp(-chi2_r(beta_r) / 2)
   N(beta_r; -3.3, 0.1^2), chi2_r = sum over p in r, s, nu of (d - A(beta_r) a)^2 / sigma^2, with
-  a fixed at the BP release posterior-mean component maps. Reported with and without the prior
-  factor (the "without" sd is the conditional likelihood width).
+  a fixed. Amended 2026-10-28 before the main result was read: a is drawn from P(a | beta*, d)
+  (beta* = the T2 mean with prior for Spur and Plane, the prior mean for the prior-only
+  regions), and the width is averaged over 20 draws, because the Gibbs coupling depends on the
+  conditional at amplitudes consistent with the data; T1 at the BP release posterior-mean maps
+  is kept as a diagnostic of the surrogate's consistency with those maps only (the first run
+  showed it pinned at the grid edge: the release maps were fit with bandpass-integrated SEDs,
+  the full-mission 353 map and native resolution, and a conditional of width 0.02 resolves
+  per-mille mismatches). Reported with and without the prior factor.
 - **T2, collapsed, flat amplitude prior:** P(beta_r | d) propto prod over p in r, s of
   [ det(M_{p,s})^{-1/2} exp(b^T M^{-1} b / 2) ] N(beta_r; -3.3, 0.1^2), with
   M = A^T N^{-1} A (3 x 3) and b = A^T N^{-1} d evaluated at beta_r; the -1/2 log det M term is
@@ -119,7 +125,40 @@ index precision by the same factor. The surrogate uses BP's rms_true for LFI, so
 not in E022; the 353 noise is white-propagated (NPIPE A, dust at S/N above 15 at nside 16, so
 it hardly matters for beta_s), and the WMAP noise is the diagonal of the dense covariance.
 
-(main results pending)
+**Main result (2026-10-28, 10:56; `result.json`, `posteriors_and_chains.png`, chains
+`gibbs_chain_{bp,all}.npy`):** surrogate with 7 bands, 3072 pixels, regions High Latitude 2194,
+Spur 464, Galactic Center 91, Plane 323 pixels (BP map means there -3.295, -3.183, -3.294,
+-3.022; sd map 0.098, 0.064, 0.095, 0.067, matching the paper's prior-only / 0.06 / prior-only
+/ 0.07 pattern). Grid spacing 0.0015.
+
+| Region | T1 conditional, sd (mean) | T1 with dense WMAP N^-1, sd | T2 collapsed with prior, mean +- sd | profile with prior, mean +- sd | ratio sd_T2 / sd_T1 | Gaussian tau = 2r^2 - 1 | Gibbs tau, BP scheme | Gibbs tau, all regions |
+|---|---|---|---|---|---|---|---|---|
+| Spur | 0.0198 (-2.853) | 0.0199 | -2.8725 +- 0.0466 | -3.1431 +- 0.0454 | 2.35 | 10.1 | 14.0 +- 1.8 | 10.2 +- 1.1 |
+| Plane | 0.0184 (-3.109) | 0.0187 | -3.1094 +- 0.0389 | -3.2349 +- 0.0387 | 2.11 | 7.9 | 8.1 +- 0.8 | 7.0 +- 0.6 |
+| Galactic Center | 0.0130 (-3.134) | 0.0133 | -2.6379 +- 0.0257 | -2.6581 +- 0.0257 | 1.99 | 6.9 | prior-only | 17.1 +- 2.4 |
+| High Latitude | 0.0168 (-3.044) | 0.0172 | -1.5013 +- 0.0019 (grid edge) | -2.9523 +- 0.0360 | (edge) | (edge) | prior-only | 3.1 +- 0.2 at the edge |
+
+T1 sds vary by 0.0002 over the 20 amplitude draws (their means by 0.008 to 0.02). The Gibbs
+chains (4000 iterations, burn 400) reproduce T2: Spur -2.8759 / sd 0.0465 against
+-2.8725 +- 0.0466, Plane -3.1124 / 0.0386 against -3.1094 +- 0.0389 (BP scheme; the all-regions
+chain -2.8762 / 0.0455 and -3.1163 / 0.0385). Effective samples 257 to 511 of 3600. The
+all-regions chain is a second realization for Spur and Plane and adds the prior-only regions:
+High Latitude runs from -3.3 to the grid edge at -1.5 within 50 iterations under the flat
+amplitude prior (the collapsed target there is at the edge: the -1/2 log det M term of 4388
+pixel-Stokes marginals dominates a region with per-pixel synchrotron S/N below 1), while its
+conditional (-3.04 +- 0.017) and profile (-2.95 +- 0.036) are regular. The Galactic Center
+collapsed target sits at -2.64 +- 0.026 with the conditional at -3.13 +- 0.013 and tau 17.
+Prior-to-posterior width ratios (prior 0.1 over sd_T2 with prior): Spur 2.1, Plane 2.6, GC 3.9.
+
+Surrogate consistency: the conditional at the BP release posterior-mean amplitudes pins at
+the grid edge -1.5 in every region (chi2 strongly prefers the flattest synchrotron allowed),
+so the release amplitudes do not fit the surrogate at the level a conditional of width 0.02
+resolves; expected (bandpass integration, native resolution, full-mission 353, the BP
+10-degree-smoothed index map) and the reason T1 is evaluated at draws. The surrogate's own
+T2 means (Spur -2.87, Plane -3.11) are not comparable to BP XV's -3.17 +- 0.06 and
+-3.03 +- 0.07 for the same reasons and because the flat-prior volume term scales with the
+number of amplitude pixels (Follow-ups); the profile values (-3.14, -3.23) happen to lie close
+to the paper's, which is noted, not interpreted.
 
 ## Negative control
 The intensity analogue of F14: the same scripts on the E014 nside-64 intensity configuration are
@@ -127,9 +166,40 @@ not rerun here; instead the Gaussian formula is checked on T3 itself (a chain wh
 with 2 r^2 - 1 by more than its error flags a non-Gaussian 1-D posterior or a chain bug).
 
 ## Conclusion
-(pending)
+(draft, stats review of the targets and scripts pending)
+- On the BP XV polarization configuration the amplitude-index Gibbs coupling is weak: the
+  collapsed posterior sd of beta_s is 2.1 to 2.4 times the conditional sd in the two
+  likelihood-sampled regions, and a two-block Gibbs sampler with exact conditional draws has
+  integrated autocorrelation times of 7 to 14 iterations, as the Gaussian two-block formula
+  predicts (8 to 10). F14's ratio of 180 (full-sky intensity index at nside 64, per-pixel
+  amplitude S/N in the hundreds) does not transfer to this configuration, where the polarized
+  synchrotron amplitude per nside-16 pixel has S/N of 2 to 3 at 30 GHz (|Q| median 4.4 uK_RJ
+  against sigma 1.6).
+- BP XV's reported Gibbs correlation length of 30 to 50 is larger than the 7 to 14 the
+  amplitude-index coupling alone produces here, so there is no evidence that it understates the
+  coupling; the remainder is attributable to the Metropolis step within the conditional and the
+  other Gibbs blocks (gain, bandpass, noise), which this cell does not model. With about 500
+  samples and tau 30 to 50 the paper had 10 to 17 independent index samples, so its sds of 0.06
+  and 0.07 carry a Monte Carlo uncertainty of about 20 percent, not a coupling bias. Paper A
+  Sect. 3 states this instead of extrapolating F14.
+- The flat-amplitude-prior marginal (the stationary distribution of a Gibbs sampler with flat
+  amplitude priors and a conditional index step) is shifted from the profile by +0.27 (Spur),
+  +0.13 (Plane), +0.02 (GC) and runs to the flattest allowed index for the High Latitude
+  region on this real-data surrogate: the prior-volume effect of Paper A Sect. 4 at a
+  publication-relevant configuration, and a direct mechanism for the "prior-dominated" regions
+  BP XV sampled from the prior alone. The quantitative shifts belong to this surrogate (nside 16
+  amplitudes); at BP's native resolution the volume term is larger by the pixel ratio.
+- Limits: diagonal noise for the collapsed target (the dense WMAP covariance changes the
+  conditional width by under 2 percent); delta bandpasses; NPIPE A split at 353; regions
+  recovered from the smoothed release map; nside 16 instead of multi-resolution; the ratio r is
+  approximately resolution-independent for white noise and smooth signals (both Fisher
+  quantities scale with the summed inverse variance), the volume term is not.
 
 ## Follow-ups
+- Resolution scaling of the flat-prior volume term: repeat T2 at nside 32 and 64 (LFI and 353
+  only, WMAP excluded) to measure how the collapsed means move with the number of amplitude
+  pixels; this is the quantitative link to BP's native-resolution amplitude step and to Paper A
+  Sect. 4.
 - Dense WMAP covariance in the collapsed target (18432-amplitude Gaussian marginal per beta
   grid point) if the diagonal approximation moves the conditional width by more than 20 percent.
 - Bandpass-integrated mixing matrix from the BP bandpass files instead of delta bandpasses.
