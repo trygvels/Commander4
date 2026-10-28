@@ -2,6 +2,51 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-28 (Mac mini, 05:45): E020 closed as a design flaw (F21), sampler exonerated by direct computation; E021 on a model-consistent sky designed, under stats review, timing run started
+
+**Learned**
+- The 1023-gradient saturation of every E020 attempt was not a mass-matrix problem. Attempt 3
+  (fixed Hessian metric, `adapt_mass: false`) reproduced attempt 2 transition for transition until
+  the first window at iteration 100, and saturated from iteration 30 like the others. The saved
+  chain states, evaluated offline with the same likelihood built from the band files, have a log
+  posterior 104,122 above the state at the PySM truth by iteration 182 (log-likelihood part
+  +123,001), with beta_s mean -4.05, sd 3.84, range -26 to -0.6 and beta_d shifted by +0.08 at the
+  Galactic centre (30 Fisher sd). The sampler was climbing the target. The target is right: the
+  analytic gradient matches finite differences to five digits in every block at the truth and at
+  the runaway state, and the C++ kernel equals a direct 12 x 12 Gaussian marginal per pixel in
+  every region checked, including regions at beta_s = -9.7 (constant offset only).
+- Two misspecifications of the E020 design drive it (F21): the fixed-T region-constant dust model
+  misfits the PySM sky in the plane (the fit gains 101,841 in chi-square by moving both indices),
+  and in the faint half of the sky the data-built template is wrong by factors 0.41 to 1.66 under
+  one global scatter s, so killing the synchrotron in all bands but 23 GHz lowers the
+  amplitude-prior cost more than it costs in fit. At 0.03 x E012 noise both dominate; every prior
+  option would have been scored on the same runaway. E020 production stopped at 05:10 (D014); the
+  data and chains are kept as evidence. The two NUTS changes (relative floor, `adapt_mass`) are
+  correct and kept but were not the fix; the attempt-2 diagnosis is withdrawn in the record.
+- E021: the same ten options, metrics and analyzer on a sky drawn from the model class
+  (`pysm_intensity_sim.py --sky consistent`: region-constant indices at nside 16 from the PySM
+  region means, one MBB at the fixed T, PySM amplitudes, templates equal to truth over
+  1 + 0.3 eps). Verified offline before any run: the truth state is 53,859 above the flat start and
+  519,360 above a flat beta_s = -4; 1-D scans are symmetric about the truth; gradient against
+  finite differences agrees. Q16 opened for the robustness question (non-stationary or
+  heavy-tailed template scatter, sampled T_d) on the kept PySM sky at realistic noise.
+
+**Running**
+- E021 timing run, gmrf16, 40 iterations, `adapt_mass: true` (started 05:31; decides the metric
+  setting and the iteration count for the ten production runs, target about two days in total).
+- stats-reviewer on the E021 design and sky (sky from the model class, template construction,
+  fairness of the metrics across nside_beta, analyzer edge cases).
+- E016 hier SBC replication (seed 2027, 300 replicates; about 24 h left).
+
+**Next**
+- Timing result, then the E021 production loop (ten runs); analysis, Result, Conclusion, F22,
+  Q3, ROADMAP M2.5. Apply the reviewer's must-fix items before launch.
+- SBC verdict by the pre-registered rule; F16 final or withdrawn.
+- E014 BP XV cell; BP XVI; M2.6 (Q7, Q8); Paper A outline update with E017 to E021 numbers.
+
+**Needs Trygve**
+- Nothing new. The hier default question (D003/D011) stands.
+
 ## 2026-10-27 (Mac mini, 22:55): E020 relaunched on a fixed Hessian metric; hier SBC borderline FAIL, replication running; BeyondPlanck papers read; monopole design decided
 
 **Learned**
