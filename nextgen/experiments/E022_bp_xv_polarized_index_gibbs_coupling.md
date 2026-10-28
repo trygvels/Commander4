@@ -340,7 +340,18 @@ true index varies within the region (BP's own release map shows -3.0 along the o
 and the prior value at the centre), and a region-constant index fitted at finer resolution
 weights the bright, flat-index inner plane more heavily than the diluted nside-16 pixels do;
 that is a model-misspecification effect of the region-constant model, which the E020/E021
-line (index fields at the resolution the data support) is designed to remove. Caveats for nside 32 and 64: the
+line (index fields at the resolution the data support) is designed to remove. Tested (13:30,
+`nextgen/scripts/bpxv_plane_subregions.py`; all-amplitude priors, grid [-4, -2]): the Plane
+split into its nside-4 pixels (25 to 39 sub-regions with at least 4 pixels) gives
+sub-region indices that are resolution-stable, most within 0.05 over nside 16, 32, 64 (for
+example -3.342, -3.339, -3.360; -3.232, -3.225, -3.201; -3.352, -3.345, -3.355), with a
+pixel-weighted mean of -3.249, -3.252, -3.245 and a weighted spread of 0.27 to 0.30 (values
+from -2.43 to -2.49 in one bright sub-region near the centre to -3.97 to -3.99, the grid
+edge, in two others), while the single-index Plane fit moves -3.301, -3.170, -2.909. The
+Plane's resolution dependence is therefore the misspecification of one index for a region
+whose index spans 1.5, weighted differently by the resolution; the sub-regions at the grid
+edge and the one at -2.4 are themselves suspect (bright plane, fixed dust SED) and are not
+interpreted. Caveats for nside 32 and 64: the
 noise is white and diagonal although the 60 arcmin smoothing correlates neighbours (about
 0.3 at nside 64), and the regions are re-assigned per nside, so each resolution is a
 different data set and the extrapolation to nside 1024 is a direction, not a value. Inference, labelled as such
@@ -419,7 +430,11 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   and Galactic Center are stable to 0.05 and High Latitude to 0.11, so priors on every
   component with a data-set scale (the E016 hierarchical form is the proper version) give a
   resolution-stable target where the volume term is the cause; the Plane still moves 0.39
-  with all priors in place, a likelihood effect this cell does not explain.
+  with all priors in place, which the sub-region test attributes to one index being fitted
+  to a region whose index spans 1.5 (sub-region values resolution-stable, their weighted
+  mean -3.25 at all three resolutions, the single fit from -3.30 to -2.91): a region-constant
+  index is misspecified in the plane, the case for index fields at the resolution the data
+  support (M2.x).
 - Limits: diagonal noise in the collapsed target (the dense WMAP covariance changes the
   conditional width by under 5 percent); delta bandpasses; NPIPE A split at 353; unsmoothed
   WMAP r4 maps; regions recovered from the smoothed release map; nside 16 instead of
@@ -431,10 +446,9 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   `beta_pixreg_proplen` and `nprop` of 6e-4 and 1000 belong to the intensity row).
 
 ## Follow-ups
-- The Plane's resolution dependence (collapsed, profile and all-priors targets all move by
-  0.4 from nside 16 to 64; region assignment and T_d averaging excluded): test the
-  varying-index hypothesis by fitting the Plane with an nside-4 or nside-8 index field at
-  each resolution and checking that the resolution dependence goes away.
+- The two Plane sub-regions at the grid edge (-4.0) and the one at -2.4: inspect for
+  compact sources and the fixed dust SED before any science use; E022 does not interpret
+  them.
 - A longer or differently started polarized beta_s chain is the only way to settle the
   movement question; it is not in the release.
 - Dense WMAP covariance in the collapsed target (18432-amplitude Gaussian marginal per beta

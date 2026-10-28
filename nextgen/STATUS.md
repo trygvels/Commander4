@@ -30,8 +30,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   the Plane -3.16, -2.88, -2.65 (r 2.6 to 6, tau 18 to 77); the C_l-sized CMB prior
   stabilizes Spur, High Latitude and Galactic Center but not the Plane (flat dust and
   synchrotron priors): data-scaled priors on every component (E016 form) or the profile are
-  the hypotheses to test (the Plane's resolution dependence is a likelihood effect not
-  explained yet). Fifth review round: BP's effective amplitude element count is undetermined
+  the hypotheses to test. The Plane's resolution dependence is the misspecification of one
+  index for a region whose index spans 1.5: its nside-4 sub-regions are resolution-stable
+  (weighted mean -3.25 at nside 16, 32 and 64) while the single fit moves -3.30 to -2.91,
+  the real-data case for index fields at the data's resolution. Fifth review round: BP's effective amplitude element count is undetermined
   (7k to 4M per region), so the released chains cannot distinguish an unsettled flat-prior
   chain from a stationary one driven by the other Gibbs blocks; the record states the
   dichotomy and its discriminator (Commander3 prior semantics, or one conditional-width

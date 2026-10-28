@@ -358,7 +358,9 @@ target moves -2.88, -2.13, uniform-prior boundary (7434 pixels), the Plane -3.16
 the profile are stable. With the C_l-sized CMB prior Spur, High Latitude and Galactic Center
 move by 0.03 to 0.16 with tau 1.2 to 1.6 (High Latitude's 0.16 with a stable profile is the
 synchrotron volume term), the Plane moves -3.29 to -2.88 with its profile moving the same
-way, a resolution-dependent likelihood effect not explained here. By element count
+way: not a volume term but the misspecification of one index for a region whose index spans
+1.5 (its nside-4 sub-regions are resolution-stable with a weighted mean of -3.25 at every
+resolution), the real-data case for index fields at the resolution the data support. By element count
 (inference, labelled; a direction, not a value) the BP XV chain's flat-prior stationary
 target for the Spur lies at the boundary and the released chains are far from it.
 Stats-reviewed in four rounds.
