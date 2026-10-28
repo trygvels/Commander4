@@ -349,4 +349,12 @@ spread of chains with 23 to 114 effective samples that cannot be shown to have s
 lies at flatter indices is an expectation from the surrogate and a toy, not a chain
 measurement. On the surrogate the flat-prior marginal is shifted from the profile by +0.27
 (Spur) and +0.13 (Plane) and runs to the flattest allowed index in the High Latitude region;
-the C_l-sized CMB prior removes the runaway. Stats-reviewed in three rounds.
+the C_l-sized CMB prior removes the runaway. (c) Resolution scaling on the real data (LFI and
+353, nside 16, 32, 64, white LFI noise): with flat amplitude priors the Spur's collapsed
+target moves -2.88, -2.13, uniform-prior boundary (7434 pixels), the Plane -3.16, -2.88,
+-2.65, with r 2.6 to 6.0 and tau 18 to 77 before pinning; the Galactic Center (high S/N) and
+the profile are stable. With the C_l-sized CMB prior Spur, High Latitude and Galactic Center
+are stable to 0.16 with tau 1.2 to 1.6, the Plane still moves -3.29 to -2.88 (flat
+synchrotron and dust priors). By element count (inference, labelled) the BP XV chain's
+flat-prior stationary target lies at the boundary and the released chains are far from it.
+Stats-reviewed in three rounds; the resolution part under review.

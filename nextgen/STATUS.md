@@ -25,7 +25,13 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   1000 samples and stays an indication.
 - Method point for Paper A Sect. 4: the coupling and the runaway are carried by the free
   per-pixel CMB amplitude (0.19 uK of signal against 1.5 to 2 uK of noise); a C_l-sized CMB
-  prior removes both on the surrogate.
+  prior removes both on the surrogate. Resolution scaling on the real data (LFI and 353,
+  nside 16 to 64): with flat priors the Spur's collapsed target goes -2.88, -2.13, boundary,
+  the Plane -3.16, -2.88, -2.65 (r 2.6 to 6, tau 18 to 77); the C_l-sized CMB prior
+  stabilizes Spur, High Latitude and Galactic Center but not the Plane (flat dust and
+  synchrotron priors): data-scaled priors on every component (E016 form) or the profile are
+  the resolution-stable options. By element count the BP XV chain's flat-prior target lies at
+  the boundary (inference, under review).
 
 **Running**
 - E021 gmrf16 alone (ends about 17:30), then iid16 and the other eight in start order.

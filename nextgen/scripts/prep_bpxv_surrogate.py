@@ -16,7 +16,7 @@ from astropy.io import fits
 
 T_CMB = 2.7255
 H_OVER_K = 0.0479924  # h/k in K/GHz
-NSIDE_OUT = 16
+NSIDE_OUT = 16  # overridden by --nside
 FWHM_OUT = 60.0  # arcmin
 LMAX = 600
 BP = os.path.expanduser("~/data/beyondplanck")
@@ -61,12 +61,12 @@ def stage_band(out, name, q, u, fwhm_in, nu, to_rj, sq=None, su=None, mc_rms=Non
     qs, us = smooth_pol(q, u, fwhm_in)
     q16, u16 = degrade(qs), degrade(us)
     if mc_rms is not None:
-        rq, ru, nside_mc, nreal = mc_rms
+        rq, ru, nside_mc, nreal = mc_rms[:4]; fwhm_noise = mc_rms[4] if len(mc_rms) > 4 else 0.0
         rng = np.random.default_rng(seed)
         acc_q = np.zeros((nreal, hp.nside2npix(NSIDE_OUT))); acc_u = acc_q.copy()
         for i in range(nreal):
             nq = rq * rng.standard_normal(rq.size); nu_ = ru * rng.standard_normal(ru.size)
-            nqs, nus = smooth_pol(nq, nu_, 0.0)  # white noise has no beam: full kernel
+            nqs, nus = smooth_pol(nq, nu_, fwhm_noise)  # the kernel the map itself received
             acc_q[i], acc_u[i] = degrade(nqs), degrade(nus)
         sq, su = acc_q.std(axis=0, ddof=1), acc_u.std(axis=0, ddof=1)
     np.savez(fn, q=q16 * to_rj, u=u16 * to_rj, sq=sq * to_rj, su=su * to_rj, nu=nu)
@@ -78,19 +78,31 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=os.path.expanduser("~/data/bpxv_surrogate"))
     ap.add_argument("--nreal", type=int, default=60)
+    ap.add_argument("--nside", type=int, default=16, help="output nside (WMAP nside-16 maps only at 16)")
+    ap.add_argument("--no-wmap", action="store_true")
     a = ap.parse_args()
+    global NSIDE_OUT
+    NSIDE_OUT = a.nside
     os.makedirs(a.out, exist_ok=True)
 
     print("LFI bands (BP release maps, BP nside-16 60 arcmin rms)")
     for name, nside, fwhm, nu in (("030", 512, 32.29, 28.4), ("044", 512, 27.0, 44.1), ("070", 1024, 13.25, 70.1)):
         fn = f"{BP}/BP_{name}_IQU_n{nside:04d}_v2.fits"
         q, u = col(fn, "Q_MEAN"), col(fn, "U_MEAN")
-        rf = f"{BP}/BP7_{name}_rms_n0016_60arcmin_uK_true.fits"
-        sq, su = col(rf, "Q_POLARISATION"), col(rf, "U_POLARISATION")
-        stage_band(a.out, name, q, u, fwhm, nu, cmb_to_rj(nu), sq=sq, su=su)
+        if NSIDE_OUT == 16:
+            rf = f"{BP}/BP7_{name}_rms_n0016_60arcmin_uK_true.fits"
+            sq, su = col(rf, "Q_POLARISATION"), col(rf, "U_POLARISATION")
+            stage_band(a.out, name, q, u, fwhm, nu, cmb_to_rj(nu), sq=sq, su=su)
+        else:  # no BP simulated rms at this nside: white propagation (Q7 factor 1.6 applies)
+            rq, ru = col(fn, "Q_RMS"), col(fn, "U_RMS")
+            nside_mc = 256; fac = (nside // nside_mc) ** 2
+            rq = np.sqrt(hp.ud_grade(rq**2, nside_mc) / fac); ru = np.sqrt(hp.ud_grade(ru**2, nside_mc) / fac)
+            # the white-noise realization is smoothed with the map's own kernel, so the MC step uses fwhm 0
+            # on noise already at the map's resolution: emulate by passing mc_rms and fwhm_in through stage_band
+            stage_band(a.out, name, q, u, fwhm, nu, cmb_to_rj(nu), mc_rms=(rq, ru, nside_mc, a.nreal, fwhm), seed=int(name))
 
     print("LFI white-noise variant (Monte-Carlo propagation of the release Q_RMS/U_RMS maps)")
-    for name, nside, fwhm, nu in (("030", 512, 32.29, 28.4), ("044", 512, 27.0, 44.1), ("070", 1024, 13.25, 70.1)):
+    for name, nside, fwhm, nu in (() if NSIDE_OUT != 16 else (("030", 512, 32.29, 28.4), ("044", 512, 27.0, 44.1), ("070", 1024, 13.25, 70.1))):
         fn = os.path.join(a.out, f"band_{name}_white.npz")
         if os.path.exists(fn):
             print(f"  {name} white: cached"); continue
@@ -122,7 +134,7 @@ def main():
         print("  353: cached")
 
     print("WMAP Ka, Q, V (nine-year nside-16 band maps, diagonal of N from the dense N^-1)")
-    for name, nu in (("Ka", 33.0), ("Q", 40.6), ("V", 60.8)):
+    for name, nu in (() if (a.no_wmap or NSIDE_OUT != 16) else (("Ka", 33.0), ("Q", 40.6), ("V", 60.8))):
         fn = os.path.join(a.out, f"band_W{name}.npz")
         if os.path.exists(fn):
             print(f"  W{name}: cached"); continue
@@ -166,6 +178,7 @@ def main():
         th, ph = hp.pix2ang(NSIDE_OUT, np.arange(hp.nside2npix(NSIDE_OUT)))
         ang = np.degrees(np.arccos(np.clip(np.sin(np.pi / 2 - th) * 0 + np.cos(th - np.pi / 2) * np.cos(ph), -1, 1)))
         region[(region == 0) & (ang < 25.0)] = 2
+        # at nside above 16 the labels come from the same plateau rule on the finer BP map
         np.savez(fn, amp=np.array([[sq, su], [dq, du], [cq, cu]]), T_d=td, beta_d=beta_d, region=region,
                  beta_bp=beta_bp, sd_bp=sd_bp)
         for r, nm in enumerate(("High Latitude", "Spur", "Galactic Center", "Plane")):

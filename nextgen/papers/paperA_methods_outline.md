@@ -74,6 +74,12 @@ model component rather than a preprocessing choice.
 - Full-sky coverage table for w0, w1, gauss and hier at S/N 680 to 23 (E017, pending): profile
   calibrated at high S/N, 2 times too narrow at S/N 23; w1 unusable at every S/N (6 to 20 sd,
   edge pile-up below S/N 70); hier calibrated (provisional numbers in E017).
+- Real-data resolution scaling (E022, F22c): on the BP XV polarization data with flat amplitude
+  priors the collapsed synchrotron index of the Spur region moves from -2.88 at nside 16 to the
+  uniform-prior boundary at nside 64, carried by the free CMB (and, in the plane, dust and
+  synchrotron) amplitudes; a C_l-sized CMB prior stabilizes three of four regions, data-scaled
+  priors on every component are the resolution-stable option. The strongest real-data case for
+  Sect. 4 and 5; presentation subject to Trygve's decision on the BP XV diagnostics.
 - Figure 2: z and coverage versus S/N, spatially varying (E012/E016) and full sky (E017).
 - Discussion: Jeffreys-type factor of the ridge; why the fixed Gaussian prior is not a fix (4 to 10
   sd bias where the index is well measured; E012, E017).
