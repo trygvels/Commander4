@@ -156,7 +156,17 @@ refreshed at transitions 50 and 200, burn 500 (700 post-burn samples per run; th
 gradient; 1200 gives about 8 h), `adapt_mass: true`. Two runs concurrently (lane A: gmrf16,
 indep16, gmrf8, indep8, gmrf4; lane B: iid16, scalar, iid8, iid4, indep4) on the 10-core Mac
 mini alongside the SBC replication; the per-gradient slowdown of the two lanes is measured at
-chain-1 iteration 70 and the lanes are serialized if it exceeds 1.5x. The MC inflation of the
+chain-1 iteration 70 and the lanes are serialized if it exceeds 1.5x. Stats review of the refresh
+(2026-10-28, target invariance CONFIRMED: the kernel is fixed after warm-up for any sequence of
+positive metrics; `_DualAveraging.restart` matches Stan's window restart) with its items taken:
+a refresh must sit at least 50 transitions before the end of warm-up (a refresh at n_warmup - 1
+left the step size at the heuristic value, acceptance 0 in the reviewer's check), each count
+fires once at the first Gibbs iteration that reaches it (numstep need not divide it), and with
+`adapt_mass: true` the window ending at 250 would have replaced the refreshed Hessian by a
+50-sample variance estimate, so the production runs `adapt_mass: false` (the metric is the
+Hessian at transition 200 for the rest of the run, the setting the 136-gradient diagnostic
+measured). The first two-lane attempt (07:10 to 08:20, `adapt_mass: true`, kept as
+`chains_{gmrf16,iid16}_windows_attempt2/`) was restarted with that setting at 08:20. The MC inflation of the
 RMSE (above) decides whether 700 samples suffice for each comparison; a run is extended if not.
 
 ## Negative control
