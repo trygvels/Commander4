@@ -221,3 +221,25 @@ original numbering.
 - **Depends on:** E021 (the clean baseline); M3 (real-data model) before any real-data claim.
 - **Decides:** whether Paper A can run hier on real intensity maps or must restrict the template
   prior to polarization and low-S/N intensity.
+
+## Q17. Is the BeyondPlanck XV polarized beta_s chain stationary, and what is its effective number of free amplitude elements?
+- **Why:** E022 / F22. The released chains (four, 1001 samples, one shared start) have 23 to
+  114 effective samples per chain and move towards flatter indices; on an nside-16 surrogate
+  the flat-prior collapsed target is shifted by +0.27 (Spur) and runs to the prior boundary
+  at nside 64, but BP's effective element count (7k to 4M per region) decides whether its
+  own target is shifted or neutralized by the run's component priors. Paper A's statement
+  about BP XV depends on it; so does the method recommendation (data-scaled priors on every
+  amplitude).
+- **How:** (1) the Commander3 semantics of `COMP_CL_TYPE = gauss` (D_l = 200, synchrotron
+  and dust) and `none` (CMB): does the amplitude step apply S^-1 with those spectra, and how
+  many effective elements does that leave per region (Trygve knows the code; otherwise read
+  comm_Cl_mod.f90 and comm_diffuse_comp_mod.f90); (2) one conditional-width measurement: the
+  index chi2 curvature at a released sample's amplitudes (BP_c0001_v2.h5 holds the
+  amplitude alms per sample; a 1-D scan of beta_s for the Spur at fixed amplitudes gives
+  sd_cond directly, 0.01 against 5e-4 is the discriminating range); (3) if sd_cond is below
+  1e-3, the chains never approached their flat-prior target and the reported sds are not
+  posterior widths; if it is near 0.01 the target is unshifted and the reported values are
+  those of a stationary chain forced by the other Gibbs blocks.
+- **Decides:** whether Paper A reports BP XV's polarized index uncertainties as
+  underestimated or as consistent; Needs Trygve for the presentation either way (STATUS).
+
