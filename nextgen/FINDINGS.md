@@ -377,9 +377,14 @@ percent below the realized mean of a/g (mu_s 0.981, mu_d 0.973, sd 0.0014); the 
 reproduces it (faint-quartile dust index +0.128 at posterior sd 0.033, amp mu_s 0.965) and sits
 at the target's mode. The CMB prior width does not matter; redrawing a = g r from the same
 templates removes the shift (peak 0.000, hyperparameters 1.000), as does the corrected sky.
-Cause: at fixed a the realized r is anti-correlated with g, so a | g is not N(g, (s g)^2) and
-the score identity fails for the per-pixel marginal, whose determinant term weights pixels by
-g^2. Consequence for real data (Q16): the hier posterior in prior-dominated regions depends on
-how the template errors are distributed, not only on their size; a 30 percent scatter of the
-wrong law moves the faint-sky dust index by 0.13 at four stated sigma. Exact-target computation
-(numpy 12 x 12 marginal), stats review pending.
+Cause: with a fixed and g = a / r, p(a | g) is proportional to p(a) p_r(a/g), and since the
+amplitude distribution falls steeply this is errors-in-variables attenuation with g as the
+noisy variable (E[a | g]/g from 1.29 in the faintest template decile to 0.54 in the brightest,
+slope of a on g 0.71, while mean(a/g) stays 1), so a | g is not N(g, (s g)^2) and the score
+identity fails for the per-pixel marginal. Consequence for real data (Q16): the hier posterior
+in prior-dominated regions depends on how the template errors are distributed, not only on
+their size; a 30 percent scatter of the wrong law moves the faint-sky dust index by 0.11 at
+four stated sigma. Exact-target computation (numpy 12 x 12 marginal); stats-reviewed
+(independent marginal code, replays with fresh scatter and noise: +0.125 / +0.127 under the
+data story, -0.001 / -0.009 under the model story; the corrected sky checked for other
+departures from the model class, none above 0.2 sd).

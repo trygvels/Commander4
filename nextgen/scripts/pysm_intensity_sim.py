@@ -136,9 +136,12 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
     eps iid N(0, 1), i.e. the prior's own generative story; "data" (E021 attempt 1): the true
     amplitudes are the PySM ones and g = a / r. The two are not equivalent: with g = a / r the
     conditional distribution of a given g is not the prior's (the realized r is anti-correlated
-    with g at fixed a), and the exact collapsed marginal then prefers a dust index 0.125 above the
-    truth in the prior-dominated regions and amplitude-hyperparameter means 2 percent low (E021,
-    numpy scan of the 12 x 12 marginal; the shift is zero under the "model" story)."""
+    with g at fixed a: errors-in-variables attenuation, E[a | g] below g at large g), and the
+    exact collapsed marginal then prefers a dust index 0.114 above the truth in the
+    prior-dominated regions (grid argmax 0.125) and amplitude-hyperparameter means 2 percent low
+    (E021, numpy scan of the 12 x 12 marginal; the shift is zero under the "model" story). The
+    "data" option at this code does not regenerate the E021 attempt-1 sky at the same seed: the
+    ratios are now drawn before the noise."""
     import pysm3
     import pysm3.units as u
     os.makedirs(outdir, exist_ok=True)

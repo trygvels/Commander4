@@ -16,7 +16,9 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   term +456 nats against chi-square -235) and hyperparameter means 2 percent low. Cause: the
   sky built its templates as g = a / r, so a given g does not follow the prior's N(g, (0.3 g)^2)
   law and the score identity fails. Redrawing a = g r removes the shift exactly; the CMB prior
-  width is irrelevant (F23, D017; stats review running).
+  width is irrelevant (F23, D017; stats review CONFIRMED with the mechanism made precise:
+  errors-in-variables attenuation, E[a | g]/g from 1.29 to 0.54 across template deciles on the
+  old sky, 1.00 on the new; replays with fresh scatter reproduce +0.125 / -0.001).
 - The corrected sky (`e021_consistent_v2`, `--template-story model`) passes: shift peaks
   +0.003 +- 0.005 (dust) and +0.010 +- 0.007 (sync), hyperparameters within 1 sd of the
   realized values, log posterior at the truth 79,652 above the flat start, gradients to 5e-4.
@@ -24,7 +26,6 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 **Running**
 - E021 attempt 2: the ten runs one at a time from 17:15 (gmrf16 first, about 8 h; iid16,
   indep16, scalar, then nside 8 and 4; about 40 h in all), scratchpad `run_e021_v2_queue.sh`.
-- stats-reviewer on the F23 diagnosis and the new sky (if it refutes, the queue stops).
 - SBC replication (seed 2027), about 15 h left.
 
 **Next**

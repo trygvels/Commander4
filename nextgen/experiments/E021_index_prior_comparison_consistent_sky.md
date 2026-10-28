@@ -30,7 +30,10 @@ guard log s_c >= -8, and the four index-prior options at nside_beta 4, 8, 16 and
 well specified:
 
 Sky (writer `nextgen/scripts/pysm_intensity_sim.py --sky consistent --nside-truth 16
---template-scatter 0.3`, seed 2027, same bands, nside and noise as E020):
+--template-scatter 0.3 --template-story model`, seed 2027, same bands, nside and noise as E020;
+attempt 2, the sky the comparison runs on; the attempt-1 chains in
+`/Users/trygvels/data/e021_consistent/` are on a misspecified sky and are excluded from the
+comparison):
 - beta_s(p) and beta_d(p) are the plain means of the PySM s1 and d1 index maps (degraded to
   nside 64) over each nside-16 region, broadcast back to nside 64: 3072 distinct values each.
   Truth sd 0.0615 (sync) and 0.0323 (dust) at nside 64; ranges -3.267 to -2.761 and 1.430 to 1.727.
@@ -38,7 +41,8 @@ Sky (writer `nextgen/scripts/pysm_intensity_sim.py --sky consistent --nside-trut
   true regions (their RMSE floors are the truth's own region means, reported by the analyzer),
   and the single index averages over all 3072.
 - Dust: one modified blackbody at T = 20.929 K everywhere (the mean of the d1 temperature map,
-  the value the model fixes), amplitude a_dust(p) = the PySM d1 emission at 545 GHz in uK_RJ.
+  the value the model fixes), amplitude a_dust(p) = g_dust(p) r_p with g_dust the PySM d1
+  emission at 545 GHz in uK_RJ and r_p the per-pixel scatter of the template bullet below.
   Hence beta_eff = beta_eff3 = beta_d; the fixed-T misspecification of E020 is gone by
   construction.
 - Synchrotron: a_sync(p) (nu/30)^beta_s(p) with a_sync the PySM s1 emission at 30 GHz.
@@ -127,6 +131,32 @@ per-nside GLS references for the cross-nside rules (2); realized hyperparameter 
 2-sd band (3); Monte Carlo error of the posterior means reported as an RMSE inflation (4).
 Confirmed: the analyzer has no division by beta_eff - beta_d and does not use T_d (5); templates,
 hyperpriors, Gibbs seed, noise realization and NUTS settings are shared by all ten runs (6).
+That review's "from the model class" verdict was for the attempt-1 sky and was wrong on the
+templates: it checked a = g r pixel by pixel, which is not sufficient; the conditional a | g
+must be the prior's, which requires g, not a, to be the fixed quantity (lesson recorded).
+
+Second stats review (2026-10-28, after attempt 1; own marginal code, Cholesky form): the score
+identity holds for the model story and fails for the data story, CONFIRMED with the mechanism
+made precise: with a fixed and g = a / r, p(a | g) is proportional to p(a) p_r(a/g) over the
+pixel ensemble, and since the PySM amplitude distribution falls steeply this is
+errors-in-variables attenuation with g as the noisy variable, E[a | g] below g at large g and
+above it at small g while mean(a/g) stays 1 (faint dust quartile, E[a|g]/g by g bins from the
+lowest to the highest decile: old sky 1.29, 1.16, 1.06, 0.97, 0.84, 0.54 and a slope of a on g
+of 0.71; new sky 1.00 in every bin, slope 0.98). The scan numbers reproduced on both skies
+(dust +0.1143 and +0.0028, sync +0.0385 and +0.0097, hyperparameters as stated above); an
+independent replay with fresh r and noise gave +0.125 and +0.127 under the data story and
+-0.001 and -0.009 under the model story (sd 0.0055 / 0.0050): the shift is the exact target's,
+systematic across seeds. New sky checked for other departures: the CMB per-pixel prior (84.1 or
+1e4 instead of 100 uK moves the dust peak by at most 0.002; the per-pixel likelihood ignores
+the CMB's spatial correlation by construction), the ratio floor (0.36 / 0.43 percent of pixels;
+six model-story realizations give a dust shift of -0.002 +- 0.002, bound 0.0008), the
+positivity floor (inactive), the SEDs (sky recomputed to 0 in all bands, T_fixed 2.4e-5 K),
+the noise (z sd per band 0.993 to 1.006): nothing above 0.2 sd of the common shift. The
+hyperparameter test is valid with the realized targets; its 2-sd band is lenient (the posterior
+sd of mu, 0.0014, equals the sampling sd of the realized mean over 49152 pixels, so the
+posterior mean sits within about 0.0004 of it) and a pass is not a tight check. Noted: the
+`data` option at the new code does not regenerate the attempt-1 sky at the same seed (RNG
+order), so the attempt-1 directory is the only copy.
 
 ## Reference
 The truth maps in truth.npz (region-constant indices, the c1 CMB, the amplitudes). No exact
