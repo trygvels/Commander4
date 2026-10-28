@@ -245,6 +245,10 @@ linear fit with n_eff = n / tau; both chains start from the same state):
 | 2, 1 (Spur) | -3.167 | 0.070 (0.067) | 0.029 | 2.40 | 0.83 | 16.9 +- 9 | 10.5 | 59 | +0.027 (+1.5) | +0.065 +- 0.032 | 0.40, 0.09, 0.08, 0.02, -0.03 |
 | 2, 2 (prior-only) | -3.304 | 0.096 (0.096) | 0.094 | 1.02 | 0.03 | 1.2 | 1.1 | 848 | +0.002 (+0.4) | +0.006 +- 0.012 | 0 within 0.05 |
 | 2, 3 (Plane) | -3.022 | 0.074 (0.069) | 0.043 | 1.74 | 0.67 | 40 +- 28 | 5.0 | 25 | +0.027 (+0.9) | +0.092 +- 0.052 | 0.42, 0.34, 0.27, 0.17, 0.04 |
+| 3, 1 (Spur) | -3.150 | 0.067 (0.066) | 0.029 | 2.34 | 0.82 | 11.1 +- 3 | 9.9 | 89 | +0.018 (+1.3) | +0.029 +- 0.025 | |
+| 3, 3 (Plane) | -2.999 | 0.067 (0.066) | 0.044 | 1.51 | 0.56 | 10.4 +- 4 | 3.6 | 95 | +0.025 (+1.9) | +0.025 +- 0.024 | |
+| 4, 1 (Spur) | -3.153 | 0.062 (0.062) | 0.028 | 2.19 | 0.79 | 8.7 +- 2 | 8.5 | 114 | -0.002 (-0.1) | +0.006 +- 0.020 | |
+| 4, 3 (Plane) | -2.997 | 0.070 (0.067) | 0.042 | 1.64 | 0.63 | 10.4 +- 4 | 4.4 | 96 | +0.035 (+2.4) | +0.070 +- 0.025 | |
 
 The two prior-only regions are exact prior draws by construction (sd 0.096 to 0.104, lag-1
 within 0.03 of zero, trends within 1.3 sigma of zero): they check the reader and the
@@ -268,8 +272,22 @@ of Spur and Plane in the last quarter (quarter means Spur -3.168, -3.168, -3.159
 Plane -3.002, -2.996, -2.996, -2.941) rather than a steady drift. Between-chain means differ
 by 1.0 sigma (Spur) and 1.7 sigma (Plane). This is consistent with a chain that has not
 settled and with a transient from the common start; it establishes neither. The movement adds
-little to the sds (detrended 0.066 to 0.071 against 0.069 to 0.075). Chains 3 and 4, if
-started elsewhere, are the test (being read).
+little to the sds (detrended 0.066 to 0.071 against 0.069 to 0.075).
+
+Chains 3 and 4 (added 13:10, rows above; not separately reviewed) start from the same state
+as chains 1 and 2, so they do not provide an independent start. They mix better: IPS tau 9 to
+11 with 40 percent errors, 89 to 114 effective samples, lag-1 0.82 and 0.79 (Spur) and 0.56
+and 0.63 (Plane); the prior-only regions behave as before. The four chain means agree to
+0.02 (Spur -3.152, -3.167, -3.150, -3.153, pooled -3.155; Plane -2.984, -3.022, -2.999,
+-2.997, pooled -3.000). All eight likelihood-sampled chain-regions move towards flatter
+indices (Spur +0.073, +0.065, +0.029, +0.006 per 1000 samples, Plane +0.080, +0.092, +0.025,
++0.070; 0.3 to 2.8 sigma each under the AR model; the prior-only ones +0.012 to -0.014,
+mixed signs), on average +0.04 (Spur) and +0.07 (Plane) per 1000 samples, half to one
+reported sd. In the quarter means the movement is largest in the last quarters of chains 1, 2
+and 4 rather than decaying from the start, which is what a slow approach to flatter values
+looks like and what a transient from the common start does not; but with a shared start and
+0.3 to 2.8 sigma per chain-region it remains an indication, not a measurement. The paper's
+means (-3.17, -3.03) match the first-half means of chains 1 and 2.
 
 Surrogate consistency: the conditional at the BP release posterior-mean amplitudes pins at
 the grid edge -1.5 in every region (chi2 prefers the flattest synchrotron allowed), so the
@@ -314,7 +332,11 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   (1.5 to 2.0 sigma per chain-region under an AR model with a poorly determined tau; the four
   tests share a start and pair within chains, and chain 1's movement is a last-quarter joint
   excursion), which is consistent with a chain that has not settled and with a transient, and
-  establishes neither. The reported sds of 0.06 and 0.07 are the spread of chains with 23 to
+  establishes neither. Chains 3 and 4 (same start) mix better (tau 9 to 11, 89 to 114
+  effective samples) and move the same way more weakly (+0.006 to +0.070 per 1000 samples);
+  across all four chains the movement averages +0.04 (Spur) and +0.07 (Plane) per 1000
+  samples, is largest in the last quarters rather than decaying from the start, and stays
+  an indication. The reported sds of 0.06 and 0.07 are the spread of chains with 23 to
   59 effective samples each, from chains that cannot be shown to have settled. That the
   stationary distribution of the flat-prior target lies at flatter indices than the reported
   means is an expectation from the surrogate and the reviewer's toy, not a chain measurement;
@@ -329,12 +351,13 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
 - Limits: diagonal noise in the collapsed target (the dense WMAP covariance changes the
   conditional width by under 5 percent); delta bandpasses; NPIPE A split at 353; unsmoothed
   WMAP r4 maps; regions recovered from the smoothed release map; nside 16 instead of
-  multi-resolution; the movement in the BP chains is a 1.5 to 2.0 sigma effect per
-  chain-region from a shared start (chains 3 and 4 are the test).
+  multi-resolution; the movement in the BP chains is a 0.3 to 2.8 sigma effect per
+  chain-region, all eight from one shared start state (the release has no chain started
+  elsewhere).
 
 ## Follow-ups
-- Chains 3 and 4 of the release (same reader, 12 minutes each) would double the drift
-  statistics; the drift test is at 1.5 to 2.0 sigma per chain-region now.
+- A longer or differently started polarized beta_s chain is the only way to settle the
+  movement question; it is not in the release.
 - Resolution scaling of the flat-prior volume term: repeat T2 at nside 32 and 64 (LFI and 353
   only, WMAP excluded) to measure how the collapsed means move with the number of amplitude
   pixels; this is the quantitative link to BP's native-resolution amplitude step and to Paper A

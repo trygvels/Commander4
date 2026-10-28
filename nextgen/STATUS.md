@@ -19,8 +19,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   reported sds (0.06, 0.07) are the spread of chains with 23 to 59 effective samples that
   cannot be shown to have settled; that the flat-prior target lies at flatter indices is an
   expectation from the surrogate and a toy, not a chain measurement (E022, F22; stats review
-  in three rounds: targets, code, inputs and chain numbers CONFIRMED). Chains 3 and 4, if
-  started elsewhere, are the test; being read.
+  in three rounds: targets, code, inputs and chain numbers CONFIRMED). Chains 3 and 4 share
+  the same start, mix better (tau 9 to 11, 89 to 114 effective samples) and move the same way
+  more weakly; across the four chains the movement averages +0.04 (Spur) and +0.07 (Plane) per
+  1000 samples and stays an indication.
 - Method point for Paper A Sect. 4: the coupling and the runaway are carried by the free
   per-pixel CMB amplitude (0.19 uK of signal against 1.5 to 2 uK of noise); a C_l-sized CMB
   prior removes both on the surrogate.
