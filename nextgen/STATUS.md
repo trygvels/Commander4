@@ -30,8 +30,12 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   the Plane -3.16, -2.88, -2.65 (r 2.6 to 6, tau 18 to 77); the C_l-sized CMB prior
   stabilizes Spur, High Latitude and Galactic Center but not the Plane (flat dust and
   synchrotron priors): data-scaled priors on every component (E016 form) or the profile are
-  the resolution-stable options. By element count the BP XV chain's flat-prior target lies at
-  the boundary (inference, under review).
+  the hypotheses to test (the Plane's resolution dependence is a likelihood effect not
+  explained yet). Fifth review round: BP's effective amplitude element count is undetermined
+  (7k to 4M per region), so the released chains cannot distinguish an unsettled flat-prior
+  chain from a stationary one driven by the other Gibbs blocks; the record states the
+  dichotomy and its discriminator (Commander3 prior semantics, or one conditional-width
+  measurement on a released sample).
 
 **Running**
 - E021 gmrf16 alone (ends about 17:30), then iid16 and the other eight in start order.
@@ -42,9 +46,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   scaling of the volume term (nside 32, 64) for Paper A Sect. 4; Q8; Paper A outline update.
 
 **Needs Trygve**
-- How to present the E022 BP XV chain diagnostics (23 to 59 effective samples per chain,
-  chains that cannot be shown to have settled, movement towards flatter indices from a common
-  start) in Paper A, given BP XV is his paper: as a
+- How to present the E022 BP XV chain diagnostics (23 to 114 effective samples per chain,
+  the unsettled-versus-stationary dichotomy, movement towards flatter indices from a common
+  start) in Paper A, given BP XV is his paper, and whether to check the Commander3 semantics
+  of `COMP_CL_TYPE = gauss` and `none` (he knows the code): as a
   worked example of the prior-volume effect with the numbers above, or only as the method
   recommendation (C_l-sized CMB prior or profile) with the diagnostics in an appendix. The
   record and F22 hold the numbers either way; nothing is published without his decision.

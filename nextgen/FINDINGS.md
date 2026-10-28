@@ -336,18 +336,20 @@ to 0.005 with E[var_cond] from the grid), for either LFI noise model; with a Gau
 prior sized from the Planck EE spectrum (0.19 uK at this resolution) the ratio is 1.02 to
 1.04. The polarized synchrotron S/N per pixel is 2 to 3 (hundreds in the F14 intensity case);
 the volume term and the stationary distribution grow with the number of amplitude elements,
-so the surrogate bounds BP's native-resolution coupling from below. (b) The released chains
-(four, 1001 samples each, all from one start state, read over HTTP from the 1.8 TB files):
-lag-1 0.79 to 0.83 (Spur) and 0.56 to 0.67 (Plane), consistent with the surrogate's 0.82 and
-below its 0.78 (the chain's lag-1 also holds the incomplete Metropolis relaxation and the
-other Gibbs blocks); IPS tau 9 to 43, consistent with the paper's 30 to 50; 23 to 114
-effective samples per chain; chain means agree to 0.02; all eight likelihood-sampled
-chain-regions move towards flatter indices, on average +0.04 (Spur) and +0.07 (Plane) per
-1000 samples (0.3 to 2.8 sigma each, shared start), largest in the last quarters, consistent
-with slow equilibration and not established. The reported sds of 0.06 and 0.07 are the
-spread of chains with 23 to 114 effective samples that cannot be shown to have settled; that the flat-prior stationary target
-lies at flatter indices is an expectation from the surrogate and a toy, not a chain
-measurement. On the surrogate the flat-prior marginal is shifted from the profile by +0.27
+so the surrogate bounds BP's native-resolution coupling from below. (b) The released chains (four, 1001 samples each, one shared start, read over HTTP from the
+1.8 TB files): lag-1 0.79 to 0.83 (Spur) and 0.56 to 0.67 (Plane), IPS tau 9 to 43
+consistent with the paper's 30 to 50, 23 to 114 effective samples per chain, chain means
+agreeing to 0.02, and a movement towards flatter indices of +0.04 (Spur) and +0.07 (Plane)
+per 1000 samples (0.3 to 2.8 sigma per chain-region, shared start). The index step is the
+relaxed alm sampler, and BP's conditional width scales with its effective number of free
+amplitude elements, which is undetermined between 7k and 4M per region (conditional sd 0.01
+to 5e-4, two-block r 7 to 140), so the per-step motion is driven by the other Gibbs blocks
+and the chains cannot distinguish an unsettled flat-prior chain (target shifted as on the
+surrogate, r of at least 70) from a stationary chain whose target the run's component priors
+keep unshifted; the reported sds of 0.06 and 0.07 are posterior widths only under the second
+reading. The discriminator is the effective element count (Commander3 semantics of
+`COMP_CL_TYPE = gauss` and `none`, or one conditional-width measurement on a released
+sample). On the surrogate the flat-prior marginal is shifted from the profile by +0.27
 (Spur) and +0.13 (Plane) and runs to the flattest allowed index in the High Latitude region;
 the C_l-sized CMB prior removes the runaway. (c) Resolution scaling on the real data (LFI and
 353, nside 16, 32, 64, white LFI noise): with flat amplitude priors the Spur's collapsed

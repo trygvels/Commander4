@@ -326,13 +326,12 @@ This is the reviewer's toy reproduced on the real data (toy: pinned from 16 elem
 nside-16 pixel; data: pinned at 16 per pixel for the Spur). Caveats for nside 32 and 64: the
 noise is white and diagonal although the 60 arcmin smoothing correlates neighbours (about
 0.3 at nside 64), and the regions are re-assigned per nside, so each resolution is a
-different data set and the extrapolation to nside 1024 is a direction, not a value. Inference, labelled as such:
-BP's amplitude step has about 256 times the nside-64 pixel count for the synchrotron
-(nside 1024; the 30 arcmin smoothing prior reduces the free elements to about the number of
-30 arcmin beams, still above the nside-64 count) and no prior on the CMB at lmax 2000, so the
-flat-prior stationary target of the BP XV chain for the Spur and the Plane lies at the
-uniform-prior boundary on this evidence; the released chains at -3.15 and -3.00, moving
-flatter at +0.04 to +0.07 per 1000 samples, are then far from it. Whether BP's CMB carried an effective C_l prior at the index step rests on the parameter
+different data set and the extrapolation to nside 1024 is a direction, not a value. Inference, labelled as such
+(fifth review round): BP's effective number of free synchrotron elements per region is not
+determined within three orders of magnitude (7k if the gauss C_l prior with D_l = 200 binds
+the synchrotron above l of about 150, 44k for 30 arcmin beams, 4M raw nside-1024 pixels), so
+whether the BP XV flat-prior target is shifted as the surrogate's is or neutralized by the
+run's component priors is open; the Conclusion states the dichotomy and its discriminator. Whether BP's CMB carried an effective C_l prior at the index step rests on the parameter
 file's first token and on the absence of `cmb/Dl_*` in the mean file; the parser semantics of
 `COMP_CL_TYPE = none` are not verified, and the chains' lag-1 carries no information on it.
 
@@ -366,37 +365,30 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   F14's ratio of 180 (intensity, S/N in the hundreds) does not appear. The surrogate's volume
   term and stationary distribution scale with the number of amplitude elements and are lower
   bounds for BP's native resolution.
-- The released BP chains (two chains, 1001 samples each, read from the 1.8 TB files; both
-  start from the same state) have lag-1 of 0.83 (Spur) and 0.67 (Plane); under the two-block
-  reading that corresponds to r 2.4 and 1.75, consistent with the surrogate's lag-1 0.82 for
-  the Spur and below its 0.78 for the Plane, but the chain's lag-1 also contains the
-  incomplete Metropolis relaxation inside the conditional (1000 proposals of length 6e-4 in a
-  conditional of sd at least 0.03) and the other Gibbs blocks, so the attribution is
-  consistency, not confirmation. The measured IPS tau of 17 to 43 (40 to 65 percent errors,
-  biased low at 23 to 59 effective samples per chain) is consistent with the paper's 30 to 50;
-  nothing in the chains indicates a per-step coupling larger than that. Both chains move
-  towards flatter indices from their common start at about one reported sd per 1000 samples
-  (1.5 to 2.0 sigma per chain-region under an AR model with a poorly determined tau; the four
-  tests share a start and pair within chains, and chain 1's movement is a last-quarter joint
-  excursion), which is consistent with a chain that has not settled and with a transient, and
-  establishes neither. Chains 3 and 4 (same start) mix better (tau 9 to 11, 89 to 114
-  effective samples) and move the same way more weakly (+0.006 to +0.070 per 1000 samples);
-  across all four chains the movement averages +0.04 (Spur) and +0.07 (Plane) per 1000
-  samples, is largest in the last quarters rather than decaying from the start, and stays
-  an indication. The reported sds of 0.06 and 0.07 are the spread of chains with 23 to
-  59 effective samples each, from chains that cannot be shown to have settled. That the
-  stationary distribution of the flat-prior target lies at flatter indices than the reported
-  means is an expectation from the surrogate and the reviewer's toy, not a chain measurement;
-  an unsettled drift may be a factor in the reported values, the per-step coupling is not
-  beyond the 30 to 50 reported. The resolution scaling on the real data (nside 16 to 64, LFI
-  and 353) puts the flat-prior collapsed target of the Spur at the uniform-prior boundary
-  from 7434 pixels and the Plane at -2.65 at nside 64, with r and tau growing with the pixel
-  count; by the element-count inference (labelled in the Result, a direction rather than a
-  value because each resolution is a different data set) the BP XV chain's stationary
-  target for the Spur lies at the boundary and the chains are far from it, which the movement
-  in all eight chain-regions is consistent with; for the Plane the inference is weakened by
-  the unexplained resolution dependence of its likelihood. The Galactic Center and the Spur
-  and High Latitude profiles are resolution-stable. How to present this in Paper A is Trygve's call (STATUS).
+- The released BP chains (four, 1001 samples each, one shared start) have lag-1 0.79 to
+  0.83 (Spur) and 0.56 to 0.67 (Plane), IPS tau 9 to 43 consistent with the paper's 30 to
+  50, and 23 to 114 effective samples. The polarized index step is the alm sampler with 100
+  proposals tuned to the conditional, so the step is relaxed and the per-step increments (sd
+  0.04 to 0.06) contain the amplitude block's 2 E[var_cond]. The conditional width at BP's
+  resolution scales with the number of free amplitude elements (surrogate: curvature
+  2150 + 0.4 N per Stokes-element with a CMB prior, 1.4 N with the flat CMB); BP's effective
+  count per region is between 7k (if the gauss synchrotron prior binds above l of 150) and
+  4M (raw nside-1024 pixels), giving a conditional sd of 0.01 to 5e-4 and a two-block r of 7
+  to 140. For any count above ten times the nside-16 surrogate's, the amplitude block is
+  under 12 percent of the increment variance: the chain's motion is driven by the other Gibbs
+  blocks (gains, bandpasses, correlated noise), not by the amplitude draws, and the
+  surrogate's r of 2.4 is not what the chain shows. The chains moved 5e-5 per sample from
+  their start, against 0.045 per step for the nside-16 surrogate relaxing to its +0.27
+  shifted target and immediate pinning at nside 64. Either BP's flat-prior target is shifted
+  by at least that amount, which forces r of at least 70 and chains that never approached
+  it, or the BP run's component priors neutralize the volume term and the reported values
+  are those of a stationary chain forced by the other blocks. The chains cannot distinguish
+  these; the reported sds of 0.06 and 0.07 are the spread of 23 to 114 effective samples
+  under the second reading and not posterior widths under the first. Deciding requires the
+  effective element count: the semantics of `COMP_CL_TYPE = gauss` (D_l = 200) and `none` in
+  Commander3, or one conditional-width measurement from BP's own tuning files or a re-run of
+  the index step on one released sample. How to present this in Paper A is Trygve's call
+  (STATUS).
 - The flat-amplitude-prior marginal is shifted from the profile by +0.27 (Spur) and +0.13
   (Plane) on the surrogate and runs to the flattest allowed index in the High Latitude region;
   a C_l-sized CMB prior removes the runaway and moves the Spur to -3.20. This is the
