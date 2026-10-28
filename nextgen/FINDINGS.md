@@ -354,7 +354,9 @@ the C_l-sized CMB prior removes the runaway. (c) Resolution scaling on the real 
 target moves -2.88, -2.13, uniform-prior boundary (7434 pixels), the Plane -3.16, -2.88,
 -2.65, with r 2.6 to 6.0 and tau 18 to 77 before pinning; the Galactic Center (high S/N) and
 the profile are stable. With the C_l-sized CMB prior Spur, High Latitude and Galactic Center
-are stable to 0.16 with tau 1.2 to 1.6, the Plane still moves -3.29 to -2.88 (flat
-synchrotron and dust priors). By element count (inference, labelled) the BP XV chain's
-flat-prior stationary target lies at the boundary and the released chains are far from it.
-Stats-reviewed in three rounds; the resolution part under review.
+move by 0.03 to 0.16 with tau 1.2 to 1.6 (High Latitude's 0.16 with a stable profile is the
+synchrotron volume term), the Plane moves -3.29 to -2.88 with its profile moving the same
+way, a resolution-dependent likelihood effect not explained here. By element count
+(inference, labelled; a direction, not a value) the BP XV chain's flat-prior stationary
+target for the Spur lies at the boundary and the released chains are far from it.
+Stats-reviewed in four rounds.

@@ -294,17 +294,19 @@ first follow-up):** the same surrogate built at nside 16, 32 and 64 with LFI 30 
 only (WMAP exists only at nside 16), white-propagated LFI noise at all three (BP's simulated
 rms exists only at nside 16; Q7 factor 1.6 applies to the widths), regions by the same
 plateau rule on the finer BP map, CMB prior either flat or Gaussian with the per-nside
-Planck-EE rms (0.19, 0.32, 0.44 uK); 2000-iteration chains for Spur and Plane. Cells: T2 mean
-+- sd with prior / profile mean with prior / r = sd_T2 / sd_T1 / measured tau.
+Planck-EE rms (0.19, 0.32, 0.44 uK); 2000-iteration chains for Spur and Plane (the JSON
+`variant` field says `lfi_noise: bp` for nside 32 and 64 because the builder stores the white
+propagation in the primary sigma there; all six rows are white). Cells: T2 mean +- sd with
+prior / profile mean with prior / r = sd_T2 / sd_T1 / measured tau.
 
 | nside, CMB prior | Spur pixels | High Latitude | Spur | Galactic Center | Plane |
 |---|---|---|---|---|---|
-| 16, flat CMB | 464 | -2.175 +- 0.043 / -3.215 / r 2.83 | -2.880 +- 0.045 / -3.162 / r 2.63 / tau 18 | -3.024 +- 0.028 / -3.046 / r 2.26 | -3.157 +- 0.039 / -3.294 / r 2.42 / tau 9 |
-| 32, flat CMB | 1863 | -1.500 (edge) / -3.212 | -2.128 +- 0.047 / -3.167 / r 6.00 / tau 77 | -3.034 +- 0.023 / -3.090 / r 2.32 | -2.875 +- 0.031 / -3.238 / r 2.86 / tau 15 |
-| 64, flat CMB | 7434 | -1.500 (edge) / -3.236 | -1.500 (edge) / -3.234 / pinned | -3.019 +- 0.016 / -3.129 / r 2.35 | -2.651 +- 0.017 / -3.130 / r 3.35 / tau 24 |
-| 16, CMB prior 0.19 | 464 | -3.229 +- 0.017 / -3.281 / r 1.08 | -3.166 +- 0.021 / -3.182 / r 1.07 / tau 1.2 | -3.143 +- 0.013 / -3.144 / r 1.05 | -3.286 +- 0.019 / -3.295 / r 1.11 / tau 1.5 |
-| 32, CMB prior 0.32 | 1863 | -3.151 +- 0.013 / -3.272 / r 1.07 | -3.160 +- 0.018 / -3.203 / r 1.07 / tau 1.4 | -3.165 +- 0.010 / -3.167 / r 1.06 | -3.135 +- 0.014 / -3.152 / r 1.10 / tau 1.6 |
-| 64, CMB prior 0.44 | 7434 | -3.065 +- 0.008 / -3.255 / r 1.06 | -3.137 +- 0.012 / -3.219 / r 1.08 / tau 1.2 | -3.098 +- 0.007 / -3.102 / r 1.04 | -2.875 +- 0.006 / -2.886 / r 1.07 / tau 1.3 |
+| 16, white LFI noise, flat CMB | 464 | -2.175 +- 0.043 / -3.215 / r 2.83 | -2.880 +- 0.045 / -3.162 / r 2.63 / tau 18 | -3.024 +- 0.028 / -3.046 / r 2.26 | -3.157 +- 0.039 / -3.294 / r 2.42 / tau 9 |
+| 32, white, flat CMB | 1863 | -1.500 (edge) / -3.212 | -2.128 +- 0.047 / -3.167 / r 6.00 / tau 77 | -3.034 +- 0.023 / -3.090 / r 2.32 | -2.875 +- 0.031 / -3.238 / r 2.86 / tau 15 |
+| 64, white, flat CMB | 7434 | -1.500 (edge) / -3.236 | -1.500 (edge) / -3.234 / pinned | -3.019 +- 0.016 / -3.129 / r 2.35 | -2.651 +- 0.017 / -3.130 / r 3.35 / tau 24 |
+| 16, white, CMB prior 0.19 | 464 | -3.229 +- 0.017 / -3.281 / r 1.08 | -3.166 +- 0.021 / -3.182 / r 1.07 / tau 1.2 | -3.143 +- 0.013 / -3.144 / r 1.05 | -3.286 +- 0.019 / -3.295 / r 1.11 / tau 1.5 |
+| 32, white, CMB prior 0.32 | 1863 | -3.151 +- 0.013 / -3.272 / r 1.07 | -3.160 +- 0.018 / -3.203 / r 1.07 / tau 1.4 | -3.165 +- 0.010 / -3.167 / r 1.06 | -3.135 +- 0.014 / -3.152 / r 1.10 / tau 1.6 |
+| 64, white, CMB prior 0.44 | 7434 | -3.065 +- 0.008 / -3.255 / r 1.06 | -3.137 +- 0.012 / -3.219 / r 1.08 / tau 1.2 | -3.098 +- 0.007 / -3.102 / r 1.04 | -2.875 +- 0.006 / -2.886 / r 1.07 / tau 1.3 |
 
 With flat amplitude priors the collapsed target of the Spur moves from -2.88 (nside 16) to
 -2.13 (nside 32) to the uniform-prior boundary (nside 64, 7434 pixels), the High Latitude
@@ -312,21 +314,27 @@ region is at the boundary from nside 32, the Plane moves from -3.16 to -2.65, an
 grow with the pixel count (Spur r 2.6 to 6.0, tau 18 to 77 before pinning; Plane 2.4 to 3.4,
 9 to 24); the Galactic Center (91 to 1523 pixels at high S/N) is stable at -3.02. The profile
 is stable to 0.08 (Spur, High Latitude, Galactic Center) and 0.16 (Plane) across the three
-resolutions. With the C_l-sized CMB prior the Spur, High Latitude and Galactic Center are
-stable to 0.03 to 0.16 and tau is 1.2 to 1.6 everywhere, but the Plane still moves from
--3.29 to -2.88 with the flat synchrotron and dust priors (dust and synchrotron are both
-strong there), so the CMB prior alone does not make the target resolution-stable in the
-plane. This is the reviewer's toy reproduced on the real data (toy: pinned from 16 elements
-per nside-16 pixel; data: pinned at 16 per pixel for the Spur). Inference, labelled as such:
+resolutions. With the C_l-sized CMB prior tau is 1.2 to 1.6 everywhere and the collapsed
+means move by 0.03 (Spur), 0.07 (Galactic Center), 0.16 (High Latitude; its profile is
+stable at -3.28 to -3.26, so this is the synchrotron volume term) and 0.41 (Plane, -3.29 to
+-2.88) over nside 16 to 64. The Plane's movement is not a volume term: its profile, which has
+none, moves the same way (-3.30, -3.15, -2.89), so it is a resolution-dependent likelihood
+effect this cell does not determine (candidates: pixel averaging of the model, nonlinear in
+T_d, across the plane's strong gradients; region re-assignment at the plane boundary; a CMB
+prior too tight for a flat-spectrum residual there; the flat-CMB profile moves 0.16 too).
+This is the reviewer's toy reproduced on the real data (toy: pinned from 16 elements per
+nside-16 pixel; data: pinned at 16 per pixel for the Spur). Caveats for nside 32 and 64: the
+noise is white and diagonal although the 60 arcmin smoothing correlates neighbours (about
+0.3 at nside 64), and the regions are re-assigned per nside, so each resolution is a
+different data set and the extrapolation to nside 1024 is a direction, not a value. Inference, labelled as such:
 BP's amplitude step has about 256 times the nside-64 pixel count for the synchrotron
 (nside 1024; the 30 arcmin smoothing prior reduces the free elements to about the number of
 30 arcmin beams, still above the nside-64 count) and no prior on the CMB at lmax 2000, so the
 flat-prior stationary target of the BP XV chain for the Spur and the Plane lies at the
 uniform-prior boundary on this evidence; the released chains at -3.15 and -3.00, moving
-flatter at +0.04 to +0.07 per 1000 samples, are then far from it. The alternative, that
-BP's CMB carried an effective C_l prior at the index step, is disfavoured by the chains'
-lag-1 of 0.79 to 0.83 (flat-CMB surrogate 0.82, CMB-prior surrogate 0.03 to 0.10), but the
-parser semantics of `COMP_CL_TYPE = none` are not verified.
+flatter at +0.04 to +0.07 per 1000 samples, are then far from it. Whether BP's CMB carried an effective C_l prior at the index step rests on the parameter
+file's first token and on the absence of `cmb/Dl_*` in the mean file; the parser semantics of
+`COMP_CL_TYPE = none` are not verified, and the chains' lag-1 carries no information on it.
 
 Surrogate consistency: the conditional at the BP release posterior-mean amplitudes pins at
 the grid edge -1.5 in every region (chi2 prefers the flattest synchrotron allowed), so the
@@ -383,27 +391,34 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   beyond the 30 to 50 reported. The resolution scaling on the real data (nside 16 to 64, LFI
   and 353) puts the flat-prior collapsed target of the Spur at the uniform-prior boundary
   from 7434 pixels and the Plane at -2.65 at nside 64, with r and tau growing with the pixel
-  count; by the element-count inference (labelled in the Result) the BP XV chain's
-  stationary target lies at the boundary and the chains are far from it, which the movement
-  in all eight chain-regions is consistent with. The Galactic Center and the profile are
-  resolution-stable. How to present this in Paper A is Trygve's call (STATUS).
+  count; by the element-count inference (labelled in the Result, a direction rather than a
+  value because each resolution is a different data set) the BP XV chain's stationary
+  target for the Spur lies at the boundary and the chains are far from it, which the movement
+  in all eight chain-regions is consistent with; for the Plane the inference is weakened by
+  the unexplained resolution dependence of its likelihood. The Galactic Center and the Spur
+  and High Latitude profiles are resolution-stable. How to present this in Paper A is Trygve's call (STATUS).
 - The flat-amplitude-prior marginal is shifted from the profile by +0.27 (Spur) and +0.13
   (Plane) on the surrogate and runs to the flattest allowed index in the High Latitude region;
   a C_l-sized CMB prior removes the runaway and moves the Spur to -3.20. This is the
   prior-volume effect of Paper A Sect. 4 on real polarization data, carried by the free
   per-pixel CMB amplitude at S/N below 0.2, and it grows with resolution (measured: Spur
-  -2.88, -2.13, boundary at nside 16, 32, 64). A C_l-sized CMB prior makes the Spur, High
-  Latitude and Galactic Center targets resolution-stable (0.03 to 0.16 over nside 16 to 64,
-  tau 1.2 to 1.6) but not the Plane (-3.29 to -2.88), where the flat synchrotron and dust
-  priors carry the volume term; amplitude priors on every component with a scale set by the
-  data (the hierarchical prior of E016/E018) or the profile are the resolution-stable
-  options. That is the method recommendation for Paper A Sect. 4 and 5.
+  -2.88, -2.13, boundary at nside 16, 32, 64). With a C_l-sized CMB prior the coupling is
+  gone (tau 1.2 to 1.6) and the collapsed means move by 0.03 (Spur), 0.07 (Galactic Center),
+  0.16 (High Latitude; profile stable, the synchrotron volume term) and 0.41 (Plane; the
+  profile moves too, a resolution-dependent likelihood effect this cell does not explain)
+  over nside 16 to 64. That amplitude priors on every component with a data-set scale (the
+  E016 hierarchical form) or the profile give a resolution-stable target is the hypothesis
+  the listed follow-up tests; this cell supports it for the synchrotron volume term and not
+  for the Plane.
 - Limits: diagonal noise in the collapsed target (the dense WMAP covariance changes the
   conditional width by under 5 percent); delta bandpasses; NPIPE A split at 353; unsmoothed
   WMAP r4 maps; regions recovered from the smoothed release map; nside 16 instead of
   multi-resolution; the movement in the BP chains is a 0.3 to 2.8 sigma effect per
   chain-region, all eight from one shared start state (the release has no chain started
-  elsewhere).
+  elsewhere); the nside 32 and 64 surrogates use white diagonal noise (neighbour correlation
+  from the smoothing ignored) and re-assigned regions; the within-conditional Metropolis
+  relaxation of BP's polarized alm sampler is not characterized here (the stored
+  `beta_pixreg_proplen` and `nprop` of 6e-4 and 1000 belong to the intensity row).
 
 ## Follow-ups
 - Resolution scaling with the hierarchical amplitude prior (E016 form) on all three components
