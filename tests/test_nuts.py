@@ -263,3 +263,34 @@ def test_reset_metric_during_warmup_replaces_metric_and_keeps_target():
     assert abs(np.corrcoef(draws[:, 1], draws[:, 2])[0, 1] - 0.8) < 0.05
     with pytest.raises(ValueError, match="warm-up"):
         sampler.reset_metric(true_var, theta, f)
+
+
+def test_two_refreshes_with_windows_keep_target():
+    """Two ``reset_metric`` calls under ``adapt_mass=True`` (one inside a window, one on a window
+    end) on a correlated Gaussian: the post-warm-up kernel is fixed and reproduces the target."""
+    cov = np.array([[1.0, 0.8 * 3.0], [0.8 * 3.0, 9.0]])
+    prec = np.linalg.inv(cov)
+
+    def f(theta):
+        return -0.5 * theta @ prec @ theta, -prec @ theta
+
+    rng = np.random.default_rng(5)
+    sampler = NUTSSampler(2, rng, n_warmup=300, adapt_mass=True)
+    ends = sampler._window_ends
+    theta = np.zeros(2)
+    draws, steps = [], []
+    for it in range(300 + 5000):
+        if it in (ends[0] - 10, ends[1]):
+            sampler.reset_metric(np.array([0.5, 20.0]), theta, f)
+        theta, info = sampler.transition(theta, f)
+        if it >= 300:
+            draws.append(theta.copy())
+            steps.append(info.step_size)
+    draws = np.array(draws)
+    assert len(set(steps)) == 1
+    for j, var in enumerate((1.0, 9.0)):
+        ess = _ess(draws[:, j])
+        assert ess > 300
+        assert abs(draws[:, j].mean()) < 4 * np.sqrt(var / ess)
+        assert abs(draws[:, j].var() - var) < 4 * var * np.sqrt(2.0 / ess)
+    assert abs(np.corrcoef(draws[:, 0], draws[:, 1])[0, 1] - 0.8) < 0.05

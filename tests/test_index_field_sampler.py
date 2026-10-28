@@ -342,6 +342,9 @@ def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog) -> None:
     assert ifs.NUTSConfig.from_block(None).refresh_inv_mass_at == ()
     with pytest.raises(ValueError, match="below n_warmup"):
         ifs.NUTSConfig.from_block(Bunch(n_warmup=10, refresh_inv_mass_at=[10]))
+    with pytest.raises(ValueError, match="at least 50"):
+        ifs.NUTSConfig.from_block(Bunch(n_warmup=400, refresh_inv_mass_at=[50, 360]))
+    assert ifs.NUTSConfig.from_block(Bunch(n_warmup=400, refresh_inv_mass_at=[50, 350])).refresh_inv_mass_at == (50, 350)
     with pytest.raises(ValueError, match="positive integers"):
         ifs.NUTSConfig.from_block(Bunch(n_warmup=10, refresh_inv_mass_at=["4"]))
     with pytest.raises(ValueError, match="positive integers"):
@@ -357,18 +360,24 @@ def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog) -> None:
     priors = {"sync": comps[1].amp_prior, "dust": comps[2].amp_prior}
     group = ifs.IndexFieldSamplingGroup(MPI.COMM_SELF, like, layout, views,
                                         {"sync": [comps[1]], "dust": [comps[2]]}, priors,
-                                        ifs.NUTSConfig(n_warmup=6, max_depth=5,
-                                                       refresh_inv_mass_at=(2,)))
+                                        ifs.NUTSConfig(n_warmup=8, max_depth=5,
+                                                       refresh_inv_mass_at=(1, 3)))
     import logging
+    # numstep 2 does not divide the counts 1 and 3: each fires once, at the first run whose
+    # transition count has reached it (count 1 at the run starting from 2 transitions, count 3
+    # at the run starting from 4), never again.
     with caplog.at_level(logging.INFO, logger=ifs.logger.name):
         group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(1))
         st = group.state(1, "g", np.random.default_rng(1))
         np.testing.assert_array_equal(st.sampler.inv_mass, np.ones(layout.dim))
-        group.run(numstep=1, chain=1, group_name="g", rng=np.random.default_rng(2))
-    assert sum("inverse mass refreshed" in r.message for r in caplog.records) == 1
-    assert not np.array_equal(st.sampler.inv_mass, np.ones(layout.dim))
-    assert np.all(st.sampler.inv_mass > 0)
-    # No second refresh: the count 2 is passed.
-    with caplog.at_level(logging.INFO, logger=ifs.logger.name):
-        group.run(numstep=1, chain=1, group_name="g", rng=np.random.default_rng(3))
-    assert sum("inverse mass refreshed" in r.message for r in caplog.records) == 1
+        group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(2))
+        first = st.sampler.inv_mass.copy()
+        group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(3))
+        second = st.sampler.inv_mass.copy()
+        group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(4))
+    msgs = [r.message for r in caplog.records if "inverse mass refreshed" in r.message]
+    assert len(msgs) == 2 and "configured [1]" in msgs[0] and "configured [3]" in msgs[1]
+    assert not np.array_equal(first, np.ones(layout.dim)) and np.all(first > 0)
+    assert not np.array_equal(second, first) and np.all(second > 0)
+    np.testing.assert_array_equal(st.sampler.inv_mass, second)
+    assert st.refreshed == {1, 3}

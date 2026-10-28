@@ -67,9 +67,12 @@ class NUTSConfig:
                                  "(transition counts during warm-up).")
             values["refresh_inv_mass_at"] = tuple(int(v) for v in at)
         cfg = cls(**values)
-        if any(v >= cfg.n_warmup for v in cfg.refresh_inv_mass_at):
-            raise ValueError("nuts.refresh_inv_mass_at entries must be below n_warmup (the "
-                             "metric can only be reset during warm-up).")
+        buffer = 50 if cfg.n_warmup >= 100 else cfg.n_warmup // 2
+        if any(v > cfg.n_warmup - buffer for v in cfg.refresh_inv_mass_at):
+            raise ValueError(f"nuts.refresh_inv_mass_at entries must be below n_warmup by at "
+                             f"least {buffer} transitions (the step size re-adapts after a "
+                             f"refresh; a refresh at the end of warm-up leaves it at the "
+                             f"heuristic value).")
         if cfg.parameterization not in ("noncentred", "centred"):
             raise ValueError(f"nuts.parameterization must be 'noncentred' or 'centred', got "
                              f"{cfg.parameterization!r}.")
@@ -291,6 +294,7 @@ class IndexSamplerState:
     x: NDArray
     n_transitions: int = 0
     mass_initialized: bool = False
+    refreshed: set = field(default_factory=set)   # refresh_inv_mass_at entries already applied
 
 
 _STATES: dict[tuple[int, str], IndexSamplerState] = {}
@@ -436,18 +440,22 @@ class IndexFieldSamplingGroup:
                                 f"{inv.min():.3g} to {inv.max():.3g}, "
                                 f"{int(np.sum(inv == 1.0))} coordinates left at 1")
                 st.mass_initialized = True
-                if (st.n_transitions in self.nuts.refresh_inv_mass_at
-                        and st.sampler.iteration < st.sampler.n_warmup):
-                    # Warm-up only: a fresh finite-difference Hessian at the current state
-                    # replaces the metric (the start-state Hessian is stale once the chain has
-                    # left the transient), and the step size is re-found; same target.
+                due = [v for v in self.nuts.refresh_inv_mass_at
+                       if v <= st.n_transitions and v not in st.refreshed]
+                if due and st.sampler.iteration < st.sampler.n_warmup:
+                    # Warm-up only, once per configured count, at the first Gibbs iteration whose
+                    # transition count has reached it (numstep need not divide the count): a
+                    # fresh finite-difference Hessian at the current state replaces the metric
+                    # (the start-state Hessian is stale once the chain has left the transient)
+                    # and the step size is re-found; same target.
+                    st.refreshed.update(due)
                     inv = fd_inverse_mass(self._logp_and_grad_root, x)
                     st.sampler.reset_metric(inv, x, self._logp_and_grad_root)
                     logger.info(f"Index-field group {group_name!r}: inverse mass refreshed from "
                                 f"the finite-difference Hessian at transition "
-                                f"{st.n_transitions}, {2 * x.size} gradients, range "
-                                f"{inv.min():.3g} to {inv.max():.3g}, step size "
-                                f"{st.sampler.step_size:.3g}")
+                                f"{st.n_transitions} (configured {sorted(due)}), "
+                                f"{2 * x.size} gradients, range {inv.min():.3g} to "
+                                f"{inv.max():.3g}, step size {st.sampler.step_size:.3g}")
                 for _ in range(numstep):
                     x, info = st.sampler.transition(x, self._logp_and_grad_root)
                     infos.append(info)
