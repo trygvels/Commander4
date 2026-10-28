@@ -132,7 +132,32 @@ python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consisten
 ```
 
 ## Result
-(timing run started 05:31 on 2026-10-28)
+**Timing run, gmrf16, 40 iterations, centred, fd_hessian start, adapt_mass true (05:31 to
+06:28):** Hessian start 14 min per chain (12304 gradients, range 1.4e-8 to 2). The chain
+converges towards the truth (sync index RMSE 0.117 at the start, 0.076 at iteration 40 with the
+field sd 0.076 against a truth sd 0.061; dust 0.068 to 0.060; sync log sigma -4.9 to -2.5, u
+wandering between 8 and 0) but at 255 to 1023 gradients per transition with step sizes 0.004 to
+0.017 and acceptance near 1.0: 66 s per Gibbs iteration (both chains), 37 h per run.
+Offline diagnosis (scratchpad `diag_e021_nuts.py`, the same likelihood from the band files, NUTS
+from the iteration-40 state, fixed metric, 30 transitions each): with a fresh finite-difference
+Hessian at that state the sampler takes 136 gradients per transition at step sizes 0.05 to 0.16
+(all 6152 coordinates free); with the field hyperparameters log sigma and u additionally held
+fixed, 187. So the cost was the stale start-state metric (range 1.4e-8 to 2 there against
+1.4e-8 to 0.014 at iteration 40: the hyperparameter and field scales change by orders of
+magnitude in the transient), not the hyperparameter funnel. Fix: `nuts.refresh_inv_mass_at`
+(commit c707a34; warm-up only: the Hessian is recomputed at the stated transition counts and the
+step size re-found, same target; tests on the exact non-Gaussian target of the fixed-metric
+test). The first production attempt with the stale metric (07:10 stop, 40 iterations in 40 min,
+kept as `chains_gmrf16_stalemetric_attempt1/`) was restarted with the refreshed metric.
+
+**Production settings (2026-10-28, 07:10):** 1200 Gibbs iterations, warm-up 400 with the metric
+refreshed at transitions 50 and 200, burn 500 (700 post-burn samples per run; the E020 plan of
+2000/500/600 would take 13 h per nside-16 run at 136 gradients per transition and 83 ms per
+gradient; 1200 gives about 8 h), `adapt_mass: true`. Two runs concurrently (lane A: gmrf16,
+indep16, gmrf8, indep8, gmrf4; lane B: iid16, scalar, iid8, iid4, indep4) on the 10-core Mac
+mini alongside the SBC replication; the per-gradient slowdown of the two lanes is measured at
+chain-1 iteration 70 and the lanes are serialized if it exceeds 1.5x. The MC inflation of the
+RMSE (above) decides whether 700 samples suffice for each comparison; a run is extended if not.
 
 ## Negative control
 The single index converges to the Fisher-weighted sky mean, not the unweighted mean (review item

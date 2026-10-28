@@ -133,3 +133,20 @@ climb). The E021 timing run decides between the two settings on gradients per tr
 the first window. Iteration counts are set from that timing run so that the ten runs fit in
 about two days on the Mac mini (D-level: a shorter chain with the same burn fraction, logged in
 E021, not a change of target).
+
+## D015 (2026-10-28): E021 runs with a warm-up metric refresh, 1200 iterations and two concurrent lanes
+
+**Decision.** The E021 production uses `nuts.refresh_inv_mass_at: [50, 200]` (the diagonal
+inverse mass recomputed from the finite-difference Hessian at the current state during warm-up,
+step size re-found; c707a34), 1200 Gibbs iterations with warm-up 400 and burn 500 instead of
+E020's 2000/500/600, and two runs at a time on the Mac mini.
+
+**Why.** The E021 timing run cost 255 to 1023 gradients per transition on the start-state
+Hessian metric; an offline test from the iteration-40 state showed a fresh Hessian brings it to
+136 (a fixed hyperparameter block does not help: 187), so the cost was the stale metric, not the
+funnel. With 136 gradients at 83 ms each, 2000 iterations are 13 h per nside-16 run and ten runs
+over a week; 1200 iterations keep 700 post-burn samples, and the analyzer's MC inflation of the
+RMSE says whether that is enough per comparison. The refresh is adaptation only (any positive
+metric is a valid kernel; the step size restarts as at a Stan window end), so the target is the
+one reviewed for E018 and E020; the E021 Result records it and the stats review of the E021
+sampler configuration is run while the production is going, not after.
