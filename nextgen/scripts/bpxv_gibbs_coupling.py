@@ -37,9 +37,15 @@ def mbb_rj(nu, beta_d, T):
 
 
 class Surrogate:
-    def __init__(self, path):
+    def __init__(self, path, lfi_noise="bp", cmb_prior_sd=0.0):
         z = np.load(os.path.join(path, "surrogate.npz"), allow_pickle=True)
-        self.d = z["d"]; self.sigma = z["sigma"]; self.nu = z["freqs"]; self.bands = [str(b) for b in z["bands"]]
+        self.d = z["d"]; self.sigma = z["sigma"].copy(); self.nu = z["freqs"]; self.bands = [str(b) for b in z["bands"]]
+        if lfi_noise == "white":
+            for ib, b in enumerate(self.bands):
+                if b in ("030", "044", "070"): self.sigma[ib] = z["sigma_white"][ib]
+        # Gaussian per-pixel prior N(0, sd^2) on the CMB amplitude (uK_CMB); 0 means flat
+        self.prior_prec = np.zeros(3); self.cmb_prior_sd = float(cmb_prior_sd)
+        if cmb_prior_sd > 0: self.prior_prec[2] = 1.0 / cmb_prior_sd**2
         self.amp = z["amp"]; self.T_d = z["T_d"]; self.beta_d = float(z["beta_d"]); self.region = z["region"]
         self.nb, _, self.npix = self.d.shape
         self.w = 1.0 / self.sigma**2
@@ -91,7 +97,7 @@ class Surrogate:
             fs = self.f_s(beta)
             A = np.empty((self.nb, m.sum(), 3)); A[:, :, 0] = fs[:, None]; A[:, :, 1] = Ad; A[:, :, 2] = Ac[:, None]
             # M[s,p,i,j] = sum_b w[b,s,p] A[b,p,i] A[b,p,j]; b[s,p,i] = sum_b w A d
-            M = np.einsum("bsp,bpi,bpj->spij", w, A, A); bv = np.einsum("bsp,bpi,bsp->spi", w, A, d)
+            M = np.einsum("bsp,bpi,bpj->spij", w, A, A) + np.diag(self.prior_prec); bv = np.einsum("bsp,bpi,bsp->spi", w, A, d)
             L = np.linalg.cholesky(M); y = np.linalg.solve(L, bv[..., None])[..., 0]
             q = 0.5 * np.sum(y**2)
             ld = np.sum(np.log(np.diagonal(L, axis1=-2, axis2=-1))) if logdet else 0.0
@@ -103,7 +109,7 @@ class Surrogate:
     def draw_amp(self, beta_r, rng):
         beta_pix = beta_r[self.region]
         A = self.mixing(beta_pix)                             # [nb, npix, 3]
-        M = np.einsum("bsp,bpi,bpj->spij", self.w, A, A); bv = np.einsum("bsp,bpi,bsp->spi", self.w, A, self.d)
+        M = np.einsum("bsp,bpi,bpj->spij", self.w, A, A) + np.diag(self.prior_prec); bv = np.einsum("bsp,bpi,bsp->spi", self.w, A, self.d)
         L = np.linalg.cholesky(M)
         mean = np.linalg.solve(M, bv[..., None])[..., 0]
         z = rng.standard_normal(mean.shape)
@@ -120,7 +126,7 @@ def moments(grid, lp):
 
 
 def draw_from_grid(grid, lp, rng):
-    p = np.exp(lp - lp.max()); c = np.cumsum(p); c /= c[-1]
+    p = np.exp(lp - lp.max()); c = np.cumsum(p) - 0.5 * p; c /= np.sum(p)  # cell-centred CDF
     return float(np.interp(rng.random(), c, grid))
 
 
@@ -128,19 +134,20 @@ def tau_ips(x):
     """Integrated autocorrelation time by Geyer's initial positive sequence; returns (tau, err)."""
     x = np.asarray(x, dtype=float); n = x.size; xc = x - x.mean()
     f = np.fft.rfft(xc, 2 * n); acf = np.fft.irfft(f * np.conj(f))[:n] / np.arange(n, 0, -1); acf /= acf[0]
-    tau = -1.0
+    tau = -1.0; K = 0
     for k in range(0, n - 1, 2):
         g = acf[k] + acf[k + 1]
         if g <= 0: break
-        tau += 2 * g
+        tau += 2 * g; K = k + 1
     tau = max(tau, 1.0)
-    return float(tau), float(tau * np.sqrt(2 * (2 * tau + 1) / n))  # Sokal-type error
+    return float(tau), float(tau * np.sqrt(2 * (2 * K + 1) / n))  # Sokal error with the truncation lag
 
 
 def dense_wmap_cond(sur, amp, beta_mode, grid, r):
     """T1 for region r with the dense WMAP N^-1 on the WMAP bands (others diagonal), other
     regions fixed at beta_mode; returns the log posterior on the grid (with prior)."""
     lp = np.zeros(grid.size)
+    C0, S1, S2 = sur.cond_stats(amp, r)
     beta_pix = beta_mode[sur.region].copy()
     m_r = (sur.region == r) & sur.ok
     for ib, b in enumerate(sur.bands):
@@ -159,14 +166,13 @@ def dense_wmap_cond(sur, amp, beta_mode, grid, r):
             A0 = sur.mixing(beta_pix)[ib]                        # [npix, 3]
             res0 = np.stack([sur.d[ib, s] - np.einsum("pi,ip->p", A0, amp[:, s, :]) for s in range(2)])
             v = np.stack([np.where(m_r, amp[0, s], 0.0) for s in range(2)])
-            res0 = np.where(np.isfinite(res0), res0, 0.0); v = np.where(np.isfinite(v), v, 0.0)
+            res0[:, ~sur.ok] = 0.0; v[:, ~sur.ok] = 0.0
             R = np.concatenate([to_n(res0[0]), to_n(res0[1])]); V = np.concatenate([to_n(v[0]), to_n(v[1])])
             c0 = R @ ninv @ R; c1 = V @ ninv @ R; c2 = V @ ninv @ V
             df = fgrid - f0
             lp += -0.5 * (c0 - 2 * df * c1 + df**2 * c2)
         else:
-            C0, S1, S2 = sur.cond_stats(amp, r)  # all bands diagonal; take this band's share
-            lp += -0.5 * (-2 * fgrid * S1[ib] + fgrid**2 * S2[ib])
+            lp += -0.5 * (-2 * fgrid * S1[ib] + fgrid**2 * S2[ib])  # this band's diagonal share
     return lp - 0.5 * ((grid - PRIOR_MEAN) / PRIOR_SD) ** 2
 
 
@@ -177,14 +183,19 @@ def main():
     ap.add_argument("--seed", type=int, default=2022)
     ap.add_argument("--out", default="nextgen/experiments/E022_bp_xv_polarized_index_gibbs_coupling")
     ap.add_argument("--no-dense", action="store_true")
+    ap.add_argument("--lfi-noise", choices=("bp", "white"), default="bp", help="LFI noise sd: BP nside-16 simulated rms, or white-noise propagation")
+    ap.add_argument("--cmb-prior-sd", type=float, default=0.0, help="Gaussian per-pixel prior sd on the CMB Q/U amplitude in uK_CMB (0: flat)")
+    ap.add_argument("--tag", default="")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
-    sur = Surrogate(a.dir)
+    sur = Surrogate(a.dir, lfi_noise=a.lfi_noise, cmb_prior_sd=a.cmb_prior_sd)
+    tag = a.tag or f"{a.lfi_noise}_cmb{a.cmb_prior_sd:g}"
+    print(f"variant {tag}: LFI noise {a.lfi_noise}, CMB prior sd {a.cmb_prior_sd:g} uK_CMB")
     print(f"bands {sur.bands}, pixels used {sur.ok.sum()} of {sur.npix}; region sizes",
           [int(((sur.region == r) & sur.ok).sum()) for r in range(4)])
     grid = np.linspace(-4.5, -1.5, 2001)
     amp0 = sur.amp
-    res = {"bands": sur.bands, "regions": {}}
+    res = {"bands": sur.bands, "regions": {}, "variant": {"lfi_noise": a.lfi_noise, "cmb_prior_sd": a.cmb_prior_sd, "iters": a.iters}}
     # T2 first (independent of amplitudes), then T1 at amplitude draws consistent with the data
     for r, name in enumerate(REGIONS):
         t0 = time.time()
@@ -221,37 +232,47 @@ def main():
         print(f"  {name:16s} cond {rr['cond']['mean']:.4f}+-{rr['cond']['sd']:.4f} (sd spread over draws {rr['cond']['sd_spread']:.4f}, mean spread {rr['cond']['mean_spread']:.4f}); "
               f"with prior sd {rr['cond_prior']['sd']:.4f}" + (f"; dense-WMAP sd {rr['cond_prior_denseWMAP']['sd']:.4f}" if not a.no_dense else "") +
               f" | ratio marg/cond {rr['ratio_prior']:.2f} (no prior {rr['ratio_noprior']:.2f}) -> Gaussian tau {rr['tau_gauss_prior']:.1f}; prior/posterior width {rr['prior_to_post_width']:.2f}")
-    np.savez(os.path.join(a.out, "grids.npz"), grid=grid)
 
     # T3 Gibbs: BP XV scheme (High Latitude and Galactic Center from the prior), then all four
     # regions from the likelihood (what the flat-prior marginal does to the prior-dominated regions)
-    def run_chain(prior_only, tag, start):
+    def run_chain(prior_only, ctag, start):
         rng = np.random.default_rng(a.seed)
-        beta = np.array(start, dtype=float); chain = np.empty((a.iters, 4)); t0 = time.time()
+        beta = np.array(start, dtype=float); chain = np.empty((a.iters, 4)); cvar = np.full((a.iters, 4), np.nan); t0 = time.time()
         for it in range(a.iters):
             amp = sur.draw_amp(beta, rng)
             for r in range(4):
                 if r in prior_only: beta[r] = PRIOR_MEAN + PRIOR_SD * rng.standard_normal()
-                else: beta[r] = draw_from_grid(grid, sur.cond_logp(grid, amp, r, prior=True), rng)
+                else:
+                    lp = sur.cond_logp(grid, amp, r, prior=True); beta[r] = draw_from_grid(grid, lp, rng)
+                    cvar[it, r] = moments(grid, lp)[1] ** 2
             chain[it] = beta
-        np.save(os.path.join(a.out, f"gibbs_chain_{tag}.npy"), chain)
+        np.save(os.path.join(a.out, f"gibbs_chain_{ctag}_{tag}.npy"), chain)
         burn = a.iters // 10; out = {}
         for r, name in enumerate(REGIONS):
             if r in prior_only: continue
-            x = chain[burn:, r]; tau, err = tau_ips(x)
-            out[name] = {"mean": float(x.mean()), "sd": float(x.std(ddof=1)), "tau": tau, "tau_err": err, "n": int(x.size), "ess": float(x.size / tau),
-                         "at_edge": bool(np.mean(x > grid[-1] - 0.02) > 0.05 or np.mean(x < grid[0] + 0.02) > 0.05)}
+            x = chain[burn:, r]; tau, err = tau_ips(x); n = x.size
+            xc = x - x.mean(); lag1 = float(np.sum(xc[1:] * xc[:-1]) / np.sum(xc**2))
+            var_T2 = float(x.var(ddof=1)); e_cvar = float(np.nanmean(cvar[burn:, r]))
             rr = res["regions"][name]
-            print(f"  [{tag}] {name:16s} Gibbs mean {x.mean():.4f} sd {x.std(ddof=1):.4f} (T2 with prior {rr['marg_prior']['mean']:.4f}+-{rr['marg_prior']['sd']:.4f}); "
-                  f"tau {tau:.1f}+-{err:.1f} (Gaussian prediction {rr['tau_gauss_prior']:.1f}); ESS {x.size/tau:.0f} of {x.size}{' EDGE' if out[name]['at_edge'] else ''}")
-        print(f"  [{tag}] {a.iters} iterations in {time.time()-t0:.0f}s")
+            out[name] = {"mean": float(x.mean()), "mean_mc_err": float(x.std(ddof=1) * np.sqrt(tau / n)), "sd": float(x.std(ddof=1)),
+                         "sd_rel_mc_err": float(np.sqrt(tau / (2 * n))), "tau": tau, "tau_err": err, "n": int(n), "ess": float(n / tau),
+                         "lag1": lag1, "lag1_identity": 1.0 - e_cvar / var_T2, "mean_cond_sd_along_chain": float(np.sqrt(e_cvar)),
+                         "tau_from_lag1": float((1 + lag1) / (1 - lag1)),
+                         "mean_minus_T2_in_mc_err": float((x.mean() - rr["marg_prior"]["mean"]) / (x.std(ddof=1) * np.sqrt(tau / n))),
+                         "at_edge": bool(np.mean(x > grid[-1] - 0.02) > 0.05 or np.mean(x < grid[0] + 0.02) > 0.05)}
+            o = out[name]
+            print(f"  [{ctag}] {name:16s} Gibbs mean {o['mean']:.4f}+-{o['mean_mc_err']:.4f} sd {o['sd']:.4f} (rel err {o['sd_rel_mc_err']:.2f}) vs T2 {rr['marg_prior']['mean']:.4f}+-{rr['marg_prior']['sd']:.4f} "
+                  f"(mean off by {o['mean_minus_T2_in_mc_err']:.1f} MC err); tau {tau:.1f}+-{err:.1f} (Gaussian {rr['tau_gauss_prior']:.1f}, from lag-1 {o['tau_from_lag1']:.1f}); "
+                  f"lag-1 {lag1:.3f} vs identity 1 - E[var_cond]/var {o['lag1_identity']:.3f} (E[sd_cond] along chain {o['mean_cond_sd_along_chain']:.4f}); ESS {n/tau:.0f}{' EDGE' if o['at_edge'] else ''}")
+            if a.iters < 200 * rr["tau_gauss_prior"]: print(f"    WARNING: {a.iters} iterations is below 200 tau_gauss = {200*rr['tau_gauss_prior']:.0f}")
+        print(f"  [{ctag}] {a.iters} iterations in {time.time()-t0:.0f}s")
         return out
     res["gibbs_bp_scheme"] = run_chain(PRIOR_ONLY, "bp", [PRIOR_MEAN, -3.17, PRIOR_MEAN, -3.0])
     res["gibbs_all_regions"] = run_chain((), "all", [PRIOR_MEAN, -3.17, PRIOR_MEAN, -3.0])
     for name in REGIONS:
         if name in res["gibbs_bp_scheme"]: res["regions"][name]["gibbs"] = res["gibbs_bp_scheme"][name]
-    with open(os.path.join(a.out, "result.json"), "w") as f: json.dump(res, f, indent=1)
-    print("written", os.path.join(a.out, "result.json"))
+    with open(os.path.join(a.out, f"result_{tag}.json"), "w") as f: json.dump(res, f, indent=1)
+    print("written", os.path.join(a.out, f"result_{tag}.json"))
 
 
 if __name__ == "__main__":

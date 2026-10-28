@@ -57,13 +57,23 @@ separable over regions, so each is a 1-D distribution per region.
 Prior-only regions: BP XV sampled High Latitude and Galactic Center from the prior alone; those
 regions carry no Gibbs coupling and are reported for completeness only.
 
+Variants (added after the stats review, 2026-10-28): the CMB amplitude prior is either flat
+(the released BP configuration, `COMP_CL_TYPE01 = none`) or Gaussian N(0, sigma_cmb^2) per
+pixel and Stokes with sigma_cmb = 0.187 uK_CMB from the Planck 2018 EE spectrum at this
+resolution (then M gains the prior precision on the CMB diagonal in T2 and T3); the LFI noise
+sd is either BP's simulated nside-16 rms or white-noise propagation. All four combinations are
+reported; the flat-CMB, BP-rms case is the primary one and the others bound the dependence.
+
 ## Setup
 Surrogate built by `nextgen/scripts/prep_bpxv_surrogate.py` into `~/data/bpxv_surrogate/`:
 - LFI 30, 44, 70: BP release frequency maps (`BP_0xx_IQU_n0512/1024_v2.fits`, Q_MEAN, U_MEAN,
   uK_CMB), smoothed from the LFI beams (32.29, 27.0, 13.25 arcmin) to 60 arcmin, degraded to
   nside 16; noise sd from the BP low-resolution noise maps
-  `BP7_0xx_rms_n0016_60arcmin_uK_true.fits` (BP's own nside-16, 60 arcmin rms used for its
-  low-resolution index sampling; they include correlated noise).
+  `BP7_0xx_rms_n0016_60arcmin_uK_true.fits` (BP's simulated nside-16, 60 arcmin rms, which
+  include correlated noise; correction after the stats review: BP XV's index step evaluated
+  Eq. 26 at native resolution with the per-pixel white rms, so these maps are not what BP XV
+  weighted with, and a white-noise variant from the release Q_RMS/U_RMS maps propagated through
+  the same smoothing is run next to them).
 - WMAP Ka, Q, V: the nine-year nside-16 band polarization maps and dense QU inverse noise
   covariances from LAMBDA (`wmap_band_qumap_r4_9yr_{Ka,Q,V}_v5.fits`,
   `wmap_band_quninv_r4_9yr_{Ka,Q,V}_v5.fits`), the data BP XV used (Sect. 3); maps as provided.
@@ -125,40 +135,77 @@ index precision by the same factor. The surrogate uses BP's rms_true for LFI, so
 not in E022; the 353 noise is white-propagated (NPIPE A, dust at S/N above 15 at nside 16, so
 it hardly matters for beta_s), and the WMAP noise is the diagonal of the dense covariance.
 
-**Main result (2026-10-28, 10:56; `result.json`, `posteriors_and_chains.png`, chains
-`gibbs_chain_{bp,all}.npy`):** surrogate with 7 bands, 3072 pixels, regions High Latitude 2194,
-Spur 464, Galactic Center 91, Plane 323 pixels (BP map means there -3.295, -3.183, -3.294,
--3.022; sd map 0.098, 0.064, 0.095, 0.067, matching the paper's prior-only / 0.06 / prior-only
-/ 0.07 pattern). Grid spacing 0.0015.
+**Main result (2026-10-28, 11:40, after the stats review; `result_<variant>.json`,
+`posteriors_and_chains_{bp_cmb0,bp_cmb0.187}.png`, chains `gibbs_chain_{bp,all}_<variant>.npy`):**
+surrogate with 7 bands, 3072 pixels, regions High Latitude 2194, Spur 464, Galactic Center 91,
+Plane 323 pixels (BP map means there -3.295, -3.183, -3.294, -3.022; released-map sd plateaus
+0.098, 0.064, 0.095, 0.067; the paper quotes 0.06 for the Spur and 0.07 for the Plane, the
+released map's Plane plateau is 0.05 to 0.07). Grid spacing 0.0015. Four variants, requested by
+the review: LFI noise from BP's simulated nside-16 rms ("BP sim. rms") or from white-noise
+propagation of the release rms maps ("white rms", what a native-resolution white-rms chi2 as in
+BP XV Eq. 26 effectively weights with; the two differ by the Q7 factor 1.6), crossed with the
+CMB amplitude prior: flat per pixel (the released BP configuration: `COMP_CL_TYPE01 = none` in
+`BP_param_c0001_v2.txt`, no power-spectrum prior on the CMB in the Gibbs chain; the synchrotron
+and dust amplitudes carry Gaussian smoothing priors at 30 and 10 arcmin, which do not act on
+nside-16 amplitudes) or Gaussian N(0, 0.187^2 uK_CMB) per pixel and Stokes, the CMB Q/U rms at
+nside 16 and 60 arcmin from the Planck 2018 EE spectrum (CAMB, l <= 200, beam and pixel window;
+BB negligible). Chains: 6000 iterations, burn 600, exact inverse-CDF index draws, prior-only
+regions drawn from the prior in the "BP scheme" chain and from the likelihood in the "all" chain.
 
-| Region | T1 conditional, sd (mean) | T1 with dense WMAP N^-1, sd | T2 collapsed with prior, mean +- sd | profile with prior, mean +- sd | ratio sd_T2 / sd_T1 | Gaussian tau = 2r^2 - 1 | Gibbs tau, BP scheme | Gibbs tau, all regions |
-|---|---|---|---|---|---|---|---|---|
-| Spur | 0.0198 (-2.853) | 0.0199 | -2.8725 +- 0.0466 | -3.1431 +- 0.0454 | 2.35 | 10.1 | 14.0 +- 1.8 | 10.2 +- 1.1 |
-| Plane | 0.0184 (-3.109) | 0.0187 | -3.1094 +- 0.0389 | -3.2349 +- 0.0387 | 2.11 | 7.9 | 8.1 +- 0.8 | 7.0 +- 0.6 |
-| Galactic Center | 0.0130 (-3.134) | 0.0133 | -2.6379 +- 0.0257 | -2.6581 +- 0.0257 | 1.99 | 6.9 | prior-only | 17.1 +- 2.4 |
-| High Latitude | 0.0168 (-3.044) | 0.0172 | -1.5013 +- 0.0019 (grid edge) | -2.9523 +- 0.0360 | (edge) | (edge) | prior-only | 3.1 +- 0.2 at the edge |
+Columns: T1 sd (conditional with prior, mean over 20 amplitude draws; the dense WMAP N^-1
+changes it by at most 5 percent); T2 and profile means and sds with prior; r = sd_T2 / sd_T1;
+Gaussian 2 r^2 - 1; measured tau (BP scheme / all chain); lag-1 measured / exact identity
+1 - E[var_cond]/var; chain mean with its Monte Carlo error and the offset from the T2 mean in
+units of that error.
 
-T1 sds vary by 0.0002 over the 20 amplitude draws (their means by 0.008 to 0.02). The Gibbs
-chains (4000 iterations, burn 400) reproduce T2: Spur -2.8759 / sd 0.0465 against
--2.8725 +- 0.0466, Plane -3.1124 / 0.0386 against -3.1094 +- 0.0389 (BP scheme; the all-regions
-chain -2.8762 / 0.0455 and -3.1163 / 0.0385). Effective samples 257 to 511 of 3600. The
-all-regions chain is a second realization for Spur and Plane and adds the prior-only regions:
-High Latitude runs from -3.3 to the grid edge at -1.5 within 50 iterations under the flat
-amplitude prior (the collapsed target there is at the edge: the -1/2 log det M term of 4388
-pixel-Stokes marginals dominates a region with per-pixel synchrotron S/N below 1), while its
-conditional (-3.04 +- 0.017) and profile (-2.95 +- 0.036) are regular. The Galactic Center
-collapsed target sits at -2.64 +- 0.026 with the conditional at -3.13 +- 0.013 and tau 17.
-Prior-to-posterior width ratios (prior 0.1 over sd_T2 with prior): Spur 2.1, Plane 2.6, GC 3.9.
+| Variant | Region | T1 sd | T2 mean +- sd | profile mean +- sd | r | 2r^2-1 | tau (bp / all) | lag-1 meas. / identity | chain mean (offset) |
+|---|---|---|---|---|---|---|---|---|---|
+| BP sim. rms, flat CMB (released config) | Spur | 0.0198 | -2.872 +- 0.0466 | -3.143 +- 0.0454 | 2.35 | 10.1 | 11.3 +- 1.9 / 9.4 +- 1.2 | 0.817 / 0.819 | -2.8709 +- 0.0021 (+0.7) |
+| BP sim. rms, flat CMB (released config) | Plane | 0.0184 | -3.109 +- 0.0389 | -3.235 +- 0.0387 | 2.11 | 7.9 | 8.0 +- 0.9 / 7.3 +- 0.8 | 0.780 / 0.777 | -3.1111 +- 0.0015 (-1.1) |
+| BP sim. rms, flat CMB (released config) | High Latitude (prior-only in BP) | 0.0168 | -1.501 +- 0.0019 (grid edge) | -2.952 +- 0.0360 | 0.11 | -1.0 | - / 2.3 +- 0.2 | 0.372 / 0.405 | -1.5016 +- 0.0000 (-7.8) |
+| BP sim. rms, flat CMB (released config) | Galactic Center (prior-only in BP) | 0.0130 | -2.638 +- 0.0257 | -2.658 +- 0.0257 | 1.99 | 6.9 | - / 16.0 +- 3.7 | 0.843 / 0.845 | -2.6347 +- 0.0014 (+2.4) |
+| white rms, flat CMB | Spur | 0.0156 | -2.978 +- 0.0361 | -3.150 +- 0.0362 | 2.31 | 9.7 | 10.9 +- 1.8 / 8.9 +- 1.1 | 0.812 / 0.815 | -2.9769 +- 0.0016 (+0.8) |
+| white rms, flat CMB | Plane | 0.0142 | -3.165 +- 0.0305 | -3.245 +- 0.0306 | 2.15 | 8.2 | 8.1 +- 0.9 / 7.5 +- 0.8 | 0.788 / 0.785 | -3.1664 +- 0.0012 (-1.5) |
+| white rms, flat CMB | High Latitude (prior-only in BP) | 0.0131 | -2.439 +- 0.0301 | -3.034 +- 0.0281 | 2.30 | 9.6 | - / 19.5 +- 2.8 | 0.916 / 0.918 | -2.4410 +- 0.0018 (-1.0) |
+| white rms, flat CMB | Galactic Center (prior-only in BP) | 0.0101 | -2.756 +- 0.0204 | -2.768 +- 0.0203 | 2.01 | 7.1 | - / 14.8 +- 3.5 | 0.831 / 0.833 | -2.7536 +- 0.0010 (+2.4) |
+| BP sim. rms, CMB prior 0.19 uK | Spur | 0.0231 | -3.197 +- 0.0236 | -3.193 +- 0.0238 | 1.02 | 1.1 | 1.1 +- 0.1 / 1.1 +- 0.0 | 0.026 / 0.025 | -3.1965 +- 0.0003 (+0.0) |
+| BP sim. rms, CMB prior 0.19 uK | Plane | 0.0189 | -3.177 +- 0.0195 | -3.176 +- 0.0196 | 1.03 | 1.1 | 1.1 +- 0.0 / 1.1 +- 0.1 | 0.055 / 0.029 | -3.1770 +- 0.0003 (-0.6) |
+| BP sim. rms, CMB prior 0.19 uK | High Latitude (prior-only in BP) | 0.0172 | -3.104 +- 0.0177 | -3.098 +- 0.0181 | 1.03 | 1.1 | - / 1.1 +- 0.0 | 0.040 / 0.079 | -3.1040 +- 0.0003 (-1.0) |
+| BP sim. rms, CMB prior 0.19 uK | Galactic Center (prior-only in BP) | 0.0120 | -2.974 +- 0.0123 | -2.973 +- 0.0123 | 1.02 | 1.1 | - / 1.1 +- 0.0 | 0.027 / 0.033 | -2.9730 +- 0.0002 (+3.2) |
+| white rms, CMB prior 0.19 uK | Spur | 0.0173 | -3.189 +- 0.0179 | -3.194 +- 0.0180 | 1.03 | 1.1 | 1.2 +- 0.1 / 1.1 +- 0.0 | 0.043 / 0.046 | -3.1888 +- 0.0003 (+0.2) |
+| white rms, CMB prior 0.19 uK | Plane | 0.0146 | -3.226 +- 0.0152 | -3.228 +- 0.0153 | 1.04 | 1.2 | 1.2 +- 0.1 / 1.2 +- 0.1 | 0.078 / 0.053 | -3.2258 +- 0.0002 (-1.0) |
+| white rms, CMB prior 0.19 uK | High Latitude (prior-only in BP) | 0.0133 | -3.158 +- 0.0137 | -3.176 +- 0.0140 | 1.03 | 1.1 | - / 1.1 +- 0.0 | 0.061 / 0.101 | -3.1586 +- 0.0002 (-0.7) |
+| white rms, CMB prior 0.19 uK | Galactic Center (prior-only in BP) | 0.0095 | -3.030 +- 0.0097 | -3.030 +- 0.0097 | 1.01 | 1.1 | - / 1.1 +- 0.0 | 0.027 / 0.032 | -3.0296 +- 0.0001 (+3.3) |
+
+Reading of the table:
+- With the flat CMB prior (released configuration) the collapsed-to-conditional ratio is 2.1
+  to 2.35 for Spur and Plane and the Gibbs coupling length 7 to 11 iterations, independent of
+  the LFI noise model (the noise model changes the widths by 1.3, not the ratio); the Gaussian
+  two-block formula predicts 8 to 10 and the measured lag-1 equals the exact identity to 0.005.
+  The High Latitude region's collapsed target sits at the grid edge with the BP noise and at
+  -2.44 +- 0.03 with white noise, with tau 20 there; the Galactic Center has tau 15 to 16
+  against a Gaussian prediction of 7 (its 1-D posterior is skewed; the chain mean sits 2.4 to
+  3.3 Monte Carlo errors from the grid mean, the largest offset in the table).
+- With a C_l-sized Gaussian prior on the CMB amplitude the coupling disappears: r = 1.02 to
+  1.04, tau 1.1 in every region and both noise models, and the High Latitude and Galactic Center
+  targets become regular (-3.10 +- 0.02 and -2.98 +- 0.01 with the BP noise). The
+  amplitude-index coupling in this configuration is carried by the per-pixel CMB amplitude
+  (0.19 uK of true signal against 1.5 to 2 uK of noise per pixel and Stokes), as the reviewer's
+  toy found: with a flat prior the CMB column absorbs synchrotron and the marginal over it
+  both widens the index posterior and shifts it (Spur -2.87 against -3.20 with the prior; the
+  profile, which does not integrate over the CMB, sits at -3.14 in both cases).
+- Chain validation: for Spur and Plane the chain means are within 0.7 to 1.5 Monte Carlo errors
+  of the grid means in all variants and the sds agree to 1 percent (relative MC error 0.01 to
+  0.03); effective samples 476 to 5100 of 5400.
 
 Surrogate consistency: the conditional at the BP release posterior-mean amplitudes pins at
-the grid edge -1.5 in every region (chi2 strongly prefers the flattest synchrotron allowed),
-so the release amplitudes do not fit the surrogate at the level a conditional of width 0.02
-resolves; expected (bandpass integration, native resolution, full-mission 353, the BP
-10-degree-smoothed index map) and the reason T1 is evaluated at draws. The surrogate's own
-T2 means (Spur -2.87, Plane -3.11) are not comparable to BP XV's -3.17 +- 0.06 and
+the grid edge -1.5 in every region (chi2 prefers the flattest synchrotron allowed), so the
+release amplitudes do not fit the surrogate at the level a conditional of width 0.02 resolves;
+expected (bandpass integration, native resolution, full-mission 353, the BP 10-degree-smoothed
+index map, unsmoothed WMAP r4 maps against 60-arcmin amplitudes) and the reason T1 is
+evaluated at draws. The surrogate's T2 means are not comparable to BP XV's -3.17 +- 0.06 and
 -3.03 +- 0.07 for the same reasons and because the flat-prior volume term scales with the
-number of amplitude pixels (Follow-ups); the profile values (-3.14, -3.23) happen to lie close
-to the paper's, which is noted, not interpreted.
+number of amplitude pixels (Follow-ups); only widths and ratios are used.
 
 ## Negative control
 The intensity analogue of F14: the same scripts on the E014 nside-64 intensity configuration are
@@ -166,36 +213,46 @@ not rerun here; instead the Gaussian formula is checked on T3 itself (a chain wh
 with 2 r^2 - 1 by more than its error flags a non-Gaussian 1-D posterior or a chain bug).
 
 ## Conclusion
-(draft, stats review of the targets and scripts pending)
-- On the BP XV polarization configuration the amplitude-index Gibbs coupling is weak: the
-  collapsed posterior sd of beta_s is 2.1 to 2.4 times the conditional sd in the two
-  likelihood-sampled regions, and a two-block Gibbs sampler with exact conditional draws has
-  integrated autocorrelation times of 7 to 14 iterations, as the Gaussian two-block formula
-  predicts (8 to 10). F14's ratio of 180 (full-sky intensity index at nside 64, per-pixel
-  amplitude S/N in the hundreds) does not transfer to this configuration, where the polarized
-  synchrotron amplitude per nside-16 pixel has S/N of 2 to 3 at 30 GHz (|Q| median 4.4 uK_RJ
-  against sigma 1.6).
-- BP XV's reported Gibbs correlation length of 30 to 50 is larger than the 7 to 14 the
-  amplitude-index coupling alone produces here, so there is no evidence that it understates the
-  coupling; the remainder is attributable to the Metropolis step within the conditional and the
-  other Gibbs blocks (gain, bandpass, noise), which this cell does not model. With about 500
-  samples and tau 30 to 50 the paper had 10 to 17 independent index samples, so its sds of 0.06
-  and 0.07 carry a Monte Carlo uncertainty of about 20 percent, not a coupling bias. Paper A
-  Sect. 3 states this instead of extrapolating F14.
+(stats review of the targets and scripts: CONFIRMED WITH ITEMS on 2026-10-28; must-fix items
+1 to 3 addressed by the variants, the chain-error reporting and the corrected noise statement;
+re-check requested)
+- On an nside-16 surrogate of the BP XV polarization configuration the amplitude-index Gibbs
+  coupling for the two likelihood-sampled regions is modest: with the released configuration's
+  flat CMB amplitude prior the collapsed posterior sd of beta_s is 2.1 to 2.35 times the
+  conditional sd and a two-block Gibbs sampler with exact conditional draws has integrated
+  autocorrelation times of 7 to 11 iterations (Gaussian prediction 8 to 10; lag-1 matches the
+  exact identity), for either LFI noise model. With a Gaussian CMB prior of the size the Planck
+  EE spectrum implies the coupling vanishes (ratio 1.02 to 1.04, tau 1.1). F14's ratio of 180
+  (full-sky intensity index at nside 64, per-pixel amplitude S/N in the hundreds) does not
+  transfer: here the polarized synchrotron amplitude per pixel has S/N of 2 to 3 and the
+  coupling that exists comes from the free CMB amplitude, not from the synchrotron amplitude.
+- BP XV's reported Gibbs correlation length of 30 to 50 is larger than what this coupling
+  produces (at most 11), so there is no evidence that it understates the amplitude-index
+  coupling; the remainder is attributable to the Metropolis step within the conditional and
+  the other Gibbs blocks (gains, bandpasses, correlated noise), which the surrogate does not
+  contain. The surrogate therefore cannot confirm or refute the paper's sds; it establishes
+  that this coupling is not a cause of underestimated error bars there. The direct test is
+  the autocorrelation of beta_s in the released BP chain files, being read (Follow-ups).
 - The flat-amplitude-prior marginal (the stationary distribution of a Gibbs sampler with flat
-  amplitude priors and a conditional index step) is shifted from the profile by +0.27 (Spur),
-  +0.13 (Plane), +0.02 (GC) and runs to the flattest allowed index for the High Latitude
-  region on this real-data surrogate: the prior-volume effect of Paper A Sect. 4 at a
-  publication-relevant configuration, and a direct mechanism for the "prior-dominated" regions
-  BP XV sampled from the prior alone. The quantitative shifts belong to this surrogate (nside 16
-  amplitudes); at BP's native resolution the volume term is larger by the pixel ratio.
-- Limits: diagonal noise for the collapsed target (the dense WMAP covariance changes the
-  conditional width by under 2 percent); delta bandpasses; NPIPE A split at 353; regions
-  recovered from the smoothed release map; nside 16 instead of multi-resolution; the ratio r is
-  approximately resolution-independent for white noise and smooth signals (both Fisher
-  quantities scale with the summed inverse variance), the volume term is not.
+  amplitude priors and a conditional index step) is shifted from the profile by +0.27 (Spur)
+  and +0.13 (Plane) and runs to the flattest allowed index in the High Latitude region on this
+  surrogate; a C_l-sized CMB prior removes the runaway and moves the Spur to -3.20. This is the
+  prior-volume effect of Paper A Sect. 4 on real polarization data, and it identifies the free
+  per-pixel CMB amplitude at S/N below 0.2 as its carrier in this configuration. The sizes
+  belong to this surrogate (nside-16 amplitudes); at BP's native resolution the volume term is
+  larger by the pixel ratio.
+- Limits: diagonal noise in the collapsed target (the dense WMAP covariance changes the
+  conditional width by under 5 percent); delta bandpasses; NPIPE A split at 353; unsmoothed
+  WMAP r4 maps; regions recovered from the smoothed release map; nside 16 instead of
+  multi-resolution. The ratio r is approximately resolution-independent for white noise and
+  smooth signals (both Fisher quantities scale with the summed inverse variance); the volume
+  term is not.
 
 ## Follow-ups
+- The released BP chain files store the per-region index values per sample
+  (`<sample>/synch/beta_pixreg_val`); `nextgen/scripts/bp_chain_beta_s.py` reads them over HTTP
+  range requests from the 1.8 TB chain without downloading it. Lag-1, tau and ESS of the actual
+  BP XV beta_s chain against the 30 to 50 of the paper and the 7 to 11 of this cell.
 - Resolution scaling of the flat-prior volume term: repeat T2 at nside 32 and 64 (LFI and 353
   only, WMAP excluded) to measure how the collapsed means move with the number of amplitude
   pixels; this is the quantitative link to BP's native-resolution amplitude step and to Paper A

@@ -327,17 +327,19 @@ attempt was the funnel climb of this runaway, not a mass-matrix defect (the rela
 level, intensity only.
 
 **F22. The amplitude-index Gibbs coupling in the BeyondPlanck XV polarized beta_s configuration
-is weak; F14 does not transfer** (E022, nside-16 surrogate of the BP XV data: LFI 30 to 70,
-WMAP Ka/Q/V with the dense nine-year covariances, NPIPE 353, four BP XV regions, prior
-N(-3.3, 0.1)): the collapsed posterior sd of beta_s is 2.35 (Spur) and 2.11 (Plane) times the
-conditional sd at amplitudes drawn from their conditional (0.047 against 0.020 and 0.039
-against 0.018), and a two-block Gibbs sampler with exact conditional draws has integrated
-autocorrelation times 14.0 +- 1.8 and 8.1 +- 0.8 (second chain 10.2 +- 1.1 and 7.0 +- 0.6),
-matching the Gaussian two-block prediction 2 r^2 - 1 of 10 and 8. The per-pixel polarized
-synchrotron S/N at nside 16 is 2 to 3 at 30 GHz, against hundreds for the F14 intensity case.
-BP XV's reported correlation length of 30 to 50 therefore does not understate this coupling.
-On the same surrogate the flat-amplitude-prior marginal is shifted from the profile by +0.27
-(Spur) and +0.13 (Plane) and runs to the flattest allowed index in the High Latitude region
-(2194 pixels at S/N below 1), the prior-volume effect (F3-type) on real polarization data.
-Draft until the E022 stats review is in.
-
+is modest and is carried by the free CMB amplitude; F14 does not transfer** (E022, nside-16
+surrogate of the BP XV data: LFI 30 to 70, WMAP Ka/Q/V with the dense nine-year covariances,
+NPIPE 353, the four BP XV regions, prior N(-3.3, 0.1)): with the released configuration's flat
+per-pixel CMB prior the collapsed posterior sd of beta_s is 2.35 (Spur) and 2.11 (Plane) times
+the conditional sd at amplitudes drawn from their conditional, and a two-block Gibbs sampler
+with exact conditional draws has integrated autocorrelation times of 7 to 11 (two chains per
+variant, 6000 iterations; the Gaussian formula 2 r^2 - 1 gives 8 to 10 and the measured lag-1
+equals 1 - E[var_cond]/var to 0.005), for both LFI noise models (BP's simulated nside-16 rms or
+white propagation, which changes the widths by 1.3 and the ratio by under 2 percent). With a
+Gaussian CMB prior sized from the Planck EE spectrum (0.19 uK at this resolution) the ratio is
+1.02 to 1.04 and tau 1.1. The polarized synchrotron amplitude per nside-16 pixel has S/N of 2
+to 3, against hundreds in the F14 intensity case. BP XV's reported correlation length of 30 to
+50 therefore does not understate this coupling. On the same surrogate the flat-prior marginal
+is shifted from the profile by +0.27 (Spur) and +0.13 (Plane) and runs to the flattest allowed
+index in the High Latitude region (2194 pixels at S/N below 1); the C_l-sized CMB prior removes
+the runaway. Stats review CONFIRMED WITH ITEMS (items applied; re-check pending).

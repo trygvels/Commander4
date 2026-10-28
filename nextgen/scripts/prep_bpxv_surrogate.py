@@ -89,6 +89,25 @@ def main():
         sq, su = col(rf, "Q_POLARISATION"), col(rf, "U_POLARISATION")
         stage_band(a.out, name, q, u, fwhm, nu, cmb_to_rj(nu), sq=sq, su=su)
 
+    print("LFI white-noise variant (Monte-Carlo propagation of the release Q_RMS/U_RMS maps)")
+    for name, nside, fwhm, nu in (("030", 512, 32.29, 28.4), ("044", 512, 27.0, 44.1), ("070", 1024, 13.25, 70.1)):
+        fn = os.path.join(a.out, f"band_{name}_white.npz")
+        if os.path.exists(fn):
+            print(f"  {name} white: cached"); continue
+        mf = f"{BP}/BP_{name}_IQU_n{nside:04d}_v2.fits"
+        rq, ru = col(mf, "Q_RMS"), col(mf, "U_RMS")
+        nside_mc = 256; fac = (nside // nside_mc) ** 2
+        rq = np.sqrt(hp.ud_grade(rq**2, nside_mc) / fac); ru = np.sqrt(hp.ud_grade(ru**2, nside_mc) / fac)
+        rng = np.random.default_rng(int(name))
+        acc = np.zeros((2, a.nreal, hp.nside2npix(NSIDE_OUT)))
+        for i in range(a.nreal):
+            nq = rq * rng.standard_normal(rq.size); nu_ = ru * rng.standard_normal(ru.size)
+            nqs, nus = smooth_pol(nq, nu_, fwhm)  # the map's own smoothing step
+            acc[0, i], acc[1, i] = degrade(nqs), degrade(nus)
+        z = np.load(os.path.join(a.out, f"band_{name}.npz"))
+        np.savez(fn, q=z["q"], u=z["u"], sq=acc[0].std(axis=0, ddof=1) * cmb_to_rj(nu), su=acc[1].std(axis=0, ddof=1) * cmb_to_rj(nu), nu=nu)
+        print(f"  {name} white: sigma_Q median {np.median(acc[0].std(axis=0, ddof=1) * cmb_to_rj(nu)):.3g} uK_RJ (BP rms_true {np.median(z['sq']):.3g})")
+
     print("HFI 353 (NPIPE A split, Monte-Carlo white-noise rms)")
     if not os.path.exists(os.path.join(a.out, "band_353.npz")):
         fn = f"{BP}/npipe/npipe6v20A_353_map_uK.fits"
@@ -162,7 +181,11 @@ def main():
     for b in bands:
         z = np.load(os.path.join(a.out, f"band_{b}.npz")); d.append([z["q"], z["u"]]); s.append([z["sq"], z["su"]]); nus.append(float(z["nu"]))
     c = np.load(fn)
-    np.savez(os.path.join(a.out, "surrogate.npz"), d=np.array(d), sigma=np.array(s), freqs=np.array(nus), bands=np.array(bands),
+    s_white = []
+    for b in bands:
+        wf = os.path.join(a.out, f"band_{b}_white.npz")
+        z = np.load(wf if os.path.exists(wf) else os.path.join(a.out, f"band_{b}.npz")); s_white.append([z["sq"], z["su"]])
+    np.savez(os.path.join(a.out, "surrogate.npz"), d=np.array(d), sigma=np.array(s), sigma_white=np.array(s_white), freqs=np.array(nus), bands=np.array(bands),
              amp=c["amp"], T_d=c["T_d"], beta_d=c["beta_d"], region=c["region"], beta_bp=c["beta_bp"], sd_bp=c["sd_bp"], nside=NSIDE_OUT)
     print("assembled surrogate.npz with bands", bands)
 
