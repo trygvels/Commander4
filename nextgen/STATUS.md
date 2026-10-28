@@ -2,6 +2,40 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-28 (Mac mini, 17:30): E021 attempt 1 stopped after gmrf16; the sky's template construction biased the target; attempt 2 running on a corrected sky
+
+**Learned**
+- gmrf16 on the attempt-1 sky finished (1200 iterations, 9.5 h, 63 gradients per transition
+  after the refresh at 200). Sync is fine (region-level RMSE 0.055 against the 0.063
+  single-index floor, z median -0.8, 93 percent of regions within 2 sd, ESS 54 to 640). Dust is
+  not: RMSE 0.076 against a 0.032 constant-at-the-mean floor, the faint three quarters of the
+  sky 0.13 above the truth at a stated sd of 0.033, ESS 4 to 19 there, amplitude
+  hyperparameters 2 to 24 sd off their targets.
+- The chain is at its target. The exact collapsed marginal (numpy, 12 x 12 per pixel) at the
+  true index field prefers the same +0.114 shift of the faint dust regions (21 sd; determinant
+  term +456 nats against chi-square -235) and hyperparameter means 2 percent low. Cause: the
+  sky built its templates as g = a / r, so a given g does not follow the prior's N(g, (0.3 g)^2)
+  law and the score identity fails. Redrawing a = g r removes the shift exactly; the CMB prior
+  width is irrelevant (F23, D017; stats review running).
+- The corrected sky (`e021_consistent_v2`, `--template-story model`) passes: shift peaks
+  +0.003 +- 0.005 (dust) and +0.010 +- 0.007 (sync), hyperparameters within 1 sd of the
+  realized values, log posterior at the truth 79,652 above the flat start, gradients to 5e-4.
+
+**Running**
+- E021 attempt 2: the ten runs one at a time from 17:15 (gmrf16 first, about 8 h; iid16,
+  indep16, scalar, then nside 8 and 4; about 40 h in all), scratchpad `run_e021_v2_queue.sh`.
+- stats-reviewer on the F23 diagnosis and the new sky (if it refutes, the queue stops).
+- SBC replication (seed 2027), about 15 h left.
+
+**Next**
+- After the nside-16 pair: analyzer with `--burn 500`, MC inflation check, hyperparameter
+  targets (1.0031 / 0.2989 sync, 0.9999 / 0.2990 dust), E021 Result, F24, Q3, M2.5.
+- Q16 gains the attempt-1 sky as the mildest template-law misspecification.
+
+**Needs Trygve**
+- Unchanged: Paper A presentation of E022, `COMP_CL_TYPE = none` semantics (Q17), hier default
+  (D003/D011).
+
 ## 2026-10-28 (Mac mini, 12:45): E022 closed with the released BeyondPlanck chains; a decision for Trygve on Paper A
 
 **Learned**

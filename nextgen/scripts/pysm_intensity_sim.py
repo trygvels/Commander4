@@ -125,14 +125,20 @@ def _bb_ratio(nu, nu0, T):
 def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int,
              n_warmup: int, sky_mode: str = "pysm", nside_truth: int = 16,
              template_scatter: float = 0.3, adapt_mass: bool = True,
-             refresh_mass_at: int = 50) -> None:
+             refresh_mass_at=(50,), template_story: str = "model") -> None:
     """`sky_mode` "pysm": the PySM d1 s1 c1 sky as it is (E020; T_d varies, indices vary per nside
     pixel, templates built from the data). "consistent" (E021): a sky drawn from the model class
     Commander4 fits: indices constant per nside_truth region (the PySM region means), one modified
-    blackbody at T_fixed, PySM amplitudes at the pivots and the c1 CMB, and templates equal to the
-    true amplitudes divided by (1 + template_scatter * eps), eps iid N(0, 1), the ratio floored at
-    0.2, so that a_true = g (1 + template_scatter eps) matches the hier prior a ~ N(mu g, (s g)^2)
-    with mu = 1, s = template_scatter up to the floor (hit by 0.4 percent of pixels)."""
+    blackbody at T_fixed, the c1 CMB, and amplitudes tied to the templates of the hier amplitude
+    prior a ~ N(mu g, (s g)^2) with mu = 1, s = template_scatter. `template_story` says which of
+    the two is drawn: "model" (E021 attempt 2 onwards): the templates g are the PySM amplitudes at
+    the pivots and the true amplitudes are a = g r with r = max(1 + template_scatter * eps, 0.2),
+    eps iid N(0, 1), i.e. the prior's own generative story; "data" (E021 attempt 1): the true
+    amplitudes are the PySM ones and g = a / r. The two are not equivalent: with g = a / r the
+    conditional distribution of a given g is not the prior's (the realized r is anti-correlated
+    with g at fixed a), and the exact collapsed marginal then prefers a dust index 0.125 above the
+    truth in the prior-dominated regions and amplitude-hyperparameter means 2 percent low (E021,
+    numpy scan of the 12 x 12 marginal; the shift is zero under the "model" story)."""
     import pysm3
     import pysm3.units as u
     os.makedirs(outdir, exist_ok=True)
@@ -156,13 +162,22 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
         u.uK_RJ, equivalencies=u.cmb_equivalencies(545.0 * u.GHz)).value
     sky = np.empty((npix, len(FREQS)))
     dust_bands = np.empty((npix, len(FREQS)))
+    g_pysm = {"sync": a_sync.copy(), "dust": a_dust.copy()}
+    ratio_ta = {}
     if sky_mode == "consistent":
         # Region-constant indices (plain mean of the PySM map over each nside_truth region), one
-        # MBB at T_fixed; the amplitudes at the pivots are the PySM ones, so the sky differs from
-        # PySM only through the SED shapes.
+        # MBB at T_fixed. "model" story: the PySM amplitudes are the templates and the true
+        # amplitudes are g r; "data" story: the PySM amplitudes are the truth (templates below).
+        if template_story not in ("model", "data"):
+            raise ValueError(f"template_story must be 'model' or 'data', got {template_story!r}")
         beta_s = hp.ud_grade(hp.ud_grade(beta_s, nside_truth), nside)
         beta_d = hp.ud_grade(hp.ud_grade(beta_d, nside_truth), nside)
         T_d = np.full(npix, T_fixed)
+        for name in ("sync", "dust"):
+            ratio_ta[name] = np.maximum(1.0 + template_scatter * rng.standard_normal(npix), 0.2)
+        if template_story == "model":
+            a_sync = g_pysm["sync"] * ratio_ta["sync"]
+            a_dust = g_pysm["dust"] * ratio_ta["dust"]
         dust_bands[:] = a_dust[:, None] * _dust_sed(nu_arr, beta_d, T_fixed)
         sky[:] = (cmb_sed(nu_arr)[None, :] * cmb_map[:, None]
                   + a_sync[:, None] * (nu_arr[None, :] / 30.0) ** beta_s[:, None] + dust_bands)
@@ -197,18 +212,24 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
     templates = {}
     for name, g, a_true in (("sync", g_sync, a_sync), ("dust", g_dust, a_dust)):
         if sky_mode == "consistent":
-            # Template = truth / (1 + s eps) with the ratio floored at 0.2: a_true = g (1 + s eps).
-            ratio_ta = np.maximum(1.0 + template_scatter * rng.standard_normal(npix), 0.2)
-            gs = np.asarray(a_true, dtype=float) / ratio_ta
+            r_ta = ratio_ta[name]
+            if template_story == "model":
+                # Template = the PySM amplitude (floored for positivity); a_true = g r was drawn above.
+                gs = np.asarray(g_pysm[name], dtype=float)
+            else:
+                # Template = truth / r with r floored at 0.2: a_true = g r.
+                gs = np.asarray(a_true, dtype=float) / r_ta
             floor = 1e-3 * float(np.mean(np.abs(gs)))
             gf = np.maximum(gs, floor)
             templates[name] = gf
             ratio = gf[hi] / a_true[hi]
-            report.append(f"template {name} (truth with iid scatter {template_scatter}): ratio floor "
-                          f"0.2 hit by {np.mean(ratio_ta <= 0.2) * 100:.2f} percent of pixels, "
+            r_real = a_true / gf
+            report.append(f"template {name} ({template_story} story, iid scatter {template_scatter}): "
+                          f"ratio floor 0.2 hit by {np.mean(r_ta <= 0.2) * 100:.2f} percent of pixels, "
                           f"positivity floor {floor:.3g} hits {np.mean(gs < floor) * 100:.2f} percent; "
                           f"g/true at |b| > 20 16/50/84 pct {np.percentile(ratio, 16):.3f}/"
-                          f"{np.percentile(ratio, 50):.3f}/{np.percentile(ratio, 84):.3f}")
+                          f"{np.percentile(ratio, 50):.3f}/{np.percentile(ratio, 84):.3f}; realized "
+                          f"a/g mean {r_real.mean():.5f} sd {r_real.std():.5f} (hyperparameter targets)")
             continue
         gs = hp.smoothing(g, fwhm=np.radians(TEMPLATE_FWHM_DEG), lmax=lmax, iter=3)
         floor = float(np.percentile(gs, TEMPLATE_FLOOR_PCT))
@@ -274,6 +295,7 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
              index_prior_dust=INDEX_PRIOR["dust"], indep_sd=INDEP_SD, cmb_sd=CMB_SD,
              sky_mode=sky_mode, nside_truth=nside_truth if sky_mode == "consistent" else 0,
              template_scatter=template_scatter if sky_mode == "consistent" else 0.0,
+             template_story=template_story if sky_mode == "consistent" else "",
              **{f"fisher_sd_{k}": v for k, v in fisher.items()})
     with open(f"{outdir}/sim_report.txt", "w") as f:
         f.write("\n".join(report) + "\n")
@@ -313,7 +335,7 @@ def _field_block(kind: str | None, nside_beta: int) -> str:
 
 def param_file(outdir: str, tag: str, kind: str | None, nside_beta: int, nside: int,
                T_fixed: float, n_iter: int, n_warmup: int, adapt_mass: bool = True,
-               refresh_mass_at: int = 50) -> str:
+               refresh_mass_at=(50,)) -> str:
     fwhm = 2.0 * hp.nside2resol(nside, arcmin=True)
     bands = ""
     for f in FREQS:
@@ -382,7 +404,7 @@ compsep:
         max_depth: 10
         parameterization: centred
         init_inv_mass: fd_hessian
-        refresh_inv_mass_at: [{refresh_mass_at}]
+        refresh_inv_mass_at: [{", ".join(str(int(r)) for r in refresh_mass_at)}]
         adapt_mass: {str(adapt_mass).lower()}
   bands:{bands}
 components:
@@ -464,14 +486,19 @@ def main(argv=None) -> int:
                     help="consistent sky: nside of the region-constant true indices")
     ap.add_argument("--template-scatter", type=float, default=0.3,
                     help="consistent sky: iid relative scatter of the true amplitudes about the templates")
-    ap.add_argument("--refresh-mass-at", type=int, default=50,
-                    help="warm-up transition at which the Hessian metric is recomputed (E021)")
+    ap.add_argument("--refresh-mass-at", type=int, nargs="+", default=[50],
+                    help="warm-up transitions at which the Hessian metric is recomputed (E021)")
+    ap.add_argument("--template-story", choices=["model", "data"], default="model",
+                    help="consistent sky: 'model' draws a = g r from the PySM templates g (the hier "
+                         "prior's story); 'data' keeps the PySM amplitudes and sets g = a / r "
+                         "(E021 attempt 1, biased: see simulate())")
     ap.add_argument("--no-adapt-mass", action="store_true",
                     help="write nuts.adapt_mass: false (keep the Hessian metric for the whole run)")
     a = ap.parse_args(argv)
     simulate(a.dir, a.nside, a.noise_scale, a.seed, a.n_iter, a.n_warmup, sky_mode=a.sky,
              nside_truth=a.nside_truth, template_scatter=a.template_scatter,
-             adapt_mass=not a.no_adapt_mass, refresh_mass_at=a.refresh_mass_at)
+             adapt_mass=not a.no_adapt_mass, refresh_mass_at=a.refresh_mass_at,
+             template_story=a.template_story)
     return 0
 
 

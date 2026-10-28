@@ -208,7 +208,11 @@ original numbering.
 - **Why:** F21 (E020): with a data-built template wrong by factors 0.4 to 1.7 at high latitude
   under one global scatter s, and with T_d fixed, the collapsed hier posterior for beta_s runs
   away (to -26) and beta_d shifts by 30 Fisher sd in the plane. Real Planck plus WMAP intensity
-  data at nside 64 are in this regime for dust and near it for synchrotron.
+  data at nside 64 are in this regime for dust and near it for synchrotron. F23 (E021 attempt
+  1) adds the mildest case: a 30 percent template scatter whose conditional law differs from
+  the prior's (g = a / r instead of a = g r) shifts the prior-dominated dust index by +0.13 at
+  four stated sigma and the amplitude hyperparameters by 2 percent, with the data-dominated
+  regions untouched; the determinant term of the collapsed marginal carries it.
 - **Candidates:** a non-stationary scatter (s per latitude band or per region, or s as a smooth
   field); a heavy-tailed scatter (Student-t pseudo-band, which the collapsed Gaussian kernel does
   not give in closed form, so a scale-mixture with one latent scale per pixel sampled by Gibbs);

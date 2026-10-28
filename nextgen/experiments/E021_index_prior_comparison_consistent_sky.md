@@ -45,35 +45,45 @@ Sky (writer `nextgen/scripts/pysm_intensity_sim.py --sky consistent --nside-trut
 - CMB: the PySM c1 map (rms 84.1 uK_CMB) times the thermodynamic-to-RJ factor, as before.
 - Noise: white, rms per band 8.4, 7.2, 7.2, 6.6, 7.2, 7.2, 8.4, 4.8, 2.88, 1.92, 2.88, 9.6 uK_RJ per
   nside-64 pixel (0.03 x the E012 nside-16 levels scaled to nside 64), one realization.
-- Templates: g_c(p) = a_c(p) / r_p with r_p = max(1 + 0.3 eps_p, 0.2), eps iid N(0, 1) per pixel
-  and component (the 0.2 floor is hit by 0.34 and 0.42 percent of pixels; g/true at |b| > 20,
-  16/50/84 percentiles: 0.771/1.001/1.430 for both). So a_c = g_c (1 + 0.3 eps) up to the floor:
-  the hier prior a ~ N(mu g, (s g)^2) is correctly specified with mu = 1 and s = 0.3, which the
-  sampled hyperparameters must recover. The targets are the realized values, not 1 and 0.3: the
-  floor and the finite sky give mean(a/g) 0.9990 (sync) / 0.9976 (dust) and sd(a/g) 0.2986 /
-  0.2988 for this seed (analytic with the floor: 1.00035 and 0.29895; the full-information
-  posterior sd is about 0.0014 for mu and 0.0010 for s, so the dust mu sits 1.8 sd from 1 and a
-  check against 1 would fail with everything correct; review item 3). Acceptance: posterior mean
-  of mu_c within 2 posterior sd of the realized mean(a/g), posterior mean of s_c within 2 sd of
-  the realized sd(a/g), the same in all ten runs. Unlike E020 the templates are built from the
-  truth: this is deliberate (L3); the data-built templates return in Q16.
+- Templates and amplitudes (attempt 2, `--template-story model`, data directory
+  `/Users/trygvels/data/e021_consistent_v2`): the templates g_c are the PySM amplitude maps at
+  the pivots (floored for positivity at 1e-3 of their mean; no pixel hits it), and the true
+  amplitudes are a_c(p) = g_c(p) r_p with r_p = max(1 + 0.3 eps_p, 0.2), eps iid N(0, 1) per
+  pixel and component (the 0.2 floor is hit by 0.36 and 0.43 percent of pixels; g/true at
+  |b| > 20, 16/50/84 percentiles: 0.767/0.998/1.413 sync, 0.770/1.000/1.434 dust). This is the
+  hier prior's own generative story, a | g ~ N(mu g, (s g)^2) with mu = 1 and s = 0.3, which the
+  sampled hyperparameters must recover. The targets are the realized values: mean(a/g) 1.00309
+  (sync) / 0.99986 (dust) and sd(a/g) 0.29888 / 0.29897 for this seed (the full-information
+  posterior sd is about 0.0014 for mu and 0.0010 for s). Acceptance: posterior mean of mu_c
+  within 2 posterior sd of the realized mean(a/g), posterior mean of s_c within 2 sd of the
+  realized sd(a/g), the same in all ten runs. Verified on the data before any run (numpy
+  evaluation of the exact 12 x 12 collapsed marginal at the true index field, scratchpad
+  `e021_truth_scan.py`): the marginal's peak in mu_s is 1.0020 (realized 1.0031, sd 0.0014),
+  in mu_d 1.0004 (0.9999), in log s within 0.0004 of the realized values, and a common shift
+  of the index of the 768 lowest-S/N nside-16 regions peaks at +0.003 (dust, sd 0.005) and
+  +0.010 (sync, sd 0.007): the score identity holds on this sky. Unlike E020 the templates are
+  the smooth truth: this is deliberate (L3); the data-built templates return in Q16.
+- Attempt 1 (2026-10-28 07:17 to 17:11, data directory `/Users/trygvels/data/e021_consistent`,
+  kept) built the templates the other way round: g_c = a_c / r_p with a_c the PySM amplitude.
+  Then a_c = g_c r_p still holds pixel by pixel, but the conditional distribution of a given g
+  is not the prior's (at fixed a, a large r means a small g, so r is anti-correlated with g),
+  and the exact collapsed marginal is biased on that sky: see Result, "Attempt 1 outcome".
 
 Per-region Fisher sd (profiled over the three per-pixel amplitudes; the writer's
-`sim_report.txt`): nside_beta 4 median 0.041 sync / 0.024 dust (22 / 40 percent of regions above
-the truth sd); nside_beta 8 0.087 / 0.054 (69 / 64 percent above); nside_beta 16 0.180 / 0.116
-(89 / 78 percent above); full sky 0.0005 / 0.00002. The same regime as E020: nside_beta 4
-data-dominated, 8 marginal, 16 prior-dominated for most regions, so the comparison is a
-comparison of shrinkage.
+`sim_report.txt`, attempt-2 sky): nside_beta 4 median 0.037 sync / 0.022 dust (15 / 37 percent
+of regions above the truth sd); nside_beta 8 0.079 / 0.049 (65 / 62 percent above); nside_beta
+16 0.163 / 0.106 (88 / 77 percent above); full sky 0.0005 / 0.00002 (attempt-1 sky: 0.041 /
+0.024, 0.087 / 0.054, 0.180 / 0.116). The same regime as E020: nside_beta 4 data-dominated, 8
+marginal, 16 prior-dominated for most regions, so the comparison is a comparison of shrinkage.
 
 Verification of the target on this data before any run (offline evaluation of
-`RegionIndexLikelihood.from_arrays` on the band files, scratchpad `probe_e021_like.py`): the
-log posterior at the truth state is 53,859 above the flat prior-mean start and 519,360 above a
-flat beta_s = -4.0; 1-D scans of one region's beta_s around the truth are symmetric with local sd
-0.014 to 0.19, between the amplitudes-known and profiled Fisher sd; the analytic gradient matches
-central finite differences in every block (ratios 1.0000 to 1.0029, the latter on a 4.4-unit
-gradient with a 1e-5 step). The gradient norm at the truth is 2.8e4 against 2.3e6 on the E020
-sky, dominated by the full-sky dust mean (21,886 on a coordinate with Fisher sd 2e-5, a shift of
-1e-5): the truth is at the mode to within the noise.
+`RegionIndexLikelihood.from_arrays` on the band files, scratchpad `probe_e021_v2_like.py`;
+attempt-1 numbers in parentheses): the log posterior at the truth state is 79,652 (53,859)
+above the flat prior-mean start and 649,017 (519,360) above a flat beta_s = -4.0; 1-D scans of
+one region's beta_s around the truth are symmetric with local sd 0.013 to 0.17, between the
+amplitudes-known and profiled Fisher sd; the analytic gradient matches central finite
+differences in every block (ratios 0.9995 to 1.0001). The gradient norm at the truth is 1.0e4
+(2.8e4) against 1.3e6 at the flat start: the truth is at the mode to within the noise.
 
 ## Setup
 Writer, parameter files, runs, order, sampler and analyzer as in E020 with these settings:
@@ -125,10 +135,15 @@ verification above. The E020 chain outputs on the misspecified sky are kept as t
 
 ## Command
 ```bash
-python nextgen/scripts/pysm_intensity_sim.py --dir /Users/trygvels/data/e021_consistent --nside 64 --noise-scale 0.03 --seed 2027 --sky consistent --nside-truth 16 --template-scatter 0.3
+# attempt 1 (data-story templates, kept as evidence)
+python nextgen/scripts/pysm_intensity_sim.py --dir /Users/trygvels/data/e021_consistent --nside 64 --noise-scale 0.03 --seed 2027 --sky consistent --nside-truth 16 --template-scatter 0.3 --template-story data
 mpirun -n 12 commander4 -p /Users/trygvels/data/e021_consistent/param_timing_gmrf16.yml    # 40 iterations
-for t in gmrf16 iid16 indep16 scalar gmrf8 iid8 indep8 gmrf4 iid4 indep4; do mpirun -n 12 commander4 -p /Users/trygvels/data/e021_consistent/param_$t.yml; done
-python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consistent --burn 600
+mpirun -n 12 commander4 -p /Users/trygvels/data/e021_consistent/param_gmrf16.yml            # 1200 iterations, complete
+python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consistent --burn 500 --tags gmrf16
+# attempt 2 (model-story templates), the ten runs one at a time (scratchpad run_e021_v2_queue.sh)
+python nextgen/scripts/pysm_intensity_sim.py --dir /Users/trygvels/data/e021_consistent_v2 --nside 64 --noise-scale 0.03 --seed 2027 --sky consistent --nside-truth 16 --template-scatter 0.3 --n-iter 1200 --n-warmup 400 --refresh-mass-at 50 200 --no-adapt-mass --template-story model
+for t in gmrf16 iid16 indep16 scalar gmrf8 iid8 indep8 gmrf4 iid4 indep4; do mpirun -n 12 commander4 -p /Users/trygvels/data/e021_consistent_v2/param_$t.yml; done
+python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consistent_v2 --burn 500
 ```
 
 ## Result
@@ -188,6 +203,49 @@ two chains, 1130 iterations left plus the refresh at 200 (2 x 14 min): about 7 h
 3 h; the nside-8 and nside-4 runs have 4 to 16 times fewer index coordinates (Hessian 3084 and
 774 gradients) and should be cheaper per transition; about 35 to 40 h for the ten.
 
+**Attempt 1 outcome, gmrf16 complete (2026-10-28, 07:17 to 16:49; 1200 iterations, 700
+post-burn; two lanes until 10:31, then alone):** after the refresh at transition 200 the
+sampler settles at 63 gradients per transition (step size 0.081, acceptance 0.6 to 0.9, no
+divergences), 16.6 s per Gibbs iteration. The analyzer (`--burn 500`): sync region-level RMSE
+0.0549 (|b| > 20: 0.0609; truth sd 0.0615; single-index floor 0.0627), region z median/MAD
+-0.81/0.56, |z| < 1, < 2 for 57 and 93 percent of regions, posterior sd median 0.047, field
+mu -3.037 +- 0.003, sigma 0.079, rho 26 deg, ESS min 54 / median 354 over regions, hyper ESS
+25 to 36; CMB residual 2.85 uK against the 2.79 floor. Dust: RMSE 0.0764 (|b| > 20: 0.0928),
+worse than a constant at the sky mean (0.0323) and than the single-index floor (0.0661), z
+median/MAD +1.62/1.14, |z| < 1, < 2 for 30 and 58 percent, sigma 0.068, rho 44 deg, ESS min
+3.7 / median 54, hyper ESS 3 to 8. By S/N quartile the dust index is right where the data
+decide (highest quartile: error +0.004, RMSE 0.013, sd 0.011) and wrong where the prior does:
+lowest quartile truth 1.552, posterior mean 1.679, error +0.128 with posterior sd 0.033 (RMSE
+0.134, ESS median 19). The amplitude hyperparameters miss their targets: amp mu_s 0.965 and
+log s_s -1.231 against the realized 0.999 / -1.209, mu_d 0.996 / -1.193 against 0.998 /
+-1.208, with posterior sds of 0.0014 and 0.003. (The reduced chi-square in the chain files,
+about 70, is the alm-represented sky model through the 110-arcmin beams against the maps and
+not the per-pixel fit; it is not a diagnostic here.)
+
+**Diagnosis (exact target, numpy 12 x 12 collapsed marginal per pixel; scratchpad
+`e021_faint_scan.py`, `e021_faint_cause.py`, `e021_truth_scan.py`):** the chain is at its
+target. A common shift of the 768 lowest-S/N dust regions evaluated at the chain's posterior-mean
+state peaks at +0.025, one grid step from zero; evaluated at the truth state with the realized
+hyperparameters it peaks at +0.114 with sd 0.0055 (21 sd), the log-determinant part of the
+marginal gaining 456 nats against 235 lost by the chi-square part at +0.125; the sync shift
+peaks at +0.039 (sd 0.007); the marginal in the amplitude hyperparameters at the true index
+field peaks at mu_s 0.981 and mu_d 0.973 (sd 0.0014) and log s_d -1.201. The CMB prior width is
+irrelevant (84.1, 100 or 1e4 uK: peak +0.113 to +0.117). Resimulating the same amplitudes with
+fresh noise reproduces the pull (+0.13, +0.12); resimulating with a = g r drawn from the
+attempt-1 templates removes it (peak 0.000, hyperparameter peaks 1.000). Cause: the attempt-1
+construction g = a / r makes r anti-correlated with g at fixed a, so a | g is not N(g, (0.3 g)^2)
+and the score identity fails; the determinant term, which weights pixels by g^2, then prefers a
+steeper dust SED at the observed bands in the regions where the prior variance (s g M)^2 is
+comparable to the noise. Not a sampler fault (the E020 checks of gradient and kernel stand) and
+not a prior-volume effect of the kind in F22: a mismatch between the simulated template errors
+and the model's.
+
+**Attempt 2 (started 2026-10-28 17:15):** sky regenerated with `--template-story model` (writer
+change, same seed; the noise realization differs because the RNG order changed), verified as in
+"Target and priors"; the ten runs one at a time in the order gmrf16, iid16, indep16, scalar,
+gmrf8, iid8, indep8, gmrf4, iid4, indep4 with the attempt-1 sampler settings (D015, D017). The
+attempt-1 gmrf16 chain is kept as the evidence for F23 and as a robustness data point for Q16.
+
 ## Negative control
 The single index converges to the Fisher-weighted sky mean, not the unweighted mean (review item
 1): sync -2.9878 (unweighted -3.0000), dust 1.5973 (unweighted 1.5397). Its index RMSE must
@@ -206,5 +264,7 @@ difference).
 
 ## Follow-ups
 - Q16: the same comparison on the E020 PySM sky at noise scale 1 and 0.03 with robust template
-  priors and sampled T_d.
+  priors and sampled T_d; and the attempt-1 sky (g = a / r) as the mildest template-error
+  misspecification: a 30 percent scatter whose conditional law differs from the prior's shifts
+  the prior-dominated dust index by +0.13 at 4 posterior sd under hier at nside 16.
 - Second noise realization for the decisive pair (`--seed 2028`).

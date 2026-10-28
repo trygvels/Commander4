@@ -365,3 +365,21 @@ resolution), the real-data case for index fields at the resolution the data supp
 (inference, labelled; a direction, not a value) the BP XV chain's flat-prior stationary
 target for the Spur lies at the boundary and the released chains are far from it.
 Stats-reviewed in four rounds.
+
+**F23. The collapsed hierarchical amplitude prior is exact only for its own template-error law;
+template errors of the same size but a different conditional law bias the index where the prior
+dominates** (E021 attempt 1). On a sky with region-constant indices, the model's SEDs and
+noise, and templates g = a / r with r = max(1 + 0.3 eps, 0.2) iid per pixel (so that a = g r
+holds pixel by pixel), the exact collapsed marginal at the true index field prefers a common
+shift of the 768 lowest-S/N nside-16 dust regions of +0.114 (sd 0.0055; the determinant term
++456 nats against the chi-square term -235) and amplitude-hyperparameter means 2 to 2.5
+percent below the realized mean of a/g (mu_s 0.981, mu_d 0.973, sd 0.0014); the gmrf16 chain
+reproduces it (faint-quartile dust index +0.128 at posterior sd 0.033, amp mu_s 0.965) and sits
+at the target's mode. The CMB prior width does not matter; redrawing a = g r from the same
+templates removes the shift (peak 0.000, hyperparameters 1.000), as does the corrected sky.
+Cause: at fixed a the realized r is anti-correlated with g, so a | g is not N(g, (s g)^2) and
+the score identity fails for the per-pixel marginal, whose determinant term weights pixels by
+g^2. Consequence for real data (Q16): the hier posterior in prior-dominated regions depends on
+how the template errors are distributed, not only on their size; a 30 percent scatter of the
+wrong law moves the faint-sky dust index by 0.13 at four stated sigma. Exact-target computation
+(numpy 12 x 12 marginal), stats review pending.

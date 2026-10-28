@@ -179,3 +179,26 @@ to the prior boundary between nside 16 and 64; stable with data-scaled priors on
 components) goes into Paper A Sect. 4 as the real-data case for the prior-volume effect,
 independent of the BP XV question.
 
+## D017 (2026-10-28): E021 attempt 1 stopped after its first complete run; the sky regenerated with the hier prior's own template story and the ten runs restarted one at a time
+
+**Decision.** Stop the E021 queue (gmrf16 complete, iid16 at iteration 200, indep16 just
+started) at 17:11, change the writer so that the templates are the PySM amplitude maps and the
+true amplitudes are a = g r (`--template-story model`, the new default for the consistent
+sky), regenerate the sky in `/Users/trygvels/data/e021_consistent_v2` with the production
+sampler settings written directly (1200 iterations, warm-up 400, refresh at 50 and 200,
+`adapt_mass: false`), verify the target on the new data (exact marginal at the truth, likelihood
+probe, gradient check) and restart the ten runs in one serialized queue (gmrf16 first). Keep
+the attempt-1 data and chain as evidence (F23) and as a Q16 data point. Stats review of the
+diagnosis and of the new sky runs alongside the first run; if it refutes, the queue stops.
+
+**Why.** The complete gmrf16 chain on the attempt-1 sky put the dust index of the faint three
+quarters of the sky 0.13 above the truth at four stated sigma and the amplitude
+hyperparameters 2 to 24 sd off their targets, and the exact marginal shows this is the target,
+not the sampler: the attempt-1 templates g = a / r give a | g a law different from the prior's.
+E021 exists to measure prior behaviour in prior-dominated regions on a sky from the model
+class; on that sky it would have measured the template-law mismatch in every option. Ten hours
+of compute lost now against forty had the queue run on.
+
+**Alternatives considered.** Keep the attempt-1 sky and report the bias as the result: it is a
+useful robustness number (F23, Q16) but not the clean baseline Q3 and M2.5 need. Fit the ten
+options on both skies: deferred; Q16 does the misspecified cases at realistic noise.
