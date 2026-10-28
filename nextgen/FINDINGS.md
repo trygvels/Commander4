@@ -340,16 +340,17 @@ so the surrogate bounds BP's native-resolution coupling from below. (b) The rele
 1.8 TB files): lag-1 0.79 to 0.83 (Spur) and 0.56 to 0.67 (Plane), IPS tau 9 to 43
 consistent with the paper's 30 to 50, 23 to 114 effective samples per chain, chain means
 agreeing to 0.02, and a movement towards flatter indices of +0.04 (Spur) and +0.07 (Plane)
-per 1000 samples (0.3 to 2.8 sigma per chain-region, shared start). The index step is the
-relaxed alm sampler, and BP's conditional width scales with its effective number of free
-amplitude elements, which is undetermined between 7k and 4M per region (conditional sd 0.01
-to 5e-4, two-block r 7 to 140), so the per-step motion is driven by the other Gibbs blocks
-and the chains cannot distinguish an unsettled flat-prior chain (target shifted as on the
-surrogate, r of at least 70) from a stationary chain whose target the run's component priors
-keep unshifted; the reported sds of 0.06 and 0.07 are posterior widths only under the second
-reading. The discriminator is the effective element count (Commander3 semantics of
-`COMP_CL_TYPE = gauss` and `none`, or one conditional-width measurement on a released
-sample). On the surrogate the flat-prior marginal is shifted from the profile by +0.27
+per 1000 samples (0.3 to 2.8 sigma per chain-region, shared start). The conditional width at
+BP's own resolution, from a released sample's synchrotron amplitudes through the LFI beams,
+is 0.016 (Spur) and 0.0085 (Plane): the gauss C_l prior binds the synchrotron amplitude (700
+to 2500 effective Stokes-elements, comparable to the surrogate's), the amplitude block is 30
+(Spur) and 4 (Plane) percent of the chain's per-step motion, and a flat-prior volume term of
+the surrogate's strength would move the chain by 0.03 to 0.06 per sample against the observed
+5e-5, so the flat-prior shift is absent in BP's chain (pull at most 1e-3 of the surrogate's);
+the mechanism is not identified, the leading candidate being that the CMB amplitude is not a
+free per-pixel parameter in BP's CG step. The reported sds of 0.06 and 0.07 are consistent
+with posterior widths under BP's full model at 23 to 114 effective samples per chain; the
+slow movement remains unexplained. On the surrogate the flat-prior marginal is shifted from the profile by +0.27
 (Spur) and +0.13 (Plane) and runs to the flattest allowed index in the High Latitude region;
 the C_l-sized CMB prior removes the runaway. (c) Resolution scaling on the real data (LFI and
 353, nside 16, 32, 64, white LFI noise): with flat amplitude priors the Spur's collapsed

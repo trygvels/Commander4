@@ -30,7 +30,14 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   the Plane -3.16, -2.88, -2.65 (r 2.6 to 6, tau 18 to 77); the C_l-sized CMB prior
   stabilizes Spur, High Latitude and Galactic Center but not the Plane (flat dust and
   synchrotron priors): data-scaled priors on every component (E016 form) or the profile are
-  the hypotheses to test. The Plane's resolution dependence is the misspecification of one
+  the hypotheses to test. Sixth review round, Q17 item 2 measured on a released sample: the
+  conditional width at BP's resolution is 0.016 (Spur) and 0.0085 (Plane), the synchrotron
+  amplitude is bound by BP's gauss C_l prior, the amplitude block is 30 and 4 percent of the
+  chain's per-step motion, and the flat-prior volume pull in BP's chain is at most 1e-3 of
+  the surrogate's: the reported sds are consistent with posterior widths under BP's full
+  model at 23 to 114 effective samples per chain; the mechanism that neutralizes the volume
+  term (the CMB's treatment in the CG step, most likely) is not identified. The Plane's
+  resolution dependence is the misspecification of one
   index for a region whose index spans 1.5: its nside-4 sub-regions are resolution-stable
   (weighted mean -3.25 at nside 16, 32 and 64) while the single fit moves -3.30 to -2.91,
   the real-data case for index fields at the data's resolution. Fifth review round: BP's effective amplitude element count is undetermined
@@ -49,9 +56,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 
 **Needs Trygve**
 - How to present the E022 BP XV chain diagnostics (23 to 114 effective samples per chain,
-  the unsettled-versus-stationary dichotomy, movement towards flatter indices from a common
-  start) in Paper A, given BP XV is his paper, and whether to check the Commander3 semantics
-  of `COMP_CL_TYPE = gauss` and `none` (he knows the code): as a
+  reported sds consistent with posterior widths, amplitude block a minor part of the chain
+  motion, flat-prior volume pull absent for an unidentified reason) in Paper A, given BP XV
+  is his paper, and whether he can say from the Commander3 code what `COMP_CL_TYPE = none`
+  does to the CMB amplitude step (Q17 item 1): as a
   worked example of the prior-volume effect with the numbers above, or only as the method
   recommendation (C_l-sized CMB prior or profile) with the diagnostics in an appendix. The
   record and F22 hold the numbers either way; nothing is published without his decision.
