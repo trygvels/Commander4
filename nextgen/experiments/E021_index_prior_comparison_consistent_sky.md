@@ -57,8 +57,8 @@ Sky (writer `nextgen/scripts/pysm_intensity_sim.py --sky consistent --nside-trut
   posterior sd is about 0.0014 for mu and 0.0010 for s). Acceptance: posterior mean of mu_c
   within 2 posterior sd of the realized mean(a/g), posterior mean of s_c within 2 sd of the
   realized sd(a/g), the same in all ten runs. Verified on the data before any run (numpy
-  evaluation of the exact 12 x 12 collapsed marginal at the true index field, scratchpad
-  `e021_truth_scan.py`): the marginal's peak in mu_s is 1.0020 (realized 1.0031, sd 0.0014),
+  evaluation of the exact 12 x 12 collapsed marginal at the true index field,
+  `nextgen/scripts/e021_truth_scan.py <data dir>`): the marginal's peak in mu_s is 1.0020 (realized 1.0031, sd 0.0014),
   in mu_d 1.0004 (0.9999), in log s within 0.0004 of the realized values, and a common shift
   of the index of the 768 lowest-S/N nside-16 regions peaks at +0.003 (dust, sd 0.005) and
   +0.010 (sync, sd 0.007): the score identity holds on this sky. Unlike E020 the templates are
@@ -222,8 +222,10 @@ log s_s -1.231 against the realized 0.999 / -1.209, mu_d 0.996 / -1.193 against 
 about 70, is the alm-represented sky model through the 110-arcmin beams against the maps and
 not the per-pixel fit; it is not a diagnostic here.)
 
-**Diagnosis (exact target, numpy 12 x 12 collapsed marginal per pixel; scratchpad
-`e021_faint_scan.py`, `e021_faint_cause.py`, `e021_truth_scan.py`):** the chain is at its
+**Diagnosis (exact target, numpy 12 x 12 collapsed marginal per pixel;
+`nextgen/scripts/e021_faint_scan.py` (scan at the chain state), `e021_faint_cause.py`
+(resimulations), `e021_truth_scan.py` (scan at the truth); chain traces by
+`e021_field_trace.py <tag> <burn>`):** the chain is at its
 target. A common shift of the 768 lowest-S/N dust regions evaluated at the chain's posterior-mean
 state peaks at +0.025, one grid step from zero; evaluated at the truth state with the realized
 hyperparameters it peaks at +0.114 with sd 0.0055 (21 sd), the log-determinant part of the
