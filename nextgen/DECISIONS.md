@@ -152,3 +152,5 @@ one reviewed for E018 and E020; the E021 Result records it and the stats review 
 sampler configuration is run while the production is going, not after.
 
 **Amendment (07:17):** `adapt_mass: false` for the E021 production, so the last refreshed Hessian (transition 200) is the metric for the rest of the run; with the windows on, the one ending at 250 would have replaced it by a 50-sample variance estimate (stats review of c707a34, note 3). Review items on the refresh (terminal buffer, once-per-count firing) applied before the restart.
+
+**Amendment (10:31):** one E021 job at a time. Measured at chain-1 iteration 70: two concurrent runs cost 150 to 220 ms per gradient against 82 to 95 ms for one (the pre-registered 1.5x limit in the E021 record), so two lanes deliver the throughput of one. Lane B is paused with SIGSTOP and the jobs run in start order (scratchpad `e021_serializer.sh`); nothing is restarted, the paused run keeps its state and the kernel is unaffected (a stopped process resumes where it was).

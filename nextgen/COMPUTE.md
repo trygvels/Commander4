@@ -89,3 +89,10 @@ unverified draft:
 | MPI | MPICH 5.0.2 (pip), mpi4py 4.1.2 |
 | Compiler | Apple clang 17.0.0, `-march=native -O3 -ffast-math`, IPO on |
 | Build verified | 2026-10-25, commit 4137c7f (nextgen), full suite 859 passed / 4 skipped |
+
+Measured on the E021 runs (2026-10-28): one 13-rank maps-only run (12 bands at nside 64,
+index-field NUTS with `num_threads: 4` on the solver root) costs 82 to 95 ms per gradient of the
+collapsed likelihood and about 2 s of other work per transition; two such runs at once cost 150
+to 220 ms per gradient each and 7 s per transition, so two concurrent runs deliver the throughput
+of one. Idle band ranks waiting in MPI collectives use 10 to 30 percent of a core each (MPICH
+polling). Run jobs of this size one at a time (the E021 serializer, D015).

@@ -2,6 +2,40 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-28 (Mac mini, 10:40): E021 production on the refreshed metric; two lanes give no throughput, jobs serialized
+
+**Learned**
+- The warm-up metric refresh (`nuts.refresh_inv_mass_at`, c707a34 plus review items 5b07e7d;
+  stats-reviewed, target invariant) does what the offline diagnostic predicted. At transition 50
+  gmrf16 dropped from 400 to 640 gradients per transition (step 0.006 to 0.02) to 63 to 272
+  (step 0.04 to 0.12); iid16 from 300 to 510 to 15 to 34 (step 0.1 to 0.3). Without it the ten
+  runs would have cost about 37 h each.
+- Two concurrent runs on the 10-core Mac mini cost 150 to 220 ms per gradient against 82 to 95 ms
+  for one run (chain file times, Hessian gaps excluded; other work per transition 2 s alone,
+  7 s with two). Two lanes deliver the throughput of one, so the pre-registered rule applied:
+  from 10:31 one job runs at a time, the others are paused with SIGSTOP and resume in start
+  order (scratchpad `e021_serializer.sh`, D015 amendment); nothing is restarted.
+- E021 production settings: 1200 iterations, warm-up 400, refresh at 50 and 200,
+  `adapt_mass: false` (a window ending at 250 would have overwritten the refreshed Hessian),
+  burn 500. Stats review of the E021 design CONFIRMED the model class; the must-fix negative
+  control against the Fisher-weighted sky mean is in the record (sync 0.0627, dust 0.066).
+
+**Running**
+- E021 gmrf16 (chain-1 iteration 80 at 10:30; about 7 h at single-lane speed including the
+  refresh at 200), then iid16 (paused at iteration 80, about 3 h), then indep16, scalar, gmrf8,
+  iid8, indep8, iid4, gmrf4, indep4 in start order; about 35 to 40 h for the ten.
+- E016 hier SBC replication (seed 2027; about 20 h left).
+
+**Next**
+- Per run: trace, chi-square, hyperparameters against the realized values. Analyzer with burn 500
+  once the nside-16 pair is in; MC inflation check; second seed for the decisive pair; Result,
+  Conclusion, F22, Q3, ROADMAP M2.5.
+- SBC verdict by the pre-registered rule; F16 final or withdrawn.
+- E014 BP XV cell; M2.6 (Q7, Q8); Paper A outline update with E017 to E021 numbers.
+
+**Needs Trygve**
+- Nothing new. The hier default question (D003/D011) stands.
+
 ## 2026-10-28 (Mac mini, 05:45): E020 closed as a design flaw (F21), sampler exonerated by direct computation; E021 on a model-consistent sky designed, under stats review, timing run started
 
 **Learned**

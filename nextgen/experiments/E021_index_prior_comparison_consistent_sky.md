@@ -169,6 +169,25 @@ measured). The first two-lane attempt (07:10 to 07:16, `adapt_mass: true`, stopp
 start, kept as `chains_{gmrf16,iid16}_windows_attempt2/`) was restarted with that setting at 07:17. The MC inflation of the
 RMSE (above) decides whether 700 samples suffice for each comparison; a run is extended if not.
 
+**Refresh and timing at chain-1 iteration 70 (2026-10-28, 10:27):** the refresh at transition
+50 does what the offline diagnostic predicted. gmrf16 went from 400 to 640 gradients per
+transition before it (step sizes 0.006 to 0.02) to 63 to 272 after it (step sizes 0.04 to 0.12,
+acceptance 0.4 to 0.97 in the first blocks while dual averaging settles); iid16 from 300 to 510
+to 15 to 34 (step sizes 0.1 to 0.3). Per-gradient cost from the chain file times (gaps over
+600 s, the Hessian starts and refreshes, excluded; transitions with at most 7 gradients give the
+per-transition overhead, transitions with at least 200 the per-gradient cost): one run alone
+(timing run, SBC replication in the background) 2 s overhead and 82 to 95 ms per gradient; two
+runs at once 7 s overhead and 150 to 220 ms per gradient (gmrf16 median 152, iid16 222). The
+slowdown is 1.8 to 2.3x, so two lanes deliver the throughput of one and the rule above applied:
+at 10:31 the jobs were serialized by pausing lane B with SIGSTOP (scratchpad
+`e021_serializer.sh`, one tick per minute: the mpirun job that started earliest runs, the others
+wait and resume in start order; progress is kept, no run is restarted; D015 amendment). iid16 is
+paused at chain-1 iteration 80 and resumes when gmrf16 ends; lane A's next run (indep16) then
+waits for it. Projection at single-lane speed: gmrf16 about 2 s + 100 x 0.085 s per transition,
+two chains, 1130 iterations left plus the refresh at 200 (2 x 14 min): about 7 h; iid16 about
+3 h; the nside-8 and nside-4 runs have 4 to 16 times fewer index coordinates (Hessian 3084 and
+774 gradients) and should be cheaper per transition; about 35 to 40 h for the ten.
+
 ## Negative control
 The single index converges to the Fisher-weighted sky mean, not the unweighted mean (review item
 1): sync -2.9878 (unweighted -3.0000), dust 1.5973 (unweighted 1.5397). Its index RMSE must
