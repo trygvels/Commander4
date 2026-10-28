@@ -1,6 +1,6 @@
 # E020: Index-field prior comparison on a PySM d1s1 sky: hierarchical GMRF with inferred smoothness against independent regions at a fixed nside and a single index (M2.5 first cut, Q3)
 
-- **Date started / finished:** 2026-10-27 /
+- **Date started / finished:** 2026-10-27 / 2026-10-28 (closed: design flaw, see Conclusion)
 - **Branch and commit:** nextgen, a07f538
 - **Open question addressed:** Q3 (optimal spatially varying index model); ROADMAP M2.5
 - **Validation level:** L4 (misspecified realistic sky with known truth; the samplers themselves
@@ -282,6 +282,56 @@ whole run and adapts the step size only; any fixed metric leaves the target unch
 test added; stats review 2026-10-27 CONFIRMED: slice-sampling NUTS with a fixed diagonal metric is invariant for the target for any positive metric, verified also with a deliberately mismatched metric on a non-Gaussian target; its should-fix items applied: `inv_mass` is now a copying, validating property so a caller's array cannot alias the kernel, and the test uses a mismatched metric on a log-Gamma times correlated-Gaussian target with 4-se bounds). All ten parameter files set; production relaunched 22:26:52
 (attempt 3, gmrf16 first).
 
+**Production attempt 3, gmrf16, centred, fixed Hessian metric (22:26 to 05:10 on 2026-10-28,
+stopped at chain-1 iteration 185; output in `chains_gmrf16_misspec_attempt3/`, log
+`run_gmrf16_misspec_attempt3.log`):** the saturation did not go away. 1 to 7 gradients per
+transition for the first 25 iterations, 1023 from iteration 30 on, in both chains, and identical to
+attempt 2 up to the first window end (the two runs' step sizes agree to three digits until chain
+iteration 100, where the window changed attempt 2's metric). So the warm-up windows were not the
+cause of the saturation and `adapt_mass: false` was not the fix; the attempt-2 diagnosis above is
+withdrawn (the switch stays, documented and tested, as an option). Cost 2.5 min per Gibbs
+iteration (both chains), 85 h per run. The reduced chi-square of the written sky model rose from
+50 to 100 (against 1.2 for a per-pixel GLS fit at the same indices; the alm representation of
+the per-pixel amplitudes at lmax 191 sets that number, it is not a diagnostic of the index step).
+
+Diagnosis from the saved chain-1 states, by evaluating the same `RegionIndexLikelihood` offline
+(`from_arrays` on the band files, 50 to 75 ms per evaluation; scripts kept in the session
+scratchpad, `probe_e020_like.py`, `probe_region_gain.py`, `probe_direct_gauss.py`):
+- The target and its gradient are right. The analytic gradient matches central finite
+  differences to five digits in every block (field coefficients, mu, log sigma, u, amplitude mu
+  and log s) at the truth state and at the iteration-182 state. The C++ kernel equals a direct
+  12 x 12 Gaussian marginal per pixel, log N(d; M m, N + M T M^T) by numpy slogdet and solve, in
+  every region checked, including regions at beta_s = -9.4 and -9.7, up to a state-independent
+  constant (660.4 per region in both states and all regions).
+- The sampler climbs the target. Log posterior of the chain states relative to the truth state
+  (PySM beta_s and beta_eff at nside 16, amplitude hyperparameters at their prior means):
+  -217,720 at iteration 1 (the flat prior-mean start), +36,552 at iteration 16, +87,775 at 101,
+  +104,122 at 182; the log-likelihood part alone is +123,001 at 182. The state at 182 has beta_s
+  mean -4.05, sd 3.84, range -26.4 to -0.63 and beta_d mean 1.65, sd 0.22, range 1.15 to 2.72; the
+  sync field's log sigma went from -4.9 to +1.2 while the amplitude-prior log s stayed between
+  -1.0 and -1.3. The chain was neither stuck nor diffusing: it was moving towards the mode of a
+  target whose mode is far from the truth, and the 1023-gradient transitions are the cost of that
+  climb through a funnel that widens as sigma grows.
+- Where the gain comes from (kernel log-likelihood per region, chain state minus truth state,
+  62,834 in total at the chain's hyperparameters; the log-determinant part is 369 of it). The
+  brightest quartile of regions by profiled sync Fisher sd (the plane) contributes 36,191, and
+  there the flat-prior GLS chi-square of the chain state is 101,841 lower than at the truth: the
+  region-constant fixed-T dust model misfits the PySM sky (noise-free reduced chi-square 0.25 at
+  the nside-16 region-mean truth, concentrated in the plane and at 353 GHz, 1.8 per dof there),
+  and the fit moves beta_d by up to +0.08 (region 1504 at the Galactic centre alone gives 14,217,
+  beta_d 1.805 against beta_eff 1.721 with a Fisher sd of 0.0025) and beta_s by -0.14 to absorb
+  it. The two faintest quartiles contribute 11,508 and 12,310 while their GLS chi-square gets
+  worse (-12,719 and -12,158 in log-likelihood units): the gain is in the amplitude-prior terms.
+  The data-built pseudo-template g_sync is off from the true sync amplitude by factors 0.41 to
+  1.66 (16 to 84 percent at |b| > 20) while the inferred global s is 0.36, so at the truth the
+  prior term costs several units per high-latitude pixel, and an index that removes the sync from
+  every band but 23 GHz (beta_s below -9) or flattens it into the CMB (beta_s near -0.6) removes
+  that cost at a smaller data cost. Both mechanisms are properties of the stated target on this
+  sky, not of the sampler.
+- Sync index error rms at iteration 182 by sync Fisher-sd quartile (bright to faint): 0.14, 1.75,
+  4.42, 6.48 (truth sd 0.063); dust against beta_eff: 0.07, 0.17, 0.27, 0.34.
+Production stopped at 05:10 on 2026-10-28 (D014). The ten-run comparison moves to E021.
+
 ## Negative control
 The single index is the control: its index RMSE must equal the sd of the truth map (0.063 for
 beta_s, 0.037 for beta_d at nside 64; the region-mean RMSE floors are 0.037 / 0.024 / 0.013 for
@@ -291,7 +341,24 @@ map (posterior sd per region 3 to 10 times the GMRF's where the GMRF shrinks); i
 GMRF prior is not doing anything on this sky.
 
 ## Conclusion
-(pending)
+E020 as designed cannot answer Q3, and the reason is a finding (F21). At 0.03 x E012 noise the
+PySM d1s1 sky is so far above the noise that the two misspecifications built into the design,
+fixed T_d and a data-built template with 60 percent errors under a prior with one global scatter,
+dominate the index posterior: the collapsed hier posterior for beta_s runs away in faint regions
+(to -26) and shifts beta_d by 30 Fisher sd in the plane, and every prior option would be compared
+on how it handles that runaway rather than on how it recovers an index field. The sampler, the
+likelihood and the kernel are exonerated by direct computation (gradient against finite
+differences, kernel against a direct Gaussian marginal, log posterior of the chain states above
+the truth). The two NUTS changes made along the way (relative mass floor, `adapt_mass` switch)
+are correct and tested but were not the cause of the 1023-gradient saturation, which was the
+climb through the runaway funnel.
+
+Changes: FINDINGS F21; DECISIONS D014 (production stopped, redesign); OPEN_QUESTIONS Q16 (robust
+amplitude-template prior and T_d under misspecification). The prior comparison runs as E021 on a
+sky drawn from the model class (region-constant indices at nside 16 from the PySM region means,
+one MBB at the fixed T, PySM amplitudes, templates equal to the true amplitudes with a stationary
+30 percent scatter) at the same noise, the clean L3 test the priors need first (principles 3 and
+4). The misspecified PySM sky returns at realistic noise as the robustness experiment of Q16.
 
 ## Follow-ups
 - Noise scale 3 and a polarization (QU) version once M2.4 stage 2 allows hier for QU streams.

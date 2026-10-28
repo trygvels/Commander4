@@ -110,3 +110,26 @@ disagreement between conventions (E014 passes 2 to 4), never zero. Polarization 
 so Paper B's synchrotron field does not depend on this; every intensity result does. Trygve asked
 for the choice to be made here (2026-10-27) rather than deferred to him. Q15 item (2) is closed by
 this entry; item (3), propagating the prior widths, follows the implementation.
+
+## D014 (2026-10-28): E020 production stopped; the index-prior comparison moves to a model-consistent sky (E021); the misspecified PySM sky becomes a robustness experiment at realistic noise
+
+**Decision.** Stop the E020 ten-run production (attempt 3 stopped at chain-1 iteration 185 after
+6.7 h; 85 h per run projected). Run the same ten options, metrics and analyzer as E021 on a sky
+drawn from the model class: region-constant indices at nside 16 equal to the PySM region means,
+one modified blackbody at the fixed T, PySM amplitudes at the pivots, the c1 CMB, templates equal
+to the true amplitudes with an iid 30 percent scatter, the same bands and noise. Keep the PySM sky
+with its misspecifications for a later robustness experiment at realistic noise (Q16), after the
+prior comparison is done. The E020 data and chain outputs are kept as the evidence for F21.
+
+**Why.** E020 on the PySM sky was measuring how each prior handles a runaway driven by fixed T_d
+and a 60-percent-wrong template (F21), not how well it recovers an index field; every option would
+have scored on the same pathology. Principles 3 and 4 say: simulations from the model first, then
+misspecification as its own question. The sampler was exonerated by direct computation, so the
+code does not change; the design does.
+
+**Sampler settings for E021.** `init_inv_mass: fd_hessian` stays; `adapt_mass` returns to its
+default true (the windows were cleared of blame by attempt 3: the saturation was the funnel
+climb). The E021 timing run decides between the two settings on gradients per transition after
+the first window. Iteration counts are set from that timing run so that the ten runs fit in
+about two days on the Mac mini (D-level: a shorter chain with the same burn fraction, logged in
+E021, not a change of target).

@@ -302,3 +302,26 @@ MAMS warm-up 2 to 20 times more gradients; both samplers 5 to 240 times worse on
 funnel). The literature's 3 to 100 times gains for MAMS are reported at d of order 1e4 and above;
 at Phase 2 dimensions there is no case for a second sampler, and NUTS stays the production sampler
 (M2.3 closed; revisit for the joint amplitude-plus-index target of Q5).
+
+**F21. At high S/N the collapsed hierarchical index posterior runs away under SED or template
+misspecification; the sampler is not at fault** (E020, PySM d1s1c1 at nside 64, 12 intensity bands,
+white noise at 0.03 x the E012 levels, `likelihood: hier`, GMRF index fields at nside_beta 16 for
+beta_s and beta_d with fixed T_d = 20.93 K). The NUTS chain climbed from the flat prior-mean start
+(log posterior 217,720 below the state at the PySM truth) to states 104,122 above it by iteration
+182, with beta_s mean -4.05, sd 3.84 and range -26 to -0.6 (truth -3.00, sd 0.063) and beta_d
+shifted by up to +0.08 at the Galactic centre (30 Fisher sd). The target and its gradient were
+verified offline (analytic gradient against central finite differences to five digits in every
+block; the C++ kernel against a direct 12 x 12 Gaussian marginal per pixel including regions at
+beta_s = -9.7). Two mechanisms, both properties of the stated target on this sky: (i) in the plane
+the region-constant fixed-T dust model misfits the sky (noise-free reduced chi-square 0.25 at the
+region-mean truth, 1.8 per dof at 353 GHz) and the fit buys 101,841 in chi-square by moving both
+indices; (ii) in the faint half of the sky the data-built template is wrong by factors 0.41 to 1.66
+(16 to 84 percent at |b| > 20) under a prior with one global scatter s (inferred 0.36), and an index
+that removes the synchrotron from every band but 23 GHz, or flattens it into the CMB, lowers the
+amplitude-prior cost by more than the data cost (gain 23,818 against a GLS loss of 24,877 in the
+two faintest quartiles). Consequences: a prior comparison needs a sky from the model class first
+(E021); real-data runs at high S/N need a template-error model that is not a single global
+scatter, and T_d sampled or marginalized (Q16); the 1023-gradient saturation seen in every E020
+attempt was the funnel climb of this runaway, not a mass-matrix defect (the relative floor and the
+`adapt_mass` switch are correct, tested and kept, but were not the fix). Scope: one sky, one noise
+level, intensity only.

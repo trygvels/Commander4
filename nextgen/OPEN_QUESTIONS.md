@@ -64,6 +64,8 @@ original numbering.
   template choice on real data, and the index-resolution rule from the S/N map (Q3).
 
 ## Q3. What is the optimal spatially varying index model?
+- **Status 2026-10-28:** E020 (PySM sky at 0.03 x E012 noise) closed as a design flaw (F21: the
+  misspecified sky dominates); the ten-option comparison runs as E021 on a model-consistent sky.
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather
   than hand-drawn regions; hard region boundaries are unphysical and alms ring.
 - **Candidate (leading):** hierarchical Gaussian Markov random field on HEALPix pixels at nside_beta
@@ -194,3 +196,21 @@ original numbering.
   working convention for E014-style inputs (D011); item (2) decided 2026-10-27 (D013): per-band
   offset columns with Gaussian priors in the collapsed per-pixel likelihood, implemented at M3.3;
   item (3) follows the implementation.
+
+## Q16. How must the hierarchical amplitude prior and the dust SED be made robust to misspecification at high S/N?
+- **Why:** F21 (E020): with a data-built template wrong by factors 0.4 to 1.7 at high latitude
+  under one global scatter s, and with T_d fixed, the collapsed hier posterior for beta_s runs
+  away (to -26) and beta_d shifts by 30 Fisher sd in the plane. Real Planck plus WMAP intensity
+  data at nside 64 are in this regime for dust and near it for synchrotron.
+- **Candidates:** a non-stationary scatter (s per latitude band or per region, or s as a smooth
+  field); a heavy-tailed scatter (Student-t pseudo-band, which the collapsed Gaussian kernel does
+  not give in closed form, so a scale-mixture with one latent scale per pixel sampled by Gibbs);
+  an explicit template-error model (template = truth times a smooth field with its own prior);
+  sampling or marginalizing T_d per region (a second spectral parameter in the region kernel).
+- **How:** the E020 sky (kept) at realistic noise (noise scale 1) and at 0.03, each candidate
+  against the same metrics as E021; a well-specified control from E021. Pre-register the
+  acceptance: index RMSE within two bootstrap SE of the E021 result on the consistent sky, and
+  no region with |beta_s - truth| above 0.5 on the PySM sky.
+- **Depends on:** E021 (the clean baseline); M3 (real-data model) before any real-data claim.
+- **Decides:** whether Paper A can run hier on real intensity maps or must restrict the template
+  prior to polarization and low-S/N intensity.
