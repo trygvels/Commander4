@@ -154,3 +154,28 @@ sampler configuration is run while the production is going, not after.
 **Amendment (07:17):** `adapt_mass: false` for the E021 production, so the last refreshed Hessian (transition 200) is the metric for the rest of the run; with the windows on, the one ending at 250 would have replaced it by a 50-sample variance estimate (stats review of c707a34, note 3). Review items on the refresh (terminal buffer, once-per-count firing) applied before the restart.
 
 **Amendment (10:31):** one E021 job at a time. Measured at chain-1 iteration 70: two concurrent runs cost 150 to 220 ms per gradient against 82 to 95 ms for one (the pre-registered 1.5x limit in the E021 record), so two lanes deliver the throughput of one. Lane B is paused with SIGSTOP and the jobs run in start order (scratchpad `e021_serializer.sh`); nothing is restarted, the paused run keeps its state and the kernel is unaffected (a stopped process resumes where it was).
+
+## D016 (2026-10-28): the BP XV polarized index cell run as E022 on a surrogate plus the released chains; Paper A presentation deferred to Trygve
+
+**Decision.** The planned E014 follow-up (F14 scope: does the Gibbs conditional mixing issue
+bear on BeyondPlanck XV's reported uncertainties) was run as its own experiment, E022, on an
+nside-16 surrogate of the BP XV polarization data (LAMBDA's nside-16 WMAP maps and dense
+covariances fetched for it), and then directly on the four released BP chains by reading the
+per-region index values over HTTP range requests from the 1.8 TB chain files (613 MB fetched
+per chain). The stats-reviewer was run five times on it (targets, variants, chain analysis,
+resolution scaling, element count). Paper A keeps F14 restricted to intensity at Planck
+resolution; the polarization statement is the dichotomy of E022's conclusion. How the BP XV
+chain diagnostics are presented in Paper A is left to Trygve (STATUS, Needs Trygve).
+
+**Why.** The surrogate alone could only bound the coupling from below (the flat-prior volume
+term and the stationary target scale with the number of amplitude elements, reviewer rounds
+2 and 5), and the released chains alone cannot separate an unsettled flat-prior chain from a
+stationary one driven by the other Gibbs blocks (BP's effective element count is
+undetermined between 7k and 4M per region). Writing a verdict on a published result of
+Trygve's own with that gap open would overstate; the record holds the numbers and the
+discriminator (Commander3 prior semantics or one conditional-width measurement on a
+released sample). The resolution scaling on the real data (flat-prior Spur target from -2.88
+to the prior boundary between nside 16 and 64; stable with data-scaled priors on all
+components) goes into Paper A Sect. 4 as the real-data case for the prior-volume effect,
+independent of the BP XV question.
+

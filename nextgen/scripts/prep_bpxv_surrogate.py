@@ -80,6 +80,8 @@ def main():
     ap.add_argument("--nreal", type=int, default=60)
     ap.add_argument("--nside", type=int, default=16, help="output nside (WMAP nside-16 maps only at 16)")
     ap.add_argument("--no-wmap", action="store_true")
+    ap.add_argument("--regions-from", default="", help="take the region labels from this directory's comps.npz (lower nside) and upgrade them")
+    ap.add_argument("--Td-from", default="", help="take T_d from this directory's comps.npz (lower nside) and upgrade it")
     a = ap.parse_args()
     global NSIDE_OUT
     NSIDE_OUT = a.nside
@@ -179,6 +181,18 @@ def main():
         ang = np.degrees(np.arccos(np.clip(np.sin(np.pi / 2 - th) * 0 + np.cos(th - np.pi / 2) * np.cos(ph), -1, 1)))
         region[(region == 0) & (ang < 25.0)] = 2
         # at nside above 16 the labels come from the same plateau rule on the finer BP map
+        def upgrade(m_low):
+            """Upgrade a map by nested parent lookup (each child takes its parent's value)."""
+            ns_low = hp.npix2nside(m_low.size); fac = (NSIDE_OUT // ns_low) ** 2
+            m_nest = hp.reorder(m_low, r2n=True)
+            child = np.arange(hp.nside2npix(NSIDE_OUT))
+            return hp.reorder(m_nest[child // fac], n2r=True)
+        if a.regions_from:
+            region = upgrade(np.load(os.path.join(a.regions_from, "comps.npz"))["region"]).astype(int)
+            print(f"  regions upgraded from {a.regions_from}")
+        if a.Td_from:
+            td = upgrade(np.load(os.path.join(a.Td_from, "comps.npz"))["T_d"])
+            print(f"  T_d upgraded from {a.Td_from}")
         np.savez(fn, amp=np.array([[sq, su], [dq, du], [cq, cu]]), T_d=td, beta_d=beta_d, region=region,
                  beta_bp=beta_bp, sd_bp=sd_bp)
         for r, nm in enumerate(("High Latitude", "Spur", "Galactic Center", "Plane")):
