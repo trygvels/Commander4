@@ -55,11 +55,13 @@ model component rather than a preprocessing choice.
   BeyondPlanck or DR1 results: their samplers are valid conditional steps (E009, E010), their
   configurations differ (polarization, regions, prior-dominated), and the conditional-to-collapsed
   ratio for the BP XV polarization configuration is 2.1 to 2.35 on an nside-16 surrogate, carried
-  by the free CMB amplitude and gone with a C_l-sized CMB prior; the released BP chains are
-  consistent with it (lag-1 0.83 / 0.67), have 23 to 59 effective samples per chain and cannot be
-  shown to have settled (E022, F22). The intensity claim (ratio 180) is restricted to Planck
-  resolution; the polarization statement is about effective sample size and settling, not about a
-  hidden per-step coupling. The published BP chain
+  by the free CMB amplitude and gone with a C_l-sized CMB prior; in the released BP chains the
+  conditional width at BP's own resolution is 0.016 (Spur) and 0.0085 (Plane), the amplitude block
+  is 30 and 4 percent of the per-step chain motion, the flat-prior volume pull is absent (at most
+  1e-3 of the surrogate's, mechanism unidentified), and the reported sds are consistent with
+  posterior widths at 23 to 114 effective samples per chain (E022, F22). The intensity claim
+  (ratio 180) is restricted to Planck resolution; the polarization statement is about effective
+  sample size, not about a hidden coupling.
   lengths and diagnostics are being read from BP I, III, XIII, XV (lit-scout report
   `research/2026-10-27_beyondplanck_chain_lengths_and_index_sampling.md`).
 - Figure 1: chain against exact grid for the four modes (E014 pass 2 and 3 tables).
