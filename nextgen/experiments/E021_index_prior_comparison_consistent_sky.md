@@ -49,8 +49,13 @@ Sky (writer `nextgen/scripts/pysm_intensity_sim.py --sky consistent --nside-trut
   and component (the 0.2 floor is hit by 0.34 and 0.42 percent of pixels; g/true at |b| > 20,
   16/50/84 percentiles: 0.771/1.001/1.430 for both). So a_c = g_c (1 + 0.3 eps) up to the floor:
   the hier prior a ~ N(mu g, (s g)^2) is correctly specified with mu = 1 and s = 0.3, which the
-  sampled hyperparameters must recover (a check in itself: mu_c within its posterior sd of 1 and
-  s_c of 0.3, up to the small bias from the floor). Unlike E020 the templates are built from the
+  sampled hyperparameters must recover. The targets are the realized values, not 1 and 0.3: the
+  floor and the finite sky give mean(a/g) 0.9990 (sync) / 0.9976 (dust) and sd(a/g) 0.2986 /
+  0.2988 for this seed (analytic with the floor: 1.00035 and 0.29895; the full-information
+  posterior sd is about 0.0014 for mu and 0.0010 for s, so the dust mu sits 1.8 sd from 1 and a
+  check against 1 would fail with everything correct; review item 3). Acceptance: posterior mean
+  of mu_c within 2 posterior sd of the realized mean(a/g), posterior mean of s_c within 2 sd of
+  the realized sd(a/g), the same in all ten runs. Unlike E020 the templates are built from the
   truth: this is deliberate (L3); the data-built templates return in Q16.
 
 Per-region Fisher sd (profiled over the three per-pixel amplitudes; the writer's
@@ -82,8 +87,36 @@ alongside), with the same warm-up (500) and burn (600) as E020 if 2000 iteration
 shorter chain with warm-up 500 and burn 600 and the count recorded here before launch. 12 MPI
 ranks, Commander4 always runs two chains; the analyzer reads chain 1.
 
-Metrics: E020's, unchanged (`nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consistent`).
-Additional check: the recovered amplitude hyperparameters against their true values (mu 1, s 0.3).
+Metrics: E020's (`nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consistent`),
+with three additions from the design review (2026-10-28, below), all in the analyzer before any
+production run:
+- Cross-nside comparisons use the region-level error sqrt(RMSE^2 - floor^2) with the floor the
+  RMSE of the truth's own unweighted region means at that nside_beta (an exact decomposition of
+  the pixel RMSE; on this truth the floors are 0.0343 / 0.0195 / 0 for sync and 0.0204 / 0.0146
+  / 0 for dust at nside_beta 4 / 8 / 16, so the pixel RMSE favours 16 by construction), and the
+  GLS CMB residual is compared against the GLS at the truth's region means per nside_beta
+  (`gls_at_region_means_nside{4,8,16}`), not only against the true-index GLS. Rule (c) of E020
+  ("8 and 16 tie") is read on the region-level error and on the CMB residual relative to its
+  per-nside reference; on this truth (constant per nside-16 region) a pixel-RMSE tie between 8
+  and 16 is impossible and is not asked.
+- The Monte Carlo error of the posterior means, sqrt(mean over pixels of sd_r^2 / ESS_r), is
+  reported per run as an RMSE inflation (it adds in quadrature). Runs are compared only when
+  this is below a quarter of the RMSE difference under test; otherwise the chain is extended.
+- The hyperparameter check above (realized mean and sd of a/g, 2 posterior sd).
+
+## Design review
+stats-reviewer 2026-10-28 (independent recomputation from the files in the data directory and the
+code): the sky is from the model class, CONFIRMED on all four points (indices constant per
+`region_map(16, 64)` region and equal to the PySM region means; `_dust_sed` textually equal to
+`ThermalDust.get_sed`, constants differing by 3.3e-7 relative and T by 2.4e-5 K, at most 0.017
+uK_RJ at 353 GHz in the plane, 0.2 percent of the noise sd; CMB conversion equal to 1.4e-6; sync
+pivot 30 GHz, a_sync equal to the PySM emission; noise z-scores sd 0.99996; no template floor
+active). Must-fix taken: the negative control was stated against the unweighted mean, which a
+correct single index does not reach (rewritten above). Should-fix taken: region-level error and
+per-nside GLS references for the cross-nside rules (2); realized hyperparameter targets with a
+2-sd band (3); Monte Carlo error of the posterior means reported as an RMSE inflation (4).
+Confirmed: the analyzer has no division by beta_eff - beta_d and does not use T_d (5); templates,
+hyperpriors, Gibbs seed, noise realization and NUTS settings are shared by all ten runs (6).
 
 ## Reference
 The truth maps in truth.npz (region-constant indices, the c1 CMB, the amplitudes). No exact
@@ -102,11 +135,17 @@ python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consisten
 (timing run started 05:31 on 2026-10-28)
 
 ## Negative control
-As in E020: the single index must have index RMSE equal to the truth sd (0.0615 / 0.0323) up to
-its posterior sd and the largest CMB residual; `indep16` must be the noisiest index map where the
-GMRF shrinks. New here: the amplitude hyperparameters must recover mu = 1 and s = 0.3 in every
-option (they are the same in all ten runs; a run where they do not is a sampler or data problem,
-not a prior difference).
+The single index converges to the Fisher-weighted sky mean, not the unweighted mean (review item
+1): sync -2.9878 (unweighted -3.0000), dust 1.5973 (unweighted 1.5397). Its index RMSE must
+therefore equal the RMSE of the truth about the weighted mean, 0.0627 for sync and 0.066 for
+dust (the analyzer prints this as `rmse_of_weighted_sky_mean`), up to its posterior sd (2e-5 for
+dust), and its CMB residual must be the largest. Note that the dust prior mean mu0 = 1.60
+coincides with the weighted mean 1.597 (its offset from the unweighted mean is 1.9 truth sd); the
+scalar dust run is therefore not a test of shrinkage away from mu0, only the sync one is.
+`indep16` must be the noisiest index map where the GMRF shrinks. New here: the amplitude
+hyperparameters must recover the realized mean and sd of a/g (above) in every option (they are
+the same in all ten runs; a run where they do not is a sampler or data problem, not a prior
+difference).
 
 ## Conclusion
 (pending)

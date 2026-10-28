@@ -174,11 +174,21 @@ def analyze_run(run: dict, truth: dict, data: np.ndarray, nside: int, hi_mask: n
              "amp_log_s_mean": float(run["amp"][c][:, 1].mean()),
              "rmse_draw_mean": float(rmse_draws.mean()), "rmse_draw_sd": float(rmse_draws.std()),
              "region_floor_unweighted": float(np.sqrt(np.mean((tm_unw[region] - bt) ** 2))),
-             "region_floor_weighted": float(np.sqrt(np.mean((tm_w[region] - bt) ** 2)))}
+             "region_floor_weighted": float(np.sqrt(np.mean((tm_w[region] - bt) ** 2))),
+             # Monte Carlo error of the posterior means, as an RMSE inflation: sqrt(mean over
+             # pixels of sd_r^2 / ESS_r) (E021 review item 4; adds in quadrature to the RMSE).
+             "rmse_mc_inflation": float(np.sqrt(np.mean((sd_r ** 2 / np.maximum(ess, 1.0))[region]))),
+             # RMSE of the Fisher-weighted sky mean of the truth: what a single index converges
+             # to (E021 review item 1; the unweighted sd is what it does not reach).
+             "rmse_of_weighted_sky_mean": float(np.sqrt(np.mean((bt - np.sum(bt * snr_w) / np.sum(snr_w)) ** 2)))}
         r["block_sq_err"] = {}
         for tname, tmap in truths[c].items():
             err = beta_hat - tmap
             r[f"rmse_{tname}_all"] = float(np.sqrt(np.mean(err ** 2)))
+            # Region-level error: the pixel RMSE with the truth's own sub-region spread removed
+            # (exact decomposition for unweighted region means), comparable across nside_beta.
+            r[f"rmse_{tname}_region_level"] = float(np.sqrt(max(
+                np.mean(err ** 2) - np.mean((tm_unw[region] - bt) ** 2), 0.0)))
             r[f"rmse_{tname}_hi"] = float(np.sqrt(np.mean(err[hi_mask] ** 2)))
             r[f"bias_{tname}_all"] = float(np.mean(err))
             r[f"truth_{tname}_sd_all"] = float(tmap.std())
@@ -303,11 +313,20 @@ def main(argv=None) -> int:
     T_fixed = float(truth["T_fixed"])
     true_dust_col = truth["dust_bands"] / truth["a_dust"][:, None]
     ref = {}
-    for name, bd, dcol in (("gls_true_sed", truth["beta_d"], true_dust_col),
-                           ("gls_at_truth_fixedT", truth["beta_d"], None),
-                           ("gls_at_beta_eff", truth["beta_eff"], None),
-                           ("gls_at_beta_eff3", truth["beta_eff3"], None)):
-        m = gls_cmb(data, truth["rms"], nu, truth["beta_s"], bd, T_fixed, dust_col=dcol)
+    refs = [("gls_true_sed", truth["beta_s"], truth["beta_d"], true_dust_col),
+            ("gls_at_truth_fixedT", truth["beta_s"], truth["beta_d"], None),
+            ("gls_at_beta_eff", truth["beta_s"], truth["beta_eff"], None),
+            ("gls_at_beta_eff3", truth["beta_s"], truth["beta_eff3"], None)]
+    # GLS at the truth's own region means per nside_beta: what a perfect region model at that
+    # nside can reach (E021 review item 2; cross-nside CMB comparisons use these).
+    for nb in (4, 8, 16):
+        reg = region_map(nb, nside)
+        cnt = np.bincount(reg, minlength=12 * nb * nb)
+        bs_r = (np.bincount(reg, truth["beta_s"], minlength=cnt.size) / cnt)[reg]
+        bd_r = (np.bincount(reg, truth["beta_eff"], minlength=cnt.size) / cnt)[reg]
+        refs.append((f"gls_at_region_means_nside{nb}", bs_r, bd_r, None))
+    for name, bs, bd, dcol in refs:
+        m = gls_cmb(data, truth["rms"], nu, bs, bd, T_fixed, dust_col=dcol)
         ref[name] = cmb_metrics(m - truth["cmb"], truth["cmb"], hi)
         blk = region_map(BLOCK_NSIDE, nside)
         ref[name]["block_sq_err"] = (np.bincount(blk, (m - truth["cmb"]) ** 2,
@@ -360,6 +379,11 @@ def main(argv=None) -> int:
                      f"{d['rmse_fixedT3_hi']:.4f}; cmb per-draw rms {c['resid_rms_all_draw_mean']:.2f}"
                      f" +- {c['resid_rms_all_draw_sd']:.2f}; amp-hyper ESS min {s['amp_ess_min']:.0f}"
                      f"/{d['amp_ess_min']:.0f}")
+        lines.append(f"    region-level rmse (floor removed) sync {s['rmse_pysm_region_level']:.4f} "
+                     f"dust {d['rmse_fixedT3_region_level']:.4f}; MC inflation of the rmse sync "
+                     f"{s['rmse_mc_inflation']:.4f} dust {d['rmse_mc_inflation']:.4f}; rmse of the "
+                     f"Fisher-weighted sky mean (single-index target) sync "
+                     f"{s['rmse_of_weighted_sky_mean']:.4f} dust {d['rmse_of_weighted_sky_mean']:.4f}")
         for cname in ("sync", "dust"):
             if "field_mu" in r[cname]:
                 f = r[cname]
