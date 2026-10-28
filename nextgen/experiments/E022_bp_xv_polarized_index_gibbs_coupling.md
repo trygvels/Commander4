@@ -100,7 +100,26 @@ python -I nextgen/scripts/bpxv_gibbs_coupling.py --dir ~/data/bpxv_surrogate --i
 ```
 
 ## Result
-(pending)
+**Side measurement for Q7 (2026-10-28, `nextgen/scripts/q7_lfi_rms_check.py`):** BP's nside-16,
+60 arcmin LFI noise rms from noise simulations (`BP7_0xx_rms_n0016_60arcmin_uK_true.fits`, the
+noise description BP used for its low-resolution index sampling) against white-noise propagation
+of the BP release Q_RMS/U_RMS maps through the same smoothing and degrading (40 realizations):
+
+| Band | rms_true median (uK) | white-propagated median (uK) | ratio median | ratio 10 to 90 percent |
+|---|---|---|---|---|
+| 30 Q / U | 1.649 / 1.648 | 1.023 / 1.019 | 1.59 / 1.60 | 1.37 to 1.87 |
+| 44 Q / U | 2.147 / 2.075 | 1.293 / 1.227 | 1.64 / 1.66 | 1.40 to 1.95 |
+| 70 Q / U | 1.712 / 1.708 | 1.062 / 1.051 | 1.59 / 1.60 | 1.38 to 1.87 |
+
+Correlated noise raises the LFI noise variance at this resolution by a factor 2.5 to 2.8 over
+white propagation, everywhere on the sky (ratio 1.4 to 1.9 between the 10th and 90th
+percentiles, maximum 2.9). A per-pixel likelihood at nside 16 built from white-noise propagation
+of the native rms maps would therefore understate the LFI noise sd by 1.6 and overstate the
+index precision by the same factor. The surrogate uses BP's rms_true for LFI, so this bias is
+not in E022; the 353 noise is white-propagated (NPIPE A, dust at S/N above 15 at nside 16, so
+it hardly matters for beta_s), and the WMAP noise is the diagonal of the dense covariance.
+
+(main results pending)
 
 ## Negative control
 The intensity analogue of F14: the same scripts on the E014 nside-64 intensity configuration are

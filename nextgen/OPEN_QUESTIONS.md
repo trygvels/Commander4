@@ -116,6 +116,13 @@ original numbering.
   bias and coverage versus smoothing scale.
 - **Decides:** whether the per-pixel path is acceptable for science, or needs a noise-covariance
   model.
+- **Status (2026-10-28, E022 side measurement):** on BeyondPlanck's LFI maps at nside 16 and
+  60 arcmin, the noise rms from BP's noise simulations is 1.6 times the white-noise-propagated
+  rms in all three bands (ratio 1.4 to 1.9 across the sky): correlated noise raises the
+  large-scale noise variance by 2.5 to 2.8. A white-noise per-pixel likelihood at that
+  resolution overstates the index precision by 1.6 unless it uses simulated or measured
+  low-resolution rms maps (as BP did). The bias as a function of smoothing scale and the effect
+  on coverage are still to be measured.
 
 ## Q8. Do moment components absorb sub-resolution variation?
 - **Why:** Line-of-sight and in-beam averaging distort SEDs (Chluba et al. 2017); moment templates
