@@ -123,7 +123,15 @@ def _bb_ratio(nu, nu0, T):
 
 
 def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int,
-             n_warmup: int) -> None:
+             n_warmup: int, sky_mode: str = "pysm", nside_truth: int = 16,
+             template_scatter: float = 0.3, adapt_mass: bool = True) -> None:
+    """`sky_mode` "pysm": the PySM d1 s1 c1 sky as it is (E020; T_d varies, indices vary per nside
+    pixel, templates built from the data). "consistent" (E021): a sky drawn from the model class
+    Commander4 fits: indices constant per nside_truth region (the PySM region means), one modified
+    blackbody at T_fixed, PySM amplitudes at the pivots and the c1 CMB, and templates equal to the
+    true amplitudes divided by (1 + template_scatter * eps), eps iid N(0, 1), the ratio floored at
+    0.2, so that a_true = g (1 + template_scatter eps) matches the hier prior a ~ N(mu g, (s g)^2)
+    with mu = 1, s = template_scatter up to the floor (hit by 0.4 percent of pixels)."""
     import pysm3
     import pysm3.units as u
     os.makedirs(outdir, exist_ok=True)
@@ -147,12 +155,25 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
         u.uK_RJ, equivalencies=u.cmb_equivalencies(545.0 * u.GHz)).value
     sky = np.empty((npix, len(FREQS)))
     dust_bands = np.empty((npix, len(FREQS)))
-    for i, f in enumerate(FREQS):
-        nu = f * u.GHz
-        tot = fg.get_emission(nu)[0] + cmb.get_emission(nu)[0]
-        sky[:, i] = tot.to(u.uK_RJ, equivalencies=u.cmb_equivalencies(nu)).value
-        dust_bands[:, i] = dust.get_emission(nu)[0].to(
-            u.uK_RJ, equivalencies=u.cmb_equivalencies(nu)).value
+    if sky_mode == "consistent":
+        # Region-constant indices (plain mean of the PySM map over each nside_truth region), one
+        # MBB at T_fixed; the amplitudes at the pivots are the PySM ones, so the sky differs from
+        # PySM only through the SED shapes.
+        beta_s = hp.ud_grade(hp.ud_grade(beta_s, nside_truth), nside)
+        beta_d = hp.ud_grade(hp.ud_grade(beta_d, nside_truth), nside)
+        T_d = np.full(npix, T_fixed)
+        dust_bands[:] = a_dust[:, None] * _dust_sed(nu_arr, beta_d, T_fixed)
+        sky[:] = (cmb_sed(nu_arr)[None, :] * cmb_map[:, None]
+                  + a_sync[:, None] * (nu_arr[None, :] / 30.0) ** beta_s[:, None] + dust_bands)
+    elif sky_mode == "pysm":
+        for i, f in enumerate(FREQS):
+            nu = f * u.GHz
+            tot = fg.get_emission(nu)[0] + cmb.get_emission(nu)[0]
+            sky[:, i] = tot.to(u.uK_RJ, equivalencies=u.cmb_equivalencies(nu)).value
+            dust_bands[:, i] = dust.get_emission(nu)[0].to(
+                u.uK_RJ, equivalencies=u.cmb_equivalencies(nu)).value
+    else:
+        raise ValueError(f"sky_mode must be 'pysm' or 'consistent', got {sky_mode!r}")
     data = sky + rms[None, :] * rng.standard_normal(sky.shape)
     for i, f in enumerate(FREQS):
         hp.write_map(f"{outdir}/band{int(f):03d}_map.fits", data[:, i],
@@ -174,6 +195,20 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
     report = []
     templates = {}
     for name, g, a_true in (("sync", g_sync, a_sync), ("dust", g_dust, a_dust)):
+        if sky_mode == "consistent":
+            # Template = truth / (1 + s eps) with the ratio floored at 0.2: a_true = g (1 + s eps).
+            ratio_ta = np.maximum(1.0 + template_scatter * rng.standard_normal(npix), 0.2)
+            gs = np.asarray(a_true, dtype=float) / ratio_ta
+            floor = 1e-3 * float(np.mean(np.abs(gs)))
+            gf = np.maximum(gs, floor)
+            templates[name] = gf
+            ratio = gf[hi] / a_true[hi]
+            report.append(f"template {name} (truth with iid scatter {template_scatter}): ratio floor "
+                          f"0.2 hit by {np.mean(ratio_ta <= 0.2) * 100:.2f} percent of pixels, "
+                          f"positivity floor {floor:.3g} hits {np.mean(gs < floor) * 100:.2f} percent; "
+                          f"g/true at |b| > 20 16/50/84 pct {np.percentile(ratio, 16):.3f}/"
+                          f"{np.percentile(ratio, 50):.3f}/{np.percentile(ratio, 84):.3f}")
+            continue
         gs = hp.smoothing(g, fwhm=np.radians(TEMPLATE_FWHM_DEG), lmax=lmax, iter=3)
         floor = float(np.percentile(gs, TEMPLATE_FLOOR_PCT))
         floor = max(floor, 1e-3 * float(np.mean(np.abs(gs))))
@@ -188,8 +223,12 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
                  dtype=np.float64)
     hp.write_map(f"{outdir}/template_dust_545GHz.fits", templates["dust"], overwrite=True,
                  dtype=np.float64)
-    beta_eff = beta_eff_fixed_T(dust_bands, nu_arr, rms, T_fixed)
-    beta_eff3 = beta_eff_fixed_T_3comp(sky, nu_arr, rms, beta_s, T_fixed, cmb_sed(nu_arr))
+    if sky_mode == "consistent":
+        beta_eff = beta_d.copy()        # the dust SED is one MBB at T_fixed: no effective index
+        beta_eff3 = beta_d.copy()
+    else:
+        beta_eff = beta_eff_fixed_T(dust_bands, nu_arr, rms, T_fixed)
+        beta_eff3 = beta_eff_fixed_T_3comp(sky, nu_arr, rms, beta_s, T_fixed, cmb_sed(nu_arr))
     # Fisher sd of the region indices: amplitudes known (lower bound) and amplitudes profiled
     # (the 5-parameter per-pixel Fisher reduced to the two indices by Schur complement).
     sed_s = (nu_arr[None, :] / 30.0) ** beta_s[:, None]
@@ -232,14 +271,17 @@ def simulate(outdir: str, nside: int, noise_scale: float, seed: int, n_iter: int
              nside=nside, noise_scale=noise_scale, seed=seed, g_sync=templates["sync"],
              g_dust=templates["dust"], a_sync=a_sync, a_dust=a_dust, index_prior_sync=INDEX_PRIOR["sync"],
              index_prior_dust=INDEX_PRIOR["dust"], indep_sd=INDEP_SD, cmb_sd=CMB_SD,
+             sky_mode=sky_mode, nside_truth=nside_truth if sky_mode == "consistent" else 0,
+             template_scatter=template_scatter if sky_mode == "consistent" else 0.0,
              **{f"fisher_sd_{k}": v for k, v in fisher.items()})
     with open(f"{outdir}/sim_report.txt", "w") as f:
         f.write("\n".join(report) + "\n")
     print("\n".join(report))
     for tag, (kind, nside_beta) in RUNS.items():
         with open(f"{outdir}/param_{tag}.yml", "w") as f:
-            f.write(param_file(outdir, tag, kind, nside_beta, nside, T_fixed, n_iter, n_warmup))
-    print(f"E020 sky written to {outdir}: nside {nside}, noise scale {noise_scale} (rms per pixel "
+            f.write(param_file(outdir, tag, kind, nside_beta, nside, T_fixed, n_iter, n_warmup,
+                               adapt_mass))
+    print(f"{sky_mode} sky written to {outdir}: nside {nside}, noise scale {noise_scale} (rms per pixel "
           f"{np.round(rms, 2).tolist()} uK_RJ), T_fixed {T_fixed:.3f} K, cmb rms "
           f"{cmb_map.std():.1f} uK_CMB; {len(RUNS)} parameter files.")
 
@@ -269,7 +311,7 @@ def _field_block(kind: str | None, nside_beta: int) -> str:
 
 
 def param_file(outdir: str, tag: str, kind: str | None, nside_beta: int, nside: int,
-               T_fixed: float, n_iter: int, n_warmup: int) -> str:
+               T_fixed: float, n_iter: int, n_warmup: int, adapt_mass: bool = True) -> str:
     fwhm = 2.0 * hp.nside2resol(nside, arcmin=True)
     bands = ""
     for f in FREQS:
@@ -338,7 +380,7 @@ compsep:
         max_depth: 10
         parameterization: centred
         init_inv_mass: fd_hessian
-        adapt_mass: false
+        adapt_mass: {str(adapt_mass).lower()}
   bands:{bands}
 components:
   CMB:
@@ -412,8 +454,19 @@ def main(argv=None) -> int:
     ap.add_argument("--seed", type=int, default=2027)
     ap.add_argument("--n-iter", type=int, default=2000)
     ap.add_argument("--n-warmup", type=int, default=500)
+    ap.add_argument("--sky", choices=["pysm", "consistent"], default="pysm",
+                    help="pysm: the PySM sky as is (E020); consistent: a sky from the model class "
+                         "(E021), see simulate()")
+    ap.add_argument("--nside-truth", type=int, default=16,
+                    help="consistent sky: nside of the region-constant true indices")
+    ap.add_argument("--template-scatter", type=float, default=0.3,
+                    help="consistent sky: iid relative scatter of the true amplitudes about the templates")
+    ap.add_argument("--no-adapt-mass", action="store_true",
+                    help="write nuts.adapt_mass: false (keep the Hessian metric for the whole run)")
     a = ap.parse_args(argv)
-    simulate(a.dir, a.nside, a.noise_scale, a.seed, a.n_iter, a.n_warmup)
+    simulate(a.dir, a.nside, a.noise_scale, a.seed, a.n_iter, a.n_warmup, sky_mode=a.sky,
+             nside_truth=a.nside_truth, template_scatter=a.template_scatter,
+             adapt_mass=not a.no_adapt_mass)
     return 0
 
 
