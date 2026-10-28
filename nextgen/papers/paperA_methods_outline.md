@@ -61,7 +61,7 @@ model component rather than a preprocessing choice.
   1e-3 of the surrogate's, mechanism unidentified), and the reported sds are consistent with
   posterior widths at 23 to 114 effective samples per chain (E022, F22). The intensity claim
   (ratio 180) is restricted to Planck resolution; the polarization statement is about effective
-  sample size, not about a hidden coupling.
+  sample size, not about a hidden coupling. The published BP chain
   lengths and diagnostics are being read from BP I, III, XIII, XV (lit-scout report
   `research/2026-10-27_beyondplanck_chain_lengths_and_index_sampling.md`).
 - Figure 1: chain against exact grid for the four modes (E014 pass 2 and 3 tables).
