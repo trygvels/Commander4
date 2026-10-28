@@ -2,6 +2,42 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-28 (Mac mini, 12:45): E022 closed with the released BeyondPlanck chains; a decision for Trygve on Paper A
+
+**Learned**
+- The released BP chain files store the per-region polarized beta_s per sample; two chains
+  (1001 samples each) were read over HTTP range requests from the 1.8 TB files (613 MB each).
+  From the exact two-block identity var(delta beta)/2 = E[var_cond]: r = 2.4 (Spur) and 1.75
+  (Plane), lag-1 0.83 and 0.67 in both chains, matching the nside-16 surrogate with the flat
+  CMB prior (2.35 / 2.11, 0.82 / 0.78). IPS tau 17 to 43 (the paper's 30 to 50) against 5 to
+  11 from lag-1 (a slow component); 23 to 59 effective samples per chain. Both
+  likelihood-sampled regions drift towards flatter indices in both chains (+0.065 to +0.092
+  per 1000 samples, 1.5 to 2.0 sigma per chain-region, none in the prior-only regions), the
+  direction of the flat-prior volume pull. The reported sds (0.06, 0.07) are the spread of
+  unsettled chains; the stationary flat-prior target lies at flatter indices by an amount not
+  determined here (E022, F22; stats review: targets, code, inputs CONFIRMED, conclusion
+  rewritten per the re-check, final check requested). Chains 3 and 4 are being read to
+  double the drift statistics.
+- Method point for Paper A Sect. 4: the coupling and the runaway are carried by the free
+  per-pixel CMB amplitude (0.19 uK of signal against 1.5 to 2 uK of noise); a C_l-sized CMB
+  prior removes both on the surrogate.
+
+**Running**
+- E021 gmrf16 alone (ends about 17:30), then iid16 and the other eight in start order.
+- BP chains 3 and 4 reader; E022 final stats check; E016 hier SBC replication (about 18 h).
+
+**Next**
+- E021 analysis once the nside-16 pair is in; SBC verdict; E022 follow-up on the resolution
+  scaling of the volume term (nside 32, 64) for Paper A Sect. 4; Q8; Paper A outline update.
+
+**Needs Trygve**
+- How to present the E022 BP XV chain diagnostics (unsettled flat-prior chains, drift towards
+  flatter indices, 23 to 59 effective samples) in Paper A, given BP XV is his paper: as a
+  worked example of the prior-volume effect with the numbers above, or only as the method
+  recommendation (C_l-sized CMB prior or profile) with the diagnostics in an appendix. The
+  record and F22 hold the numbers either way; nothing is published without his decision.
+- The hier default question (D003/D011) stands.
+
 ## 2026-10-28 (Mac mini, 11:50): E022 (BP XV polarized beta_s Gibbs coupling) done on a surrogate, stats-reviewed; Q7 data point; E021 running serialized
 
 **Learned**
