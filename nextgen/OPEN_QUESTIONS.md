@@ -242,4 +242,10 @@ original numbering.
   those of a stationary chain forced by the other Gibbs blocks.
 - **Decides:** whether Paper A reports BP XV's polarized index uncertainties as
   underestimated or as consistent; Needs Trygve for the presentation either way (STATUS).
+- **Status (2026-10-28, 13:50):** item 2 measured on sample 000500 of chain 1
+  (`bp_sample_cond_width.py`): sd_cond 0.016 (Spur), 0.0085 (Plane), the wide end; the
+  synchrotron amplitude is bound by the gauss C_l prior, the chains sit at their target, the
+  amplitude block is 30 and 4 percent of the per-step motion, r 4 to 9, two-block tau 36
+  (Spur) and 150 (Plane). Item 1 (the semantics of `none` for the CMB) remains; the
+  measurement implies the CMB column is not a free per-pixel amplitude in BP's chain.
 

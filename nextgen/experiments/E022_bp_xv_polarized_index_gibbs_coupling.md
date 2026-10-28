@@ -363,6 +363,42 @@ run's component priors is open; the Conclusion states the dichotomy and its disc
 file's first token and on the absence of `cmb/Dl_*` in the mean file; the parser semantics of
 `COMP_CL_TYPE = none` are not verified, and the chains' lag-1 carries no information on it.
 
+**Conditional width at BP's own resolution from a released sample (2026-10-28, 13:50;
+`nextgen/scripts/bp_sample_cond_width.py`, Q17 item 2):** sample 000500 of chain 1 holds the
+synchrotron amplitude as E and B alms with lmax 1500 (34 MB read over HTTP for l <= 1500).
+The information term of the conditional, sum over bands, Stokes and region pixels of
+w (a_s f_nu ln(nu/30))^2, with a_s the sample's Q/U amplitude put through each LFI beam
+(32.29, 27.0, 13.25 arcmin) and pixel window at the band's native nside (512, 512, 1024)
+against the release Q_RMS/U_RMS maps, plus WMAP Ka, Q, V at nside 16 with the diagonal of
+their covariances, and the N(-3.3, 0.1) prior:
+
+| Region | sd_cond, sample amplitudes | sd_cond, release mean map (60 arcmin, no pixel noise) | ratio |
+|---|---|---|---|
+| High Latitude | 0.0088 | 0.0134 | 1.5 |
+| Spur | 0.0160 | 0.0186 | 1.2 |
+| Galactic Center | 0.0091 | 0.0109 | 1.2 |
+| Plane | 0.0085 | 0.0116 | 1.4 |
+
+The sample's amplitude Q rms in the Spur is 14.7 to 15.7 uK_RJ through the three beams
+against 13.2 for the mean map: the sample carries little small-scale amplitude noise, so the
+Gaussian C_l prior (`COMP_CL_TYPE02 = gauss`) binds the synchrotron amplitude and BP's
+effective element count is at the low end of the 7k to 4M range (the surrogate's curvature
+scaling 2150 + 0.4 N gives N of about 1700 Stokes-elements for the Spur's 0.016, less than
+the nside-16 surrogate's 928 times two). Consequences, from the numbers alone: (1) the
+chain's per-step increments (0.029 Spur, 0.043 Plane) are 1.8 and 5 times the conditional
+width, so the amplitude block contributes about 30 percent (Spur) and 4 percent (Plane) of
+the increment variance and the other Gibbs blocks the rest; (2) with the chain sds as the
+marginal width, r = 0.069 / 0.016 = 4.3 (Spur) and 0.074 / 0.0085 = 8.7 (Plane), Gaussian
+two-block tau 36 and 150, against the measured IPS 17 to 43 (biased low at 23 to 114
+effective samples); (3) a chain with r of 4 to 9 relaxes towards its target in of order r^2
+= 20 to 80 steps, so the 1000-sample chains, which moved by 0.05, are at a target within
+about 0.05 of the reported values: the flat-prior shift the surrogate shows (+0.27 at nside
+16, the boundary at nside 64) is not present in BP's chain, which means the CMB column does
+not act as a free per-pixel amplitude there (an effective constraint from `COMP_CL_TYPE01 =
+none` or the CG's treatment of the CMB; the semantics remain unverified). The measurement
+uses the information term only (the residual term of the curvature is not included), delta
+bandpasses, and the release rms maps; it is an order-of-magnitude discriminator.
+
 Surrogate consistency: the conditional at the BP release posterior-mean amplitudes pins at
 the grid edge -1.5 in every region (chi2 prefers the flattest synchrotron allowed), so the
 release amplitudes do not fit the surrogate at the level a conditional of width 0.02 resolves;
@@ -395,28 +431,24 @@ CONFIRMED; the conclusion wording on the chains follows the reviewer's must-fix 
   bounds for BP's native resolution.
 - The released BP chains (four, 1001 samples each, one shared start) have lag-1 0.79 to
   0.83 (Spur) and 0.56 to 0.67 (Plane), IPS tau 9 to 43 consistent with the paper's 30 to
-  50, and 23 to 114 effective samples. The polarized index step is the alm sampler with 100
-  proposals tuned to the conditional, so the step is relaxed and the per-step increments (sd
-  0.04 to 0.06) contain the amplitude block's 2 E[var_cond]. The conditional width at BP's
-  resolution scales with the number of free amplitude elements (surrogate: curvature
-  2150 + 0.4 N per Stokes-element with a CMB prior, 1.4 N with the flat CMB); BP's effective
-  count per region is between 7k (if the gauss synchrotron prior binds above l of 150) and
-  4M (raw nside-1024 pixels), giving a conditional sd of 0.01 to 5e-4 and a two-block r of 7
-  to 140. For any count above ten times the nside-16 surrogate's, the amplitude block is
-  under 12 percent of the increment variance: the chain's motion is driven by the other Gibbs
-  blocks (gains, bandpasses, correlated noise), not by the amplitude draws, and the
-  surrogate's r of 2.4 is not what the chain shows. The chains moved 5e-5 per sample from
-  their start, against 0.045 per step for the nside-16 surrogate relaxing to its +0.27
-  shifted target and immediate pinning at nside 64. Either BP's flat-prior target is shifted
-  by at least that amount, which forces r of at least 70 and chains that never approached
-  it, or the BP run's component priors neutralize the volume term and the reported values
-  are those of a stationary chain forced by the other blocks. The chains cannot distinguish
-  these; the reported sds of 0.06 and 0.07 are the spread of 23 to 114 effective samples
-  under the second reading and not posterior widths under the first. Deciding requires the
-  effective element count: the semantics of `COMP_CL_TYPE = gauss` (D_l = 200) and `none` in
-  Commander3, or one conditional-width measurement from BP's own tuning files or a re-run of
-  the index step on one released sample. How to present this in Paper A is Trygve's call
-  (STATUS).
+  50, and 23 to 114 effective samples. The conditional width at BP's own resolution,
+  measured from a released sample's synchrotron amplitudes through the LFI beams, is 0.016
+  (Spur) and 0.0085 (Plane): the Gaussian C_l prior binds the synchrotron amplitude, so the
+  effective element count is at the low end and the amplitude block contributes about 30
+  percent (Spur) and 4 percent (Plane) of the chain's per-step increment variance, the rest
+  coming from the other Gibbs blocks. With the chain sds as marginal widths the two-block
+  r is 4.3 (Spur) and 8.7 (Plane), Gaussian tau 36 and 150; the measured IPS tau of 17 to
+  43 is biased low at this effective sample size, so the Plane's coupling may be
+  underestimated by the paper's 30 to 50 while the Spur's is about right. A chain with r of
+  4 to 9 relaxes in 20 to 80 steps, so the released chains, which moved 0.05 in 1000
+  samples, sit within about 0.05 of their target; the flat-prior shift of the surrogate
+  (+0.27 at nside 16, the boundary at nside 64) is not present in BP's chain, which means
+  the CMB column does not act there as a free per-pixel amplitude (the mechanism in
+  Commander3's handling of `COMP_CL_TYPE = none` is unverified). The reported sds of 0.06
+  and 0.07 are then posterior widths with 23 to 114 effective samples per chain (10 to 15
+  percent Monte Carlo uncertainty), and the slow movement is consistent with other-block
+  equilibration. Wording subject to the sixth review round. How to present this in Paper A
+  is Trygve's call (STATUS).
 - The flat-amplitude-prior marginal is shifted from the profile by +0.27 (Spur) and +0.13
   (Plane) on the surrogate and runs to the flattest allowed index in the High Latitude region;
   a C_l-sized CMB prior removes the runaway and moves the Spur to -3.20. This is the
