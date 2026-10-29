@@ -1,0 +1,33 @@
+SBC summary: hier_hier.jsonl
+  configuration: param noncentred, family graph, mode hier, rho_prior loguniform, nside_beta 4, nside_d 16, noise x1, amp_prior default, warmup 500, samples 2000 (x2 per retry, up to 5 tries), ess_min 400, L 99
+  replicates: {'ok': 300} ; used in tests: 300 (every replicate with ranks, primary); error indices []
+  unclean replicates: 0
+  sampler: seconds per replicate mean 1474 / median 848 / max 26628; attempts mean 1.31; final n median 2000; min ESS median 619 (min 403); divergences 0; sampling loglike errors 0; E-BFMI median 0.96 (min 0.84); tree depth 4.3; leapfrogs per chain 70929
+  checks: loglike recovery max |diff| 2.91e-11; K^-1 form minus z^T z max |diff| 1.80e-07
+  median ESS by quantity: mu 1794, log_sigma 762, u 1788, beta_bright0 2287, beta_bright1 2238, beta_faint0 2057, beta_faint1 2089, beta_mean 1794, ztz 721, quad_Kinv 721, logprior_beta 794, loglike 753, tarp_prior_dist0 1535, tarp_local_dist0 1188, mu_sync 2573, mu_dust 2971, log_s_sync 2864, log_s_dust 1956
+  quantity              chi2       p  z_mean var_ratio ecdf_maxdiff  ecdf
+  mu                   23.07  0.2344   +1.53     1.094       0.0600  inside
+  log_sigma            16.53  0.6215   +0.11     0.987       0.0267  inside
+  u                    24.00  0.1962   -1.76     1.048       0.0567  inside
+  beta_bright0         14.67  0.7435   -0.37     1.023       0.0467  inside
+  beta_bright1         18.67  0.4784   +0.43     1.049       0.0400  inside
+  beta_faint0          27.47  0.0942   +0.06     1.149       0.0500  inside
+  beta_faint1          27.20  0.1001   +2.96     1.043       0.1067  OUTSIDE
+  beta_mean            23.07  0.2344   +1.53     1.094       0.0600  inside  (= mu, not counted)
+  ztz                  18.53  0.4871   -0.09     0.949       0.0333  inside
+  quad_Kinv            18.53  0.4871   -0.09     0.949       0.0333  inside  (= ztz, not counted)
+  logprior_beta        20.53  0.3631   -0.46     1.050       0.0367  inside
+  loglike              18.40  0.4959   -1.31     1.021       0.0533  inside
+  tarp_prior_dist0     26.80  0.1094   +1.96     1.046       0.0600  inside
+  tarp_local_dist0     18.13  0.5135   +0.72     0.985       0.0400  inside
+  mu_sync              23.73  0.2066   +0.43     1.033       0.0367  inside
+  mu_dust              11.60  0.9020   -0.50     1.055       0.0433  inside
+  log_s_sync           16.27  0.6394   -1.27     1.043       0.0533  inside
+  log_s_dust           25.47  0.1457   -1.54     0.992       0.0533  inside
+  tarp_prior           26.80  0.1094   +1.96     1.046       0.0600  inside  (= tarp_prior_dist0, not counted)
+  tarp_local           18.13  0.5135   +0.72     0.985       0.0400  inside  (= tarp_local_dist0, not counted)
+  Bonferroni over 16 distinct quantities at alpha 0.01: level 0.00063, min p 0.0942 (beta_faint0)  PASS
+  KS of the p-value set against uniform: D 0.236, p 0.285  PASS
+  ECDF simultaneous 99% band (gamma 0.00037, realized coverage 0.993 on 4000 sims): some OUTSIDE  FAIL
+  TARP: prior references 4/4 ECP curves inside the band, local references 4/4
+  VERDICT FAIL (n = 300; E012 v2 power at n = 300: sd off by 0.8 detected with prob 0.84, bias of 0.5 sd with 1.0)

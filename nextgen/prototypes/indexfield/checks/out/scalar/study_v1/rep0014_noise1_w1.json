@@ -1,0 +1,61 @@
+{
+ "rep": 14,
+ "noise_scale": 1.0,
+ "mode": "w1",
+ "setting": {
+  "nside_d": 16,
+  "amp_prior": "default",
+  "n_warmup": 500,
+  "n_samples": 1000,
+  "target_accept": 0.8,
+  "max_depth": 10,
+  "seed": 20261026,
+  "beta_prior": [
+   -3.0,
+   0.2
+  ],
+  "overwrite": false
+ },
+ "n_beta": 1,
+ "snr_full_sky": 69.57242216970627,
+ "quantile_levels": [
+  2.5,
+  16.0,
+  84.0,
+  97.5
+ ],
+ "names": [
+  "beta"
+ ],
+ "truth": [
+  -3.09506306972248
+ ],
+ "mean": [
+  -1.501104330395806
+ ],
+ "sd": [
+  0.0012844618982456597
+ ],
+ "quantiles": [
+  [
+   -1.504641205955537
+  ],
+  [
+   -1.5023354151678343
+  ],
+  [
+   -1.5002873984253664
+  ],
+  [
+   -1.5000449060039636
+  ]
+ ],
+ "at_edge": true,
+ "grid": {
+  "lo": -4.5,
+  "hi": -1.5,
+  "n": 3001,
+  "n_evals": 3001
+ },
+ "seconds_total": 21.518335103988647
+}

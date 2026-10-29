@@ -2,6 +2,42 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 11:30): E021 closed (F24): the GMRF prior wins at every nside; resolution costs nothing per region under it; seed-2028 triple started
+
+**Learned**
+- gmrf4, iid4, indep4 (30, 22, 22 min): region-level RMSE 0.033 / 0.020, 0.036 / 0.025, 0.043 /
+  0.026; paired against gmrf4 directly iid4 +0.0023 +- 0.0005 and +0.0034 +- 0.0005, indep4
+  +0.0073 +- 0.0013 and +0.0041 +- 0.0008. Same ordering, smaller gaps; the GMRF-over-iid gap is
+  inside the MC inflation of 700 draws (not established at nside 4 by the pre-registered rule,
+  though the inflation sits on the GMRF side and can only understate it). All three under-cover
+  (55 to 60 percent at 1 sd) and fail the amplitude-hyperparameter test, including indep4 with
+  no index hyperparameters: one index per 256 pixels misfits the nside-16 truth, so the test
+  detects any index-model misspecification. iid4 is still the most biased (dust z median +0.89,
+  mu chain unresolved at ESS 2). CMB residual 5.56 uK in all three (resolution).
+- Ladder (GMRF): region-level error flat, 0.0333 / 0.0180, 0.0325 / 0.0163, 0.0327 / 0.0200 at
+  nside 16, 8, 4; pixel-level error and CMB residual (2.89, 4.22, 5.56 uK) track the floor; cost
+  125, 63, 39 gradients per iteration. Resolution rule: as fine as the budget allows under a
+  spatial prior (D018). E021 Conclusion written; F24; Q3 core answered; M2.5 updated; Paper A
+  outline has the ladder point and a Table 2 candidate.
+- Re-ranked OPEN_QUESTIONS: Q16 (robustness on misspecified skies) first, then Q15 (zero levels,
+  needs Trygve), then the Q4 efficiency items, then Q8/Q7, then Q14 second half and Q5.
+
+**Running**
+- E021 seed-2028 realization of gmrf16, iid16, indep16 in `/Users/trygvels/data/e021_consistent_v2_seed2028`
+  (queue started 11:30, about 14.5 h; pre-registered expectation in the E021 Follow-ups).
+
+**Next**
+- When the seed-2028 triple ends: paired differences on the new sky, append to E021 and F24.
+- Meanwhile (does not need the machine): Q16 design (E020 sky at noise scale 1 and 0.03 with
+  robust template priors and sampled T_d; attempt-1 sky as the template-law case), the M2.4
+  efficiency item for mu_d (non-centred field mean), and the Paper A Table 2 draft from the ten
+  E021 runs.
+
+**Needs Trygve**
+- Unchanged: Paper A presentation of the E022 diagnostics; `COMP_CL_TYPE = none` semantics
+  (Q17 item 1); the hier default (D003/D011). New: Q15 (zero-level model) is now the highest
+  ranked item that needs a model decision.
+
 ## 2026-10-29 (Mac mini, 08:15): E021 attempt 2 iid16 done; the GMRF beats iid shrinkage at nside 16 on both indices and the CMB; iid biases the mid-S/N dust index
 
 **Learned**

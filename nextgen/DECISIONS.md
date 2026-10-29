@@ -202,3 +202,30 @@ of compute lost now against forty had the queue run on.
 **Alternatives considered.** Keep the attempt-1 sky and report the bias as the result: it is a
 useful robustness number (F23, Q16) but not the clean baseline Q3 and M2.5 need. Fit the ten
 options on both skies: deferred; Q16 does the misspecified cases at realistic noise.
+
+## D018 (2026-10-29): E021 closed; the hierarchical GMRF is the index prior of record; the index resolution rule is the finest the budget allows; a second realization of the nside-16 triple runs before the paper table is final
+
+**Decision.** Close E021 attempt 2 with its ten runs (F24). Adopt the hierarchical GMRF (graph
+Laplacian basis, learned mean, amplitude and correlation length) as the index prior of record
+for M2.x and Paper A; drop the exchangeable (iid) prior as a candidate; keep independent
+regions and the single index only as references. Set the resolution rule for the index field
+as the finest nside the compute budget allows under the spatial prior, not a coarse ladder.
+Before the E021 table goes into Paper A, run gmrf16, iid16 and indep16 once more on a second
+noise and template realization (seed 2028, about 14.5 h, started 11:30) with the pre-registered
+expectation written in the E021 Follow-ups. Treat the slow mixing of the dust field mean in the
+centred parameterization as an M2.4 efficiency item.
+
+**Why.** The ordering GMRF, iid, independent holds on both indices at nside 16, 8 and 4, with the
+nside-16 gaps at 13 and 9 bootstrap SE against iid and the mechanism of the iid loss verified
+on the exact target (plane-weighted global mean). Under the GMRF the region-level error does not
+change from nside 4 to 16 while everything the coarse field cannot represent is lost, so there
+is no accuracy argument for coarse regions, only cost. One realization is enough to establish
+the ordering and the mechanism but not the size of the gaps, hence the second seed for the
+pair that matters.
+
+**Alternatives considered.** Run the full ten-run ladder on the second seed (40 h): the nside-8
+and 4 runs add nothing to the decision. Run nside 32 on this sky (about 40 h) to test a field
+finer than the truth: deferred to Q16's PySM sky, where the truth has structure at every scale
+and the question is the real one. Keep iid as a cheap option for low-resolution runs: rejected,
+it is biased wherever the sky differs from its global mean, and at nside 4, where it is closest
+to the GMRF, it is still the most biased of the three.

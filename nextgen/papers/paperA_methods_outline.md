@@ -102,16 +102,23 @@ model component rather than a preprocessing choice.
   hyperparameters 2 percent low; the data-dominated regions are untouched and the CMB prior
   width is irrelevant. The point for real data: where the prior dominates, the index posterior
   reports the template-error model, so the model needs a stated template law (Q16).
-- Why the index prior needs spatial structure (E021 attempt 2, nside-16 pair; the nside ladder
-  is pending): an exchangeable (iid) hierarchical prior shrinks every region toward one global
+- Why the index prior needs spatial structure (E021 attempt 2, ten runs, F24): an exchangeable (iid) hierarchical prior shrinks every region toward one global
   mean whose posterior is the precision-weighted mean of the regions, so it follows the
   Galactic plane; regions whose true index differs from it are pulled off (mid-S/N dust +0.02
   to +0.03 with the chain at the mode of its target, verified by exact block-shift scans). The
   GMRF shrinks toward neighbours and follows the large-scale index structure: sync RMSE 0.033
   against 0.051, dust 0.018 against 0.028, CMB residual 0.05 uK lower, posterior sds 1.2 times
   too wide rather than too narrow, at 11 times the gradients per effective sample. In
-  simulations the amplitude-law hyperparameter check (realized mean and sd of a/g) detects the
-  index-prior misspecification (mu_d 6.9 sd off under iid, 1.5 sd under the GMRF).
+  simulations the amplitude-law hyperparameter check (realized mean and sd of a/g) detects
+  index-model misspecification of any kind (mu_d 6.9 sd off under iid, 1.5 sd under the GMRF
+  at nside 16; every prior fails it at nside 4 from the resolution misfit).
+- Resolution of the index field (E021 nside ladder, F24): under the GMRF the region-level error
+  is flat from nside 4 to 16 (0.033 sync) while the pixel-level error and the CMB residual
+  (5.6, 4.2, 2.9 uK) follow what the field can represent, at 39, 63 and 125 gradients per
+  iteration. The rule: as fine as the budget allows under a spatial prior; coarse regions buy
+  only compute and under-report their uncertainty on a structured sky (coverage 55 to 60
+  percent at 1 sd at nside 4). Table 2 candidate: the ten-run E021 table (index RMSE, coverage,
+  CMB residual, gradients per iteration).
 - Sampler: NUTS with dual averaging and windowed diagonal mass adaptation; efficiency per gradient;
   the funnel at low S/N (E018 L1 diagnostic: the centred reference chain does not reach the
   small-sigma tail where NUTS in non-centred coordinates does). MAMS comparison (M2.3, pending).
