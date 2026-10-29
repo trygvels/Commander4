@@ -111,14 +111,17 @@ model component rather than a preprocessing choice.
   too wide rather than too narrow, at 11 times the gradients per effective sample. In
   simulations the amplitude-law hyperparameter check (realized mean and sd of a/g) detects
   index-model misspecification of any kind (mu_d 6.9 sd off under iid, 1.5 sd under the GMRF
-  at nside 16; every prior fails it at nside 4 from the resolution misfit).
-- Resolution of the index field (E021 nside ladder, F24): under the GMRF the region-level error
-  is flat from nside 4 to 16 (0.033 sync) while the pixel-level error and the CMB residual
-  (5.6, 4.2, 2.9 uK) follow what the field can represent, at 39, 63 and 125 gradients per
-  iteration. The rule: as fine as the budget allows under a spatial prior; coarse regions buy
-  only compute and under-report their uncertainty on a structured sky (coverage 55 to 60
-  percent at 1 sd at nside 4). Table 2 candidate: the ten-run E021 table (index RMSE, coverage,
-  CMB residual, gradients per iteration).
+  at nside 16; every prior fails it at nside 4 from the resolution misfit). Calibration
+  language: the GMRF over-covers at nside 16 (78 / 98 percent), not "calibrated".
+- Resolution of the index field (E021 nside ladder, F24, stats-reviewed): against the
+  S/N-weighted region reference the GMRF's per-region error falls only from 0.0333 to 0.0295
+  (sync) and 0.0180 to 0.0138 (dust) between nside 16 and 4, against factors 3.5 and 4.9 for
+  independent regions, while the pixel-level error and the CMB residual (2.9, 4.2, 5.6 uK)
+  follow what the field can represent, at 125, 63 and 39 gradients per iteration. The spatial
+  prior recovers most of the averaging coarse regions buy. A field finer than the sky's
+  structure is still to be tested (E023, Q16) before the paper states a resolution rule. Table 2
+  candidate: the ten-run E021 table (index RMSE against both references, CMB residual,
+  gradients per iteration; coverage only at nside 16).
 - Sampler: NUTS with dual averaging and windowed diagonal mass adaptation; efficiency per gradient;
   the funnel at low S/N (E018 L1 diagnostic: the centred reference chain does not reach the
   small-sigma tail where NUTS in non-centred coordinates does). MAMS comparison (M2.3, pending).

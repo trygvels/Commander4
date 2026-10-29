@@ -2,6 +2,41 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 12:45): E021 Conclusion corrected after stats review (resolution reading withdrawn, ordering stands); E023 designed and under review; seed-2028 triple running
+
+**Learned**
+- Third stats review of E021 (reproduced): the nside-16 and 8 orderings and the iid mechanism
+  hold; nside 4 is suggestive only; the "per-region error flat with nside" reading was an
+  artefact of the unweighted region reference. Against the S/N-weighted reference the GMRF's
+  per-region error falls 0.0333 / 0.0318 / 0.0295 (sync) and 0.0180 / 0.0153 / 0.0138 (dust) at
+  nside 16 / 8 / 4, while independent regions lose factors 3.5 / 4.9: the spatial prior keeps
+  most of the averaging coarse regions buy. The negative control had quoted attempt-1 numbers
+  (dust clause actually met, sync 0.012 off); the MC-inflation rule fails for more pairs than
+  recorded but its effect on an RMSE is at most 0.0004; coverage at nside 8 and 4 is
+  reference-dependent; block-bootstrap SEs are understated. F24, Conclusion, Q3, M2.5, Paper A
+  outline rewritten; D019 withdraws the resolution rule from D018 until a field finer than the
+  sky's structure is tested.
+- E023 (Q16) designed: exact-target block-shift scans of the profiled hier marginal on the PySM
+  sky at noise scale 1 and 0.03 (template built from data or exact; T fixed or true; global or
+  per-quartile scatter); script written and smoke-tested (3 to 7 s per state). Stats review of
+  the target: formula correct; required before running: an expected-log-likelihood scan on the
+  noiseless sky (with the tr(C^-1 N) term) so the thresholds are decidable at noise 1, a Laplace
+  term for the profiled hyperparameters, a noise-free region-fit reference instead of region
+  means, quartiles from template S/N, a mu-per-quartile candidate, and a kernel-agreement check
+  instead of the F21 reproduction as the code control. Being implemented.
+
+**Running**
+- E021 seed-2028 gmrf16, iid16, indep16 (from 11:13, about 14.5 h).
+
+**Next**
+- E023 script v2 with the review's changes, then the control run on the E021 sky and the two
+  PySM skies (about 1.5 h each on one core, alongside the queue).
+- When the seed-2028 triple ends: paired differences on the new sky, append to E021 and F24.
+
+**Needs Trygve**
+- Unchanged: Paper A presentation of the E022 diagnostics; `COMP_CL_TYPE = none` semantics
+  (Q17 item 1); the hier default (D003/D011); Q15 (zero-level model).
+
 ## 2026-10-29 (Mac mini, 11:30): E021 closed (F24): the GMRF prior wins at every nside; resolution costs nothing per region under it; seed-2028 triple started
 
 **Learned**

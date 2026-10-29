@@ -229,3 +229,21 @@ finer than the truth: deferred to Q16's PySM sky, where the truth has structure 
 and the question is the real one. Keep iid as a cheap option for low-resolution runs: rejected,
 it is biased wherever the sky differs from its global mean, and at nside 4, where it is closest
 to the GMRF, it is still the most biased of the three.
+
+## D019 (2026-10-29): D018 amended after the third stats review; the resolution rule is withdrawn until a field finer than the sky's structure is tested
+
+**Decision.** Keep the GMRF as the index prior of record and the seed-2028 replication (D018).
+Withdraw the D018 clause "the index resolution rule is the finest the budget allows" as a
+result: E021 showed that the nside-16 GMRF keeps most of the per-region averaging of coarse
+regions (within 13 / 30 percent of the nside-4 model's per-region error against the
+S/N-weighted reference, where independent regions lose factors 3.5 / 4.9) and keeps the
+structure coarse fields cannot represent, but no run had a field finer than the truth's
+structure, which is the real-data case. The rule returns as a hypothesis for E023 / Q16 (PySM
+sky with structure at every scale). Negative controls and cross-run rules in future records
+quote the statistic's reference explicitly (weighted or unweighted region mean), and the
+MC-inflation rule is applied to every pair with the quadrature arithmetic.
+
+**Why.** The reviewer showed the "flat per-region error" reading rested on the analyzer's
+unweighted reference, which measures misfit, not per-region cost; against the weighted
+reference the error falls with coarser regions as the data per region grow. The ordering
+results stand.

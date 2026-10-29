@@ -389,32 +389,36 @@ four stated sigma. Exact-target computation (numpy 12 x 12 marginal); stats-revi
 data story, -0.001 / -0.009 under the model story; the corrected sky checked for other
 departures from the model class, none above 0.2 sd).
 
-**F24. A spatial (GMRF) prior on the index field beats exchangeable shrinkage and independent
-regions at every resolution, and under a spatial prior the resolution of a region model costs
-nothing per region** (E021 attempt 2: ten runs on one model-consistent sky, 12 bands 23 to 353
-GHz at 0.03 x E012 noise, truth region-constant at nside 16, 700 post-burn draws each, every
-chain at the mode of its exact target where checked). Index RMSE at nside 16 (sync / dust):
+**F24. On a model-consistent sky a spatial (GMRF) prior on the index field beats exchangeable
+shrinkage and independent regions at nside 16 and 8, and keeps most of the per-region averaging
+that coarse regions buy while retaining the structure they cannot represent** (E021 attempt 2:
+ten runs on one sky, 12 bands 23 to 353 GHz at 0.03 x E012 noise, truth region-constant and
+spatially smooth at nside 16, 700 post-burn draws each, every chain at the mode of its exact
+target where checked; stats-reviewed, corrections taken). Index RMSE at nside 16 (sync / dust):
 GMRF 0.0333 / 0.0180, iid 0.0505 / 0.0275 (paired +0.0172 +- 0.0013 and +0.0095 +- 0.0010 over
-192 sky blocks), independent N(mu0, 1) regions 0.1424 / 0.1009, single index 0.0669 / 0.0691;
-GLS CMB residual 2.89, 2.93, 3.16 and 9.03 uK against the true-SED floor 2.79. The GMRF gains in
-every S/N quartile (factors 2.5 and 1.6 over independent regions in the brightest). The same
-ordering at nside 8 (region-level 0.033 / 0.016, 0.041 / 0.023, 0.070 / 0.047) and nside 4
-(0.033 / 0.020, 0.036 / 0.025, 0.043 / 0.026, where the GMRF-over-iid gap is inside the MC
-inflation of 700 draws). Mechanism of the iid loss: it shrinks every region toward one mean
-whose posterior is the precision-weighted mean of the regions, dominated by the Galactic plane
-(dust 1.554 against the sky mean 1.540), so the mid-S/N regions whose truth differs are pulled
-0.02 to 0.03 off; exact block-shift scans at the chain state peak at zero, so this is the iid
-target, and the biased field drags the amplitude hyperparameters off their realized targets
-(mu_d +6.9 sd). That hyperparameter test detects index-model misspecification of any kind (at
-nside 4 every prior fails it, including the one with no index hyperparameters, from the
-resolution misfit) and is not a sampler check. Calibration: GMRF and independent region
-posteriors calibrated at nside 16 and 8 (z MAD 0.55 to 0.75, 68 to 78 percent at 1 sd; the
-GMRF sds 1.2 times wide at nside 16), iid dust biased (z median +0.40, +0.44, +0.89 at nside
-16, 8, 4). Resolution: under the GMRF the region-level error is flat from nside 4 to 16 while
-the pixel-level error and the CMB residual (5.56, 4.22, 2.89 uK) follow what the field can
-represent, so the rule for Q3 is the finest resolution the budget allows under a spatial prior
-(39, 63, 125 gradients per iteration at nside 4, 8, 16); coarse regions buy only compute and
-misreport their own uncertainty on a structured sky. Cost of the GMRF against iid at nside 16:
-11 times the gradients per effective sample, with the dust field mean mixing slowly (ESS 5 to
-14 of 700) in the centred parameterization. One sky, one noise and template realization (the
-seed-2028 nside-16 triple is running), fixed T_d, no template-law misspecification (F23).
+192 sky blocks, SEs understated by block correlation), independent N(mu0, 1) regions 0.1424 /
+0.1009, single index 0.0669 / 0.0691; GLS CMB residual 2.89, 2.93, 3.16 and 9.03 uK against the
+true-SED floor 2.79. The GMRF gains in every S/N quartile (factors 2.5 and 1.6 over independent
+regions in the brightest). The same ordering at nside 8 (iid +0.0072 +- 0.0012 / +0.0052 +-
+0.0008 region-level, independent +0.036 / +0.029) and, suggestively, at nside 4 (gaps 0.002 to
+0.007, inside the pre-registered MC-inflation rule's margin). Mechanism of the iid loss: it
+shrinks every region toward one mean whose posterior is the precision-weighted mean of the
+regions, dominated by the Galactic plane (dust 1.554 against the sky mean 1.540; linear-Gaussian
+prediction 1.556), so the mid-S/N regions whose truth differs are pulled 0.02 to 0.03 off, and
+the biased field drags the amplitude hyperparameters off their realized targets (mu_d +6.9 sd);
+that hyperparameter test detects index-model misspecification of any kind (at nside 4 every
+prior fails it from the resolution misfit) and is not a sampler check. Calibration: the GMRF
+over-covers at nside 16 (78 / 98 percent at 1 / 2 sd, sds 1.2 times wide), independent regions
+cover 68 / 95; iid dust is biased (z median +0.40, +0.44, +0.89 at nside 16, 8, 4); coverage at
+nside 8 and 4 is reference-dependent and not a calibration test. Resolution: against the
+S/N-weighted region reference the GMRF's per-region error falls with coarser regions (0.0333 /
+0.0318 / 0.0295 sync, 0.0180 / 0.0153 / 0.0138 dust at nside 16 / 8 / 4), so the nside-16 field
+is within 13 and 30 percent of the nside-4 model that has 16 times the data per region, while
+independent regions lose factors 3.5 and 4.9; the pixel-level error and the CMB residual (2.89,
+4.22, 5.56 uK) follow what the field can represent; cost 125, 63, 39 gradients per iteration.
+No field finer than the sky's structure was run, so the resolution rule for real data is still
+open (Q16). Cost of the GMRF against iid at nside 16: 11 times the gradients per effective
+sample, with the dust field mean mixing slowly (hyperparameter ESS 3 to 14 of 700) in the
+centred parameterization. One sky, one noise and template realization (the seed-2028 nside-16
+triple is running), a spatially smooth truth (on an uncorrelated truth the iid prior is the
+correct one), fixed T_d, no template-law misspecification (F23).

@@ -9,7 +9,7 @@ Paper A's method runs on real intensity maps), then Q15 (zero levels; blocks any
 result and needs Trygve's model decision), then the Q4 efficiency items (slow mixing of the
 field mean in the centred parameterization; MAMS and preconditioners), then Q8/Q7 (M2.6), then
 the second half of Q14 and Q5 (CG amplitudes). Answered: Q1 (E014), Q2 (E012, E016, E017), the
-core of Q3 (E021, F24: GMRF prior of record, resolution rule). The entries below keep their
+core of Q3 (E021, F24: GMRF prior of record; the resolution rule remains open, D019). The entries below keep their
 original numbering.
 
 ## Q1. Does the legacy acceptance matter on real-data configurations? (ANSWERED at nside 64, E014)
@@ -67,15 +67,18 @@ original numbering.
   template choice on real data, and the index-resolution rule from the S/N map (Q3).
 
 ## Q3. What is the optimal spatially varying index model? (CORE ANSWERED, E021)
-- **Answer (2026-10-29, E021, F24):** on a model-consistent sky the hierarchical GMRF prior beats
-  exchangeable (iid) shrinkage and independent regions on both indices and on the CMB at nside
-  16, 8 and 4 (nside 16: 0.033 / 0.018 against 0.051 / 0.028 and 0.142 / 0.101); iid is biased
-  where the sky differs from its plane-weighted global mean and is dropped as a candidate. Under
-  the GMRF the region-level error is flat from nside 4 to 16 while the pixel-level error and the
-  CMB residual follow what the field can represent, so the resolution rule is the finest the
-  budget allows under a spatial prior (D018). Still open inside Q3: the alm GRF and heavy-tailed
-  (edge-preserving) variants and the clustering baselines were not run; a field finer than the
-  sky's structure and the misspecified skies belong to Q16; joint fields for beta_d and T_d.
+- **Answer (2026-10-29, E021, F24, stats-reviewed):** on a model-consistent, spatially smooth
+  sky the hierarchical GMRF prior beats exchangeable (iid) shrinkage and independent regions on
+  both indices and on the CMB at nside 16 and 8 (nside 16: 0.033 / 0.018 against 0.051 / 0.028
+  and 0.142 / 0.101; suggestive at 4); iid is biased where the sky differs from its
+  plane-weighted global mean and is dropped as a candidate (D018). Against the S/N-weighted
+  region reference the nside-16 GMRF is within 13 / 30 percent of the per-region error of the
+  nside-4 model with 16 times the data, while independent regions lose factors 3.5 / 4.9, and the
+  finer field keeps the structure. The resolution rule (as fine as the budget allows under a
+  spatial prior) is untested in the direction that matters, a field finer than the sky's
+  structure (D019; E023 and Q16). Still open inside Q3: the alm GRF and heavy-tailed
+  (edge-preserving) variants and the clustering baselines were not run; joint fields for beta_d
+  and T_d.
 - **Status 2026-10-28:** E020 (PySM sky at 0.03 x E012 noise) closed as a design flaw (F21: the
   misspecified sky dominates); the ten-option comparison runs as E021 on a model-consistent sky.
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather
