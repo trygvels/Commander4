@@ -1,0 +1,9 @@
+Commander4 likelihood built; pixels 49152 regions 3072
+A truth, hyp0                kernel+trail  1411470022.752169  numpy    -1648026.887569  numpy-kernel -1413118049.639738  (const -1413118049.639739, numpy-kernel-const 4.768e-07)
+B sync faint +0.5, hyp1      kernel+trail  1411456005.672205  numpy    -1662043.967533  numpy-kernel -1413118049.639738  (const -1413118049.639739, numpy-kernel-const 4.768e-07)
+C dust bright +0.05, hyp0    kernel+trail  1411367550.409089  numpy    -1750499.230649  numpy-kernel -1413118049.639739  (const -1413118049.639739, numpy-kernel-const 0.000e+00)
+D truth, hyp1                kernel+trail  1411457677.235592  numpy    -1660372.404146  numpy-kernel -1413118049.639738  (const -1413118049.639739, numpy-kernel-const 4.768e-07)
+difference to A: B sync faint +0.5, hyp1      kernel    -14017.079964 numpy    -14017.079964 relative mismatch 3.62e-12
+difference to A: C dust bright +0.05, hyp0    kernel   -102472.343080 numpy   -102472.343080 relative mismatch 4.29e-12
+difference to A: D truth, hyp1                kernel    -12345.516577 numpy    -12345.516577 relative mismatch 1.92e-12
+KERNEL CHECK PASS
