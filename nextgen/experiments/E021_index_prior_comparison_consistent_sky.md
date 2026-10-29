@@ -352,7 +352,10 @@ RMSE 0.041, chain 0.051; chain quartile errors -0.004 to -0.007 against predicte
 alone and is left as an observation (coupling to the dust bias through the joint amplitude
 solve is the candidate, not checked). The amplitude hyperparameters are a consequence: with the
 dust index 0.02 to 0.03 too high over half the sky, the amplitude ratio a/g the data prefer
-shifts, and mu_d lands 6.9 sd above its realized target. The pre-registered reading in
+shifts, and mu_d lands 6.9 sd above its realized target: the exact-marginal scan of mu_d at the
+iid16 chain betas (all other parameters at their chain means) peaks at 1.010 (the grid edge;
+chain 1.0113) and at the truth betas at 1.000 (realized 0.99986), so the shift is implied by
+the biased index field. The pre-registered reading in
 "Negative control" (hyperparameters off target = sampler or data problem, not a prior
 difference) was therefore wrong; corrected there.
 
