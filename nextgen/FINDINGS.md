@@ -439,3 +439,19 @@ couplings of the field mean and the hyperparameters with the coefficients that c
 pattern are invisible to a diagonal metric. Scope: nside 8, one sky, high S/N; nside 16 and the
 low-S/N funnel untested.
 
+**F26. The per-pixel CMB amplitude prior of the collapsed hier likelihood, N(0, 100^2 uK^2),
+biases the dust index at realistic noise** (E023 stage 1, PySM d1s1c1 sky at the E012 noise
+levels, exact-target expected-log-likelihood scans with exact templates and the true T_d, no
+other misspecification than the region model itself). With the prior at 100 uK the target
+prefers the dust index of the second S/N quartile 0.05 above the noise-free region fit (3.8
+block sd, 7.7 nats) and the two fainter quartiles at or beyond +0.10 (9.4 and 2.9 nats), the
+faintest sync quartile at -0.10 (2.4 nats), all in the chi-square term; with the prior at 1e4
+uK every scan peaks within 0.02 of the reference at below 0.1 sd. Cause: at per-pixel noise
+of 64 to 320 uK_RJ per band the 100 uK prior on an 84 uK rms CMB is informative, it shrinks
+the per-pixel CMB and the dust index absorbs the residual; at 0.03 x that noise the same prior
+moves the index by at most 0.002 (E021 design review), which is why every earlier control
+passed. The E018/E021/E024 results stand (their noise level); real-data or realistic-noise
+runs need the flat (or the proper spatially correlated) CMB prior in the collapsed per-pixel
+likelihood (D021). Scope: one sky, one prior width tested against flat; the proper correlated
+CMB prior is Q5's territory.
+

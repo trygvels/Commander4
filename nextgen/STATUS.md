@@ -2,6 +2,37 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 21:15): E023 stage 1: 0.03 sky read; noise-1 sky exposed the per-pixel CMB prior (F26, D021), rerun with a flat prior in progress
+
+**Learned**
+- E023, 0.03 sky: the data-built template under one global scatter drives the hier target's
+  bias (0.05 to above 0.1 in both indices in every quartile but the brightest; faint-sync
+  runaway reproduced as a block shift); fixed T adds at most 0.03 with an exact template; the
+  per-quartile scatter removes the runaway and nothing else; per-quartile mean and scatter fix
+  the mid-S/N sync (to 0.01) but leave the dust at 0.05 to 0.10, because the 353 GHz-based
+  dust template's error varies with T_d, hence with the index: no scalar-hyperparameter law
+  fixes it. Neither candidate goes to stage 2 as a fix.
+- E023, noise-1 sky: the baseline cell (exact templates, true T) was biased by 0.05 to 0.1 in
+  the fainter dust quartiles; traced (three hypotheses, one confirmed) to the per-pixel CMB
+  prior N(0, 100^2) of the E018/E021 target, informative at realistic noise (F26). With a flat
+  CMB prior the baseline is clean. All noise-1 cells are being rerun with the flat prior
+  (`--cmb-sd 1e4`, from 21:04, about 3 h); production runs at realistic noise use it (D021).
+
+**Running**
+- E023 noise-1 rerun (flat CMB prior); E021 seed-2028 triple (gmrf16 near its end, then iid16,
+  indep16).
+
+**Next**
+- Read the noise-1 cells; E023 Conclusion; Q16 and ROADMAP updates; design of a template-error
+  field model (the dust template's error must be a field correlated with T_d) or of a
+  component-separation-based template as the Q16 candidate for stage 2.
+- Seed-2028 paired differences into E021 and F24.
+
+**Needs Trygve**
+- New: the per-pixel CMB prior width in the collapsed likelihood for real-data runs (D021 sets
+  it flat; the proper correlated CMB prior belongs to the CG amplitude step, Q5). Unchanged
+  items as before.
+
 ## 2026-10-29 (Mac mini, 16:10): E024 done, dense Hessian metric adopted for production (F25, D020)
 
 **Learned**

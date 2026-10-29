@@ -267,3 +267,22 @@ that changes the geometry for every quantity and would need its own validation; 
 since a Gaussian metric already fixes the observed coupling. Longer chains: 30 times the
 compute. Per-block step sizes: the next efficiency item for the sync-side loss.
 
+## D021 (2026-10-29): flat CMB amplitude prior in the collapsed per-pixel likelihood for runs at realistic noise; the simulator writes it on request
+
+**Decision.** Production index-field runs at realistic noise (E023 stage 2, any real-data run)
+set the CMB component's `amp_prior` in the collapsed per-pixel likelihood to a Gaussian with sd
+1e4 uK (flat in effect) instead of the 100 uK used by the E018 to E024 simulations; the
+simulator `pysm_intensity_sim.py` gains `--cmb-prior-sd` (default unchanged at 100 so that
+recorded commands reproduce their parameter files); the E023 noise-1 scans are rerun with 1e4.
+The Commander4 code default (no amp_prior: flat) is unchanged.
+
+**Why.** F26: at the E012 noise levels the 100 uK per-pixel prior is informative against a
+CMB of 84 uK rms and shifts the dust index by 0.05 to 0.1 in the mid and faint S/N quartiles
+with exact templates and the true dust SED; with the flat prior the shift is below 0.02 at
+below 0.1 sd. At 0.03 x noise (every earlier experiment) the prior was inert.
+
+**Alternatives considered.** The true per-pixel CMB variance (84 uK): still a per-pixel prior
+that ignores the CMB's spatial correlation and still shrinks; its bias would be smaller but
+not zero. The proper correlated CMB prior: the right model, needs the CG amplitude step (Q5,
+M3), not available in the collapsed per-pixel likelihood.
+

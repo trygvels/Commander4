@@ -480,6 +480,9 @@ def main(argv=None) -> int:
     ap.add_argument("--nside", type=int, default=64)
     ap.add_argument("--noise-scale", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=2027)
+    ap.add_argument("--cmb-prior-sd", type=float, default=CMB_SD,
+                    help="per-pixel CMB amplitude prior sd in uK_CMB written to the parameter files "
+                         "(E023: 100 is informative at noise scale 1 and shifts the dust index; use 1e4)")
     ap.add_argument("--n-iter", type=int, default=2000)
     ap.add_argument("--n-warmup", type=int, default=500)
     ap.add_argument("--sky", choices=["pysm", "consistent"], default="pysm",
@@ -498,6 +501,8 @@ def main(argv=None) -> int:
     ap.add_argument("--no-adapt-mass", action="store_true",
                     help="write nuts.adapt_mass: false (keep the Hessian metric for the whole run)")
     a = ap.parse_args(argv)
+    global CMB_SD
+    CMB_SD = a.cmb_prior_sd
     simulate(a.dir, a.nside, a.noise_scale, a.seed, a.n_iter, a.n_warmup, sky_mode=a.sky,
              nside_truth=a.nside_truth, template_scatter=a.template_scatter,
              adapt_mass=not a.no_adapt_mass, refresh_mass_at=a.refresh_mass_at,

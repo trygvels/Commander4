@@ -252,7 +252,36 @@ scalar-hyperparameter law is not usable for dust at this depth, and that the tem
 must be modelled as a field (correlated with T_d) or the template must come from a
 component separation with its own T_d, not from one scaled frequency map.
 
-**PySM sky at noise 1 (`E023/scan_n1.txt`, 17:19 to 20:45):** (being read; see below)
+**PySM sky at noise 1, first pass with the E021 CMB prior (`E023/scan_n1.txt`, 17:19 to
+20:45):** the "stop and find it" rule fired. The baseline cell exact_trueT_global (exact
+templates, true T; profiled s_s 0.032, s_d 0.023) peaks at +0.050 in dust Q2 (gain 7.7 nats,
+curvature sd 0.013: 3.8 sd), at the +0.100 edge in dust Q3 and Q4 (9.4 and 2.9 nats) and at
+-0.100 in sync Q4 (2.4 nats), all in the chi-square part (log-determinant and trace parts
+below 0.2 nats). Three hypotheses were tested at 21:00: (H1) the flat-amplitude region fit is
+not the pseudo-true value of a model whose amplitudes are pinned to the template: refuted, a
+pinned-amplitude region fit (sync and dust amplitudes at the truth, CMB free) differs from the
+flat fit by 0.001 in every dust quartile and 0.002 in sync (scratchpad
+`e023_n1_pinned_refs.npz`); (H2) the determinant or trace terms: refuted by the part table;
+(H4) the per-pixel CMB prior N(0, 100^2) of the E018/E021 target, which at noise scale 1 (per-pixel
+rms 64 to 320 uK_RJ per band against a CMB rms of 84 uK) is informative and shrinks the CMB
+amplitude: CONFIRMED. The same cell with the CMB prior sd at 1e4
+(`E023/scan_n1_baseline_cmbflat_check.txt`, `--cmb-sd 1e4`) peaks at +0.010 in dust Q2, Q3,
+Q4 (gains 0.02 to 0.04 nats, below 0.1 sd) and at -0.020 in sync Q4 (0.02 nats), the wide scan
+at 0.000. At 0.03 noise the same prior moves nothing (E021 design review: at most 0.002),
+which is why it passed every control so far. Consequence: the per-pixel CMB prior is part of
+the target and biases the dust index by 0.05 to 0.1 in the mid and faint quartiles at
+realistic noise even with exact templates and true T (F26); production runs at realistic
+noise use a flat CMB amplitude prior in the collapsed likelihood (D021), the writer gains
+`--cmb-prior-sd`, and the noise-1 cells are rerun with it (`E023/scan_n1_cmbflat.txt`, from
+21:04). The first-pass noise-1 cells are kept as evidence but not read for attribution.
+
+Noted from the first pass regardless of the CMB prior: at noise 1 the block curvature sds are
+0.03 to 0.12 (sync quartiles) and 0.003 to 0.05 (dust), so the quartile scans resolve shifts of
+0.1 only at 1 to 4 sd for the fainter quartiles; the data-built templates at this noise are not
+templates in the faint half of the sky (realized a/g means 2.3 and 141 in sync Q3 and Q4, 5.9
+and 48 in dust Q3 and Q4: the 23 and 353 GHz maps at this noise, scaled, smoothed and floored).
+
+**PySM sky at noise 1 with the flat CMB prior:** (pending)
 
 ## Negative control
 Replaced by the code control (kernel agreement) and the model control (E021 sky) under
