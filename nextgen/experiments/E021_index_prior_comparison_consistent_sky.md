@@ -425,6 +425,26 @@ as nside 16 per region and loses only what it cannot represent (the pixel-level 
 CMB residual); the region-model ladder is therefore about representable structure, which is
 what Q3 asks.
 
+**Attempt 2, iid8 and indep8 complete (08:48 to 09:23 and 09:23 to 09:49; 1200 iterations each,
+700 post-burn, 15 gradients and 1.1 to 1.3 s per iteration):** the nside-16 pattern repeats one
+level down. iid8: pixel-level RMSE 0.0450 (sync) and 0.0274 (dust), region-level with the nside-8
+floor removed 0.0405 / 0.0232 against gmrf8 0.0325 / 0.0163; paired against gmrf16 +0.0117 +-
+0.0012 and +0.0094 +- 0.0008 (gmrf8: +0.0046, +0.0038); dust z median +0.44 (MAD 0.63) with
+coverage 63 / 93 percent against 71 / 96 for sync; dust mu 1.5555 +- 0.0060 (truth 1.5397), the
+same pull toward the plane as iid16 (1.5541); by S/N quartile (low to high) dust RMSE 0.020,
+0.032, 0.031, 0.024 against gmrf8 0.019, 0.020, 0.024, 0.024, the middle quartiles again. Its
+hyperparameters mix badly (mu_d ESS 5, amplitude mu_d ESS 5, log s_d ESS 15, sync amplitude
+mean ESS 13), so the quoted mu_d sd 0.006 is partly Monte Carlo; the amplitude hyperparameters
+fail the 2-sd test as at nside 16 (mu_s -2.8 sd, mu_d +4.5 sd with a Monte Carlo error near 0.5
+sd of that figure, s_d +2.7 sd). indep8 (near-flat N(mu0, 1) per region): RMSE 0.0723 / 0.0489
+(region-level 0.0696 / 0.0467), z MAD 0.67 / 0.75, coverage 67 / 94 and 62 / 95, amplitude
+hyperparameters pass (-1.7, -0.1, +1.8, +1.4 sd); paired against gmrf16 +0.0390 +- 0.0022 and
++0.0309 +- 0.0022. GLS CMB residuals 4.22 (iid8) and 4.26 uK (indep8) against 4.22 for gmrf8:
+at nside 8 the CMB residual is set by the resolution misfit (the GLS at the truth's own nside-8
+region means gives 5.37 uK), not by the index prior. Ordering at nside 8 as at 16: GMRF, iid,
+independent, on both indices; the single index (scalar) is worse than every region model on dust
+and worse than the GMRF and iid models on sync.
+
 **Sampler note:** every run prints 13 numpy RuntimeWarnings at its first transition (12 ranks:
 divide by zero in the GMRF prior at sigma = 0; one rank: overflow in exp). They come from the
 initial step-size heuristic (eps doubling from 1, Hoffman and Gelman Algorithm 4) visiting an

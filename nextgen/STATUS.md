@@ -37,9 +37,15 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   field cannot represent (the truth is region-constant at nside 16). Calibration z MAD 0.63 / 0.61,
   coverage 72 / 96 and 73 / 96; mu_d amplitude hyperparameter at +2.1 sd (marginal, noted).
 
+- iid8 and indep8 (35 and 26 min): the nside-16 ordering repeats, GMRF 0.033 / 0.016, iid 0.041 /
+  0.023, independent 0.070 / 0.047 region-level RMSE; iid again pulls the dust field mean to the
+  plane (1.556 against 1.540) with dust z median +0.44 and fails the amplitude-hyperparameter
+  test (mu_d +4.5 sd), and mixes badly (hyperparameter ESS 3 to 15 of 700); indep8 is calibrated
+  and passes. At nside 8 the CMB residual (4.2 uK in all three) is set by the resolution misfit.
+
 **Running**
-- E021 attempt 2 iid8 (from 08:48), then indep8, gmrf4, iid4, indep4 (a few hours). A waiter
-  runs the analyzer when indep8 ends.
+- E021 attempt 2 gmrf4, iid4, indep4 (from 09:49, about an hour). A waiter runs the full
+  ten-run analyzer when the queue ends.
 
 **Next**
 - indep16 as the no-shrinkage reference (its per-region posterior sds are the s_r of the
