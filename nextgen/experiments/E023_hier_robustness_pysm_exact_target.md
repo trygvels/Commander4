@@ -239,6 +239,19 @@ template of the synchrotron at all.
   that varies with T_d and hence with the pixel's own index and position, which no scalar per
   quartile absorbs; the dust shifts under perqmu equal those under the global prior.
 
+- data_fixT_perregmu (added 2026-10-29 21:27 after the perqmu result: one template multiplier
+  per nside-16 region for each component, 3072 each with the N(1, 0.5^2) hyperprior, plus a
+  scatter per quartile; `E023/scan_n003_perregmu.txt`; profiled region means per sync quartile
+  0.91, 0.83, 1.03, 2.12 with sd 0.22 to 1.0, dust 0.90, 0.93, 0.91, 0.82; s_s [0.13, 0.08,
+  0.16, 1.10], s_d [0.26, 0.18, 0.18, 0.18], below the realized scatters because the region
+  means absorb part of them): sync +0.000, +0.000, +0.000, -0.100 (edge; wide -0.2, gain 179)
+  and dust +0.000, +0.050, +0.100, +0.100 (gains 389, 624, 112). A free template amplitude per
+  region fixes the sync everywhere the template is a template at all and leaves the dust
+  shifts exactly where the global, per-quartile and per-quartile-mean laws left them: the dust
+  template's error is a within-region, pixel-scale structure (the 353 GHz map scaled with one T
+  carries the sky's T_d variation, which tracks the index itself), not an amplitude error at
+  any region scale.
+
 Reading of the 0.03 sky (pre-registered rules): the Commander4 configuration (data-built
 template, fixed T, global scatter) is biased in every quartile but the brightest, by 0.05 to
 above 0.1 in both indices with the faint-sync runaway; the driver is the template under one
@@ -248,9 +261,10 @@ per-quartile mean and scatter also fix the mid-S/N sync but leave the dust at 0.
 Neither candidate is "unbiased" by the rule, and the dust failure is structural (a
 template-error law correlated with the index, F23's mechanism in a second form), so neither
 is carried to stage 2 as a fix; the result for Q16 is that a data-built template with any
-scalar-hyperparameter law is not usable for dust at this depth, and that the template error
-must be modelled as a field (correlated with T_d) or the template must come from a
-component separation with its own T_d, not from one scaled frequency map.
+scalar-hyperparameter law, and with a free multiplier per nside-16 region, is not usable for
+dust at this depth: the error lives at the pixel scale and is tied to T_d, so the template must
+come from a component separation with its own T_d (or the dust SED must carry a sampled T_d so
+that the template error decorrelates from the index), not from one scaled frequency map.
 
 **PySM sky at noise 1, first pass with the E021 CMB prior (`E023/scan_n1.txt`, 17:19 to
 20:45):** the "stop and find it" rule fired. The baseline cell exact_trueT_global (exact

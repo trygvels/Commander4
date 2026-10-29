@@ -75,13 +75,20 @@ class Hyper:
     """Layout of theta: mu_s[nmu], log s_s[ns], mu_d[nmu], log s_d[ns]; per-pixel expansion through
     the quartile index of each pixel."""
 
-    def __init__(self, kind, qs, qd):
+    def __init__(self, kind, qs, qd, reg=None):
         self.kind, self.qs, self.qd = kind, qs, qd
-        self.nmu = 4 if kind == "perqmu" else 1
-        self.ns = 4 if kind in ("perq", "perqmu") else 1
-        self.dim = 2 * (self.nmu + self.ns)
         n = qs.size
-        self.imu = {"s": qs if self.nmu == 4 else np.zeros(n, int), "d": qd if self.nmu == 4 else np.zeros(n, int)}
+        if kind == "perregmu":
+            # one mean per nside-16 region (a template-error field at the region scale with a
+            # weak prior), one scatter per quartile
+            self.nmu = int(reg.max()) + 1
+            self.imu = {"s": reg, "d": reg}
+        else:
+            self.nmu = 4 if kind == "perqmu" else 1
+            self.imu = {"s": qs if self.nmu == 4 else np.zeros(n, int),
+                        "d": qd if self.nmu == 4 else np.zeros(n, int)}
+        self.ns = 4 if kind in ("perq", "perqmu", "perregmu") else 1
+        self.dim = 2 * (self.nmu + self.ns)
         self.ils = {"s": qs if self.ns == 4 else np.zeros(n, int), "d": qd if self.ns == 4 else np.zeros(n, int)}
         o = 0
         self.sl = {}
@@ -117,7 +124,12 @@ class Hyper:
         return lp, g
 
     def fmt(self, th):
-        f = lambda x: f"{x[0]:.4f}" if x.size == 1 else str(np.round(x, 4).tolist())
+        def f(x):
+            if x.size == 1:
+                return f"{x[0]:.4f}"
+            if x.size > 8:
+                return f"[{x.size} values: mean {x.mean():.4f} sd {x.std():.4f} min {x.min():.3f} max {x.max():.3f}]"
+            return str(np.round(x, 4).tolist())
         return (f"mu_s {f(th[self.sl['mu_s']])} s_s {f(np.exp(th[self.sl['ls_s']]))} "
                 f"mu_d {f(th[self.sl['mu_d']])} s_d {f(np.exp(th[self.sl['ls_d']]))}")
 
@@ -171,7 +183,8 @@ class Sky:
     def profile(self, Ms, Md, th0, hyper, expected):
         f = self.objective(Ms, Md, hyper, expected)
         res = minimize(f, th0, jac=True, method="L-BFGS-B", bounds=hyper.bounds(),
-                       options={"maxiter": 300, "ftol": 1e-13, "gtol": 1e-5})
+                       options={"maxiter": 300 if hyper.dim < 100 else 3000, "ftol": 1e-13,
+                                "gtol": 1e-5, "maxcor": 10 if hyper.dim < 100 else 50})
         chi, ld, tr, _ = self.terms(Ms, Md, res.x, hyper, expected)
         lp, _ = hyper.hyperprior(res.x)
         return res.x, dict(chi=float(chi), ld=float(ld), tr=float(tr), lp=float(lp)), res.nfev
@@ -318,7 +331,7 @@ def main():
         tmpl, sed, kind = cell.split("_")
         sky.gs, sky.gd = (g_data if tmpl == "data" else g_exact)["sync"], (g_data if tmpl == "data" else g_exact)["dust"]
         T = np.full(npix, T_fixed) if sed == "fixT" else T_true
-        hyper = Hyper(kind, qs64, qd64)
+        hyper = Hyper(kind, qs64, qd64, reg=reg)
         bs_ref, bd_ref = refs[sed]
         bs0, bd0 = bs_ref[reg], bd_ref[reg]
         for expected in ([True, False] if cell in a.real_cells else [True]):
@@ -335,8 +348,14 @@ def main():
                 for c in ("s", "d"):
                     comp = "sync" if c == "s" else "dust"
                     sq = np.exp(th0[hyper.sl[f"ls_{c}"]]); mq = th0[hyper.sl[f"mu_{c}"]]
+                    if kind == "perregmu":
+                        q16 = qs16 if c == "s" else qd16
+                        mq_desc = "per-quartile mean/sd of the region means " + " ".join(
+                            f"{mq[q16 == k].mean():.3f}/{mq[q16 == k].std():.3f}" for k in range(4))
+                    else:
+                        mq_desc = f"mu_q {np.round(mq, 3).tolist()}"
                     say(f"   {comp}: profiled s_q {np.round(sq, 3).tolist()} against realized sd(a/g) "
-                        f"{[round(x[1], 3) for x in realized[tmpl][comp]]}; mu_q {np.round(mq, 3).tolist()} against mean(a/g) "
+                        f"{[round(x[1], 3) for x in realized[tmpl][comp]]}; {mq_desc} against mean(a/g) "
                         f"{[round(x[0], 3) for x in realized[tmpl][comp]]}")
             summary["cells"][key] = {"theta0": th0.tolist(), "parts0": p0, "laplace0": lap0, "scans": {}}
             scans = [(f"{c}_Q{q+1}", c, q, fine) for c in ("s", "d") for q in range(4)]
