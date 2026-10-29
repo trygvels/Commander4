@@ -102,6 +102,20 @@ model component rather than a preprocessing choice.
   hyperparameters 2 percent low; the data-dominated regions are untouched and the CMB prior
   width is irrelevant. The point for real data: where the prior dominates, the index posterior
   reports the template-error model, so the model needs a stated template law (Q16).
+- What the amplitude-template prior can and cannot take as a template (E023, F27): with a
+  template built from one scaled, smoothed frequency map the collapsed index target is biased
+  at 0.03 x and at 1 x the E012 noise (0.05 to beyond 0.1 in both indices, faint-sync runaway);
+  with exact templates it is clean; fixed T_d is at most a 0.03 effect; no scalar or
+  region-scale hyperparameter law repairs a dust template whose error is tied to T_d. The
+  regime boundary at realistic noise: the faint half of the sky at nside 16 is prior-dominated
+  for both indices (block sds 0.08 to 0.12 sync, 0.03 to 0.05 dust), so the template is the
+  posterior there. Figure candidate: block-shift scans per S/N quartile for the exact,
+  data-built and component-separation-quality templates (E025).
+- The per-pixel CMB prior at realistic noise (E023, F26): any finite per-pixel prior leaks the
+  spatially correlated CMB realization into the collapsed index likelihood with a
+  realization-dependent sign at several block sd (an iid prior is calibrated only for an iid
+  field); the flat per-pixel CMB prior is exact at the cost of one dof per pixel; the
+  correlated CMB prior belongs to the CG step. Inert at 0.03 x noise (scales as noise^2).
 - Why the index prior needs spatial structure (E021 attempt 2, ten runs, F24): an exchangeable (iid) hierarchical prior shrinks every region toward one global
   mean whose posterior is the precision-weighted mean of the regions, so it follows the
   Galactic plane; regions whose true index differs from it are pulled off (mid-S/N dust +0.02
