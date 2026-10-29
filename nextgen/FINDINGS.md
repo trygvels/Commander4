@@ -439,19 +439,31 @@ couplings of the field mean and the hyperparameters with the coefficients that c
 pattern are invisible to a diagonal metric. Scope: nside 8, one sky, high S/N; nside 16 and the
 low-S/N funnel untested.
 
-**F26. The per-pixel CMB amplitude prior of the collapsed hier likelihood, N(0, 100^2 uK^2),
-biases the dust index at realistic noise** (E023 stage 1, PySM d1s1c1 sky at the E012 noise
-levels, exact-target expected-log-likelihood scans with exact templates and the true T_d, no
-other misspecification than the region model itself). With the prior at 100 uK the target
-prefers the dust index of the second S/N quartile 0.05 above the noise-free region fit (3.8
-block sd, 7.7 nats) and the two fainter quartiles at or beyond +0.10 (9.4 and 2.9 nats), the
-faintest sync quartile at -0.10 (2.4 nats), all in the chi-square term; with the prior at 1e4
-uK every scan peaks within 0.02 of the reference at below 0.1 sd. Cause: at per-pixel noise
-of 64 to 320 uK_RJ per band the 100 uK prior on an 84 uK rms CMB is informative, it shrinks
-the per-pixel CMB and the dust index absorbs the residual; at 0.03 x that noise the same prior
-moves the index by at most 0.002 (E021 design review), which is why every earlier control
-passed. The E018/E021/E024 results stand (their noise level); real-data or realistic-noise
-runs need the flat (or the proper spatially correlated) CMB prior in the collapsed per-pixel
-likelihood (D021). Scope: one sky, one prior width tested against flat; the proper correlated
-CMB prior is Q5's territory.
-
+**F26. A finite per-pixel CMB amplitude prior in the collapsed hier likelihood leaks the fixed,
+spatially correlated CMB realization into the index likelihood at realistic noise; the induced
+index shift has a realization-dependent sign and is several block sd because the per-pixel
+likelihood counts correlated leakage as independent** (E023 stage 1, PySM d1s1c1 sky at the
+E012 noise levels, exact-target expected-log-likelihood scans with exact templates and the
+true T_d; stats-reviewed with independent code, sign-flip, shuffle and roll tests reproduced:
+`experiments/E023/f26_check.py`, `f26_shuffle.py`, `f26_scaling.py`). With the E018/E021 prior
+N(0, 100^2 uK^2) the target prefers the dust index of the second S/N quartile 0.05 from the
+noise-free region fit (7.7 nats, 3.8 of the model's own block sd), the two fainter quartiles
+at or beyond 0.10 and the faintest sync quartile at 0.10, all in the term of the expected
+chi-square that is linear in the fixed CMB realization: flipping the sign of the CMB flips
+every shift, rolling the CMB over the sky gives dust Q2 shifts between -0.02 and +0.02 and
+dust Q3 shifts between -0.10 and +0.10, and shuffling the CMB pixels (same marginal, no
+spatial correlation) gives 0.002 and 0.010 (0.2 to 0.4 sd): an iid per-pixel prior is
+calibrated for an iid field and not for the real CMB (neighbour correlation 0.56 at nside 64).
+The leak fraction sigma_c^2 / (tau^2 + sigma_c^2) is 0.25 at tau = 100 uK with sigma_c = 58 uK
+(the per-pixel CMB noise at noise scale 1) and 1.7 uK at 0.03 x noise; the shift scales as
+noise^2 at fixed tau (dust Q2: 0.046, 0.008, 0.001 at noise 1, 0.3, 0.1; about 1e-4 at 0.03),
+so E018, E021 and E024 are unaffected. The true per-pixel variance (tau = 84) makes it larger
+(dust Q2 0.058, 11 nats); the flat CMB prior (`amp_prior: none`, or sd 1e4, leak 3e-5) projects
+the CMB out exactly per pixel, is independent of the CMB realization and its correlation, and
+costs the CMB column's one degree of freedom (block sd 20 to 25 percent wider in the faint dust
+quartiles); with it every noise-1 baseline scan peaks within 0.03 of the reference at gains
+below 0.05 nats (dust Q2 +0.01 at 0.6 sd by shift). The correlated CMB prior of the CG step
+(Q5) is the only choice that is both calibrated and uses the CMB's smoothness. Scope: one sky,
+one CMB realization, template-Fisher quartiles, the noise-free region-fit reference, scan-edge
+peaks in the fainter quartiles; the per-pixel kernel on real maps at this depth must not carry
+a finite CMB prior (D021).

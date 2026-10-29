@@ -13,9 +13,12 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   dust template's error varies with T_d, hence with the index: no scalar-hyperparameter law
   fixes it. Neither candidate goes to stage 2 as a fix.
 - E023, noise-1 sky: the baseline cell (exact templates, true T) was biased by 0.05 to 0.1 in
-  the fainter dust quartiles; traced (three hypotheses, one confirmed) to the per-pixel CMB
-  prior N(0, 100^2) of the E018/E021 target, informative at realistic noise (F26). With a flat
-  CMB prior the baseline is clean. All noise-1 cells are being rerun with the flat prior
+  the fainter dust quartiles; traced to the per-pixel CMB prior N(0, 100^2) of the E018/E021
+  target (F26). Stats review of F26 (reproduced): the mechanism is leakage of the fixed,
+  correlated CMB realization through the finite per-pixel prior (sign flips with the CMB,
+  shuffled CMB pixels give no shift), not shrinkage; the true variance 84 uK is worse; the flat
+  prior projects the CMB out exactly at the cost of one dof per pixel. With a flat CMB prior
+  the baseline is clean. All noise-1 cells are being rerun with the flat prior
   (`--cmb-sd 1e4`, from 21:04, about 3 h); production runs at realistic noise use it (D021).
 
 **Running**

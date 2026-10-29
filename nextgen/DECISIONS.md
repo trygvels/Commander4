@@ -286,3 +286,10 @@ that ignores the CMB's spatial correlation and still shrinks; its bias would be 
 not zero. The proper correlated CMB prior: the right model, needs the CG amplitude step (Q5,
 M3), not available in the collapsed per-pixel likelihood.
 
+Correction to D021 (2026-10-29, after the stats review of F26): the mechanism is leakage of
+the fixed, correlated CMB realization, not shrinkage; the true per-pixel variance (84 uK) makes
+the shift larger (dust Q2 0.058, 11 nats), not "smaller but not zero"; the exact flat prior is
+`amp_prior: none` (inverse variance 0 in `index_field.py`), to which sd 1e4 is equivalent (leak
+3e-5); the cost of flat is the CMB column's one degree of freedom per pixel (faint dust block sd
+20 to 25 percent wider). The decision stands.
+

@@ -11,3 +11,113 @@ E023 exact-target scans (v2) on /Users/trygvels/data/e023_pysm_n1: nside 64, noi
   reference (trueT): region fit in 8 s; fit minus region mean: sync rms 0.0209 max 0.4886, dust rms 0.0094 max 0.1184; at the bounds: 0 sync, 0 dust
 
 == cell exact_trueT_global [expected]: profiled at the reference field (33 evals, 14.4 s): mu_s 0.9910 s_s 0.0484 mu_d 1.0021 s_d 0.0206; chi2 -187.4, logdet -3335935.1, trace -270148.8, hyperprior -5.25, Laplace -15.88
+-- exact_trueT_global [expected] s_Q1: 12288 pixels; argmax delta -0.010 (curvature sd 0.0281), gain over delta 0 0.08; Laplace term over the scan min -0.01 max +0.01; argmax with Laplace among those deltas -0.000; hyperparameters at argmax mu_s 0.9891 s_s 0.0483 mu_d 1.0020 s_d 0.0206; 131 s
+   -0.100 chi2        -5.15 logdet         1.81 trace      -1.40 hyper    -0.06 total        -4.80 laplace    -0.01
+   -0.090 chi2        -4.14 logdet         1.99 trace      -1.56 hyper    -0.06 total        -3.77
+   -0.080 chi2        -3.14 logdet         1.48 trace      -1.15 hyper    -0.05 total        -2.86
+   -0.070 chi2        -2.37 logdet         1.66 trace      -1.31 hyper    -0.05 total        -2.06
+   -0.060 chi2        -1.62 logdet         1.14 trace      -0.89 hyper    -0.04 total        -1.40
+   -0.050 chi2        -1.04 logdet         1.10 trace      -0.88 hyper    -0.03 total        -0.85 laplace    -0.00
+   -0.040 chi2        -0.56 logdet         0.92 trace      -0.76 hyper    -0.03 total        -0.43
+   -0.030 chi2        -0.21 logdet         0.49 trace      -0.40 hyper    -0.02 total        -0.13
+   -0.020 chi2        -0.05 logdet         0.66 trace      -0.56 hyper    -0.02 total         0.04
+   -0.010 chi2         0.04 logdet         0.20 trace      -0.16 hyper    -0.01 total         0.08
+   -0.000 chi2         0.00 logdet         0.14 trace      -0.14 hyper    -0.00 total        -0.00 laplace    +0.00
+   +0.010 chi2        -0.17 logdet        -0.21 trace       0.16 hyper     0.01 total        -0.21
+   +0.020 chi2        -0.47 logdet        -0.27 trace       0.18 hyper     0.01 total        -0.55
+   +0.030 chi2        -0.89 logdet        -0.64 trace       0.50 hyper     0.02 total        -1.01
+   +0.040 chi2        -1.44 logdet        -0.71 trace       0.52 hyper     0.02 total        -1.61
+   +0.050 chi2        -2.13 logdet        -1.09 trace       0.85 hyper     0.03 total        -2.33 laplace    +0.00
+   +0.060 chi2        -2.94 logdet        -1.32 trace       1.03 hyper     0.04 total        -3.19
+   +0.070 chi2        -3.88 logdet        -1.56 trace       1.22 hyper     0.04 total        -4.18
+   +0.080 chi2        -4.96 logdet        -1.80 trace       1.41 hyper     0.05 total        -5.30
+   +0.090 chi2        -6.16 logdet        -2.05 trace       1.61 hyper     0.06 total        -6.55
+   +0.100 chi2        -7.50 logdet        -2.31 trace       1.81 hyper     0.06 total        -7.94 laplace    +0.01
+-- exact_trueT_global [expected] s_Q2: 12288 pixels; argmax delta -0.030 (curvature sd 0.0811), gain over delta 0 0.05; Laplace term over the scan min -0.00 max +0.00; argmax with Laplace among those deltas -0.050; hyperparameters at argmax mu_s 0.9907 s_s 0.0483 mu_d 1.0021 s_d 0.0206; 119 s
+   -0.100 chi2        -0.41 logdet         0.21 trace      -0.17 hyper    -0.01 total        -0.37 laplace    -0.00
+   -0.090 chi2        -0.30 logdet         0.22 trace      -0.17 hyper    -0.01 total        -0.26
+   -0.080 chi2        -0.20 logdet         0.19 trace      -0.15 hyper    -0.00 total        -0.17
+   -0.070 chi2        -0.12 logdet         0.15 trace      -0.12 hyper    -0.00 total        -0.09
+   -0.060 chi2        -0.06 logdet         0.16 trace      -0.13 hyper    -0.00 total        -0.03
+   -0.050 chi2        -0.02 logdet         0.16 trace      -0.13 hyper    -0.00 total         0.01 laplace    +0.00
+   -0.040 chi2         0.02 logdet         0.09 trace      -0.07 hyper    -0.00 total         0.04
+   -0.030 chi2         0.04 logdet         0.09 trace      -0.08 hyper    -0.00 total         0.05
+   -0.020 chi2         0.03 logdet         0.11 trace      -0.09 hyper    -0.00 total         0.05
+   -0.010 chi2         0.03 logdet         0.02 trace      -0.02 hyper    -0.00 total         0.03
+   -0.000 chi2        -0.00 logdet         0.03 trace      -0.03 hyper    -0.00 total        -0.00 laplace    +0.00
+   +0.010 chi2        -0.04 logdet        -0.02 trace       0.02 hyper     0.00 total        -0.05
+   +0.020 chi2        -0.10 logdet        -0.02 trace       0.01 hyper     0.00 total        -0.11
+   +0.030 chi2        -0.17 logdet        -0.07 trace       0.06 hyper     0.00 total        -0.19
+   +0.040 chi2        -0.26 logdet        -0.07 trace       0.05 hyper     0.00 total        -0.28
+   +0.050 chi2        -0.36 logdet        -0.12 trace       0.10 hyper     0.00 total        -0.38 laplace    -0.00
+   +0.060 chi2        -0.48 logdet        -0.11 trace       0.09 hyper     0.00 total        -0.51
+   +0.070 chi2        -0.61 logdet        -0.17 trace       0.14 hyper     0.00 total        -0.64
+   +0.080 chi2        -0.76 logdet        -0.16 trace       0.13 hyper     0.00 total        -0.79
+   +0.090 chi2        -0.93 logdet        -0.15 trace       0.12 hyper     0.00 total        -0.96
+   +0.100 chi2        -1.10 logdet        -0.24 trace       0.20 hyper     0.01 total        -1.14 laplace    -0.00
+-- exact_trueT_global [expected] s_Q3: 12288 pixels; argmax delta -0.020 (curvature sd 0.1040), gain over delta 0 0.03; Laplace term over the scan min -0.00 max +0.00; argmax with Laplace among those deltas -0.000; hyperparameters at argmax mu_s 0.9909 s_s 0.0484 mu_d 1.0021 s_d 0.0206; 111 s
+   -0.100 chi2        -0.27 logdet         0.14 trace      -0.11 hyper    -0.00 total        -0.24 laplace    -0.00
+   -0.090 chi2        -0.20 logdet         0.14 trace      -0.11 hyper    -0.00 total        -0.17
+   -0.080 chi2        -0.14 logdet         0.14 trace      -0.11 hyper    -0.00 total        -0.12
+   -0.070 chi2        -0.09 logdet         0.14 trace      -0.12 hyper    -0.00 total        -0.07
+   -0.060 chi2        -0.05 logdet         0.08 trace      -0.06 hyper    -0.00 total        -0.03
+   -0.050 chi2        -0.02 logdet         0.09 trace      -0.07 hyper    -0.00 total        -0.00 laplace    +0.00
+   -0.040 chi2         0.00 logdet         0.09 trace      -0.07 hyper    -0.00 total         0.02
+   -0.030 chi2         0.01 logdet         0.09 trace      -0.07 hyper    -0.00 total         0.03
+   -0.020 chi2         0.02 logdet         0.03 trace      -0.02 hyper    -0.00 total         0.03
+   -0.010 chi2         0.01 logdet         0.03 trace      -0.03 hyper    -0.00 total         0.02
+   -0.000 chi2        -0.01 logdet         0.04 trace      -0.03 hyper    -0.00 total        -0.00 laplace    +0.00
+   +0.010 chi2        -0.02 logdet         0.01 trace      -0.01 hyper    -0.00 total        -0.03
+   +0.020 chi2        -0.06 logdet         0.00 trace      -0.00 hyper     0.00 total        -0.06
+   +0.030 chi2        -0.10 logdet        -0.02 trace       0.02 hyper     0.00 total        -0.11
+   +0.040 chi2        -0.16 logdet        -0.02 trace       0.01 hyper     0.00 total        -0.16
+   +0.050 chi2        -0.22 logdet        -0.01 trace       0.01 hyper     0.00 total        -0.23 laplace    +0.00
+   +0.060 chi2        -0.28 logdet        -0.08 trace       0.07 hyper     0.00 total        -0.30
+   +0.070 chi2        -0.36 logdet        -0.08 trace       0.06 hyper     0.00 total        -0.38
+   +0.080 chi2        -0.45 logdet        -0.08 trace       0.06 hyper     0.00 total        -0.47
+   +0.090 chi2        -0.55 logdet        -0.08 trace       0.06 hyper     0.00 total        -0.57
+   +0.100 chi2        -0.65 logdet        -0.14 trace       0.11 hyper     0.00 total        -0.68 laplace    -0.00
+-- exact_trueT_global [expected] s_Q4: 12288 pixels; argmax delta -0.020 (curvature sd 0.1196), gain over delta 0 0.02; Laplace term over the scan min -0.00 max +0.00; argmax with Laplace among those deltas -0.000; hyperparameters at argmax mu_s 0.9909 s_s 0.0484 mu_d 1.0021 s_d 0.0206; 109 s
+   -0.100 chi2        -0.20 logdet         0.10 trace      -0.08 hyper    -0.00 total        -0.18 laplace    -0.00
+   -0.090 chi2        -0.15 logdet         0.11 trace      -0.09 hyper    -0.00 total        -0.13
+   -0.080 chi2        -0.11 logdet         0.11 trace      -0.09 hyper    -0.00 total        -0.09
+   -0.070 chi2        -0.07 logdet         0.11 trace      -0.09 hyper    -0.00 total        -0.05
+   -0.060 chi2        -0.04 logdet         0.11 trace      -0.09 hyper    -0.00 total        -0.02
+   -0.050 chi2        -0.01 logdet         0.05 trace      -0.04 hyper    -0.00 total        -0.00 laplace    -0.00
+   -0.040 chi2         0.00 logdet         0.05 trace      -0.04 hyper    -0.00 total         0.01
+   -0.030 chi2         0.01 logdet         0.05 trace      -0.05 hyper    -0.00 total         0.02
+   -0.020 chi2         0.01 logdet         0.05 trace      -0.05 hyper    -0.00 total         0.02
+   -0.010 chi2         0.01 logdet         0.06 trace      -0.05 hyper    -0.00 total         0.01
+   -0.000 chi2        -0.01 logdet         0.06 trace      -0.06 hyper    -0.00 total        -0.00 laplace    +0.00
+   +0.010 chi2        -0.02 logdet        -0.01 trace       0.01 hyper     0.00 total        -0.02
+   +0.020 chi2        -0.05 logdet        -0.01 trace       0.00 hyper     0.00 total        -0.05
+   +0.030 chi2        -0.08 logdet        -0.01 trace       0.00 hyper     0.00 total        -0.08
+   +0.040 chi2        -0.12 logdet        -0.00 trace      -0.00 hyper     0.00 total        -0.12
+   +0.050 chi2        -0.17 logdet        -0.00 trace      -0.00 hyper     0.00 total        -0.17 laplace    +0.00
+   +0.060 chi2        -0.22 logdet        -0.01 trace       0.00 hyper     0.00 total        -0.23
+   +0.070 chi2        -0.28 logdet        -0.00 trace      -0.00 hyper     0.00 total        -0.29
+   +0.080 chi2        -0.35 logdet         0.00 trace      -0.01 hyper     0.00 total        -0.36
+   +0.090 chi2        -0.41 logdet        -0.09 trace       0.07 hyper     0.00 total        -0.43
+   +0.100 chi2        -0.50 logdet        -0.09 trace       0.07 hyper     0.00 total        -0.51 laplace    +0.00
+-- exact_trueT_global [expected] d_Q1: 12288 pixels; argmax delta -0.000 (curvature sd 0.0036), gain over delta 0 0.00; Laplace term over the scan min -0.49 max +0.02; argmax with Laplace among those deltas -0.000; hyperparameters at argmax mu_s 0.9910 s_s 0.0484 mu_d 1.0021 s_d 0.0206; 128 s
+   -0.100 chi2      -386.55 logdet       -59.09 trace      51.28 hyper     0.46 total      -393.90 laplace    -0.49
+   -0.090 chi2      -314.95 logdet       -49.15 trace      42.67 hyper     0.40 total      -321.03
+   -0.080 chi2      -250.43 logdet       -40.22 trace      34.92 hyper     0.34 total      -255.40
+   -0.070 chi2      -193.09 logdet       -32.28 trace      27.99 hyper     0.28 total      -197.09
+   -0.060 chi2      -143.02 logdet       -25.25 trace      21.85 hyper     0.23 total      -146.19
+   -0.050 chi2      -100.31 logdet       -19.09 trace      16.48 hyper     0.17 total      -102.75 laplace    -0.20
+   -0.040 chi2       -65.06 logdet       -13.76 trace      11.83 hyper     0.12 total       -66.87
+   -0.030 chi2       -37.32 logdet        -9.23 trace       7.88 hyper     0.08 total       -38.59
+   -0.020 chi2       -17.19 logdet        -5.44 trace       4.61 hyper     0.04 total       -17.98
+   -0.010 chi2        -4.73 logdet        -2.37 trace       1.99 hyper     0.02 total        -5.10
+   -0.000 chi2        -0.00 logdet         0.00 trace      -0.00 hyper    -0.00 total        -0.00 laplace    +0.00
+   +0.010 chi2        -3.05 logdet         1.69 trace      -1.37 hyper    -0.00 total        -2.73
+   +0.020 chi2       -13.94 logdet         2.72 trace      -2.13 hyper     0.01 total       -13.34
+   +0.030 chi2       -32.70 logdet         3.07 trace      -2.27 hyper     0.03 total       -31.87
+   +0.040 chi2       -59.37 logdet         2.73 trace      -1.78 hyper     0.06 total       -58.36
+   +0.050 chi2       -93.98 logdet         1.68 trace      -0.65 hyper     0.11 total       -92.84 laplace    +0.02
+   +0.060 chi2      -136.55 logdet        -0.12 trace       1.15 hyper     0.17 total      -135.35
+   +0.070 chi2      -187.09 logdet        -2.70 trace       3.66 hyper     0.23 total      -185.90
+   +0.080 chi2      -245.61 logdet        -6.12 trace       6.91 hyper     0.31 total      -244.52
+   +0.090 chi2      -312.13 logdet       -10.43 trace      10.93 hyper     0.39 total      -311.24
+   +0.100 chi2      -386.62 logdet       -15.70 trace      15.79 hyper     0.47 total      -386.06 laplace    -0.12

@@ -262,18 +262,23 @@ not the pseudo-true value of a model whose amplitudes are pinned to the template
 pinned-amplitude region fit (sync and dust amplitudes at the truth, CMB free) differs from the
 flat fit by 0.001 in every dust quartile and 0.002 in sync (scratchpad
 `e023_n1_pinned_refs.npz`); (H2) the determinant or trace terms: refuted by the part table;
-(H4) the per-pixel CMB prior N(0, 100^2) of the E018/E021 target, which at noise scale 1 (per-pixel
-rms 64 to 320 uK_RJ per band against a CMB rms of 84 uK) is informative and shrinks the CMB
-amplitude: CONFIRMED. The same cell with the CMB prior sd at 1e4
-(`E023/scan_n1_baseline_cmbflat_check.txt`, `--cmb-sd 1e4`) peaks at +0.010 in dust Q2, Q3,
-Q4 (gains 0.02 to 0.04 nats, below 0.1 sd) and at -0.020 in sync Q4 (0.02 nats), the wide scan
-at 0.000. At 0.03 noise the same prior moves nothing (E021 design review: at most 0.002),
-which is why it passed every control so far. Consequence: the per-pixel CMB prior is part of
-the target and biases the dust index by 0.05 to 0.1 in the mid and faint quartiles at
-realistic noise even with exact templates and true T (F26); production runs at realistic
-noise use a flat CMB amplitude prior in the collapsed likelihood (D021), the writer gains
-`--cmb-prior-sd`, and the noise-1 cells are rerun with it (`E023/scan_n1_cmbflat.txt`, from
-21:04). The first-pass noise-1 cells are kept as evidence but not read for attribution.
+(H4) the per-pixel CMB prior N(0, 100^2) of the E018/E021 target: confirmed as the cause by
+the same cell with the CMB prior sd at 1e4 (`E023/scan_n1_baseline_cmbflat_check.txt`,
+`--cmb-sd 1e4`), which peaks at +0.010 in dust Q2, Q3, Q4 (gains 0.02 to 0.04 nats) and at
+-0.020 in sync Q4 (0.02 nats), the wide scan at 0.000. The mechanism was identified by the
+stats review (independent code, `E023/f26_check.py`, `f26_shuffle.py`, `f26_scaling.py`,
+reproduced, `f26_shuffle_output.txt`): not shrinkage but leakage of the fixed, spatially
+correlated CMB realization through the finite per-pixel prior into the term of the expected
+chi-square that is linear in the realization; the sign flips with the CMB's sign, rolling the
+CMB over the sky gives shifts of either sign (dust Q3 from -0.10 to +0.10), shuffling its
+pixels removes them (0.002 to 0.010), the leak fraction is 0.25 at 100 uK and the true
+variance 84 uK makes it larger (0.058, 11 nats); the shift scales as noise^2 and is about
+1e-4 at 0.03 noise, which is why every earlier control passed. Consequence (F26, D021): the
+collapsed per-pixel likelihood at realistic noise must carry a flat CMB amplitude prior
+(`amp_prior: none`, or sd 1e4), at the cost of the CMB's one degree of freedom per pixel
+(faint dust block sd 20 to 25 percent wider); the writer gains `--cmb-prior-sd`, and the
+noise-1 cells are rerun with it (`E023/scan_n1_cmbflat.txt`, from 21:04). The first-pass
+noise-1 cells are kept as evidence but not read for attribution.
 
 Noted from the first pass regardless of the CMB prior: at noise 1 the block curvature sds are
 0.03 to 0.12 (sync quartiles) and 0.003 to 0.05 (dust), so the quartile scans resolve shifts of

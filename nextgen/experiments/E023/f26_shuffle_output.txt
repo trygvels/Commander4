@@ -1,0 +1,25 @@
+<string>:16: HealpyDeprecationWarning: "verbose" was deprecated in version 1.15.0 and will be removed in a future version. 
+d_Q2 cmb shuffled 0                tau     100: argmax +0.002 (sd 0.0125) gain    0.00; chi2 at -0.1/+0.1   -37.05/  -27.57; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb shuffled 1                tau     100: argmax -0.001 (sd 0.0125) gain    0.00; chi2 at -0.1/+0.1   -34.79/  -29.50; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb shuffled 2                tau     100: argmax +0.002 (sd 0.0125) gain    0.00; chi2 at -0.1/+0.1   -36.98/  -27.63; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb shuffled 3                tau     100: argmax -0.001 (sd 0.0125) gain    0.00; chi2 at -0.1/+0.1   -34.49/  -29.77; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb rolled 6000               tau     100: argmax -0.017 (sd 0.0123) gain    0.96; chi2 at -0.1/+0.1   -23.52/  -39.22; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb rolled 12000              tau     100: argmax -0.014 (sd 0.0122) gain    0.52; chi2 at -0.1/+0.1   -25.82/  -37.23; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb rolled 30000              tau     100: argmax +0.015 (sd 0.0128) gain    0.58; chi2 at -0.1/+0.1   -45.60/  -20.22; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q2 cmb rolled 40000              tau     100: argmax -0.005 (sd 0.0126) gain    0.00; chi2 at -0.1/+0.1   -31.65/  -32.20; logdet -0.35/+0.29; trace +0.28/-0.24
+d_Q3 cmb shuffled 0                tau     100: argmax +0.005 (sd 0.0277) gain    0.00; chi2 at -0.1/+0.1    -7.91/   -5.25; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb shuffled 1                tau     100: argmax -0.009 (sd 0.0280) gain    0.00; chi2 at -0.1/+0.1    -5.89/   -6.98; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb shuffled 2                tau     100: argmax +0.006 (sd 0.0276) gain    0.00; chi2 at -0.1/+0.1    -8.03/   -5.14; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb shuffled 3                tau     100: argmax -0.010 (sd 0.0280) gain    0.00; chi2 at -0.1/+0.1    -5.85/   -7.02; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb rolled 6000               tau     100: argmax +0.045 (sd 0.0286) gain    1.24; chi2 at -0.1/+0.1   -13.43/   -0.51; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb rolled 12000              tau     100: argmax -0.087 (sd 0.0261) gain    5.11; chi2 at -0.1/+0.1     5.02/  -16.36; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb rolled 30000              tau     100: argmax +0.059 (sd 0.0292) gain    2.16; chi2 at -0.1/+0.1   -15.40/    1.20; logdet -0.07/+0.06; trace +0.06/-0.05
+d_Q3 cmb rolled 40000              tau     100: argmax -0.100 (sd nan) gain    6.07; chi2 at -0.1/+0.1     6.08/  -17.26; logdet -0.07/+0.06; trace +0.06/-0.05
+s_Q4 cmb shuffled 0                tau     100: argmax -0.016 (sd 0.1177) gain    0.01; chi2 at -0.1/+0.1    -0.25/   -0.47; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb shuffled 1                tau     100: argmax -0.013 (sd 0.1179) gain    0.00; chi2 at -0.1/+0.1    -0.27/   -0.45; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb shuffled 2                tau     100: argmax -0.013 (sd 0.1180) gain    0.00; chi2 at -0.1/+0.1    -0.27/   -0.45; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb shuffled 3                tau     100: argmax -0.006 (sd 0.1195) gain    0.00; chi2 at -0.1/+0.1    -0.32/   -0.38; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb rolled 6000               tau     100: argmax -0.044 (sd 0.1140) gain    0.07; chi2 at -0.1/+0.1    -0.05/   -0.71; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb rolled 12000              tau     100: argmax +0.001 (sd 0.1204) gain    0.00; chi2 at -0.1/+0.1    -0.36/   -0.33; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb rolled 30000              tau     100: argmax -0.033 (sd 0.1148) gain    0.04; chi2 at -0.1/+0.1    -0.13/   -0.62; logdet -0.02/+0.02; trace +0.02/-0.02
+s_Q4 cmb rolled 40000              tau     100: argmax +0.100 (sd nan) gain    0.34; chi2 at -0.1/+0.1    -0.91/    0.34; logdet -0.02/+0.02; trace +0.02/-0.02
