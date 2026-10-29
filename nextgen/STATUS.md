@@ -2,6 +2,40 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 12:10): dense Hessian metric for the index-field NUTS merged after stats review (E024 run in progress); E023 scans and the seed-2028 triple running
+
+**Learned**
+- Diagonal-metric baseline (E021 gmrf8): dust field mean mu_d ESS 9 of 700, dust amplitude
+  mean ESS 39, dust region ESS min 6, median 66; sync fine (mu_s 69, regions median 575). In
+  centred coordinates the likelihood curvature is diagonal in pixels but the basis is global, so
+  a diagonal metric cannot follow the couplings of the field mean and the hyperparameters.
+- Implemented `nuts.init_inv_mass: fd_hessian_dense`: the full finite-difference Hessian (same
+  2 dim gradients as the diagonal estimate) as a dense inverse mass, eigenvalues 1/|lam| capped
+  at 10, refreshed at the configured transitions; same target for any fixed metric.
+  Stats-reviewed (consistency of the Hamiltonian confirmed; a silent corruption of the Hessian
+  by rejected stencil points found and fixed in both initializers), 952 tests green. On an
+  8-dimensional correlated Gaussian the dense metric takes 3 leapfrogs per transition against 7
+  for the best diagonal one.
+- E023 code control: the numpy exact-target marginal agrees with Commander4's kernel to 4e-12.
+
+**Running**
+- E024: gmrf8 with the dense metric on the E021 data (from 11:56, same target as the diagonal
+  gmrf8 chain; pre-registered reading in the record: posterior agreement within 4 MC SE, mu_d
+  ESS per gradient up by at least 3).
+- E023 stage 1: scans on the E021 control sky, then the PySM sky at 0.03 and at noise 1 (one
+  core, slow under load; several hours).
+- E021 seed-2028 gmrf16, iid16, indep16 (from 11:13; about 14.5 h unloaded, slower now).
+
+**Next**
+- E024 result into the record; if adopted, the dense metric becomes the production setting for
+  the E023 stage-2 chains and is noted in Paper A Sect. 5 (sampler).
+- E023 stage-1 reading per the pre-registration; then the stage-2 chain on the noise-1 sky.
+- Seed-2028 paired differences into E021 and F24; Paper A Table 2 final.
+
+**Needs Trygve**
+- Unchanged: Paper A presentation of the E022 diagnostics; `COMP_CL_TYPE = none` semantics
+  (Q17 item 1); the hier default (D003/D011); Q15 (zero-level model).
+
 ## 2026-10-29 (Mac mini, 11:45): E021 Conclusion corrected after stats review (resolution reading withdrawn, ordering stands); E023 designed and under review; seed-2028 triple running
 
 **Learned**
