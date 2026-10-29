@@ -419,9 +419,12 @@ independent regions lose factors 3.5 and 4.9; the pixel-level error and the CMB 
 No field finer than the sky's structure was run, so the resolution rule for real data is still
 open (Q16). Cost of the GMRF against iid at nside 16: 11 times the gradients per effective
 sample, with the dust field mean mixing slowly (hyperparameter ESS 3 to 14 of 700) in the
-centred parameterization. One sky, one noise and template realization (the seed-2028 nside-16
-triple is running), a spatially smooth truth (on an uncorrelated truth the iid prior is the
-correct one), fixed T_d, no template-law misspecification (F23).
+centred parameterization. Replicated on a second noise and template realization (seed 2028):
+gmrf16 0.0323 / 0.0180, iid16 0.0501 / 0.0271 (paired +0.0178 +- 0.0013, +0.0091 +- 0.0010),
+indep16 0.1373 / 0.1074, iid dust mean 1.553, iid hyperparameter test failing (mu_d +5.6 sd)
+and the GMRF passing: the realization scatter of the gaps is about 0.0005. One sky, a
+spatially smooth truth (on an uncorrelated truth the iid prior is the correct one), fixed T_d,
+no template-law misspecification (F23), the per-pixel CMB prior inert at this noise (F26).
 
 **F25. A dense finite-difference Hessian metric fixes the slow mixing of the GMRF field mean in
 the centred index-field NUTS at high S/N without changing the posterior** (E024, the E021 gmrf8

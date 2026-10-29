@@ -2,6 +2,25 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 21:40): E021 seed-2028 replication meets every pre-registered expectation
+
+**Learned**
+- Second realization (new template scatter and noise, same truth): gmrf16 0.0323 / 0.0180,
+  iid16 0.0501 / 0.0271 (paired +0.0178 +- 0.0013, +0.0091 +- 0.0010; first sky +0.0172, +0.0095),
+  indep16 0.1373 / 0.1074; CMB 2.86 / 2.91 / 3.13 uK; iid dust mean 1.553 against 1.540; iid
+  hyperparameters fail (mu_d +5.6 sd), GMRF and independent pass. Gap scatter between
+  realizations about 0.0005. gmrf16 ran at 63 gradients per iteration this time (125 before).
+  E021, F24, registry and the Paper A table carry it.
+
+**Running**
+- E023 noise-1 rerun with the flat CMB prior (from 21:04; the machine is now otherwise free).
+
+**Next**
+- E023 noise-1 reading and Conclusion; Q16 update; the template-error-field design.
+
+**Needs Trygve**
+- Unchanged (including the CMB prior width for real-data runs, D021).
+
 ## 2026-10-29 (Mac mini, 21:15): E023 stage 1: 0.03 sky read; noise-1 sky exposed the per-pixel CMB prior (F26, D021), rerun with a flat prior in progress
 
 **Learned**

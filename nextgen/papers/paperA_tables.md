@@ -37,5 +37,8 @@ understated by block correlation): sync +0.0172 +- 0.0013, dust +0.0095 +- 0.001
 0.007 uK. Reading (F24): the spatial prior wins at nside 16 and 8; at nside 4 the gaps are
 suggestive only. Against the region reference the GMRF loses 13 / 30 percent going from nside 4
 to 16 while independent regions lose factors 3.5 / 4.9; the pixel-level error and the CMB
-residual follow what the field can represent. A second noise and template realization
-(seed 2028) of the nside-16 rows is running; the table is not final until it is in.
+residual follow what the field can represent. Second noise and template realization (seed 2028,
+nside-16 rows): GMRF 0.0323 / 0.0180, iid 0.0501 / 0.0271 (paired +0.0178 +- 0.0013, +0.0091 +-
+0.0010), independent 0.1373 / 0.1074; CMB 2.86 / 2.91 / 3.13 uK; iid hyperparameter test fails
+(mu_d +5.6 sd), the others pass. The realization scatter of the gaps is about 0.0005; the
+table's nside-16 rows can be quoted as the mean of the two realizations.
