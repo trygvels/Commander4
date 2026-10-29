@@ -91,8 +91,8 @@ model component rather than a preprocessing choice.
   index grid, Matern alpha 2, constant mode dropped, hyperpriors on (mu, sigma, rho) (D009);
   amplitude hyperparameters (mu_c, log s_c) with their hyperpriors; the collapsed joint target;
   non-centred and centred parameterizations and their Jacobian.
-- Validation ladder: exact-target checks (E012 L1), SBC at K 192 (E012; hier SBC E016 L2,
-  pending), coverage with a misspecified template (E016: a 30 percent large-scale distortion or 23
+- Validation ladder: exact-target checks (E012 L1), SBC at K 192 (E012; hier SBC E016 L2
+  passed on 600 replicates in two seeded runs), coverage with a misspecified template (E016: a 30 percent large-scale distortion or 23
   percent scatter of the template leaves z within 0.3 sd and coverage 0.64 to 0.75 / 0.92 to 0.98).
 - Template-error law (F23, E021 attempt 1, stats-reviewed): the collapsed hier marginal is
   exact for its own law a | g ~ N(mu g, (s g)^2) and not for template errors of the same size
