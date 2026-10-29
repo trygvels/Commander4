@@ -538,6 +538,29 @@ region means gives 5.48 and 4.13 uK, 0.08 below the runs, which is gmrf16's own 
 true-SED floor; the design review's cross-nside CMB rule (c) therefore had no valid per-nside
 reference, and the CMB ladder is read only as "set by the resolution, not by the prior".
 
+**Second realization (seed 2028; same truth indices, T_d, CMB and templates, new template
+scatter r and new noise; gmrf16, iid16, indep16; 11:13 to 21:18 under load, 1200 iterations,
+700 post-burn; `E021_seed2028_analyzer_output.txt`):** pixel-level RMSE gmrf16 0.0323 /
+0.0180, iid16 0.0501 / 0.0271, indep16 0.1373 / 0.1074 (first sky 0.0333 / 0.0180, 0.0505 /
+0.0275, 0.1424 / 0.1009); paired against gmrf16 iid16 +0.0178 +- 0.0013 and +0.0091 +- 0.0010,
+indep16 +0.1050 +- 0.0039 and +0.0894 +- 0.0060 (first sky +0.0172 / +0.0095 and +0.1091 /
++0.0829); GLS CMB residual 2.86, 2.91, 3.13 uK (first sky 2.89, 2.93, 3.16; the true-SED floor
+on this sky 2.78), iid16 +0.056 +- 0.009 uK. iid16 dust field mean 1.5531 +- 0.0011 against
+the sky mean 1.5397 (first sky 1.5541), dust z median +0.34 (first sky +0.40); gmrf16 z median
+/ MAD +0.02 / 0.51 and +0.10 / 0.54. Amplitude hyperparameters against this sky's realized
+targets (mu_s 0.99836, s_s 0.29900, mu_d 0.99906, s_d 0.29959): gmrf16 -0.5, +0.3, +1.1, +1.0
+sd (pass), iid16 -2.8, +0.0, +5.6, +2.9 sd (fail, mu_d), indep16 -1.5, -0.1, +1.3, +0.5 sd
+(pass). Every pre-registered expectation of the Follow-ups is met: the ordering repeats on
+both indices with the iid and independent paired differences at 9 to 27 SE, the iid dust mean
+is again above the sky mean, and the iid amplitude hyperparameters are again outside the 2-sd
+band while gmrf16's are inside. The two realizations put the iid minus GMRF gap at 0.0172 and
+0.0178 (sync) and 0.0095 and 0.0091 (dust): the realization-to-realization scatter of the gap
+is of order 0.0005, below the bootstrap SE, so the bootstrap SE is not what limits the gap's
+precision, the single-sky systematics (one truth, one template family) are. Sampler aside: on
+this realization gmrf16 settled at 63 gradients per iteration (first sky 125) with the same
+ESS pattern (dust hyperparameters ESS 5 to 24), so the first sky's cost was partly a step-size
+accident.
+
 **Sampler note:** every run prints 13 numpy RuntimeWarnings at its first transition (12 ranks:
 divide by zero in the GMRF prior at sigma = 0; one rank: overflow in exp). They come from the
 initial step-size heuristic (eps doubling from 1, Hoffman and Gelman Algorithm 4) visiting an
@@ -628,19 +651,20 @@ review (Design review, last paragraph).
    its target with the largest CMB residual; its RMSE matches the Fisher-weighted prediction for
    dust (0.0691 against 0.0686) and approximately for sync (0.0669 against 0.0630, 0.012 off).
 
-Limitations: one noise and template realization (the seed-2028 nside-16 triple is running), one
-sky drawn from the model class with a smooth, region-constant truth at nside 16 (no field finer
-than the sky's structure; Q16), one noise level, fixed T_d, no template-law misspecification
-(F23). Recorded as F24 (corrected); the GMRF is the index prior of record for M2.x (D018, amended
-by D019).
+Limitations: two noise and template realizations of one sky (the seed-2028 triple reproduces
+the nside-16 ordering, gaps and mechanism within 0.0006), one sky drawn from the model class
+with a smooth, region-constant truth at nside 16 (no field finer than the sky's structure;
+Q16), one noise level, fixed T_d, no template-law misspecification (F23), the per-pixel CMB
+prior inert at this noise (F26). Recorded as F24 (corrected); the GMRF is the index prior of
+record for M2.x (D018, amended by D019).
 
 ## Follow-ups
 - Q16: the same comparison on the E020 PySM sky at noise scale 1 and 0.03 with robust template
   priors and sampled T_d; and the attempt-1 sky (g = a / r) as the mildest template-error
   misspecification: a 30 percent scatter whose conditional law differs from the prior's shifts
   the prior-dominated dust index by +0.13 at 4 posterior sd under hier at nside 16.
-- Second noise and template realization for the nside-16 triple (`--seed 2028`, started
-  2026-10-29 11:13, `/Users/trygvels/data/e021_consistent_v2_seed2028`, gmrf16 then iid16 then
+- DONE 2026-10-29 21:18 (Result, second realization): second noise and template realization
+  for the nside-16 triple (`--seed 2028`, started 2026-10-29 11:13, `/Users/trygvels/data/e021_consistent_v2_seed2028`, gmrf16 then iid16 then
   indep16, about 14.5 h). Pre-registered expectation: the same ordering on both indices with the
   iid16 and indep16 paired differences against gmrf16 at least 3 bootstrap SE from zero, the iid
   dust field mean again above the sky mean 1.540, and the iid16 amplitude hyperparameters again
