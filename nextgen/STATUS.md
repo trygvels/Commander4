@@ -32,9 +32,14 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   prediction missed the sync optimum by 0.014, so that clause of the negative control holds only
   approximately; recorded.
 
+- gmrf8 (56 min): region-level RMSE 0.033 / 0.016, as good as gmrf16 per region; at the pixel level
+  +0.005 / +0.004 worse and the CMB residual 4.2 uK against 2.9, both from structure the nside-8
+  field cannot represent (the truth is region-constant at nside 16). Calibration z MAD 0.63 / 0.61,
+  coverage 72 / 96 and 73 / 96; mu_d amplitude hyperparameter at +2.1 sd (marginal, noted).
+
 **Running**
-- E021 attempt 2 gmrf8 (from 07:52), then iid8, indep8, gmrf4, iid4, indep4 (about 15 h). A
-  waiter runs the analyzer when gmrf8 ends.
+- E021 attempt 2 iid8 (from 08:48), then indep8, gmrf4, iid4, indep4 (a few hours). A waiter
+  runs the analyzer when indep8 ends.
 
 **Next**
 - indep16 as the no-shrinkage reference (its per-region posterior sds are the s_r of the

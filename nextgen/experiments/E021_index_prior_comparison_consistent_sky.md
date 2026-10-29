@@ -404,6 +404,27 @@ are far off because one index per component misfits the sky and the amplitude ra
 it (the corrected reading). Note that the data-only dust optimum 1.6008 coincides with the
 hyperprior mean mu0 = 1.60, as anticipated in "Negative control".
 
+**Attempt 2, gmrf8 complete (2026-10-29 07:52 to 08:48, 56 min; 1200 iterations, 700
+post-burn):** 3088-gradient Hessians, 63 gradients and 2.5 s per iteration (12 to 16 ms per
+gradient), no divergences. Analyzer: pixel-level RMSE against the nside-16 truth sync 0.0379
+(|b| > 20: 0.0362) and dust 0.0218 (0.0211), of which 0.0195 / 0.0146 is the unbeatable
+within-region spread of the truth at nside 8; region-level RMSE with that floor removed 0.0325
+(sync) and 0.0163 (dust) against 0.0333 / 0.0180 for gmrf16. Paired against gmrf16 at the pixel
+level: sync +0.0046 +- 0.0007, dust +0.0038 +- 0.0007, GLS CMB residual +1.34 +- 0.51 uK (4.22 uK
+against 2.89; the reference GLS at the truth's nside-8 region means is 5.37 uK, so the
+resolution misfit in the plane, not the sampler, drives the CMB). Region z median/MAD -0.13/0.63
+(sync) and +0.09/0.61 (dust), coverage 72 / 96 and 73 / 96 percent, posterior sd medians 0.037 /
+0.020, ESS min 133 / 5 over regions (dust hyperparameters again slow: mu_d ESS 9, ESS of the
+dust amplitude mean 39). Fields: sync mu -3.0004 +- 0.0028, sigma 0.066 +- 0.005, rho 34 +- 5
+deg; dust mu 1.5421 +- 0.0020, sigma 0.036 +- 0.002, rho 32 +- 4 deg (the coarser basis takes a
+longer correlation length). Amplitude hyperparameters: mu_s -1.2 sd, s_s +0.2 sd, s_d +1.4 sd,
+mu_d 1.00384 +- 0.00190 (+2.1 sd), a marginal exceedance of the 2-sd band (one of 4 tests in the
+fifth run; its direction matches a slight dust misfit of the nside-8 model to the nside-16
+truth), noted and not treated as a failure. Reading: at this noise the nside-8 field is as good
+as nside 16 per region and loses only what it cannot represent (the pixel-level +0.004 and the
+CMB residual); the region-model ladder is therefore about representable structure, which is
+what Q3 asks.
+
 **Sampler note:** every run prints 13 numpy RuntimeWarnings at its first transition (12 ranks:
 divide by zero in the GMRF prior at sigma = 0; one rank: overflow in exp). They come from the
 initial step-size heuristic (eps doubling from 1, Hoffman and Gelman Algorithm 4) visiting an
