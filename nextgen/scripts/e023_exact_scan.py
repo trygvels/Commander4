@@ -259,6 +259,10 @@ def main():
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--cmb-sd", type=float, default=CMB_SD, help="per-pixel CMB prior sd in uK_CMB")
     ap.add_argument("--scans", nargs="*", default=None, help="run only these scan labels (e.g. d_Q2 s_Q4_wide)")
+    ap.add_argument("--cs-scatter", type=float, default=0.3,
+                    help="rms of the log error field of the 'cs' (component-separation-quality) template")
+    ap.add_argument("--cs-fwhm", type=float, default=10.0, help="correlation FWHM in degrees of that field")
+    ap.add_argument("--cs-seed", type=int, default=11)
     a = ap.parse_args()
     CMB_SD = a.cmb_sd
     D = a.dir
@@ -273,6 +277,20 @@ def main():
               "dust": np.maximum(hp.read_map(f"{D}/template_dust_545GHz.fits", field=0), 1e-3)}
     a_true = {"sync": np.asarray(t["a_sync"], float), "dust": np.asarray(t["a_dust"], float)}
     g_exact = {k: np.maximum(v, 1e-3 * np.mean(np.abs(v))) for k, v in a_true.items()}
+    # "cs" template: the true amplitude times exp(f), f a Gaussian random field with rms
+    # cs_scatter and a Gaussian correlation of FWHM cs_fwhm (a smooth multiplicative error with
+    # no coupling to T_d or the index; a | g = g exp(-f) is log-normal, not the prior's law)
+    g_cs = {}
+    lmax_cs = 3 * nside - 1
+    sig_b = np.radians(a.cs_fwhm) / np.sqrt(8.0 * np.log(2.0))
+    ell = np.arange(lmax_cs + 1)
+    cl = np.exp(-ell * (ell + 1) * sig_b**2)
+    cs_fields = {}
+    np.random.seed(a.cs_seed)
+    for k in ("sync", "dust"):
+        f = hp.synfast(cl, nside, lmax=lmax_cs, new=True)
+        cs_fields[k] = f / f.std() * a.cs_scatter
+        g_cs[k] = np.maximum(a_true[k] * np.exp(cs_fields[k]), 1e-3 * np.mean(np.abs(a_true[k])))
     T_fixed = float(t["T_fixed"]); T_true = np.asarray(t["T_d"], float)
     nreg = hp.nside2npix(16)
     reg = hp.ud_grade(np.arange(nreg, dtype=float), nside).astype(int)
@@ -299,8 +317,11 @@ def main():
         say(f"  data template {name}: g/true at |b|>20 16/50/84 pct {np.percentile(r,16):.3f}/"
             f"{np.percentile(r,50):.3f}/{np.percentile(r,84):.3f}")
     # realized a/g per quartile for the two template levels
+    say(f"  cs template: log error field rms {a.cs_scatter}, FWHM {a.cs_fwhm} deg, seed {a.cs_seed}; realized "
+        f"exp(-f) mean/sd sync {np.exp(-cs_fields['sync']).mean():.3f}/{np.exp(-cs_fields['sync']).std():.3f}, "
+        f"dust {np.exp(-cs_fields['dust']).mean():.3f}/{np.exp(-cs_fields['dust']).std():.3f}")
     realized = {}
-    for tmpl, g in (("data", g_data), ("exact", g_exact)):
+    for tmpl, g in (("data", g_data), ("exact", g_exact), ("cs", g_cs)):
         realized[tmpl] = {}
         for c, q64 in (("sync", qs64), ("dust", qd64)):
             r = a_true[c] / g[c]
@@ -329,7 +350,8 @@ def main():
         a.cells, a.real_cells, fine, wide = a.cells[:1], [], np.array([-0.01, 0.0, 0.01]), np.array([])
     for cell in a.cells:
         tmpl, sed, kind = cell.split("_")
-        sky.gs, sky.gd = (g_data if tmpl == "data" else g_exact)["sync"], (g_data if tmpl == "data" else g_exact)["dust"]
+        gsel = {"data": g_data, "exact": g_exact, "cs": g_cs}[tmpl]
+        sky.gs, sky.gd = gsel["sync"], gsel["dust"]
         T = np.full(npix, T_fixed) if sed == "fixT" else T_true
         hyper = Hyper(kind, qs64, qd64, reg=reg)
         bs_ref, bd_ref = refs[sed]
@@ -340,7 +362,8 @@ def main():
             t0 = time.time()
             th0, p0, nfev = sky.profile(sync_sed(bs0), dust_sed(bd0, T), hyper.theta0(), hyper, expected)
             tot0 = p0["chi"] + p0["ld"] + p0["tr"] + p0["lp"]
-            lap0 = sky.laplace(sync_sed(bs0), dust_sed(bd0, T), th0, hyper, expected) if a.laplace_at else 0.0
+            use_lap = a.laplace_at and hyper.dim <= 100      # no finite-difference Hessian of 6000 parameters
+            lap0 = sky.laplace(sync_sed(bs0), dust_sed(bd0, T), th0, hyper, expected) if use_lap else 0.0
             say(f"\n== cell {cell} [{mode}]: profiled at the reference field ({nfev} evals, {time.time()-t0:.1f} s): "
                 f"{hyper.fmt(th0)}; chi2 {p0['chi']:.1f}, logdet {p0['ld']:.1f}, trace {p0['tr']:.1f}, "
                 f"hyperprior {p0['lp']:.2f}, Laplace {lap0:.2f}")
@@ -366,7 +389,7 @@ def main():
             for label, comp, q, deltas in scans:
                 sel = (qs64 if comp == "s" else qd64) == q
                 th = th0.copy(); rows = []
-                lap_idx = set(np.linspace(0, len(deltas) - 1, a.laplace_at).round().astype(int).tolist()) if a.laplace_at else set()
+                lap_idx = set(np.linspace(0, len(deltas) - 1, a.laplace_at).round().astype(int).tolist()) if use_lap else set()
                 t1 = time.time()
                 for k, dl in enumerate(deltas):
                     bs = bs0 + dl * sel if comp == "s" else bs0
