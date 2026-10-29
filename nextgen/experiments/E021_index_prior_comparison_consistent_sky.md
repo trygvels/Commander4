@@ -383,6 +383,27 @@ has error +0.033 with RMSE 0.175 under the near-flat prior. The pre-registered p
 (indep16 the noisiest index map where the GMRF shrinks) holds; the trace scripts that read the
 field hyperparameters fail on this run by construction (no `index_field/mu` in the state).
 
+**Attempt 2, scalar complete (2026-10-29 07:33 to 07:52, 19 min; 1200 iterations, 700
+post-burn):** one index per component, 4 gradients and 0.9 s per iteration. Chain: beta_s
+-2.97371 +- 0.00094, beta_d 1.60077 +- 0.00012; amplitude hyperparameters mu_s 0.99295 (-7.2 sd
+from the realized target), s_s +3.1 sd, mu_d 1.05020 (+32 sd), s_d +13.6 sd. Index RMSE against
+the truth 0.0669 (sync) and 0.0691 (dust); GLS CMB residual 9.03 uK (per-draw 9.03, power
+fractions 9e-3 and 1.4e-2, regression coefficient 0.991); paired against gmrf16: sync +0.0336 +-
+0.0035, dust +0.0511 +- 0.0014, CMB +6.27 +- 2.06 uK. Negative-control check
+(`nextgen/scripts/e021_scalar_check.py`): the exact collapsed marginal over all 49,152 pixels,
+scanned in each scalar index at the chain's amplitude hyperparameters, peaks at -2.97374
+(curvature sd 0.00084) and 1.60076 (0.00011), on top of the chain (-2.97371 +- 0.00094, 1.60077
++- 0.00012), and at the same place when the realized amplitude targets replace the chain
+hyperparameters. The chain sits at the mode of its target. The pre-registered linearized
+prediction (the Fisher-weighted sky mean -2.9878 and 1.5973, with RMSE 0.0627 and 0.0661) is
+off by 0.014 and 0.0035, so the "RMSE must equal the weighted-mean RMSE" clause is met only
+approximately (0.0669 against 0.0627; 0.0691 against 0.0661): the linearization around the
+truth does not capture where the nonlinear 12-band marginal with coupled components puts a
+single index. The CMB residual is the largest of all runs as required, and the hyperparameters
+are far off because one index per component misfits the sky and the amplitude ratios absorb
+it (the corrected reading). Note that the data-only dust optimum 1.6008 coincides with the
+hyperprior mean mu0 = 1.60, as anticipated in "Negative control".
+
 **Sampler note:** every run prints 13 numpy RuntimeWarnings at its first transition (12 ranks:
 divide by zero in the GMRF prior at sigma = 0; one rank: overflow in exp). They come from the
 initial step-size heuristic (eps doubling from 1, Hoffman and Gelman Algorithm 4) visiting an
@@ -408,6 +429,10 @@ are estimated jointly with the index fields, so a biased index field shifts them
 +6.9 sd with the mid-S/N dust index 0.02 to 0.03 too high, see the Result). The hyperparameter
 test is kept as a detector of index-prior misspecification, not as a sampler check; the sampler
 check is the exact block-shift scan at the chain state.
+Outcome (scalar run, 2026-10-29): the single index sits at the exact mode of its target (scan in
+the Result) but 0.014 (sync) and 0.0035 (dust) away from the linearized Fisher-weighted mean, so
+the RMSE clause holds only approximately (0.0669 / 0.0691 against 0.0627 / 0.0661); the CMB
+residual is the largest (9.0 uK); indep16 is the noisiest index map (0.142 / 0.101).
 
 ## Conclusion
 (pending)

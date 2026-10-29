@@ -26,9 +26,15 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   and 69 / 95), amplitude hyperparameters within 1.9 sd. The GMRF gains in every S/N quartile
   (factor 2.5 sync and 1.6 dust even in the brightest), 4.3 and 5.6 over the sky.
 
+- scalar (19 min): beta_s -2.9737, beta_d 1.6008, each on the exact mode of the collapsed marginal
+  (scan peak within 0.1 posterior sd), CMB residual 9.0 uK (largest, as required), amplitude
+  hyperparameters 7 to 32 sd off (one index misfits the sky). The linearized Fisher-weighted
+  prediction missed the sync optimum by 0.014, so that clause of the negative control holds only
+  approximately; recorded.
+
 **Running**
-- E021 attempt 2 scalar (from 07:33), then gmrf8, iid8, indep8, gmrf4, iid4, indep4 (about
-  20 h). A waiter runs the analyzer when scalar ends.
+- E021 attempt 2 gmrf8 (from 07:52), then iid8, indep8, gmrf4, iid4, indep4 (about 15 h). A
+  waiter runs the analyzer when gmrf8 ends.
 
 **Next**
 - indep16 as the no-shrinkage reference (its per-region posterior sds are the s_r of the
