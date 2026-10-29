@@ -211,7 +211,7 @@ for M2.x and Paper A; drop the exchangeable (iid) prior as a candidate; keep ind
 regions and the single index only as references. Set the resolution rule for the index field
 as the finest nside the compute budget allows under the spatial prior, not a coarse ladder.
 Before the E021 table goes into Paper A, run gmrf16, iid16 and indep16 once more on a second
-noise and template realization (seed 2028, about 14.5 h, started 11:30) with the pre-registered
+noise and template realization (seed 2028, about 14.5 h, started 11:13) with the pre-registered
 expectation written in the E021 Follow-ups. Treat the slow mixing of the dust field mean in the
 centred parameterization as an M2.4 efficiency item.
 

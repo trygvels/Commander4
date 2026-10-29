@@ -586,11 +586,13 @@ Recorded as F24; the GMRF is the index prior of record for M2.x (D018).
   misspecification: a 30 percent scatter whose conditional law differs from the prior's shifts
   the prior-dominated dust index by +0.13 at 4 posterior sd under hier at nside 16.
 - Second noise and template realization for the nside-16 triple (`--seed 2028`, started
-  2026-10-29 11:30, `/Users/trygvels/data/e021_consistent_v2_seed2028`, gmrf16 then iid16 then
+  2026-10-29 11:13, `/Users/trygvels/data/e021_consistent_v2_seed2028`, gmrf16 then iid16 then
   indep16, about 14.5 h). Pre-registered expectation: the same ordering on both indices with the
   iid16 and indep16 paired differences against gmrf16 at least 3 bootstrap SE from zero, the iid
   dust field mean again above the sky mean 1.540, and the iid16 amplitude hyperparameters again
-  outside the 2-sd band while gmrf16's are inside.
+  outside the 2-sd band while gmrf16's are inside. The second sky shares the truth indices,
+  T_d, CMB and templates with the first and redraws the template scatter r (so a = g r) and the
+  noise (checked: truth.npz keys identical except sky, a_sync, a_dust and the Fisher sds).
 - Efficiency: the dust field mean mu_d mixes slowly (ESS 5 to 14 of 700) in the centred
   parameterization; a non-centred or joint mu-plus-field move for the production runs (M2.4).
 - The ladder has no field finer than the truth's structure (nside 32 on this sky would be about

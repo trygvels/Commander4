@@ -24,7 +24,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 
 **Running**
 - E021 seed-2028 realization of gmrf16, iid16, indep16 in `/Users/trygvels/data/e021_consistent_v2_seed2028`
-  (queue started 11:30, about 14.5 h; pre-registered expectation in the E021 Follow-ups).
+  (queue started 11:13, about 14.5 h; pre-registered expectation in the E021 Follow-ups).
 
 **Next**
 - When the seed-2028 triple ends: paired differences on the new sky, append to E021 and F24.
