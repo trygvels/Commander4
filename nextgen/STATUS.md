@@ -2,6 +2,24 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 03:30): hier SBC replication PASS (F16 established); E021 attempt 2 gmrf16 near its end
+
+**Learned**
+- The seeded SBC replication of the hier target (300 fresh replicates, non-centred NUTS, 28 h on
+  a shared machine) passes the full pre-registered battery (Bonferroni min p 0.142, KS p 0.33,
+  all 16 ECDFs inside the 99 percent band, TARP 8 of 8) and the one-sided test on the pixel that
+  failed in the first run (rank mean 0.490 against the 0.528 threshold; pooled over 600: 0.520,
+  +1.7 se). By the pre-registered rule the first run's band violation is a fluctuation and the
+  SBC is PASS on 600 replicates: F16 loses its "provisional", M2.4a is done, L2 passed for the
+  hier target at nside_beta 4 (E016 Conclusion written).
+
+**Running**
+- E021 attempt 2 gmrf16 (1101 of 1200 iterations at 03:18); the waiter runs the analyzer when it
+  ends; iid16 follows automatically.
+
+**Next**
+- E021 nside-16 pair analysis; then the rest of the queue (about 30 h).
+
 ## 2026-10-28 (Mac mini, 17:30): E021 attempt 1 stopped after gmrf16; the sky's template construction biased the target; attempt 2 running on a corrected sky
 
 **Learned**

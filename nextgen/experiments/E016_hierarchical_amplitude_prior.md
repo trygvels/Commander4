@@ -290,12 +290,39 @@ deviation is recorded as a fluctuation and the SBC is PASS on 600 replicates (po
 small bias at prior-dominated pixels and F16 is withdrawn pending its cause. About 31 h at the
 current load (E020 shares the machine).
 
+**Replication result (22:47 on 2026-10-27 to 03:02 on 2026-10-29, 28.3 h with E020/E021 and E022
+sharing the machine; `sbc_out/hier_hier_seed2027.jsonl/hier_hier.jsonl`, analysis alongside
+it):** 300 of 300 replicates clean (0 divergences, 0 likelihood errors, min ESS median 604, min
+404, E-BFMI median 0.96, mean 1.30 attempts, median 824 s per replicate, one replicate 23,035 s
+with four attempts). The full battery PASSES by the same rule: chi-square p-values 0.142 to
+0.970, Bonferroni PASS (min p 0.142 against 0.00063), KS of the p-value set PASS (p 0.332), ECDF
+simultaneous 99 percent band all 16 inside (max difference 0.063), TARP 8 of 8 inside. Condition
+(ii): the `beta_faint1` rank mean on the fresh replicates is 0.4905 (se 0.0167, -0.57 se), below
+the 0.528 rejection threshold; its standardized error is -0.078 +- 0.059 against +0.153 +- 0.058
+in the first run. Pooled over 600 replicates the `beta_faint1` rank mean is 0.520 (se 0.0118,
++1.7 se) and `beta_faint0`'s 0.510 (+0.8 se). By the pre-registered decision the first run's
+deviation is recorded as a fluctuation and **the SBC of the hier target is PASS on 600
+replicates**: the non-centred NUTS sampler draws from the stated collapsed hier target at K 192
+plus four amplitude hyperparameters, with the power stated in the Setup (a 0.5 sd bias or a 0.8
+width error detected with probability 1.0 / 0.84 on either 300).
+
 ## Negative control
 Mode "gauss" with the fixed default T on the same template replicates: known biased (study_v1,
 z +14 at noise 0.3). Mode "w1": known collapsed. Both run through the same analysis.
 
 ## Conclusion
-(pending)
+The hierarchical amplitude prior (per-component scale mu_c and relative scatter s_c learned from
+the data) answers Q2 on template data: the collapsed hier index-field posterior is calibrated at
+every index-pixel S/N tested, including below S/N 1 where the profile is biased by 5 to 13 sd
+and the fixed Gaussian prior by 0.6 to 14 sd, and it survives a 30 percent large-scale or 23
+percent per-pixel template error because the learned scatter absorbs it (coverage study, 108
+replicates, numbers in F16). The target and the non-centred NUTS sampler pass simulation-based
+calibration on 600 replicates (two seeded runs of 300; the first run's single band violation on
+one faint pixel, +2.9 se, did not replicate: -0.6 se on the fresh 300, +1.7 se pooled), so the
+L2 gate of the validation ladder is passed for the hier target at nside_beta 4. Limits: nside_beta
+4 and the E012 nside-16 data layout; the amplitude prior's conditional law must be the data's
+(E021 attempt 1, F23: a template scatter of the same size but a different law a | g biases
+prior-dominated indices); the realistic-noise and misspecified-SED cases are Q16.
 
 ## Follow-ups
 - Stage 2 (coupled smoothness prior on amplitude maps) if stage 1 is insufficient.
