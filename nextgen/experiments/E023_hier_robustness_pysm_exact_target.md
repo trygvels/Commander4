@@ -179,7 +179,55 @@ python nextgen/scripts/e023_exact_scan.py --dir /Users/trygvels/data/e023_pysm_n
 ```
 
 ## Result
-(pending)
+**Model control, E021 consistent sky (`E023/scan_e021_control.txt`, 11:46 to 13:00):** the
+region fits equal the region means (rms 0.0000; region-constant truth). exact_fixT_global
+(templates equal to the true amplitudes; the profiled scatters run to 0.0012 and 0.0003 at the
+guard) and data_fixT_global (the model-story templates of E021; profiled mu_s 1.0027, s_s 0.2990,
+mu_d 0.9999, s_d 0.2987 against the realized 1.0031 / 0.2989 / 0.9999 / 0.2990) peak at delta
+0.000 in all eight fine scans and the wide sync scan, in expected mode; the realization mode of
+data_fixT_global peaks at 0.000 in eight scans and at -0.010 in sync Q4 (gain 1.4 nats,
+curvature sd 0.0070: a 1.4-sd noise excursion, as expected of a single realization). The
+Laplace term varies by at most 0.02 nats over a scan with the model-story templates and by
+up to 2.9 nats (dust Q1) with the exact templates at the guard, where it moves no argmax.
+Control PASS: the expected-log-likelihood scan, the profile, the reference fit and the
+quartile machinery give zero bias where the model is exact.
+
+**PySM sky at noise 0.03 (`E023/scan_n003.txt`, from 13:00; partial, five of seven cells at
+16:20):** the region fits differ from the region means (sync rms 0.056 at fixed T, 0.021 at
+true T, max 0.45 to 0.49; dust rms 0.012 and 0.009, max 0.12): the region means are not the
+region model's optimum on this sky, as the reviewer said. Template-S/N quartiles; the
+data-built template's realized a/g per sync quartile (bright to faint) has mean / sd 0.89 /
+0.25, 0.83 / 0.31, 1.04 / 0.42 and 77 / 155: in the faintest quartile the data-built template
+(23 GHz map scaled and smoothed, CMB included, floored at its first percentile) is not a
+template of the synchrotron at all.
+- exact_trueT_global (baseline, region misfit only; profiled s_s 0.022, s_d 0.021): argmax
+  0.000 in every scan, expected and realization modes, including the wide sync scan. The
+  region-fit reference is the target's optimum when the templates and the SED are exact.
+- exact_fixT_global (fixed T only; s_s 0.038, s_d 0.021, mu 1.014 / 1.016): sync +0.000,
+  +0.010, +0.020, +0.030 (gains 0, 5, 15, 22 nats), dust +0.000, +0.010, +0.010, +0.010 (gains
+  0, 112, 50, 3.5); wide sync scan at 0.000. Fixed T with an exact template shifts the hier
+  target by up to 0.03 (sync faint quartile) and 0.01 (dust) relative to the flat-prior region
+  fit: at the "unbiased" threshold for dust, above it for sync Q4.
+- data_trueT_global (data-built template only; mu_s 1.14, s_s 0.68, mu_d 0.89, s_d 0.27): sync
+  +0.000, +0.070, +0.050, -0.100 (edge; gains 146, 54, 981), dust +0.000, +0.050, +0.100,
+  +0.100 (edges; gains 437, 644, 395); the wide sync scan peaks at -0.6 (beta_s about -3.6 in
+  the faintest quartile, gain 3307 nats): the E020 runaway direction, reproduced as a block
+  shift.
+- data_fixT_global (the Commander4 configuration): the same numbers within 0.01 (sync +0.070,
+  +0.060, -0.100; dust +0.050, +0.100, +0.100; wide -0.6). Realization mode identical to the
+  expected mode within 0.01. Attribution at this depth: the data-built template under one
+  global scatter is the driver; fixed T adds at most 0.03.
+- data_fixT_perq (per-quartile scatter; profiled s_s [0.26, 0.32, 0.42, 3.44] against the
+  realized sd(a/g) [0.25, 0.31, 0.42, 155], s_d [0.33, 0.22, 0.22, 0.27] against [0.33, 0.22,
+  0.22, 0.40]; mu_s 0.91, mu_d 0.91): sync +0.000, +0.040, -0.050, -0.070 (gains 48, 52, 57),
+  dust +0.000, +0.030, +0.060, +0.100 (gains 246, 228, 243); the wide sync scan peaks at 0.000
+  (runaway removed: with s_4 = 3.4 the prior is inert in the faintest quartile). Not "unbiased":
+  the shifts fall by a factor 1.5 to 2 in sync and dust Q2 and stay at 0.06 to 0.10 in the
+  fainter dust quartiles, where the global mu (0.91 against realized means 0.89 to 0.99 per
+  quartile) and the template's structure, not its scatter, carry the misfit.
+- data_trueT_perq: as data_fixT_perq within 0.01 (in progress); data_fixT_perqmu pending.
+
+(The noise-1 sky follows in the same queue.)
 
 ## Negative control
 Replaced by the code control (kernel agreement) and the model control (E021 sky) under
