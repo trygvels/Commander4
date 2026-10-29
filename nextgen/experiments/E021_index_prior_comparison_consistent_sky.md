@@ -359,6 +359,30 @@ the biased index field. The pre-registered reading in
 "Negative control" (hyperparameters off target = sampler or data problem, not a prior
 difference) was therefore wrong; corrected there.
 
+**Attempt 2, indep16 complete (2026-10-29 06:50 to 07:33, 44 min; 1200 iterations, 700
+post-burn):** independent N(mu0, 1.0^2) per region (near flat), no index hyperparameters, 31
+gradients and 1.5 s per iteration. Analyzer: sync region-level RMSE 0.1424 (|b| > 20: 0.1604),
+z median/MAD -0.06/0.69, |z| < 1, < 2 for 68 and 95 percent, posterior sd median 0.131, ESS min
+341; dust RMSE 0.1009 (0.1216), z +0.08/0.65, 69 and 95 percent, sd median 0.069, ESS min 395.
+By S/N quartile (low to high) sync 0.189, 0.160, 0.124, 0.067 and dust 0.172, 0.088, 0.056,
+0.020 against gmrf16 0.037, 0.036, 0.033, 0.027 and 0.019, 0.019, 0.020, 0.012: the GMRF gains
+in every quartile, by a factor 2.5 (sync) and 1.6 (dust) even in the brightest one, and 4.3 and
+5.6 over the whole sky. Paired against gmrf16: sync +0.1091 +- 0.0037, dust +0.0829 +- 0.0053,
+GLS CMB residual +0.275 +- 0.012 uK (3.16 uK). Amplitude hyperparameters pass: mu_s 1.00003 +-
+0.00164 (-1.9 sd), s_s -0.8 sd, mu_d 1.00255 +- 0.00187 (+1.4 sd), s_d +0.5 sd. With no field
+prior the region posteriors are calibrated to the precision of the test (z MAD 0.65 to 0.69
+against 0.67, coverage 68 / 95 and 69 / 95 against 68 / 95), so the collapsed likelihood and the
+sampler are calibrated region by region and the 1.2-times-too-wide sds of gmrf16 belong to the
+field-prior part (not traced further here). The posterior sd medians 0.131 / 0.069 are below
+the profiled Fisher sds 0.163 / 0.106 (the Fisher linearization is conservative; the z test
+uses the chain sd). The precision-weighted mean of the indep16 region means with the iid16
+sigma is 1.5519 for dust and -3.0007 for sync (iid16 mu 1.5541 and -3.0054; truth 1.5397 and
+-3.0000): the dust number reproduces the iid pull toward the plane from the data alone, the
+sync number does not reproduce the -0.005 iid offset (as noted above). The faint dust quartile
+has error +0.033 with RMSE 0.175 under the near-flat prior. The pre-registered prediction
+(indep16 the noisiest index map where the GMRF shrinks) holds; the trace scripts that read the
+field hyperparameters fail on this run by construction (no `index_field/mu` in the state).
+
 **Sampler note:** every run prints 13 numpy RuntimeWarnings at its first transition (12 ranks:
 divide by zero in the GMRF prior at sigma = 0; one rank: overflow in exp). They come from the
 initial step-size heuristic (eps doubling from 1, Hoffman and Gelman Algorithm 4) visiting an
