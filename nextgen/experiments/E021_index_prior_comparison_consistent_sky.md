@@ -278,6 +278,32 @@ change, same seed; the noise realization differs because the RNG order changed),
 gmrf8, iid8, indep8, gmrf4, iid4, indep4 with the attempt-1 sampler settings (D015, D017). The
 attempt-1 gmrf16 chain is kept as the evidence for F23 and as a robustness data point for Q16.
 
+**Attempt 2, gmrf16 complete (2026-10-28 17:15 to 2026-10-29 03:59, 10.7 h alone on the machine
+with the SBC replication until 03:02; 1200 iterations, 700 post-burn):** Hessian start 15 min
+per chain; after the refresh at 200 the sampler runs at 63 to 127 gradients per transition (step
+size 0.067, acceptance 0.7 to 0.98, no divergences), 125 gradients and 25 s per Gibbs iteration
+(75 to 83 ms per gradient alone). Analyzer (`--burn 500`): sync region-level RMSE 0.0333
+(|b| > 20: 0.0342; truth sd 0.0615; single-index floor 0.0630), region z median/MAD -0.08/0.55,
+|z| < 1, < 2 for 78 and 98 percent of regions, posterior sd median 0.042, by S/N quartile 0.037,
+0.036, 0.033, 0.027 (truth sd 0.051 to 0.081), ESS min 77 / median 352 over regions; dust
+RMSE 0.0180 (0.0197; truth sd 0.0323; floor 0.0686), z +0.06/0.54, 78 and 98 percent,
+posterior sd median 0.025, by quartile 0.019, 0.019, 0.020, 0.012, ESS min 8 / median lower
+than sync (the dust field mean mu_d has ESS 8.5 with lag-1 autocorrelation 0.94, so its MC
+error is 0.0005 against a posterior sd of 0.0016). Fields: sync mu -3.0017 +- 0.0027 (truth
+mean -3.0000), sigma 0.071 +- 0.005, rho 26 +- 3 deg; dust mu 1.5410 +- 0.0016 (truth 1.5397),
+sigma 0.038 +- 0.002, rho 20 +- 2 deg. Amplitude hyperparameters pass the 2-sd test: mu_s
+1.00132 +- 0.00155 (target 1.00309, -1.1 sd), s_s 0.29869 +- 0.00107 (0.29888, -0.2 sd), mu_d
+1.00248 +- 0.00180 (0.99986, +1.5 sd; ESS 23), s_d 0.29970 +- 0.00120 (0.29897, +0.6 sd). GLS
+CMB residual 2.89 uK against the 2.79 floor (per-draw 2.99), power fractions 1e-4 and 9e-4,
+regression coefficient 0.997. MC inflation of the RMSE: sync 0.0024, dust 0.0037. The faint
+quartile is right where attempt 1 was wrong: dust truth 1.5516, posterior mean 1.5432 (sd
+0.025); the exact-marginal common-shift scan at the chain state peaks at +0.025 and at the
+truth state at 0.000. The z MAD of 0.55 against 0.67 for a standard normal says the posterior
+sds are about 1.2 times too wide at the region level; the coverage figures (78 / 98 percent
+against 68 / 95) say the same. Compared with the single index the GMRF at nside 16 halves the
+sync error (0.033 against 0.063) and quarters the dust error (0.018 against 0.069) at this
+noise.
+
 ## Negative control
 The single index converges to the Fisher-weighted sky mean, not the unweighted mean (review item
 1): sync -2.9878 (unweighted -3.0000), dust 1.5973 (unweighted 1.5397). Its index RMSE must

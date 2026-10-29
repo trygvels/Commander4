@@ -13,12 +13,21 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   SBC is PASS on 600 replicates: F16 loses its "provisional", M2.4a is done, L2 passed for the
   hier target at nside_beta 4 (E016 Conclusion written).
 
+- E021 attempt 2, gmrf16 done (04:00, 10.7 h): on the corrected sky the GMRF index field at
+  nside 16 recovers sync to 0.033 and dust to 0.018 region-level RMSE (single-index floors 0.063
+  and 0.069; truth sds 0.062 and 0.032), z median -0.08 / +0.06 with MAD 0.55 (posterior sds
+  about 1.2x too wide), 78 / 98 percent of regions within 1 / 2 sd, amplitude hyperparameters
+  within 1.5 sd of their realized targets, CMB residual 2.89 uK against the 2.79 floor, no
+  faint-region bias (exact-marginal scan at the chain state peaks at +0.025 of a 0.025 grid).
+  Dust hyperparameter mixing is slow (mu_d ESS 8.5 of 700; MC error 0.0005 against sd 0.0016).
+
 **Running**
-- E021 attempt 2 gmrf16 (1101 of 1200 iterations at 03:18); the waiter runs the analyzer when it
-  ends; iid16 follows automatically.
+- E021 attempt 2 iid16 (from 03:59, about 4 to 5 h), then indep16, scalar, nside 8 and 4
+  (about 30 h); a waiter runs the analyzer on the nside-16 pair when iid16 ends.
 
 **Next**
-- E021 nside-16 pair analysis; then the rest of the queue (about 30 h).
+- The nside-16 pair comparison (GMRF against iid shrinkage) with the MC-inflation rule; then the
+  rest of the queue.
 
 ## 2026-10-28 (Mac mini, 17:30): E021 attempt 1 stopped after gmrf16; the sky's template construction biased the target; attempt 2 running on a corrected sky
 
