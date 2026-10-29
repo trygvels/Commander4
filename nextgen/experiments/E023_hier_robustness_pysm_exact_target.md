@@ -172,7 +172,7 @@ as E024 if the prior changes the code.
 ```bash
 python nextgen/scripts/e023_kernel_check.py --dir /Users/trygvels/data/e021_consistent_v2 > nextgen/experiments/E023/kernel_check_e021.txt
 python nextgen/scripts/pysm_intensity_sim.py --dir /Users/trygvels/data/e023_pysm_n1 --nside 64 --noise-scale 1 --seed 2027 --sky pysm --n-iter 1200 --n-warmup 400 --refresh-mass-at 50 200 --no-adapt-mass
-# scratchpad run_e023_scans.sh, one sky after the other (started 2026-10-29 13:40):
+# scratchpad run_e023_scans.sh, one sky after the other (started 2026-10-29 11:46):
 python nextgen/scripts/e023_exact_scan.py --dir /Users/trygvels/data/e021_consistent_v2 --out nextgen/experiments/E023/scan_e021_control.txt --cells exact_fixT_global data_fixT_global --real-cells data_fixT_global
 python nextgen/scripts/e023_exact_scan.py --dir /Users/trygvels/data/e020_d1s1 --out nextgen/experiments/E023/scan_n003.txt
 python nextgen/scripts/e023_exact_scan.py --dir /Users/trygvels/data/e023_pysm_n1 --out nextgen/experiments/E023/scan_n1.txt

@@ -2,7 +2,7 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
-## 2026-10-29 (Mac mini, 12:45): E021 Conclusion corrected after stats review (resolution reading withdrawn, ordering stands); E023 designed and under review; seed-2028 triple running
+## 2026-10-29 (Mac mini, 11:45): E021 Conclusion corrected after stats review (resolution reading withdrawn, ordering stands); E023 designed and under review; seed-2028 triple running
 
 **Learned**
 - Third stats review of E021 (reproduced): the nside-16 and 8 orderings and the iid mechanism
