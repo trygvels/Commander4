@@ -293,3 +293,25 @@ the shift larger (dust Q2 0.058, 11 nats), not "smaller but not zero"; the exact
 3e-5); the cost of flat is the CMB column's one degree of freedom per pixel (faint dust block sd
 20 to 25 percent wider). The decision stands.
 
+## D022 (2026-10-30): no single-frequency dust template under the hier prior; stage 2 of Q16 tests component-separation-quality templates and the true-T dust SED before any chain
+
+**Decision.** The hier amplitude prior is not used for dust with a template built from one
+scaled frequency map, at any noise level; it remains the candidate for synchrotron with a
+template-error field at the region scale (a free multiplier per nside-16 region with a weak
+prior, or its GMRF version). Stage 2 of Q16 (E025) first repeats the E023 scans with (i) a dust
+template equal to the true amplitude times a smooth 30 percent error field without T_d
+coupling, (ii) the dust SED at the true T_d per pixel as the stand-in for sampled T, (iii) the
+sync per-region multiplier; only a configuration that is "unbiased at this depth" by the E023
+rule goes to a gmrf16 chain on the noise-1 sky (flat CMB prior, dense metric). Sampled T_d per
+region in the kernel is scheduled as the structural fix (M2.6 scope).
+
+**Why.** F27: every scalar or region-scale hyperparameter law leaves the dust biased because
+the single-frequency template's error is pixel-scale and tied to T_d; F26: the per-pixel CMB
+prior must be flat at realistic noise. Chains on a configuration whose exact target is biased
+would measure the bias, not the method (the E020 lesson, D014).
+
+**Alternatives considered.** Sampling T_d first: the right model but a kernel change with its
+own review and validation; the template question is cheaper to settle by scans. Dropping the
+hier prior for dust at high S/N and using a weak Gaussian prior: possible fallback, decided
+after E025.
+

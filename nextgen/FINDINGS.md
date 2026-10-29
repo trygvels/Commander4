@@ -470,3 +470,28 @@ below 0.05 nats (dust Q2 +0.01 at 0.6 sd by shift). The correlated CMB prior of 
 one CMB realization, template-Fisher quartiles, the noise-free region-fit reference, scan-edge
 peaks in the fainter quartiles; the per-pixel kernel on real maps at this depth must not carry
 a finite CMB prior (D021).
+
+**F27. Under the collapsed hier amplitude prior, a template built from one scaled, smoothed
+frequency map biases the spatially varying index field at 0.03 x and at 1 x the E012 noise,
+and no scalar or region-scale hyperparameter law repairs the dust template** (E023 stage 1,
+PySM d1s1c1 sky, exact-target expected-log-likelihood scans of Commander4's kernel, model
+control on the E021 sky PASS, kernel agreement 4e-12; stats-reviewed design). With the E020
+templates (23 GHz scaled to 30 GHz for sync, 353 GHz scaled at a fixed T to 545 GHz for dust,
+5 deg smoothing, floored) and global hyperparameters, the target prefers index shifts of 0.05
+to beyond 0.1 in every S/N quartile but the brightest at 0.03 x noise (faintest sync quartile
+toward beta_s -3.6) and, at realistic noise with a flat CMB prior, -0.09 in the brightest sync
+quartile (3 sd), beyond +0.1 in sync Q2 and dust Q2 and Q3, +0.01 in the brightest dust
+quartile (3 sd), with the faintest sync quartile running to beta_s near -5; with exact
+templates the same target is unbiased at realistic noise and off by at most 0.03 (fixed T) at
+0.03 x. A scatter per quartile removes the 0.03 x runaway only; a mean and scatter per quartile
+fixes the mid-S/N sync and leaves the dust at 0.05 to 0.10 (0.03 x) or biases the brightest
+dust quartile by +0.03 at 8 sd (noise 1); a free multiplier per nside-16 region (3072 per
+component) fixes the sync and leaves the dust untouched: the dust template's error is
+pixel-scale and tied to T_d, hence to the index itself. Fixed T_d is at most a 0.03 effect at
+0.03 x and invisible at noise 1. At realistic noise the faint half of the sky is
+prior-dominated at nside 16 (block sds 0.08 to 0.12 sync, 0.03 to 0.05 dust), so a wrong
+template is the posterior there. Consequence (D022): hier for synchrotron with a region-scale
+template-error field; for dust only with a component-separation template or sampled T_d, to
+be tested in E025. Scope: one sky, one realization per cell, the data term without the index
+prior, fixed against known T only.
+

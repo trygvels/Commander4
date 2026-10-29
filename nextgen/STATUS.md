@@ -2,6 +2,32 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-30 (Mac mini, 00:30): E023 stage 1 closed (F27, D022): the single-frequency template, not the SED, is what breaks the hier prior; dust cannot be repaired by hyperparameters
+
+**Learned**
+- Noise-1 sky with the flat CMB prior: exact-template cells unbiased in every quartile; the
+  Commander4 configuration with the data-built template biased in sync Q1 (-0.09, 3 sd) and Q2
+  (beyond +0.1), dust Q1 (+0.01, 3 sd), Q2 and Q3 (beyond +0.1), faintest sync quartile running
+  to beta_s near -5; fixed T invisible; per-quartile scatter changes nothing; per-quartile mean
+  fixes the sync and biases the brightest dust quartile by +0.03 at 8 sd.
+- 0.03 sky: a free template multiplier per nside-16 region fixes the sync everywhere the
+  template is a template and leaves the dust at +0.05 to +0.10: the dust template's error is
+  pixel-scale and tied to T_d. E023 Conclusion, F27, D022, Q16, M2.6, registry written.
+
+**Running**
+- Nothing. The machine is free.
+
+**Next**
+- E025 (stage 2 scans): component-separation-quality dust template (true amplitude times a
+  smooth error field), true-T dust SED, sync per-region multiplier; then the first gmrf16 chain
+  on the noise-1 sky with the flat CMB prior and the dense metric.
+- Paper A: Sect. 5 points for F26 and F27 (what the hier prior can and cannot take as a
+  template; the per-pixel CMB prior at realistic noise).
+
+**Needs Trygve**
+- Unchanged; D022 (no single-frequency dust template under hier) is a model-design call he may
+  want to weigh in on.
+
 ## 2026-10-29 (Mac mini, 21:40): E021 seed-2028 replication meets every pre-registered expectation
 
 **Learned**

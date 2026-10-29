@@ -300,7 +300,44 @@ Noted from the first pass regardless of the CMB prior: at noise 1 the block curv
 templates in the faint half of the sky (realized a/g means 2.3 and 141 in sync Q3 and Q4, 5.9
 and 48 in dust Q3 and Q4: the 23 and 353 GHz maps at this noise, scaled, smoothed and floored).
 
-**PySM sky at noise 1 with the flat CMB prior:** (pending)
+**PySM sky at noise 1 with the flat CMB prior (`E023/scan_n1_cmbflat.txt`, 21:04 to 00:09; CMB
+prior sd 1e4, seven cells in expected mode, two also in realization mode; gains in nats, 2 nats
+about 2 block sd):**
+- exact_trueT_global (baseline): every scan within its curvature sd, gains 0.00 to 0.08 (sync
+  -0.01 to -0.03 against sds 0.03 to 0.12; dust +0.01 against 0.016 to 0.053; wide 0.000). Clean.
+  Realization mode of the same cell: shifts up to the 0.1 edge with gains 0.2 to 9 and the
+  wide sync scan at +1.4 (68 nats): one noise realization at this depth does not constrain the
+  faint sync quartile at all (its linearized block sd of 0.12 understates a likelihood that is
+  flat over a unit of beta_s), which is why the expected scan is the primary line.
+- exact_fixT_global: gains 0.00 to 0.40 (sync -0.01 to -0.07 against sds 0.03 to 0.12, dust
+  0.00 to +0.02): fixed T is invisible at this depth.
+- data_trueT_global and data_fixT_global (the Commander4 configuration; profiled mu_s 0.90 to
+  0.91, s_s 0.35, mu_d 0.86 to 0.87, s_d 0.41): sync Q1 -0.090 (4.4 nats, 3 sd at sd 0.030), Q2
+  +0.100 edge (8.4 nats), Q3 and Q4 at the -0.100 edge (1.0 and 2.6 nats, not significant), wide
+  sync scan at -2.0 to -2.2 (33 nats: beta_s near -5 in the faintest quartile, the E020 runaway
+  direction); dust Q1 +0.010 (5 to 6 nats, 3 sd at sd 0.0037), Q2 +0.100 edge (58 to 62 nats), Q3
+  +0.100 edge (19 to 21 nats), Q4 -0.100 (1 nat, not significant). Realization mode within 0.02
+  of the expected mode where the gain exceeds 2 nats. Fixed against true T: identical within
+  0.01. The data-built template biases both indices where the data can still see the index
+  (sync Q1 and Q2, dust Q1 to Q3) and runs the faintest sync quartile away.
+- data_fixT_perq and data_trueT_perq: identical to the global cells to 0.01 in every scan
+  (profiled s_q 0.33 to 0.50 against realized scatters of 0.28 to 212: at this depth the
+  profile cannot see that the faint-quartile templates are not templates, and the index
+  likelihood there is the prior's).
+- data_fixT_perqmu (mu_s [0.93, 0.73, 0.93, 1.58], mu_d [0.90, 0.73, 0.64, 1.02]): sync Q1 -0.040
+  (0.7 nats), Q2 to Q4 at the -0.100 edge with 0.6 to 1.0 nats (not significant), wide -0.6 (1.6
+  nats, not significant); dust Q1 +0.030 (22 nats, 8 sd), Q2 +0.100 (5.6 nats), Q3 and Q4 not
+  significant. The per-quartile mean removes every significant sync shift at this depth and
+  creates a bright-quartile dust bias of +0.03 at 8 sd (a quartile-wide multiplier 0.90 with
+  scatter 0.41 is the wrong law for a template whose error has pixel-scale structure tied to
+  T_d, and the brightest quartile is where the data can tell).
+
+Reading of the noise-1 sky (pre-registered rules): with the flat CMB prior the exact-template
+cells are "unbiased at this depth" (every shift inside its block sd); the Commander4
+configuration with the data-built template is biased in sync Q1 and Q2 (3 sd and beyond the
+scan) and dust Q1 to Q3 (3 sd to beyond the scan) and runs the faintest sync quartile away;
+fixed T is not a factor; the per-quartile scatter changes nothing; the per-quartile mean fixes
+the sync and breaks the bright dust. No candidate is carried to stage 2.
 
 ## Negative control
 Replaced by the code control (kernel agreement) and the model control (E021 sky) under
@@ -324,6 +361,58 @@ constant the dust-shift difference was 2e-7 off, the known constant mismatch of 
 review, not a structural one.
 
 ## Conclusion
-(pending)
+Stage 1 (exact-target scans, no chains), on the PySM d1s1c1 sky at 0.03 x and at 1 x the E012
+noise, with the E021 consistent sky as the model control (zero bias in every scan) and the
+numpy marginal checked against Commander4's kernel (4e-12).
+
+1. **The data-built template is the driver.** With templates built from one scaled, smoothed
+   frequency map (23 GHz for sync, 353 GHz at a fixed T for dust) under the hier prior's law
+   a ~ N(mu g, (s g)^2) with global hyperparameters, the collapsed index target is biased at both
+   depths: at 0.03 x noise by 0.05 to beyond 0.1 in both indices in every quartile but the
+   brightest, with the faintest sync quartile running toward beta_s of -3.6; at realistic noise
+   by 0.09 (sync Q1, 3 sd), beyond 0.1 (sync Q2, dust Q2 and Q3), 0.01 (dust Q1, 3 sd), with the
+   faintest sync quartile running to beta_s near -5. With exact templates the same target is
+   unbiased at realistic noise and biased by at most 0.03 (sync faint quartile, fixed T) at 0.03
+   x noise.
+2. **Fixed T_d is a second-order effect here:** at most 0.03 (sync) and 0.01 (dust) at 0.03 x
+   noise with an exact template, invisible at realistic noise, and identical within 0.01 to the
+   true-T cells whenever the template drives the fit.
+3. **No scalar-hyperparameter law repairs a single-frequency dust template.** A scatter per
+   S/N quartile removes the sync runaway at 0.03 x noise and nothing else; a mean and scatter
+   per quartile fixes the mid-S/N sync (to 0.01 at 0.03 x, to insignificance at noise 1) and
+   leaves the dust at 0.05 to 0.10 (0.03 x) or moves the bias into the brightest dust quartile
+   (+0.03 at 8 sd, noise 1); a free template multiplier per nside-16 region (3072 per
+   component) fixes the sync wherever the template is a template and leaves the dust untouched.
+   The dust template's error is pixel-scale and tied to T_d (hence to the index), and the
+   profiled hyperparameters cannot see it where the data are weak.
+4. **The per-pixel CMB prior leaks at realistic noise (F26).** The finite per-pixel CMB prior of
+   the E018/E021 target leaks the fixed, correlated CMB realization into the index likelihood
+   (dust mid quartiles shifted by 0.05 to 0.1 with a realization-dependent sign, at several of
+   the model's own block sd); the flat CMB prior removes it exactly at the cost of one degree of
+   freedom per pixel (D021). Inert at 0.03 x noise (about 1e-4).
+5. **What this decides for Q16 (D022):** the hier amplitude prior is usable for synchrotron with
+   a template multiplier at the region scale (a template-error field), and not for dust with a
+   template from one scaled frequency map at any depth tested; the dust template must come from
+   a component separation with its own T_d (its error then decorrelates from the pixel's T_d),
+   or T_d must be sampled so that the fixed-T scaling is not what the template encodes; both are
+   stage-2 candidates, tested first by the same scans with a template equal to the true dust
+   amplitude times a smooth error field (the "component-separation-quality" template) and with
+   the dust SED carrying the true T_d. At realistic noise the faint half of the sky is
+   prior-dominated for both indices at nside 16 (block sds 0.08 to 0.12 for sync, 0.03 to 0.05
+   for dust), so what the prior says there is what the posterior says; a wrong template is not
+   a small effect at this depth.
+
+Not shown: the posterior bias under the GMRF index prior (stage 2), sampled T (only fixed
+against known T), correlated template errors of a component-separation kind, seed dependence
+(one realization per cell; the expected-log-likelihood scans remove the noise scatter of the
+peak, not the template realization), and anything beyond one sky. F27.
 
 ## Follow-ups
+- Stage 2 design (E025): the same scans with (i) a component-separation-quality dust template
+  (true amplitude times a smooth 30 percent error field at 5 to 10 deg, no T_d coupling), (ii)
+  the dust SED with the true T_d per pixel as the stand-in for sampled T, (iii) sync with the
+  per-region multiplier; then the gmrf16 chain on the noise-1 sky with the flat CMB prior and
+  the dense metric, E021 metrics and the Q16 acceptance.
+- Sampled T_d as a second spectral parameter per region in the kernel (M2.6 scope).
+- Realistic-noise faint sky: the index posterior there is the prior's; Paper A states this as
+  the regime boundary (block sd per quartile from this record).

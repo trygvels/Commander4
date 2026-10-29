@@ -220,6 +220,13 @@ original numbering.
   item (3) follows the implementation.
 
 ## Q16. How must the hierarchical amplitude prior and the dust SED be made robust to misspecification at high S/N?
+- **Status 2026-10-30 (E023 stage 1, F26, F27, D022):** the driver is the template, not the SED:
+  a template from one scaled frequency map biases the index field at 0.03 x and at 1 x noise,
+  and no scalar or region-scale hyperparameter law repairs it for dust (pixel-scale error tied
+  to T_d); fixed T_d is a 0.03 effect at most; the per-pixel CMB prior must be flat at realistic
+  noise (leakage of the correlated CMB). Next (E025): component-separation-quality templates
+  and the true-T dust SED by the same scans, then the first stage-2 chain; sampled T_d as the
+  structural fix. At realistic noise the faint half of the sky is prior-dominated at nside 16.
 - **Why:** F21 (E020): with a data-built template wrong by factors 0.4 to 1.7 at high latitude
   under one global scatter s, and with T_d fixed, the collapsed hier posterior for beta_s runs
   away (to -26) and beta_d shifts by 30 Fisher sd in the plane. Real Planck plus WMAP intensity
