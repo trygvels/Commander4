@@ -427,6 +427,13 @@ compsep:
       #                       # central finite-difference Hessian at the start state (2 dim
       #                       # gradients). Same target; avoids the step-size collapse when the
       #                       # hyperparameters are far stiffer than the field coefficients.
+      #                       # or fd_hessian_dense: the full finite-difference Hessian (same 2 dim
+      #                       # gradients, plus an O(dim^3) eigendecomposition and a dim x dim
+      #                       # matrix in memory) as a dense inverse mass, eigenvalues 1/H capped
+      #                       # at 10, non-positive curvature directions set to 1. Follows the
+      #                       # couplings between the field mean, the field coefficients and the
+      #                       # hyperparameters that a diagonal metric cannot; needs adapt_mass
+      #                       # false. Same target.
       #   refresh_inv_mass_at: []  # transition counts at which the diagonal inverse mass is recomputed
       #                            # from the finite-difference Hessian at the current state and the
       #                            # step size re-found (the start-state Hessian is stale once the

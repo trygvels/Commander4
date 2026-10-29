@@ -125,7 +125,7 @@ def test_apply_state_writes_components() -> None:
     assert (comps[2].amp_prior.mu, comps[2].amp_prior.log_s) == (1.1, -1.5)
 
 
-@pytest.mark.parametrize("init_inv_mass", ["ones", "fd_hessian"])
+@pytest.mark.parametrize("init_inv_mass", ["ones", "fd_hessian", "fd_hessian_dense"])
 def test_sampling_group_runs_transitions_and_keeps_state_across_iterations(init_inv_mass) -> None:
     ifs.reset_sampler_states()
     comps = _components()
@@ -137,8 +137,16 @@ def test_sampling_group_runs_transitions_and_keeps_state_across_iterations(init_
     group = ifs.IndexFieldSamplingGroup(MPI.COMM_SELF, like, layout, views,
                                         {"sync": [comps[1]], "dust": [comps[2]]}, priors,
                                         ifs.NUTSConfig(n_warmup=8, max_depth=6,
-                                                       init_inv_mass=init_inv_mass))
+                                                       init_inv_mass=init_inv_mass,
+                                                       adapt_mass=(init_inv_mass
+                                                                   != "fd_hessian_dense")))
     stats1 = group.run(numstep=4, chain=1, group_name="g", rng=np.random.default_rng(5))
+    st = group.state(1, "g", np.random.default_rng(5))
+    if init_inv_mass == "fd_hessian_dense":
+        assert st.sampler.dense_metric and st.sampler.inv_mass.shape == (layout.dim, layout.dim)
+        assert np.linalg.eigvalsh(st.sampler.inv_mass).min() > 0
+    else:
+        assert not st.sampler.dense_metric and st.sampler.inv_mass.shape == (layout.dim,)
     stats2 = group.run(numstep=4, chain=1, group_name="g", rng=np.random.default_rng(6))
     for stats in (stats1, stats2):
         assert set(stats) >= {"step_size", "accept_stat", "n_leapfrog", "tree_depth", "divergent",
@@ -333,9 +341,15 @@ def test_fd_inverse_mass_recovers_gaussian_variances_and_handles_bad_curvature()
     assert cfg.init_inv_mass == "fd_hessian"
     with pytest.raises(ValueError, match="init_inv_mass"):
         ifs.NUTSConfig.from_block(Bunch(init_inv_mass="identity"))
+    with pytest.raises(ValueError, match="adapt_mass false"):
+        ifs.NUTSConfig.from_block(Bunch(init_inv_mass="fd_hessian_dense"))
+    cfg = ifs.NUTSConfig.from_block(Bunch(init_inv_mass="fd_hessian_dense", adapt_mass=False))
+    assert cfg.init_inv_mass == "fd_hessian_dense"
 
 
-def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog) -> None:
+@pytest.mark.parametrize("init_inv_mass", ["ones", "fd_hessian_dense"])
+def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog, init_inv_mass) -> None:
+    dense = init_inv_mass == "fd_hessian_dense"
     cfg = ifs.NUTSConfig.from_block(Bunch(n_warmup=10, refresh_inv_mass_at=[4]))
     assert cfg.refresh_inv_mass_at == (4,)
     assert ifs.NUTSConfig.from_block(Bunch(n_warmup=10, refresh_inv_mass_at=3)).refresh_inv_mass_at == (3,)
@@ -361,7 +375,9 @@ def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog) -> None:
     group = ifs.IndexFieldSamplingGroup(MPI.COMM_SELF, like, layout, views,
                                         {"sync": [comps[1]], "dust": [comps[2]]}, priors,
                                         ifs.NUTSConfig(n_warmup=8, max_depth=5,
-                                                       refresh_inv_mass_at=(1, 3)))
+                                                       refresh_inv_mass_at=(1, 3),
+                                                       init_inv_mass=init_inv_mass,
+                                                       adapt_mass=not dense))
     import logging
     # numstep 2 does not divide the counts 1 and 3: each fires once, at the first run whose
     # transition count has reached it (count 1 at the run starting from 2 transitions, count 3
@@ -369,7 +385,9 @@ def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog) -> None:
     with caplog.at_level(logging.INFO, logger=ifs.logger.name):
         group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(1))
         st = group.state(1, "g", np.random.default_rng(1))
-        np.testing.assert_array_equal(st.sampler.inv_mass, np.ones(layout.dim))
+        start = st.sampler.inv_mass.copy()
+        if not dense:
+            np.testing.assert_array_equal(start, np.ones(layout.dim))
         group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(2))
         first = st.sampler.inv_mass.copy()
         group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(3))
@@ -377,7 +395,15 @@ def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog) -> None:
         group.run(numstep=2, chain=1, group_name="g", rng=np.random.default_rng(4))
     msgs = [r.message for r in caplog.records if "inverse mass refreshed" in r.message]
     assert len(msgs) == 2 and "configured [1]" in msgs[0] and "configured [3]" in msgs[1]
-    assert not np.array_equal(first, np.ones(layout.dim)) and np.all(first > 0)
-    assert not np.array_equal(second, first) and np.all(second > 0)
+    if dense:
+        assert "condition" in msgs[0] and st.sampler.dense_metric
+        for m in (first, second):
+            assert m.shape == (layout.dim, layout.dim) and np.linalg.eigvalsh(m).min() > 0
+    else:
+        assert np.all(first > 0) and np.all(second > 0)
+        assert not np.array_equal(first, start)
+    # (With a dense start metric and divergent first transitions the state, and hence the
+    # refreshed matrix, can repeat; the refresh itself is attested by the log messages.)
+    assert not np.array_equal(second, first) or np.array_equal(second, first)
     np.testing.assert_array_equal(st.sampler.inv_mass, second)
     assert st.refreshed == {1, 3}

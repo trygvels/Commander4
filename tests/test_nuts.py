@@ -294,3 +294,169 @@ def test_two_refreshes_with_windows_keep_target():
         assert abs(draws[:, j].mean()) < 4 * np.sqrt(var / ess)
         assert abs(draws[:, j].var() - var) < 4 * var * np.sqrt(2.0 / ess)
     assert abs(np.corrcoef(draws[:, 0], draws[:, 1])[0, 1] - 0.8) < 0.05
+
+
+# ---------------------------------------------------------------- dense metric
+def _gauss(cov, mean):
+    prec = np.linalg.inv(cov)
+
+    def f(theta):
+        d = theta - mean
+        return -0.5 * d @ prec @ d, -prec @ d
+    return f
+
+
+def test_dense_metric_equals_diagonal_metric_when_diagonal():
+    """A dense inverse mass that is diagonal gives the same chain as the diagonal one from the
+    same random stream (momentum draw, kinetic energy, leapfrog and U-turn test agree)."""
+    cov = np.diag([1.0, 25.0, 0.04])
+    f = _gauss(cov, np.array([1.0, -2.0, 0.5]))
+    diag = np.array([0.7, 20.0, 0.05])
+    chains = []
+    for metric in (diag, np.diag(diag)):
+        sampler = NUTSSampler(3, np.random.default_rng(11), n_warmup=50, adapt_mass=False,
+                              inv_mass=metric)
+        theta = np.zeros(3)
+        out = []
+        for _ in range(120):
+            theta, _ = sampler.transition(theta, f)
+            out.append(theta.copy())
+        chains.append(np.array(out))
+    assert chains[1].shape == chains[0].shape
+    np.testing.assert_allclose(chains[1], chains[0], rtol=1e-9, atol=1e-12)
+
+
+def _correlated_gaussian_runs():
+    """An 8-dimensional Gaussian with correlations of 0.9 and scales spanning a factor 100,
+    sampled with the exact covariance as a dense inverse mass and with the best diagonal metric
+    (the marginal variances); 3000 post-warm-up draws each."""
+    rng = np.random.default_rng(3)
+    dim = 8
+    scales = np.logspace(-1, 1, dim)
+    corr = 0.9 ** np.abs(np.subtract.outer(np.arange(dim), np.arange(dim)))
+    cov = corr * np.outer(scales, scales)
+    mean = rng.normal(size=dim)
+    f = _gauss(cov, mean)
+    results = {}
+    for name, metric in (("dense", cov), ("diag", np.diag(cov))):
+        sampler = NUTSSampler(dim, np.random.default_rng(5), n_warmup=300, adapt_mass=False,
+                              inv_mass=metric)
+        theta = np.zeros(dim)
+        draws, leaps = [], []
+        for it in range(300 + 3000):
+            theta, info = sampler.transition(theta, f)
+            if it >= 300:
+                assert not info.divergent
+                draws.append(theta.copy())
+                leaps.append(info.n_leapfrog)
+        results[name] = (np.array(draws), np.array(leaps))
+    return cov, corr, mean, results
+
+
+def test_dense_metric_matches_the_moments_of_a_correlated_gaussian():
+    cov, corr, mean, results = _correlated_gaussian_runs()
+    draws, _ = results["dense"]
+    dim = cov.shape[0]
+    ess = np.array([_ess(draws[:, j]) for j in range(dim)])
+    assert ess.min() > 500
+    for j in range(dim):
+        assert abs(draws[:, j].mean() - mean[j]) < 4 * np.sqrt(cov[j, j] / ess[j])
+        assert abs(draws[:, j].var() - cov[j, j]) < 4 * cov[j, j] * np.sqrt(2.0 / ess[j])
+    emp = np.corrcoef(draws.T)
+    for i in range(dim):
+        for j in range(i + 1, dim):
+            # SE of a sample correlation, (1 - rho^2) / sqrt(n_eff), at the smaller ESS; 4 SE.
+            se = (1.0 - corr[i, j] ** 2) / np.sqrt(min(ess[i], ess[j]))
+            assert abs(emp[i, j] - corr[i, j]) < 4 * se + 0.01
+
+
+def test_dense_metric_needs_fewer_leapfrogs_than_the_diagonal_one():
+    _, _, _, results = _correlated_gaussian_runs()
+    assert np.median(results["dense"][1]) < 0.5 * np.median(results["diag"][1])
+
+
+def test_dense_metric_on_a_non_gaussian_target_with_a_reset_during_warmup():
+    """A log-Gamma coordinate times a rho 0.95 Gaussian pair with scales 1 and 20, sampled with
+    a dense metric that is not aligned with the coordinates, reset to a second dense metric at
+    warm-up transition 150: the moments of the exact target are reproduced."""
+    cov = np.array([[1.0, 0.95 * 20.0], [0.95 * 20.0, 400.0]])
+    prec = np.linalg.inv(cov)
+    true_mean = np.array([0.92278434, 0.0, 0.0])          # digamma(3)
+    true_var = np.array([0.39493407, 1.0, 400.0])          # trigamma(3)
+
+    def f(theta):
+        x, y = theta[0], theta[1:]
+        return 3.0 * x - np.exp(x) - 0.5 * y @ prec @ y, np.concatenate([[3.0 - np.exp(x)],
+                                                                            -prec @ y])
+    rng = np.random.default_rng(21)
+    A = rng.normal(size=(3, 3))
+    m0 = A @ A.T + 0.5 * np.eye(3)                          # a random SPD metric
+    full = np.zeros((3, 3)); full[0, 0] = true_var[0]; full[1:, 1:] = cov
+    sampler = NUTSSampler(3, np.random.default_rng(9), n_warmup=400, adapt_mass=False,
+                          inv_mass=m0)
+    theta = np.array([np.log(3.0), 0.0, 0.0])
+    draws = []
+    for it in range(400 + 6000):
+        if it == 150:
+            sampler.reset_metric(0.7 * full, theta, f)    # dense reset, 30 percent too tight
+            assert sampler.dense_metric
+        theta, info = sampler.transition(theta, f)
+        if it >= 400:
+            draws.append(theta.copy())
+    draws = np.array(draws)
+    for j in range(3):
+        ess = _ess(draws[:, j])
+        assert ess > 300
+        assert abs(draws[:, j].mean() - true_mean[j]) < 4 * np.sqrt(true_var[j] / ess)
+        assert abs(draws[:, j].var() - true_var[j]) < 4 * true_var[j] * np.sqrt(2.0 / ess)
+    assert abs(np.corrcoef(draws[:, 1], draws[:, 2])[0, 1] - 0.95) < 0.03
+
+
+def test_dense_metric_rejects_adaptation_and_bad_matrices():
+    sampler = NUTSSampler(2, np.random.default_rng(0), n_warmup=10, adapt_mass=False)
+    with pytest.raises(ValueError):
+        sampler.inv_mass = np.array([[1.0, 2.0], [2.0, 1.0]])       # not positive definite
+    with pytest.raises(ValueError):
+        sampler.inv_mass = np.array([[1.0, 0.5], [0.0, 1.0]])       # not symmetric
+    with pytest.raises(ValueError):
+        NUTSSampler(2, np.random.default_rng(0), n_warmup=10, adapt_mass=True,
+                    inv_mass=np.eye(2))
+    sampler.inv_mass = np.array([[2.0, 0.5], [0.5, 1.0]])
+    assert sampler.dense_metric
+    sampler.inv_mass = np.array([1.0, 2.0])
+    assert not sampler.dense_metric
+
+
+def test_fd_inverse_mass_dense_recovers_the_covariance():
+    """On a quadratic log density the dense finite-difference Hessian gives the covariance; an
+    eigendirection of negative curvature keeps its scale (1/|lam|), curvatures below 1/cap are
+    capped, and a coordinate whose stencil point is rejected (non-finite density, zero
+    gradient) is decoupled at unit inverse mass instead of corrupting the matrix."""
+    from commander4.compsep.index_field_sampler import fd_inverse_mass_dense
+    rng = np.random.default_rng(2)
+    A = rng.normal(size=(5, 5))
+    Q, _ = np.linalg.qr(A)
+    lam = np.array([50.0, 4.0, 0.5, 0.05, -2.0])      # 0.05 < 1/cap = 0.1; -2 is a saddle
+    H = (Q * lam) @ Q.T
+    f = lambda x: (-0.5 * x @ H @ x, -H @ x)
+    inv, summ = fd_inverse_mass_dense(f, np.zeros(5))
+    expected = (Q * np.array([1 / 50.0, 1 / 4.0, 2.0, 10.0, 0.5])) @ Q.T
+    np.testing.assert_allclose(inv, expected, rtol=1e-6, atol=1e-8)
+    assert summ["n_negative"] == 1 and summ["n_capped"] == 1 and summ["n_rejected"] == 0
+    assert summ["asymmetry"] < 1e-6 and summ["condition"] == pytest.approx(500.0)
+    sampler = NUTSSampler(5, np.random.default_rng(1), n_warmup=100, adapt_mass=False,
+                          inv_mass=inv)
+    assert sampler.dense_metric
+    # Rejected stencil: the density is -inf for x[0] above 5e-4 (the +h point of coordinate 0).
+    Hc = np.array([[4.0, 1.0], [1.0, 2.0]])
+
+    def g(x):
+        if x[0] > 5e-4:
+            return -np.inf, np.zeros(2)
+        return -0.5 * x @ Hc @ x, -Hc @ x
+    inv2, summ2 = fd_inverse_mass_dense(g, np.zeros(2))
+    assert summ2["n_rejected"] == 1
+    np.testing.assert_allclose(inv2, np.diag([1.0, 0.5]), rtol=1e-6, atol=1e-9)
+    # Same contract for the diagonal estimate.
+    from commander4.compsep.index_field_sampler import fd_inverse_mass
+    np.testing.assert_allclose(fd_inverse_mass(g, np.zeros(2)), [1.0, 0.5], rtol=1e-6)

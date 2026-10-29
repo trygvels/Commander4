@@ -57,6 +57,28 @@ a bug until shown otherwise (principle 8) and is not merged; if the posterior ag
 does not improve, the coupling is not what a Gaussian metric can fix and the reparameterization
 route is taken.
 
+## Design review
+stats-reviewer 2026-10-29 (target re-derived from `nuts.py`; own moment checks on a non-Gaussian
+target with a non-aligned dense metric and a mid-warm-up dense reset; negative control with the
+wrong momentum draw fails by 5e4): the Hamiltonian, momentum draw r = L^-T z, slice acceptance
+and U-turn test are consistent for any fixed symmetric positive definite metric; the stationary
+distribution is the target, CONFIRMED. Must-fix taken: (1) a rejected stencil point (-inf
+density, zero gradient by the likelihood's contract) silently corrupted a row of the
+finite-difference Hessian; both initializers now detect it and leave that coordinate at unit
+inverse mass, decoupled, counted and logged; (2) the asymmetry diagnostic was computed after
+symmetrization (always 0), now before; (3) the sampler integration tests now run the dense
+initialization and the dense refresh through `reset_metric`. Should-fix taken: saddle-free
+rule m = min(1 / |lam|, cap) in negative-curvature directions (Dauphin et al. 2014) instead of
+1; `solve_triangular` for the momentum draw (the full LU was O(dim^3) per transition); the
+condition number logged; a non-Gaussian dense-metric test with a reset; the correlation
+tolerance derived from the ESS; the efficiency assertion moved to its own test; line lengths.
+Caveat for the run below: it started (11:56) with the pre-review code, so its initial metric
+used m = 1 in the two non-positive directions found at the start state and its refreshes at 50
+and 200 ran without the rejected-stencil guard (a rejection there would have corrupted the
+metric silently; the chain's target is unchanged either way, only its efficiency). The
+production code is the reviewed version; if E024 adopts the dense metric, the first production
+run is also the check that the reviewed version behaves as the run below.
+
 ## Command
 ```bash
 mpirun -n 12 commander4 -p /Users/trygvels/data/e021_consistent_v2/param_gmrf8_dense.yml   # started 2026-10-29 11:56

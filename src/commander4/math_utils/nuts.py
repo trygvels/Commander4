@@ -1,10 +1,10 @@
 """No-U-Turn Sampler (NUTS) for gradient-based sampling of non-linear parameters.
 
 Implements Algorithm 6 of Hoffman & Gelman (2014, JMLR 15, 1593) -- NUTS with slice sampling and
-dual-averaging step-size adaptation -- with a diagonal mass matrix, and Stan-style windowed
-adaptation of that mass matrix during warmup. It is written to be driven one transition at a time,
-so it can sit inside a Gibbs loop where the target may change slowly between iterations (e.g. the
-band maps change as TOD processing updates them).
+dual-averaging step-size adaptation -- with a diagonal or a dense mass matrix, and
+Stan-style windowed adaptation of a diagonal mass matrix during warmup. It is written to be
+driven one transition at a time, so it can sit inside a Gibbs loop where the target may change
+slowly between iterations (e.g. the band maps change as TOD processing updates them).
 
 Usage::
 
@@ -21,6 +21,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 import numpy as np
+from scipy.linalg import solve_triangular
 from numpy.typing import NDArray
 
 LogpGrad = Callable[[NDArray], tuple[float, NDArray]]
@@ -92,22 +93,30 @@ def _warmup_windows(n_warmup: int) -> list[int]:
 
 
 class NUTSSampler:
-    """NUTS (slice-sampling variant, Hoffman and Gelman 2014 Algorithm 6) with a diagonal mass
-    matrix; the step size adapts during warm-up, the mass matrix too unless ``adapt_mass`` is
-    False.
+    """NUTS (slice-sampling variant, Hoffman and Gelman 2014 Algorithm 6) with a diagonal or a
+    dense mass matrix; the step size adapts during warm-up, a diagonal mass matrix too unless
+    ``adapt_mass`` is False.
+
+    The metric enters only through the kinetic energy K(r) = 1/2 r^T M^-1 r and the momentum
+    draw r ~ N(0, M), so any fixed positive definite M leaves the target unchanged. A dense
+    inverse mass M^-1 is given as a symmetric positive definite (dim, dim) array; momenta are
+    drawn as r = L^-T z with M^-1 = L L^T (Cholesky) and z standard normal, since then
+    Cov(r) = L^-T L^-1 = M. Windowed adaptation is for the diagonal case only.
 
     Args:
         dim: Number of parameters.
         rng: Random generator; every draw of the sampler comes from it.
         n_warmup: Number of initial transitions that adapt step size and mass matrix.
         step_size: Initial leapfrog step size; found heuristically on the first call if None.
-        inv_mass: Initial diagonal inverse mass matrix (the parameter variances); ones if None.
+        inv_mass: Initial inverse mass matrix: a length-dim array (diagonal, the parameter
+            variances) or a (dim, dim) symmetric positive definite array (dense); ones if None.
         target_accept: Dual-averaging target of the mean acceptance statistic.
         max_depth: Maximum tree depth (at most 2**max_depth - 1 leapfrog steps per transition).
         adapt_mass: Re-estimate the diagonal inverse mass from the warm-up windows (Stan's
             schedule). False keeps ``inv_mass`` fixed and adapts the step size only; the target
             is the same for any fixed metric. Use False when ``inv_mass`` comes from a Hessian
-            and the windows would replace it by short-window variance estimates.
+            and the windows would replace it by short-window variance estimates. Must be False
+            with a dense inverse mass.
     """
 
     def __init__(self, dim: int, rng: np.random.Generator, n_warmup: int = 500,
@@ -117,10 +126,10 @@ class NUTSSampler:
         self.rng = rng
         self.n_warmup = n_warmup
         self.step_size = step_size
+        self.adapt_mass = adapt_mass
         self.inv_mass = np.ones(dim) if inv_mass is None else inv_mass
         self.target_accept = target_accept
         self.max_depth = max_depth
-        self.adapt_mass = adapt_mass
         self.iteration = 0
         self._dual = None
         self._window_ends = _warmup_windows(n_warmup) if adapt_mass else []
@@ -129,16 +138,52 @@ class NUTSSampler:
 
     @property
     def inv_mass(self) -> NDArray:
-        """Diagonal inverse mass matrix (parameter variances). Set from any array-like; the
+        """Inverse mass matrix: a length-dim array (diagonal, the parameter variances) or a
+        (dim, dim) symmetric positive definite array (dense). Set from any array-like; the
         sampler keeps its own copy so a caller editing its array cannot change the kernel."""
         return self._inv_mass
 
     @inv_mass.setter
     def inv_mass(self, value) -> None:
         value = np.array(value, dtype=float, copy=True)
-        if value.shape != (self.dim,) or not np.all(np.isfinite(value)) or np.any(value <= 0):
-            raise ValueError("inv_mass must be a finite positive array of length dim.")
+        if value.shape == (self.dim,):
+            if not np.all(np.isfinite(value)) or np.any(value <= 0):
+                raise ValueError("inv_mass must be a finite positive array of length dim.")
+            self._dense = False
+            self._chol = None
+        elif value.shape == (self.dim, self.dim):
+            tol = 1e-10 * np.abs(value).max()
+            symmetric = np.allclose(value, value.T, rtol=0.0, atol=tol)
+            if not np.all(np.isfinite(value)) or not symmetric:
+                raise ValueError("A dense inv_mass must be a finite symmetric (dim, dim) array.")
+            if self.adapt_mass:
+                raise ValueError("A dense inv_mass needs adapt_mass=False (the windowed "
+                                 "adaptation estimates a diagonal metric only).")
+            value = 0.5 * (value + value.T)
+            try:
+                self._chol = np.linalg.cholesky(value)
+            except np.linalg.LinAlgError as exc:
+                raise ValueError("A dense inv_mass must be positive definite.") from exc
+            self._dense = True
+        else:
+            raise ValueError("inv_mass must have shape (dim,) or (dim, dim).")
         self._inv_mass = value
+
+    @property
+    def dense_metric(self) -> bool:
+        """True when the inverse mass is a dense matrix."""
+        return self._dense
+
+    def _apply_inv_mass(self, r: NDArray) -> NDArray:
+        """M^-1 r."""
+        return self._inv_mass @ r if self._dense else self._inv_mass * r
+
+    def _draw_momentum(self) -> NDArray:
+        """r ~ N(0, M): z / sqrt(M^-1) for a diagonal metric, L^-T z for a dense one."""
+        z = self.rng.normal(size=self.dim)
+        if not self._dense:
+            return z / np.sqrt(self._inv_mass)
+        return solve_triangular(self._chol.T, z, lower=False)
 
     # ---------------------------------------------------------------- public interface
     def reset_metric(self, inv_mass, theta: NDArray, logp_and_grad: LogpGrad) -> None:
@@ -151,7 +196,8 @@ class NUTSSampler:
             raise ValueError("reset_metric is a warm-up operation; the sampler has finished "
                              "its warm-up.")
         self.inv_mass = inv_mass
-        self._floor_metric = np.array(self.inv_mass, dtype=float, copy=True)
+        self._floor_metric = (None if self._dense
+                              else np.array(self.inv_mass, dtype=float, copy=True))
         self._window_samples = []
         self.step_size = self._find_reasonable_step_size(np.asarray(theta, dtype=float),
                                                          logp_and_grad)
@@ -175,7 +221,7 @@ class NUTSSampler:
 
     # ---------------------------------------------------------------- adaptation
     def _adapt(self, theta: NDArray, accept_stat: float) -> None:
-        if self._floor_metric is None:
+        if self._floor_metric is None and not self._dense:
             self._floor_metric = np.array(self.inv_mass, dtype=float, copy=True)
         self.step_size = self._dual.update(accept_stat)
         n_init = 75 if self.n_warmup >= 150 else int(0.15 * self.n_warmup)
@@ -202,7 +248,7 @@ class NUTSSampler:
         """Heuristic initial step size (Hoffman & Gelman 2014, Algorithm 4)."""
         eps = 1.0
         logp, grad = logp_and_grad(theta)
-        r = self.rng.normal(size=self.dim) / np.sqrt(self.inv_mass)
+        r = self._draw_momentum()
         joint0 = logp - self._kinetic(r)
 
         def log_ratio(eps):
@@ -220,11 +266,11 @@ class NUTSSampler:
 
     # ---------------------------------------------------------------- dynamics
     def _kinetic(self, r: NDArray) -> float:
-        return 0.5 * float(np.dot(r, self.inv_mass * r))
+        return 0.5 * float(np.dot(r, self._apply_inv_mass(r)))
 
     def _leapfrog(self, theta, r, grad, eps, logp_and_grad):
         r = r + 0.5 * eps * grad
-        theta = theta + eps * self.inv_mass * r
+        theta = theta + eps * self._apply_inv_mass(r)
         logp, grad = logp_and_grad(theta)
         if not np.isfinite(logp):
             return theta, r, -np.inf, np.zeros_like(theta)
@@ -233,13 +279,13 @@ class NUTSSampler:
 
     def _no_uturn(self, theta_minus, theta_plus, r_minus, r_plus) -> bool:
         dtheta = theta_plus - theta_minus
-        return (np.dot(dtheta, self.inv_mass * r_minus) >= 0.0
-                and np.dot(dtheta, self.inv_mass * r_plus) >= 0.0)
+        return (np.dot(dtheta, self._apply_inv_mass(r_minus)) >= 0.0
+                and np.dot(dtheta, self._apply_inv_mass(r_plus)) >= 0.0)
 
     def _nuts_step(self, theta0, logp_and_grad, eps):
         logp0, grad0 = logp_and_grad(theta0)
         grad0 = np.asarray(grad0, dtype=float)
-        r0 = self.rng.normal(size=self.dim) / np.sqrt(self.inv_mass)
+        r0 = self._draw_momentum()
         joint0 = logp0 - self._kinetic(r0)
         log_u = joint0 + np.log(self.rng.uniform())
         tm, tp, rm, rp, gm, gp = theta0, theta0, r0, r0, grad0, grad0

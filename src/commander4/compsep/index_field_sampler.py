@@ -76,13 +76,16 @@ class NUTSConfig:
         if cfg.parameterization not in ("noncentred", "centred"):
             raise ValueError(f"nuts.parameterization must be 'noncentred' or 'centred', got "
                              f"{cfg.parameterization!r}.")
-        if cfg.init_inv_mass not in ("ones", "fd_hessian"):
-            raise ValueError(f"nuts.init_inv_mass must be 'ones' or 'fd_hessian', got "
-                             f"{cfg.init_inv_mass!r}.")
+        if cfg.init_inv_mass not in ("ones", "fd_hessian", "fd_hessian_dense"):
+            raise ValueError(f"nuts.init_inv_mass must be 'ones', 'fd_hessian' or "
+                             f"'fd_hessian_dense', got {cfg.init_inv_mass!r}.")
         if cfg.n_warmup < 0 or not 0.0 < cfg.target_accept < 1.0 or cfg.max_depth < 1:
             raise ValueError("nuts: n_warmup >= 0, 0 < target_accept < 1, max_depth >= 1.")
         if not isinstance(cfg.adapt_mass, bool):
             raise ValueError(f"nuts.adapt_mass must be true or false, got {cfg.adapt_mass!r}.")
+        if cfg.init_inv_mass == "fd_hessian_dense" and cfg.adapt_mass:
+            raise ValueError("nuts.init_inv_mass 'fd_hessian_dense' needs adapt_mass false (the "
+                             "warm-up windows estimate a diagonal metric only).")
         return cfg
 
 
@@ -100,20 +103,79 @@ def fd_inverse_mass(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
     of the negative Hessian at x: inv_mass_j = 1 / H_jj where H_jj = -(g_j(x + h e_j) - g_j(x -
     h e_j)) / 2h > 0, else 1 (the prior scale of the non-centred blocks), capped at `cap`.
     This only sets the starting point of the mass adaptation; the target is unchanged. Costs
-    2 dim gradient evaluations."""
+    2 dim gradient evaluations. A stencil point with non-finite density (a rejected state,
+    whose gradient is zero by the likelihood's contract) leaves that coordinate at 1."""
     x = np.asarray(x, dtype=float)
-    diag = np.empty(x.size)
+    diag = np.full(x.size, np.nan)
     for j in range(x.size):
         xp, xm = x.copy(), x.copy()
         xp[j] += h
         xm[j] -= h
-        gp = logp_and_grad(xp)[1][j]
-        gm = logp_and_grad(xm)[1][j]
-        diag[j] = -(gp - gm) / (2.0 * h)
+        lp_p, gp = logp_and_grad(xp)
+        lp_m, gm = logp_and_grad(xm)
+        if np.isfinite(lp_p) and np.isfinite(lp_m):
+            diag[j] = -(gp[j] - gm[j]) / (2.0 * h)
     inv = np.ones(x.size)
     ok = np.isfinite(diag) & (diag > 0.0)
     inv[ok] = np.minimum(1.0 / diag[ok], cap)
     return inv
+
+
+def _dense_note(summ: dict) -> str:
+    return (f"curvature eigenvalues {summ['lam_min']:.3g} to {summ['lam_max']:.3g} "
+            f"({summ['n_negative']} negative, {summ['n_capped']} capped, {summ['n_rejected']} "
+            f"coordinates rejected and decoupled), finite-difference asymmetry "
+            f"{summ['asymmetry']:.3g}, inverse-mass eigenvalues {summ['m_min']:.3g} to "
+            f"{summ['m_max']:.3g} (condition {summ['condition']:.3g})")
+
+
+def fd_inverse_mass_dense(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
+                          cap: float = FD_MASS_MAX) -> tuple[NDArray, dict]:
+    """Initial dense inverse mass from a central finite-difference estimate of the full negative
+    Hessian at x, H_ij = -(g_j(x + h e_i) - g_j(x - h e_i)) / 2h, symmetrized and eigendecomposed
+    H = U diag(lam) U^T; the inverse mass is U diag(m) U^T with m_k = min(1 / |lam_k|, cap)
+    (saddle-free rule: a direction of negative curvature keeps its scale; |lam| below 1 / cap
+    gives cap). A dense metric makes the kinetic energy follow the local curvature in every
+    direction, including the couplings between the field mean, the field coefficients and the
+    hyperparameters that a diagonal metric cannot represent. Same target for any fixed metric;
+    the same 2 dim gradient evaluations as the diagonal estimate, plus an O(dim^3)
+    eigendecomposition. A stencil point with non-finite density (a rejected state, whose
+    gradient is zero by the likelihood's contract) would corrupt its row; such a coordinate is
+    decoupled and left at unit inverse mass instead, and counted. Returns the inverse mass and
+    a summary dict (counts, eigenvalue ranges, the finite-difference asymmetry of H before
+    symmetrization, the metric condition number)."""
+    x = np.asarray(x, dtype=float)
+    n = x.size
+    H = np.empty((n, n))
+    rejected = np.zeros(n, dtype=bool)
+    for i in range(n):
+        xp, xm = x.copy(), x.copy()
+        xp[i] += h
+        xm[i] -= h
+        lp_p, gp = logp_and_grad(xp)
+        lp_m, gm = logp_and_grad(xm)
+        if np.isfinite(lp_p) and np.isfinite(lp_m):
+            H[i] = -(np.asarray(gp, dtype=float) - np.asarray(gm, dtype=float)) / (2.0 * h)
+        else:
+            rejected[i] = True
+            H[i] = 0.0
+    if np.any(rejected):
+        H[:, rejected] = 0.0
+        H[rejected, rejected] = 1.0
+    if not np.all(np.isfinite(H)):
+        raise ValueError("The finite-difference Hessian is not finite.")
+    asymmetry = float(np.abs(H - H.T).max())
+    H = 0.5 * (H + H.T)
+    lam, U = np.linalg.eigh(H)
+    m = np.minimum(1.0 / np.maximum(np.abs(lam), 1.0 / cap), cap)
+    inv = (U * m) @ U.T
+    inv = 0.5 * (inv + inv.T)
+    summary = {"n_negative": int(np.sum(lam < 0.0)),
+               "n_capped": int(np.sum(np.abs(lam) < 1.0 / cap)),
+               "n_rejected": int(np.sum(rejected)), "lam_min": float(lam.min()),
+               "lam_max": float(lam.max()), "m_min": float(m.min()), "m_max": float(m.max()),
+               "asymmetry": asymmetry, "condition": float(m.max() / m.min())}
+    return inv, summary
 
 
 def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
@@ -439,6 +501,12 @@ class IndexFieldSamplingGroup:
                                 f"the finite-difference Hessian, {2 * x.size} gradients, range "
                                 f"{inv.min():.3g} to {inv.max():.3g}, "
                                 f"{int(np.sum(inv == 1.0))} coordinates left at 1")
+                elif not st.mass_initialized and self.nuts.init_inv_mass == "fd_hessian_dense":
+                    inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x)
+                    st.sampler.inv_mass = inv
+                    logger.info(f"Index-field group {group_name!r}: initial dense inverse mass "
+                                f"from the finite-difference Hessian, {2 * x.size} gradients, "
+                                f"{_dense_note(summ)}")
                 st.mass_initialized = True
                 due = [v for v in self.nuts.refresh_inv_mass_at
                        if v <= st.n_transitions and v not in st.refreshed]
@@ -449,13 +517,18 @@ class IndexFieldSamplingGroup:
                     # (the start-state Hessian is stale once the chain has left the transient)
                     # and the step size is re-found; same target.
                     st.refreshed.update(due)
-                    inv = fd_inverse_mass(self._logp_and_grad_root, x)
+                    if self.nuts.init_inv_mass == "fd_hessian_dense":
+                        inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x)
+                        rng_note = _dense_note(summ)
+                    else:
+                        inv = fd_inverse_mass(self._logp_and_grad_root, x)
+                        rng_note = f"range {inv.min():.3g} to {inv.max():.3g}"
                     st.sampler.reset_metric(inv, x, self._logp_and_grad_root)
                     logger.info(f"Index-field group {group_name!r}: inverse mass refreshed from "
                                 f"the finite-difference Hessian at transition "
                                 f"{st.n_transitions} (configured {sorted(due)}), "
-                                f"{2 * x.size} gradients, range {inv.min():.3g} to "
-                                f"{inv.max():.3g}, step size {st.sampler.step_size:.3g}")
+                                f"{2 * x.size} gradients, {rng_note}, step size "
+                                f"{st.sampler.step_size:.3g}")
                 for _ in range(numstep):
                     x, info = st.sampler.transition(x, self._logp_and_grad_root)
                     infos.append(info)
