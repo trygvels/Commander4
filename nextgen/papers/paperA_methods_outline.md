@@ -102,6 +102,16 @@ model component rather than a preprocessing choice.
   hyperparameters 2 percent low; the data-dominated regions are untouched and the CMB prior
   width is irrelevant. The point for real data: where the prior dominates, the index posterior
   reports the template-error model, so the model needs a stated template law (Q16).
+- Why the index prior needs spatial structure (E021 attempt 2, nside-16 pair; the nside ladder
+  is pending): an exchangeable (iid) hierarchical prior shrinks every region toward one global
+  mean whose posterior is the precision-weighted mean of the regions, so it follows the
+  Galactic plane; regions whose true index differs from it are pulled off (mid-S/N dust +0.02
+  to +0.03 with the chain at the mode of its target, verified by exact block-shift scans). The
+  GMRF shrinks toward neighbours and follows the large-scale index structure: sync RMSE 0.033
+  against 0.051, dust 0.018 against 0.028, CMB residual 0.05 uK lower, posterior sds 1.2 times
+  too wide rather than too narrow, at 11 times the gradients per effective sample. In
+  simulations the amplitude-law hyperparameter check (realized mean and sd of a/g) detects the
+  index-prior misspecification (mu_d 6.9 sd off under iid, 1.5 sd under the GMRF).
 - Sampler: NUTS with dual averaging and windowed diagonal mass adaptation; efficiency per gradient;
   the funnel at low S/N (E018 L1 diagnostic: the centred reference chain does not reach the
   small-sigma tail where NUTS in non-centred coordinates does). MAMS comparison (M2.3, pending).
