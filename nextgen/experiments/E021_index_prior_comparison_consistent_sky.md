@@ -304,6 +304,65 @@ against 68 / 95) say the same. Compared with the single index the GMRF at nside 
 sync error (0.033 against 0.063) and quarters the dust error (0.018 against 0.069) at this
 noise.
 
+**Attempt 2, iid16 complete (2026-10-29 03:59 to 06:50, 2.85 h; 1200 iterations, 700
+post-burn):** Hessian start 11 min per chain; after the refresh at 200 the sampler runs at 15 to
+31 gradients per transition (step size 0.165, acceptance 0.4 to 0.99, no divergences), 29
+gradients and 4 s per Gibbs iteration (87 ms per gradient), 4.3 times fewer gradients per
+iteration than gmrf16. Analyzer (`--burn 500`): sync region-level RMSE 0.0505 (|b| > 20: 0.0519;
+floor 0.0630), region z median/MAD -0.10/0.56, |z| < 1, < 2 for 78 and 98 percent, posterior sd
+median 0.066, ESS per region min 247 / median 929; dust RMSE 0.0275 (0.0302; floor 0.0686), z
++0.40/0.57, 69 and 96 percent, sd median 0.032, ESS min 290 / median 916. Fields: sync mu
+-3.0054 +- 0.0024 (truth mean -3.0000), sigma 0.079 +- 0.002; dust mu 1.5541 +- 0.0010 (truth
+1.5397), sigma 0.038 +- 0.001; mu_d has ESS 9.6 (lag-1 0.98) but its trace sits between 1.552
+and 1.556 from iteration 400 on. The amplitude hyperparameters fail the 2-sd test: mu_s 0.99831
++- 0.00151 (target 1.00309, -3.2 sd), s_s 0.29833 +- 0.00112 (-0.5 sd), mu_d 1.01133 +- 0.00165
+(0.99986, +6.9 sd; ESS 147), s_d 0.30236 +- 0.00115 (+2.9 sd). GLS CMB residual 2.93 uK
+(per-draw 3.08) against 2.89 (2.99) for gmrf16.
+
+**nside-16 pair (iid16 minus gmrf16, paired, block bootstrap over 192 nside-4 blocks):** sync
+RMSE +0.0172 +- 0.0013, dust RMSE +0.0095 +- 0.0010, GLS CMB residual +0.054 +- 0.007 uK.
+MC-inflation rule: the sync inflation is 0.0024 in both runs, below a quarter of the difference
+(0.0043), so the sync comparison stands. For dust iid16 (0.0011) passes but gmrf16 (0.0037)
+exceeds the quarter (0.0024), so the rule is formally not met on the gmrf16 side; that inflation
+adds to gmrf16's own RMSE, so removing it can only widen the gap: the sign of the dust
+comparison stands and its size is uncertain at the 0.004 level until a longer or second-seed
+run. The GMRF beats iid shrinkage on both indices and on the CMB. Cost side (principle 2):
+iid16 gives a median 920 ESS per region from 20,300 post-burn gradients, gmrf16 352 from
+87,500 (sync), so the GMRF spends about 11 times more gradients per effective sample at nside
+16 for the 0.017 / 0.010 RMSE gain and for the correct mid-S/N indices below.
+
+**Where iid loses, and why (checked, `nextgen/scripts/e021_iid_check.py`):** by S/N quartile
+(profiled Fisher sd at nside 16, high to low) the iid16 dust error means are -0.000, +0.022,
++0.032, +0.003 (RMSE 0.014, 0.033, 0.038, 0.017) against gmrf16 +0.000, +0.006, +0.007, -0.008
+(0.012, 0.021, 0.020, 0.019); the truth quartile means are 1.567, 1.522, 1.519, 1.552. The iid
+prior shrinks every region toward one global mu, and the posterior of mu is the
+precision-weighted mean of the regions with weights 1 / (sigma^2 + s_r^2), which the bright
+Galactic regions dominate: the linear-Gaussian prediction from the truth and the Fisher sds
+gives mu 1.5561 (chain 1.5541; unweighted truth mean 1.5397), quartile errors -0.000, +0.026,
++0.035, +0.005 and RMSE 0.0268 (chain 0.0275). The two middle quartiles have true indices 0.035
+below the weighted mean and are pulled toward it; the faint quartile is spared only because its
+true mean (1.552) happens to sit near mu. The GMRF shrinks toward the neighbours instead and
+follows the large-scale structure of the PySM index (rho 20 deg). The exact-marginal block-shift
+scan at the iid16 chain state (collapsed likelihood plus the iid prior at the chain
+hyperparameters) peaks at 0.000 for both middle dust quartiles and for the faint sync quartile,
+with the likelihood alone wanting -0.01: the chain sits at the mode of its target, so this is a
+property of the iid target, not a sampler failure. For sync the prediction is rougher (predicted
+RMSE 0.041, chain 0.051; chain quartile errors -0.004 to -0.007 against predicted +0.001 to
++0.008): the sync offset of -0.005 (2.2 posterior sd of mu_s) is not explained by the shrinkage
+alone and is left as an observation (coupling to the dust bias through the joint amplitude
+solve is the candidate, not checked). The amplitude hyperparameters are a consequence: with the
+dust index 0.02 to 0.03 too high over half the sky, the amplitude ratio a/g the data prefer
+shifts, and mu_d lands 6.9 sd above its realized target. The pre-registered reading in
+"Negative control" (hyperparameters off target = sampler or data problem, not a prior
+difference) was therefore wrong; corrected there.
+
+**Sampler note:** every run prints 13 numpy RuntimeWarnings at its first transition (12 ranks:
+divide by zero in the GMRF prior at sigma = 0; one rank: overflow in exp). They come from the
+initial step-size heuristic (eps doubling from 1, Hoffman and Gelman Algorithm 4) visiting an
+absurd state (log sigma below -745, index far outside range); the density returns -inf there by
+the nuts.py contract and the heuristic backs off. No effect on the target. The mass-refresh
+log lines are in `chains_<tag>/logs/`, not in `run_<tag>.out`.
+
 ## Negative control
 The single index converges to the Fisher-weighted sky mean, not the unweighted mean (review item
 1): sync -2.9878 (unweighted -3.0000), dust 1.5973 (unweighted 1.5397). Its index RMSE must
@@ -316,6 +375,12 @@ scalar dust run is therefore not a test of shrinkage away from mu0, only the syn
 hyperparameters must recover the realized mean and sd of a/g (above) in every option (they are
 the same in all ten runs; a run where they do not is a sampler or data problem, not a prior
 difference).
+
+Correction (2026-10-29, after iid16): the last reading was wrong. The amplitude hyperparameters
+are estimated jointly with the index fields, so a biased index field shifts them (iid16: mu_d
++6.9 sd with the mid-S/N dust index 0.02 to 0.03 too high, see the Result). The hyperparameter
+test is kept as a detector of index-prior misspecification, not as a sampler check; the sampler
+check is the exact block-shift scan at the chain state.
 
 ## Conclusion
 (pending)

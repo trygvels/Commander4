@@ -2,6 +2,38 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 08:15): E021 attempt 2 iid16 done; the GMRF beats iid shrinkage at nside 16 on both indices and the CMB; iid biases the mid-S/N dust index
+
+**Learned**
+- iid16 (2.85 h, 29 gradients per iteration against 125 for gmrf16): sync region-level RMSE
+  0.0505 and dust 0.0275 against gmrf16 0.0333 and 0.0180; paired differences +0.0172 +- 0.0013
+  and +0.0095 +- 0.0010, GLS CMB residual +0.054 +- 0.007 uK. The MC-inflation rule holds for
+  sync; for dust the gmrf16 inflation (0.0037) exceeds a quarter of the gap, which can only
+  understate it. Fair cost: the GMRF spends about 11 times more gradients per effective sample.
+- Mechanism verified (E021 Result, `e021_iid_check.py`): iid shrinks every region toward one
+  mu, and mu is the precision-weighted mean dominated by the Galactic plane (predicted 1.556,
+  chain 1.554, sky mean 1.540); the two middle S/N quartiles of the dust index lie 0.035 below
+  it and come out +0.022 and +0.032 too high (gmrf16: +0.006, +0.007). Exact block-shift scans
+  at the chain state peak at zero: a property of the iid target, not the sampler. The amplitude
+  hyperparameters fail their 2-sd test in iid16 (mu_d +6.9 sd) as a consequence; the
+  pre-registered reading of that test (sampler or data problem) was wrong and is corrected in
+  the record: it detects index-prior misspecification.
+- The 13 numpy RuntimeWarnings at the first transition of every run come from the initial
+  step-size heuristic probing an absurd state; the density returns -inf there by contract.
+
+**Running**
+- E021 attempt 2 indep16 (from 06:50, about 3 h), then scalar, gmrf8, iid8, indep8, gmrf4,
+  iid4, indep4 (about 25 h). A waiter runs the three-run analyzer when indep16 ends.
+
+**Next**
+- indep16 as the no-shrinkage reference (its per-region posterior sds are the s_r of the
+  weighted-mean argument), scalar as the negative control, then the nside ladder; after all ten:
+  E021 Conclusion, F24, Q3, M2.5; second noise seed for the decisive pair.
+
+**Needs Trygve**
+- Unchanged: Paper A presentation of the E022 diagnostics; `COMP_CL_TYPE = none` semantics
+  (Q17 item 1); the hier default (D003/D011).
+
 ## 2026-10-29 (Mac mini, 03:30): hier SBC replication PASS (F16 established); E021 attempt 2 gmrf16 near its end
 
 **Learned**
