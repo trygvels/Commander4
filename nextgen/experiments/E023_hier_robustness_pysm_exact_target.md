@@ -225,9 +225,34 @@ template of the synchrotron at all.
   the shifts fall by a factor 1.5 to 2 in sync and dust Q2 and stay at 0.06 to 0.10 in the
   fainter dust quartiles, where the global mu (0.91 against realized means 0.89 to 0.99 per
   quartile) and the template's structure, not its scatter, carry the misfit.
-- data_trueT_perq: as data_fixT_perq within 0.01 (in progress); data_fixT_perqmu pending.
+- data_trueT_perq: as data_fixT_perq within 0.01 (sync +0.000, +0.040, -0.060, -0.080; dust
+  +0.000, +0.030, +0.060, +0.100; wide 0.000): the fixed T plays no role once the template
+  drives the fit.
+- data_fixT_perqmu (mean and scatter per quartile; profiled mu_s [0.91, 0.83, 1.04, 2.93]
+  against the realized means [0.89, 0.83, 1.04, 77], s_s [0.26, 0.31, 0.41, 2.41]; mu_d [0.90,
+  0.93, 0.91, 0.84] against [0.89, 0.93, 0.94, 0.99], s_d [0.33, 0.22, 0.22, 0.26] against
+  [0.33, 0.22, 0.22, 0.40]): sync +0.000, +0.010, -0.010, -0.060 (gains 1.7, 2.9, 40), dust
+  +0.000, +0.050, +0.100, +0.100 (gains 422, 499, 77); wide 0.000. The per-quartile mean brings
+  the sync Q2 and Q3 shifts to 0.01 (the mean of a/g per quartile, 0.83 to 1.04, was the sync
+  misfit there) but not the faintest quartile (where a/g is not a distribution at all) and not
+  the dust at all: the dust template, 353 GHz scaled with a fixed T and smoothed, has an error
+  that varies with T_d and hence with the pixel's own index and position, which no scalar per
+  quartile absorbs; the dust shifts under perqmu equal those under the global prior.
 
-(The noise-1 sky follows in the same queue.)
+Reading of the 0.03 sky (pre-registered rules): the Commander4 configuration (data-built
+template, fixed T, global scatter) is biased in every quartile but the brightest, by 0.05 to
+above 0.1 in both indices with the faint-sync runaway; the driver is the template under one
+global scatter, fixed T adds up to 0.03 (sync faint quartile) and 0.01 (dust) with an exact
+template; the per-quartile scatter removes the runaway and nothing else of substance; the
+per-quartile mean and scatter also fix the mid-S/N sync but leave the dust at 0.05 to 0.10.
+Neither candidate is "unbiased" by the rule, and the dust failure is structural (a
+template-error law correlated with the index, F23's mechanism in a second form), so neither
+is carried to stage 2 as a fix; the result for Q16 is that a data-built template with any
+scalar-hyperparameter law is not usable for dust at this depth, and that the template error
+must be modelled as a field (correlated with T_d) or the template must come from a
+component separation with its own T_d, not from one scaled frequency map.
+
+**PySM sky at noise 1 (`E023/scan_n1.txt`, 17:19 to 20:45):** (being read; see below)
 
 ## Negative control
 Replaced by the code control (kernel agreement) and the model control (E021 sky) under

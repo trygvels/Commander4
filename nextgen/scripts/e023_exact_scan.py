@@ -231,6 +231,7 @@ def quartiles(f):
 
 
 def main():
+    global CMB_SD
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", required=True)
     ap.add_argument("--out", required=True)
@@ -243,7 +244,10 @@ def main():
     ap.add_argument("--wide", type=float, nargs=3, default=[-3.0, 3.0, 0.2])
     ap.add_argument("--laplace-at", type=int, default=5, help="Laplace term at this many deltas per scan (0 = none)")
     ap.add_argument("--quick", action="store_true")
+    ap.add_argument("--cmb-sd", type=float, default=CMB_SD, help="per-pixel CMB prior sd in uK_CMB")
+    ap.add_argument("--scans", nargs="*", default=None, help="run only these scan labels (e.g. d_Q2 s_Q4_wide)")
     a = ap.parse_args()
+    CMB_SD = a.cmb_sd
     D = a.dir
     t = np.load(f"{D}/truth.npz")
     nside = int(t["nside"]); npix = hp.nside2npix(nside)
@@ -263,7 +267,7 @@ def main():
     out = open(a.out, "w")
     def say(s):
         print(s, flush=True); out.write(s + "\n"); out.flush()
-    say(f"E023 exact-target scans (v2) on {D}: nside {nside}, noise scale {float(t['noise_scale'])}, "
+    say(f"E023 exact-target scans (v2) on {D}: nside {nside}, noise scale {float(t['noise_scale'])}, CMB prior sd {CMB_SD:g}, "
         f"T_fixed {T_fixed:.3f} K; truth sd beta_s {np.asarray(t['beta_s']).std():.4f}, "
         f"beta_eff3 {np.asarray(t['beta_eff3']).std():.4f}, beta_d {np.asarray(t['beta_d']).std():.4f}")
     # quartiles from the template-based Fisher sd (real-data computable)
@@ -338,6 +342,8 @@ def main():
             scans = [(f"{c}_Q{q+1}", c, q, fine) for c in ("s", "d") for q in range(4)]
             if wide.size:
                 scans.append(("s_Q4_wide", "s", 3, wide))
+            if a.scans:
+                scans = [sc for sc in scans if sc[0] in a.scans]
             for label, comp, q, deltas in scans:
                 sel = (qs64 if comp == "s" else qd64) == q
                 th = th0.copy(); rows = []
