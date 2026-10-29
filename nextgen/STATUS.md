@@ -2,6 +2,30 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-29 (Mac mini, 16:10): E024 done, dense Hessian metric adopted for production (F25, D020)
+
+**Learned**
+- E024 (gmrf8 with the dense metric, same data and target as the diagonal chain): every
+  statistic within 1 combined MC SE of the diagonal chain; mu_d ESS 9 to 331 of 700 (27 times
+  per gradient), faint dust regions 6 to 135, dust amplitude mean 39 to 376, chain's worst
+  quantity 14 times better per gradient; sync regions 1.6 to 2.2 times worse per gradient
+  (pre-registered clause failed, recorded; 84 against 63 gradients per iteration). Adopted for
+  production runs; default unchanged.
+
+**Running**
+- E023 stage 1 scans (E021 control sky, then PySM at 0.03 and at noise 1).
+- E021 seed-2028 gmrf16, iid16, indep16 (from 11:13).
+
+**Next**
+- E023 stage-1 reading; stage-2 chain on the noise-1 sky with the dense metric (the first
+  nside-16 check of the reviewed code).
+- Seed-2028 paired differences into E021 and F24; Paper A Table 2 final.
+- Efficiency follow-up: the sync-side loss under the dense metric (per-block step size or a late
+  refresh); the two persistently non-positive Hessian directions.
+
+**Needs Trygve**
+- Unchanged.
+
 ## 2026-10-29 (Mac mini, 12:10): dense Hessian metric for the index-field NUTS merged after stats review (E024 run in progress); E023 scans and the seed-2028 triple running
 
 **Learned**

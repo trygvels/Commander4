@@ -1,0 +1,48 @@
+E020 analysis of /Users/trygvels/data/e021_consistent_v2 (burn 500; nside 64; truth sd beta_s 0.0615, beta_d 0.0323, beta_eff 0.0323; beta_eff - beta_d rms 0.0000)
+reference GLS CMB residuals (rms all / hi uK; power fractions l 2-30, 30-100): gls_true_sed: 2.79 / 2.80, 0.0001, 0.0008; gls_at_truth_fixedT: 2.79 / 2.80, 0.0001, 0.0008; gls_at_beta_eff: 2.79 / 2.80, 0.0001, 0.0008; gls_at_beta_eff3: 2.79 / 2.80, 0.0001, 0.0008; gls_at_region_means_nside4: 8.06 / 2.87, 0.0053, 0.0125; gls_at_region_means_nside8: 5.37 / 2.85, 0.0015, 0.0058; gls_at_region_means_nside16: 2.79 / 2.80, 0.0001, 0.0008 (gls_true_sed is the noise floor; the fixed-T ones carry the dust misfit)
+
+run          n   rmse_s all/hi   rmse_d all/hi rmse_d(fixT)     floor_s/d       rmse draw s/d     sd_s/sd_d  z_s med/mad  z_d med/mad  cmb rms all/hi    P<30 P<100 coef<30   chi2  grad  s/it    ESS_s/d  div
+gmrf8      700 0.0379/0.0362 0.0218/0.0211 0.0218/0.0211 0.0195/0.0146 0.0520+-0.0017/0.0293+-0.0009 0.0369/0.0197 -0.13/0.63 +0.09/0.61    4.22/  2.86 0.0010 0.0035   0.999 214.478  63.0   2.5  133/   5    0
+    rmse by S/N quartile (low to high): sync 0.0385 0.0387 0.0367 0.0377 (truth sd 0.0512 0.0514 0.0568 0.0810); dust 0.0188 0.0198 0.0243 0.0239 (truth sd 0.0164 0.0209 0.0282 0.0376); |z_w|<1,<2: sync 0.72/0.96, dust 0.73/0.96
+    dust rmse against beta_eff3 0.0218/0.0211; cmb per-draw rms 4.25 +- 0.01; amp-hyper ESS min 86/38
+    region-level rmse (floor removed) sync 0.0325 dust 0.0163; MC inflation of the rmse sync 0.0016 dust 0.0037; rmse of the Fisher-weighted sky mean (single-index target) sync 0.0630 dust 0.0686
+    sync field: mu -3.0004 +- 0.0028, field mean -3.0004, sigma 0.0659 +- 0.0052, rho 34.4 +- 5.3 deg, amp mu 1.001 log s -1.21; ESS hyper min 68
+    dust field: mu 1.5421 +- 0.0020, field mean 1.5421, sigma 0.0363 +- 0.0023, rho 31.5 +- 3.9 deg, amp mu 1.004 log s -1.20; ESS hyper min 9
+gmrf8_dense   700 0.0381/0.0364 0.0220/0.0214 0.0220/0.0214 0.0195/0.0146 0.0521+-0.0018/0.0296+-0.0010 0.0362/0.0200 -0.10/0.64 +0.08/0.61    4.22/  2.86 0.0010 0.0035   0.998 214.569  84.1  10.4  114/ 133    0
+    rmse by S/N quartile (low to high): sync 0.0389 0.0390 0.0368 0.0377 (truth sd 0.0512 0.0514 0.0568 0.0810); dust 0.0192 0.0201 0.0244 0.0239 (truth sd 0.0164 0.0209 0.0282 0.0376); |z_w|<1,<2: sync 0.73/0.96, dust 0.72/0.96
+    dust rmse against beta_eff3 0.0220/0.0214; cmb per-draw rms 4.25 +- 0.01; amp-hyper ESS min 278/375
+    region-level rmse (floor removed) sync 0.0327 dust 0.0165; MC inflation of the rmse sync 0.0020 dust 0.0011; rmse of the Fisher-weighted sky mean (single-index target) sync 0.0630 dust 0.0686
+    sync field: mu -3.0004 +- 0.0026, field mean -3.0004, sigma 0.0663 +- 0.0054, rho 34.5 +- 4.7 deg, amp mu 1.001 log s -1.21; ESS hyper min 130
+    dust field: mu 1.5420 +- 0.0017, field mean 1.5420, sigma 0.0368 +- 0.0030, rho 31.9 +- 4.8 deg, amp mu 1.004 log s -1.20; ESS hyper min 196
+
+paired differences (run minus best, block bootstrap SE over 192 nside-4 blocks): sync RMSE vs PySM | dust RMSE vs beta_eff3 | GLS CMB residual rms
+  gmrf8    +0.0000 +- 0.0000 (vs gmrf8) | +0.0000 +- 0.0000 (vs gmrf8) | +0.0000 +- 0.0000 (vs gmrf8)
+  gmrf8_dense +0.0002 +- 0.0001 (vs gmrf8) | +0.0002 +- 0.0001 (vs gmrf8) | +0.0025 +- 0.0012 (vs gmrf8)
+  best cmb run minus the true-SED GLS floor: +1.431 +- 0.532 uK
+
+gmrf8_dense: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -3.00044 sd 0.00258 ESS   268.3
+  Synchrotron/index_field/log_sigma        mean -2.71664 sd 0.08018 ESS   228.9
+  Synchrotron/index_field/u                mean -0.07499 sd 0.16997 ESS   130.9
+  Synchrotron/amp_prior/mu                 mean +1.00113 sd 0.00160 ESS   279.1
+  Synchrotron/amp_prior/log_s              mean -1.20666 sd 0.00372 ESS   323.4
+  ThermalDust/index_field/mu               mean +1.54202 sd 0.00169 ESS   330.7
+  ThermalDust/index_field/log_sigma        mean -3.30663 sd 0.07895 ESS   283.7
+  ThermalDust/index_field/u                mean -0.17838 sd 0.18677 ESS   196.5
+  ThermalDust/amp_prior/mu                 mean +1.00376 sd 0.00177 ESS   375.9
+  ThermalDust/amp_prior/log_s              mean -1.20183 sd 0.00368 ESS   475.8
+  dust beta_map: 768 regions, ESS min 135 5% 222 median 342
+  sync beta_map: 768 regions, ESS min 116 5% 224 median 344
+gmrf8: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -3.00041 sd 0.00279 ESS    69.2
+  Synchrotron/index_field/log_sigma        mean -2.72306 sd 0.07698 ESS   126.4
+  Synchrotron/index_field/u                mean -0.08325 sd 0.18762 ESS    99.5
+  Synchrotron/amp_prior/mu                 mean +1.00129 sd 0.00157 ESS    88.5
+  Synchrotron/amp_prior/log_s              mean -1.20716 sd 0.00347 ESS   906.0
+  ThermalDust/index_field/mu               mean +1.54215 sd 0.00198 ESS     9.2
+  ThermalDust/index_field/log_sigma        mean -3.31723 sd 0.06237 ESS    60.4
+  ThermalDust/index_field/u                mean -0.18977 sd 0.15629 ESS    99.3
+  ThermalDust/amp_prior/mu                 mean +1.00384 sd 0.00190 ESS    39.0
+  ThermalDust/amp_prior/log_s              mean -1.20206 sd 0.00381 ESS   146.3
+  dust beta_map: 768 regions, ESS min 6 5% 17 median 66
+  sync beta_map: 768 regions, ESS min 137 5% 294 median 575

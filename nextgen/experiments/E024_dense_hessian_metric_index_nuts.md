@@ -86,7 +86,52 @@ python nextgen/scripts/e020_analyze.py --dir /Users/trygvels/data/e021_consisten
 ```
 
 ## Result
-(pending)
+Run complete (11:56 to 15:57 under heavy load: the seed-2028 queue and the E023 scans shared the
+machine, so wall time is not comparable; 1200 iterations, 700 post-burn, no divergences, no
+tracebacks). Metric: 3088 gradients per Hessian, curvature eigenvalues -190 to 8.8e7 at the
+start state with two non-positive directions (set to 1 by the pre-review rule), inverse-mass
+eigenvalues 1.1e-8 to 2; at the refreshes (transitions 50 and 200) eigenvalues 1.1e-8 to 1 with
+the same two directions non-positive; step size 0.0625 after the first refresh, 0.016 to 0.031
+after the second. Gradients per iteration 84.1 (tree depth 7, 127 leapfrogs in most
+transitions) against 63.0 for the diagonal metric.
+
+Posterior agreement with the diagonal-metric chain (same data, same target), from
+`E024_analyzer_output.txt`: pixel-level index RMSE 0.0381 / 0.0220 against 0.0379 / 0.0218
+(paired +0.0002 +- 0.0001 on both, within the MC inflation 0.0016 / 0.0037 of the diagonal
+chain); GLS CMB residual 4.22 uK in both (paired +0.0025 +- 0.0012); region z median / MAD
+-0.10 / 0.64 and +0.08 / 0.61 against -0.13 / 0.63 and +0.09 / 0.61; posterior sd medians
+0.0362 / 0.0200 against 0.0369 / 0.0197. Hyperparameters (dense against diagonal, combined MC
+SE in brackets): mu_s -3.00044 +- 0.00258 against -3.00041 +- 0.00279 (0.1 SE), log sigma_s
+-2.717 against -2.723 (0.6 SE), u_s -0.075 against -0.083 (0.3 SE), mu_d 1.54202 +- 0.00169
+against 1.54215 +- 0.00198 (0.2 SE), log sigma_d -3.307 against -3.317 (0.9 SE), u_d -0.178
+against -0.190 (0.5 SE); amplitude mu_s 1.00113 against 1.00129 (0.7 SE), log s_s -1.2067
+against -1.2072 (0.9 SE), mu_d 1.00376 against 1.00384 (0.2 SE), log s_d -1.2018 against
+-1.2021 (0.7 SE). Amplitude-hyperparameter test against the realized targets: -1.2, +0.3, +2.2,
++1.5 sd (the diagonal chain: -1.2, +0.2, +2.1, +1.4). Every quantity agrees within 1 SE.
+
+Efficiency (ESS over 700 post-burn draws; ESS per 1000 gradients in brackets, 44,100 gradients
+for the diagonal chain and 58,870 for the dense one):
+
+| quantity | diagonal | dense | ratio per gradient |
+|---|---|---|---|
+| mu_d (dust field mean) | 9.2 [0.21] | 331 [5.6] | 27 |
+| log sigma_d / u_d | 60 / 99 [1.4 / 2.3] | 284 / 197 [4.8 / 3.3] | 3.5 / 1.5 |
+| dust amplitude mu / log s | 39 / 146 [0.9 / 3.3] | 376 / 476 [6.4 / 8.1] | 7.2 / 2.4 |
+| dust regions min / 5 pct / median | 6 / 17 / 66 [0.14 / 0.4 / 1.5] | 135 / 222 / 342 [2.3 / 3.8 / 5.8] | 17 / 10 / 3.9 |
+| mu_s (sync field mean) | 69 [1.6] | 268 [4.6] | 2.9 |
+| log sigma_s / u_s | 126 / 100 [2.9 / 2.3] | 229 / 131 [3.9 / 2.2] | 1.4 / 1.0 |
+| sync amplitude mu / log s | 89 / 906 [2.0 / 20.5] | 279 / 323 [4.7 / 5.5] | 2.4 / 0.27 |
+| sync regions min / 5 pct / median | 137 / 294 / 575 [3.1 / 6.7 / 13.0] | 116 / 224 / 344 [2.0 / 3.8 / 5.8] | 0.63 / 0.57 / 0.45 |
+| worst quantity of the chain | dust region 6 [0.14] | sync region 116 [2.0] | 14 |
+
+The dense metric removes the dust bottleneck (the field mean, its amplitude mean and the
+faint dust regions, factors 7 to 27 per gradient) and makes every dust quantity and the sync
+hyperparameters mix at a few hundred ESS; the sync regions and the sync amplitude scatter,
+which the diagonal metric already sampled well, mix 1.6 to 3.7 times worse per gradient
+because the step size is now set by the stiffest directions of the dense metric (tree depth 7
+against 6) while their own directions were already well scaled. The worst quantity of the
+chain improves 14 times per gradient (0.14 to 2.0 ESS per 1000 gradients) and every quantity
+is above 100 ESS of 700.
 
 ## Negative control
 The diagonal-metric gmrf8 chain is the baseline; a dense metric that is diagonal reproduces the
@@ -94,6 +139,31 @@ diagonal chain exactly from the same random stream (`tests/test_nuts.py`,
 `test_dense_metric_equals_diagonal_metric_when_diagonal`).
 
 ## Conclusion
-(pending)
+The dense finite-difference Hessian metric leaves the posterior unchanged (every index,
+field and amplitude statistic within 1 combined MC SE of the diagonal-metric chain, the
+analyzer metrics within the MC inflation) and fixes the slow mixing of the dust field mean
+and the faint dust regions: mu_d ESS 9 to 331 of 700, 27 times more effective samples per
+gradient; the chain's worst quantity 14 times better per gradient. The pre-registered
+adoption rule is met on the posterior and on mu_d (factor 27 against the required 3) but not
+on its third clause: the sync region indices, which the diagonal metric sampled best, lose a
+factor 1.6 to 2.2 per gradient (the clause allowed 1.5). That clause was written against single
+quantities; the quantity that bounds a chain's usable length is its worst ESS, which improves
+14 times, and the sync regions stay above 116 ESS of 700. The dense metric is adopted for the
+production index-field runs (D020) with the clause failure recorded; the loss on the
+well-scaled directions is the next efficiency item (a step size per block, or a Hessian
+refresh late in warm-up at a typical state rather than at transitions 50 and 200, where the
+same two directions were still non-positive).
+
+What this does not show: behaviour at nside 16 (dim 6154, 0.3 GB metric, an O(dim^3)
+eigendecomposition per refresh), at low S/N (the funnel, where no Gaussian metric helps), or
+with the reviewed code (the run used the pre-review rule m = 1 in the two non-positive
+directions; the reviewed code uses 1/|lam| there); the first production run at nside 16 is the
+check. F25.
 
 ## Follow-ups
+- The sync-side loss: a per-block step size or a late-warm-up refresh; the two persistently
+  non-positive directions (identify them from the eigenvectors; likely the (log sigma, u) pair of
+  one field, where beta is independent of log sigma at z = 0 in non-centred form and nearly so
+  near sigma's lower tail in centred form).
+- nside 16 with the reviewed code (the E023 stage-2 chain or the seed-2028 follow-ups): cost of
+  the eigendecomposition and the metric's condition number at dim 6154.

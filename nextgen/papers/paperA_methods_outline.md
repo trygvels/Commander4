@@ -122,7 +122,10 @@ model component rather than a preprocessing choice.
   structure is still to be tested (E023, Q16) before the paper states a resolution rule. Table 2
   candidate: the ten-run E021 table (index RMSE against both references, CMB residual,
   gradients per iteration; coverage only at nside 16).
-- Sampler: NUTS with dual averaging and windowed diagonal mass adaptation; efficiency per gradient;
+- Sampler: NUTS with dual averaging; metric from the finite-difference Hessian, dense at high
+  S/N (E024, F25: the dust field mean from ESS 9 to 331 of 700 at 1.3 times the gradients, the
+  posterior unchanged; the couplings of the field mean and the hyperparameters with the global
+  basis coefficients are invisible to a diagonal metric); efficiency per gradient;
   the funnel at low S/N (E018 L1 diagnostic: the centred reference chain does not reach the
   small-sigma tail where NUTS in non-centred coordinates does). MAMS comparison (M2.3, pending).
 - Figure 3: recovered index field and hyperparameters against truth on template skies (E016).

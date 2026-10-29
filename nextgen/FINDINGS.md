@@ -422,3 +422,20 @@ sample, with the dust field mean mixing slowly (hyperparameter ESS 3 to 14 of 70
 centred parameterization. One sky, one noise and template realization (the seed-2028 nside-16
 triple is running), a spatially smooth truth (on an uncorrelated truth the iid prior is the
 correct one), fixed T_d, no template-law misspecification (F23).
+
+**F25. A dense finite-difference Hessian metric fixes the slow mixing of the GMRF field mean in
+the centred index-field NUTS at high S/N without changing the posterior** (E024, the E021 gmrf8
+target and data, 1200 iterations each; stats-reviewed kernel change). The full Hessian costs the
+same 2 dim gradients as the diagonal estimate (plus an O(dim^3) eigendecomposition); used as the
+inverse mass (eigenvalues 1/|lam| capped at 10, refreshed at transitions 50 and 200) it gives
+every index, field and amplitude statistic within 1 combined MC SE of the diagonal-metric chain
+and the analyzer metrics within the MC inflation, with the dust field mean mu_d at ESS 331 of
+700 against 9 (27 times more per gradient), the faint dust regions 135 against 6 (17 times), the
+dust amplitude mean 376 against 39, and the chain's worst quantity 14 times better per gradient;
+the sync regions, already well sampled by the diagonal metric, lose a factor 1.6 to 2.2 per
+gradient (84 against 63 gradients per iteration, tree depth 7 against 6). Mechanism: in centred
+coordinates the likelihood curvature is diagonal in pixel space but the basis is global, so the
+couplings of the field mean and the hyperparameters with the coefficients that carry the S/N
+pattern are invisible to a diagonal metric. Scope: nside 8, one sky, high S/N; nside 16 and the
+low-S/N funnel untested.
+

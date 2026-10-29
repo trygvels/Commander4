@@ -247,3 +247,23 @@ MC-inflation rule is applied to every pair with the quadrature arithmetic.
 unweighted reference, which measures misfit, not per-region cost; against the weighted
 reference the error falls with coarser regions as the data per region grow. The ordering
 results stand.
+
+## D020 (2026-10-29): the dense Hessian metric is the production setting for index-field NUTS runs at high S/N; the default stays diagonal
+
+**Decision.** Production index-field runs (E023 stage 2, the seed-2028 follow-ups, Paper A runs)
+use `nuts.init_inv_mass: fd_hessian_dense` with `adapt_mass: false` and refreshes at 50 and
+200; the code default stays `ones` (principle 7; the simulated parameter writers set the
+production value). Adopted on E024 although its third pre-registered clause (no region index
+worse than a factor 1.5 per gradient) failed for the sync regions (1.6 to 2.2): the clause was
+set against single quantities, and the chain's worst quantity, which bounds its usable length,
+improved 14 times; the failure is recorded in the record and here.
+
+**Why.** The dust field mean and the faint dust regions were the bottleneck of every E021 GMRF
+run (ESS 5 to 14 of 700, hyperparameter inference unreliable at the run lengths the Mac mini
+allows); the dense metric makes them mix at several hundred ESS with the posterior unchanged.
+
+**Alternatives considered.** Non-centred field mean or pixel coordinates: a reparameterization
+that changes the geometry for every quantity and would need its own validation; deferred,
+since a Gaussian metric already fixes the observed coupling. Longer chains: 30 times the
+compute. Per-block step sizes: the next efficiency item for the sync-side loss.
+
