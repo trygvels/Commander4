@@ -548,19 +548,20 @@ class IndexFieldSamplingGroup:
             try:
                 if not st.mass_initialized and self.nuts.init_inv_mass == "fd_hessian":
                     # Serving ranks are in _serve() by now; every evaluation below is collective.
-                    inv = fd_inverse_mass(self._logp_and_grad_root, x,
-                                          fixed_diag=self._mu_fixed_diag(x))
+                    fixed = self._mu_fixed_diag(x)
+                    inv = fd_inverse_mass(self._logp_and_grad_root, x, fixed_diag=fixed)
                     st.sampler.inv_mass = inv
                     logger.info(f"Index-field group {group_name!r}: initial inverse mass from "
-                                f"the finite-difference Hessian, {2 * x.size} gradients, range "
+                                f"the finite-difference Hessian, {2 * (x.size - len(fixed))} gradients, range "
                                 f"{inv.min():.3g} to {inv.max():.3g}, "
                                 f"{int(np.sum(inv == 1.0))} coordinates left at 1")
                 elif not st.mass_initialized and self.nuts.init_inv_mass == "fd_hessian_dense":
+                    fixed = self._mu_fixed_diag(x)
                     inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x,
-                                                      fixed_diag=self._mu_fixed_diag(x))
+                                                      fixed_diag=fixed)
                     st.sampler.inv_mass = inv
                     logger.info(f"Index-field group {group_name!r}: initial dense inverse mass "
-                                f"from the finite-difference Hessian, {2 * x.size} gradients, "
+                                f"from the finite-difference Hessian, {2 * (x.size - len(fixed))} gradients, "
                                 f"{_dense_note(summ)}")
                 st.mass_initialized = True
                 due = [v for v in self.nuts.refresh_inv_mass_at
@@ -584,7 +585,7 @@ class IndexFieldSamplingGroup:
                     logger.info(f"Index-field group {group_name!r}: inverse mass refreshed from "
                                 f"the finite-difference Hessian at transition "
                                 f"{st.n_transitions} (configured {sorted(due)}), "
-                                f"{2 * x.size} gradients, {rng_note}, step size "
+                                f"{2 * (x.size - len(fixed))} gradients, {rng_note}, step size "
                                 f"{st.sampler.step_size:.3g}")
                 for _ in range(numstep):
                     x, info = st.sampler.transition(x, self._logp_and_grad_root)
