@@ -113,8 +113,8 @@ E021 control sky has been run for the scan code.
    region here; a GMRF would be the model), more than one error realization. F28.
 
 ## Follow-ups
-- Implement the region-scale template multiplier in Commander4's hier `AmpPrior` (mu as a map at
-  nside_mu with a Gaussian or GMRF hyperprior), tests, stats review; then the stage-2 chain
+- DONE 2026-10-30 (commit f6642a3, stats-reviewed): the region-scale template multiplier in
+  Commander4's hier `AmpPrior` (`mu_nside`); the stage-2 chains run as E026. Was: then the stage-2 chain
   (gmrf16, noise-1 sky, cs template, flat CMB prior, dense metric) with the E021 metrics.
 - A template with errors at all scales (true amplitude times a field with a power law to the
   pixel scale) to set the within-region error the method tolerates.

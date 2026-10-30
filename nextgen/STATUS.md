@@ -2,6 +2,29 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-30 (Mac mini, 04:45): mu-map hier prior merged after stats review; E026 stage-2 chains started
+
+**Learned**
+- `amp_prior: {type: hier, mu_nside: N}` gives one template multiplier per nside-N region
+  (the template-error field of E025), with per-region gradients and an analytic curvature that
+  the Hessian metrics use instead of sweeping those coordinates (24,600 gradients per refresh
+  avoided at nside 16). Stats review: target, gradients, hyperpriors, MPI consistency and
+  backward compatibility confirmed independently; its must-fix (chain restart with an array
+  mu) and should-fixes (validation, construction-time checks, masked-pixel and MPI tests)
+  taken. 960 tests green.
+
+**Running**
+- E026: gmrf16_cs_mumap, then gmrf16_cs_scalar, then gmrf16_exact_mumap on the noise-1 PySM sky
+  (flat CMB prior, dense metric, dim about 12,300; from 04:38, about 10 h each).
+
+**Next**
+- E026 analysis (`e026_analyze.py`: z and RMSE against the region-fit reference per quartile,
+  mu maps against the realized template error, ESS per block); Conclusion; Paper A Sect. 5 and
+  Table 2 at realistic noise.
+
+**Needs Trygve**
+- Unchanged (D022/D023 model-design calls; D021 CMB prior; Q15).
+
 ## 2026-10-30 (Mac mini, 04:40): E025 done (F28, D023): a region-scale template multiplier makes the hier prior usable with a component-separation-quality template; T_d misfit is not the problem
 
 **Learned**
