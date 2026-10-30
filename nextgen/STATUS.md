@@ -2,6 +2,29 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-30 (Mac mini, 04:40): E025 done (F28, D023): a region-scale template multiplier makes the hier prior usable with a component-separation-quality template; T_d misfit is not the problem
+
+**Learned**
+- E025 scans (both skies, flat CMB prior, template = true amplitude times a 10-deg 30 percent
+  error field): global law biases faint dust by 0.07 to 0.09 (0.03 x) and beyond 0.1 (1 x);
+  one free multiplier per nside-16 region brings every shift within 0.02 at 0.03 x (dust Q4
+  -0.02 to -0.03 at 2 sd, over the 0.01 rule) and to gains below 1.6 nats at 1 x (14 of 18 scans
+  inside the block sd); true against fixed T changes nothing in eight cells. Residual scatter
+  0.06 (the within-region part).
+
+**Running**
+- Nothing.
+
+**Next**
+- Implement mu as a region map in the hier `AmpPrior` (template-error field), tests, stats
+  review; then the stage-2 chain on the noise-1 sky (gmrf16, cs template, flat CMB prior, dense
+  metric).
+- Scan with a template error at all scales to set the admissible within-region error.
+
+**Needs Trygve**
+- D022/D023 are model-design calls (no single-frequency dust template; template-error field in
+  the prior; sampled T_d deprioritized); otherwise unchanged.
+
 ## 2026-10-30 (Mac mini, 00:30): E023 stage 1 closed (F27, D022): the single-frequency template, not the SED, is what breaks the hier prior; dust cannot be repaired by hyperparameters
 
 **Learned**

@@ -315,3 +315,24 @@ own review and validation; the template question is cheaper to settle by scans. 
 hier prior for dust at high S/N and using a weak Gaussian prior: possible fallback, decided
 after E025.
 
+## D023 (2026-10-30): the hier prior gets a region-scale template multiplier field; sampled T_d deprioritized; stage-2 chain after the implementation
+
+**Decision.** Implement in Commander4's hier `AmpPrior` a template multiplier per region (mu_c as
+a map at nside_mu, default 16, with a Gaussian hyperprior per region as in E025 and a GMRF
+option later), sampled with the index fields by the same NUTS (the per-pixel gradient of the
+collapsed marginal with respect to mu is already available), with tests and a stats review
+before merging; then the first stage-2 chain (gmrf16, noise-1 sky, cs template, flat CMB
+prior, dense metric, E021 metrics and the Q16 acceptance). Sampled T_d (M2.6) is deprioritized:
+in eight E025 cells the true-T SED changed no shift by more than 0.01. Templates for dust on real
+data must come from a component separation (D022 stands); the within-region error they may
+carry is to be set by a follow-up scan with errors at all scales.
+
+**Why.** F28: the region-scale multiplier removes the F23-type bias of a smooth template error
+at both depths, for both components; without it the dust index in the prior-dominated half of
+the sky is the template's error.
+
+**Alternatives considered.** Per-quartile mean and scatter: fixes the sync, not the dust
+(E023). A GMRF on log mu directly: the better model, implemented as the second step once the
+map version is validated. Dropping the hier prior for dust at high S/N: not needed if the
+multiplier field works in the chain.
+

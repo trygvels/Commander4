@@ -227,6 +227,11 @@ original numbering.
   noise (leakage of the correlated CMB). Next (E025): component-separation-quality templates
   and the true-T dust SED by the same scans, then the first stage-2 chain; sampled T_d as the
   structural fix. At realistic noise the faint half of the sky is prior-dominated at nside 16.
+- **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
+  makes the hier target close to unbiased for a smooth 30 percent template error at both
+  depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is
+  biased for dust (0.07 to beyond 0.1). Fixed against true T_d changes nothing: sampled T_d is
+  deprioritized. Next: the multiplier field in `AmpPrior`, then the stage-2 chain.
 - **Why:** F21 (E020): with a data-built template wrong by factors 0.4 to 1.7 at high latitude
   under one global scatter s, and with T_d fixed, the collapsed hier posterior for beta_s runs
   away (to -26) and beta_d shifts by 30 Fisher sd in the plane. Real Planck plus WMAP intensity

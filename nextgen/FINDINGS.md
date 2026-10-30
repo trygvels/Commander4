@@ -495,3 +495,21 @@ template-error field; for dust only with a component-separation template or samp
 be tested in E025. Scope: one sky, one realization per cell, the data term without the index
 prior, fixed against known T only.
 
+**F28. With a template-error field at the region scale the hier amplitude prior is close to
+unbiased for a component-separation-quality template at 0.03 x and 1 x noise, and the dust
+temperature misfit is below everything else** (E025, exact-target scans of Commander4's kernel
+on the PySM d1s1c1 sky, flat CMB prior, template g = a exp(f) with f a 10-deg, 30 percent
+Gaussian field uncoupled to the sky). Under the global law (one mu and s per component) the
+target shifts the two fainter dust quartiles by 0.07 to 0.09 at 0.03 x noise and beyond 0.1 at
+realistic noise (the F23 law mismatch on a realistic error); with one free template multiplier
+per nside-16 region (3072 per component, N(1, 0.5^2) hyperprior each) plus a scatter per S/N
+quartile every shift is within 0.02 at 0.03 x (dust Q4 -0.02 to -0.03 at 2 sd, the only
+excess over the pre-registered 0.01) and no scan at realistic noise has a gain above 1.6 nats
+(14 of 18 inside the block sd, four at 1.0 to 1.7 sd). The profiled residual scatter drops to
+0.06, the within-region part of the error. The dust SED at the true T_d against the fixed T
+changes no shift by more than 0.01 in any of eight cells. Consequence (D023): Commander4's
+hier prior needs mu as a region map (a template-error field), after which a template whose
+within-region error is at the few-percent level is admissible; sampled T_d is deprioritized.
+Scope: one sky, one error realization, one error scale (10 deg), the data term without the
+index prior.
+
