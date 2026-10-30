@@ -52,17 +52,23 @@ class AmpPrior:
         mean: gaussian: prior mean m_p, scalar or (npix,).
         rms: gaussian: prior sd t_p > 0, scalar or (npix,).
         template: hier: strictly positive shape template g_p (npix,).
-        mu, log_s: hier: current hyperparameters (sampled by the index-field group).
-        mu_prior, log_s_prior: hier: (mean, sd) of the Gaussian hyperpriors on mu and log s.
+        mu, log_s: hier: current hyperparameters (sampled by the index-field group). With
+            `mu_nside` 0, mu is one scalar; with `mu_nside` > 0 it is a map of 12 mu_nside^2
+            template multipliers, one per region of that nside (a template-error field at the
+            region scale, E025 / D023), each with the same Gaussian hyperprior.
+        mu_prior, log_s_prior: hier: (mean, sd) of the Gaussian hyperpriors on mu (each entry)
+            and log s.
+        mu_nside: hier: 0 for a scalar mu, else the HEALPix nside of the mu map.
     """
     type: str = "none"
     mean: float | NDArray | None = None
     rms: float | NDArray | None = None
     template: NDArray | None = None
-    mu: float = 1.0
+    mu: float | NDArray = 1.0
     log_s: float = HIER_LOG_S_PRIOR[0]
     mu_prior: tuple[float, float] = HIER_MU_PRIOR
     log_s_prior: tuple[float, float] = HIER_LOG_S_PRIOR
+    mu_nside: int = 0
     # Maps regridded to the stream's pixel count, by (name, npix); the configured maps may be at
     # another nside than the data (ud_grade keeps a positive template positive).
     _regrid: dict = field(default_factory=dict, repr=False, compare=False)
@@ -82,6 +88,19 @@ class AmpPrior:
             if self.template.ndim != 1 or np.any(self.template <= 0.0):
                 raise ValueError("The hier amp_prior template must be a strictly positive 1-D "
                                  "map at the data nside.")
+            self.mu_nside = int(self.mu_nside)
+            if self.mu_nside < 0 or (self.mu_nside > 0 and (self.mu_nside & (self.mu_nside - 1))):
+                raise ValueError("mu_nside must be 0 (scalar mu) or a power-of-two HEALPix nside.")
+            if self.mu_nside > 0:
+                mu = np.asarray(self.mu, dtype=np.float64)
+                if mu.ndim == 0:
+                    mu = np.full(self.n_mu, float(mu))
+                if mu.shape != (self.n_mu,):
+                    raise ValueError(f"A hier mu map at nside {self.mu_nside} has {self.n_mu} "
+                                     f"entries, got shape {mu.shape}.")
+                self.mu = mu
+            else:
+                self.mu = float(np.asarray(self.mu, dtype=np.float64).reshape(()))
 
     def _map_at(self, name: str, npix: int) -> NDArray:
         """The map attribute `name` (scalar or 1-D map) as an (npix,) array, ud_graded when its
@@ -103,6 +122,32 @@ class AmpPrior:
         return self._regrid[key]
 
     @property
+    def n_mu(self) -> int:
+        """Number of mu entries: 1 for a scalar mu, 12 mu_nside^2 for a mu map."""
+        return 12 * self.mu_nside * self.mu_nside if self.mu_nside > 0 else 1
+
+    def mu_regions(self, npix: int) -> NDArray:
+        """(npix,) index of the mu-map entry of every data pixel (all zeros for a scalar mu);
+        cached per npix."""
+        key = ("mu_regions", npix)
+        if key not in self._regrid:
+            if self.mu_nside == 0:
+                self._regrid[key] = np.zeros(npix, dtype=np.int64)
+            else:
+                nside_data = hp.npix2nside(npix)
+                if self.mu_nside > nside_data:
+                    raise ValueError(f"amp_prior mu_nside {self.mu_nside} exceeds the data nside "
+                                     f"{nside_data}.")
+                self._regrid[key] = region_map(self.mu_nside, nside_data)
+        return self._regrid[key]
+
+    def mu_map(self, npix: int) -> NDArray:
+        """mu per data pixel (npix,)."""
+        if self.mu_nside == 0:
+            return np.full(npix, float(self.mu))
+        return np.asarray(self.mu, dtype=np.float64)[self.mu_regions(npix)]
+
+    @property
     def is_flat(self) -> bool:
         return self.type == "none"
 
@@ -120,7 +165,7 @@ class AmpPrior:
             t = self._map_at("rms", npix)
             return m, 1.0 / t**2
         g = self._map_at("template", npix)
-        return self.mu * g, 1.0 / (np.exp(self.log_s) * g)**2
+        return self.mu_map(npix) * g, 1.0 / (np.exp(self.log_s) * g)**2
 
     def trailing_terms(self, used: NDArray) -> float:
         """The prior's beta-independent terms -1/2 sum_p m^T T^-1 m - 1/2 sum_p log det T over
@@ -132,11 +177,12 @@ class AmpPrior:
         m, inv_T = self.pseudo_band(used.size)
         return float(-0.5 * np.sum(m[used]**2 * inv_T[used]) + 0.5 * np.sum(np.log(inv_T[used])))
 
-    def hyper_grad(self, x: NDArray, diag_Ainv: NDArray, used: NDArray) -> tuple[float, float]:
-        """(dF/dmu, dF/dlog s) of the hier target for this component, from the kernel extras of
-        the augmented stream: x the conditional means A'^-1 b' and diag_Ainv the diagonal of A'^-1
-        of this component's column (npix,), on the used pixels. With P = T^-1 (E016):
-            dF/dmu    = sum_p P g (x - m),
+    def hyper_grad(self, x: NDArray, diag_Ainv: NDArray, used: NDArray) -> NDArray:
+        """(dF/dmu entries..., dF/dlog s), an (n_mu + 1,) array, of the hier target for this
+        component, from the kernel extras of the augmented stream: x the conditional means
+        A'^-1 b' and diag_Ainv the diagonal of A'^-1 of this component's column (npix,), on the
+        used pixels. With P = T^-1 (E016):
+            dF/dmu_r  = sum_{p in r} P g (x - m),
             dF/dlog s = sum_p [P (x - m)^2 + P (A'^-1)_cc] - n_used.
         """
         if self.type != "hier":
@@ -144,25 +190,52 @@ class AmpPrior:
         m, P = self.pseudo_band(used.size)
         dx = (x - m)[used]
         P, g = P[used], self._map_at("template", used.size)[used]
-        return (float(np.sum(P * g * dx)),
-                float(np.sum(P * dx**2 + P * diag_Ainv[used]) - np.count_nonzero(used)))
+        per_pixel = P * g * dx
+        if self.mu_nside == 0:
+            dmu = np.array([np.sum(per_pixel)])
+        else:
+            dmu = np.bincount(self.mu_regions(used.size)[used], per_pixel, minlength=self.n_mu)
+        dls = float(np.sum(P * dx**2 + P * diag_Ainv[used]) - np.count_nonzero(used))
+        return np.concatenate([dmu, [dls]])
+
+    def mu_curvature(self, diag_Ainv: NDArray, used: NDArray) -> NDArray:
+        """-d2F/dmu_r^2 of the collapsed target per mu entry, (n_mu,), from the kernel extras:
+        sum over the region's used pixels of P g^2 (1 - P (A'^-1)_cc) (x = A'^-1 b' depends on
+        m_p = mu_r g_p through (A'^-1)_cc P g_p). The hyperprior adds 1 / s_mu^2 per entry (not
+        included here). Used for the analytic mu block of the NUTS metric."""
+        if self.type != "hier":
+            raise ValueError("mu_curvature is defined for the hier prior only.")
+        _, P = self.pseudo_band(used.size)
+        P, g = P[used], self._map_at("template", used.size)[used]
+        per_pixel = P * g**2 * (1.0 - P * diag_Ainv[used])
+        if self.mu_nside == 0:
+            return np.array([np.sum(per_pixel)])
+        return np.bincount(self.mu_regions(used.size)[used], per_pixel, minlength=self.n_mu)
 
     def log_hyperprior(self) -> float:
         """log p(mu) + log p(log s) of the hier hyperpriors (-inf below the log s guard), 0 for
-        the other types. Normalizing constants dropped."""
+        the other types; every mu entry carries the same Gaussian. Normalizing constants
+        dropped."""
         if self.type != "hier":
             return 0.0
         if self.log_s < HIER_LOGS_MIN:
             return -np.inf
-        return -0.5 * ((self.mu - self.mu_prior[0]) / self.mu_prior[1])**2 \
-            - 0.5 * ((self.log_s - self.log_s_prior[0]) / self.log_s_prior[1])**2
+        mu = np.asarray(self.mu, dtype=np.float64)
+        return float(-0.5 * np.sum(((mu - self.mu_prior[0]) / self.mu_prior[1])**2)
+                     - 0.5 * ((self.log_s - self.log_s_prior[0]) / self.log_s_prior[1])**2)
 
-    def log_hyperprior_grad(self) -> tuple[float, float]:
-        """(d/dmu, d/dlog s) of `log_hyperprior`."""
+    def log_hyperprior_grad(self) -> NDArray:
+        """(d/dmu entries..., d/dlog s) of `log_hyperprior`, an (n_mu + 1,) array."""
         if self.type != "hier":
-            return 0.0, 0.0
-        return (-(self.mu - self.mu_prior[0]) / self.mu_prior[1]**2,
-                -(self.log_s - self.log_s_prior[0]) / self.log_s_prior[1]**2)
+            return np.zeros(2)
+        mu = np.atleast_1d(np.asarray(self.mu, dtype=np.float64))
+        return np.concatenate([-(mu - self.mu_prior[0]) / self.mu_prior[1]**2,
+                               [-(self.log_s - self.log_s_prior[0]) / self.log_s_prior[1]**2]])
+
+    @property
+    def hyper_dim(self) -> int:
+        """Sampled hyperparameters of a hier prior: n_mu + 1 (0 for the other types)."""
+        return self.n_mu + 1 if self.type == "hier" else 0
 
 
 def component_prior(comp: DiffuseComponent) -> AmpPrior:
@@ -304,11 +377,14 @@ class StateLayout:
     s) of every hier component in `hier_names` order). The index block of a field spec is the
     IndexFieldPrior state (field block, mu, log sigma, u); of a scalar spec the index itself."""
 
-    def __init__(self, specs: list[IndexSpec], hier_names: list[str]):
+    def __init__(self, specs: list[IndexSpec], hier_names: list[str],
+                 hier_dims: dict[str, int] | None = None):
         if len({s.comp_name for s in specs}) != len(specs):
             raise ValueError("Each component may carry one sampled index.")
         self.specs = list(specs)
         self.hier_names = list(hier_names)
+        # Hyperparameters per hier component: (mu entries..., log s); 2 for a scalar mu.
+        self.hier_dims = {name: int((hier_dims or {}).get(name, 2)) for name in self.hier_names}
         self.index_slices: dict[str, slice] = {}
         self.hier_slices: dict[str, slice] = {}
         pos = 0
@@ -316,8 +392,8 @@ class StateLayout:
             self.index_slices[spec.comp_name] = slice(pos, pos + spec.dim)
             pos += spec.dim
         for name in self.hier_names:
-            self.hier_slices[name] = slice(pos, pos + 2)
-            pos += 2
+            self.hier_slices[name] = slice(pos, pos + self.hier_dims[name])
+            pos += self.hier_dims[name]
         self.dim = pos
         nsides = {s.nside_beta for s in self.specs if s.nside_beta > 0}
         if len(nsides) > 1:
@@ -341,17 +417,27 @@ class StateLayout:
                 out[spec.comp_name] = spec.field.beta(block)
         return out
 
-    def hypers(self, x: NDArray) -> dict[str, tuple[float, float]]:
-        """(mu, log s) of every hier component at state x."""
-        return {name: (float(x[sl][0]), float(x[sl][1])) for name, sl in self.hier_slices.items()}
+    def hypers(self, x: NDArray) -> dict[str, tuple]:
+        """(mu, log s) of every hier component at state x; mu a float for a scalar mu, an
+        (n_mu,) array for a mu map."""
+        out = {}
+        for name, sl in self.hier_slices.items():
+            block = x[sl]
+            if self.hier_dims[name] == 2:
+                mu = float(block[0])
+            else:
+                mu = np.array(block[:-1], dtype=np.float64)
+            out[name] = (mu, float(block[-1]))
+        return out
 
-    def pack(self, index_blocks: dict[str, NDArray], hypers: dict[str, tuple[float, float]]
-             ) -> NDArray:
+    def pack(self, index_blocks: dict[str, NDArray], hypers: dict[str, tuple]) -> NDArray:
         x = np.empty(self.dim)
         for spec in self.specs:
             x[self.index_slices[spec.comp_name]] = np.atleast_1d(index_blocks[spec.comp_name])
         for name in self.hier_names:
-            x[self.hier_slices[name]] = hypers[name]
+            mu, log_s = hypers[name]
+            x[self.hier_slices[name]] = np.concatenate([np.atleast_1d(np.asarray(mu, dtype=float)),
+                                                       [float(log_s)]])
         return x
 
 
@@ -407,6 +493,12 @@ class RegionIndexLikelihood:
         self.region = None
         self.n_rejected = 0
         self.nskipped_last = 0
+        # -d2F/dmu^2 per mu entry of every hier component at the last evaluated state (plus the
+        # hyperprior curvature), filled by logp_and_grad on every rank.
+        self.mu_curvature: dict[str, NDArray] = {}
+        for comp in self.active_comps:
+            if comp.comp_name in layout.hier_names and component_prior(comp).is_hier:
+                self._check_hyper_dim(comp.comp_name, component_prior(comp))
         self._hier_defaults: dict[str, AmpPrior] = {}
         self._fixed_sed: dict[tuple[int, int], NDArray] = {}
         for comp in self.active_comps:
@@ -470,25 +562,28 @@ class RegionIndexLikelihood:
         for c, (mu, log_s) in previous.items():
             self.active_comps[c].amp_prior.mu, self.active_comps[c].amp_prior.log_s = mu, log_s
 
-    def _local_terms(self, betas: dict[str, NDArray], hypers: dict[str, tuple[float, float]]
-                     ) -> tuple[float, dict[str, NDArray], dict[str, NDArray], bool]:
-        """(log L, dlog L/dbeta per sampled component (nreg,), (dF/dmu, dF/dlog s) per hier
-        component, rejected) summed over this rank's streams."""
+    def _local_terms(self, betas: dict[str, NDArray], hypers: dict[str, tuple]
+                     ) -> tuple[float, dict[str, NDArray], dict[str, NDArray], dict[str, NDArray],
+                                bool]:
+        """(log L, dlog L/dbeta per sampled component (nreg,), (dF/dmu entries..., dF/dlog s)
+        per hier component, -d2F/dmu^2 per mu entry per hier component, rejected) summed over
+        this rank's streams."""
         layout = self.layout
         logL = 0.0
         g_beta = {name: np.zeros(layout.nreg) for name in layout.index_slices}
-        g_hyper = {name: np.zeros(2) for name in layout.hier_names}
+        g_hyper = {name: np.zeros(layout.hier_dims[name]) for name in layout.hier_names}
+        c_mu = {name: np.zeros(layout.hier_dims[name] - 1) for name in layout.hier_names}
         rejected = False
         self.nskipped_last = 0
         if not self.is_solver_root:
-            return logL, g_beta, g_hyper, rejected
+            return logL, g_beta, g_hyper, c_mu, rejected
         previous = self._set_hypers(hypers)
         try:
-            return self._stream_terms(betas, hypers, logL, g_beta, g_hyper)
+            return self._stream_terms(betas, hypers, logL, g_beta, g_hyper, c_mu)
         finally:
             self._restore_hypers(previous)
 
-    def _stream_terms(self, betas, hypers, logL, g_beta, g_hyper):
+    def _stream_terms(self, betas, hypers, logL, g_beta, g_hyper, c_mu):
         layout = self.layout
         comps = self.active_comps
         ncomp = len(comps)
@@ -509,7 +604,7 @@ class RegionIndexLikelihood:
                             self._fixed_sed[key] = np.asarray(comp.get_sed(freqs), dtype=float)
                         M_reg[:, :, c] = self._fixed_sed[key][None, :]
             if not (np.all(np.isfinite(M_reg)) and np.all(np.isfinite(dM_reg))):
-                return logL, g_beta, g_hyper, True   # zero density at this state
+                return logL, g_beta, g_hyper, c_mu, True   # zero density at this state
             sky_aug, w_aug = augment_stream(maps_sky, maps_inv_var, comps)
             M_aug, dM_aug = augment_mixing(M_reg, dM_reg)
             out = cpp_compsep.marginal_loglike_regions(
@@ -517,7 +612,7 @@ class RegionIndexLikelihood:
             ll_reg, grad_reg, nskipped = out[0], out[1], out[2]
             self.nskipped_last += int(nskipped)
             if nskipped or not np.all(np.isfinite(ll_reg)) or not np.all(np.isfinite(grad_reg)):
-                return logL, g_beta, g_hyper, True
+                return logL, g_beta, g_hyper, c_mu, True
             logL += float(ll_reg.sum())
             for c, comp in enumerate(comps):
                 if comp.comp_name in betas:
@@ -528,7 +623,8 @@ class RegionIndexLikelihood:
                     prior = comps[c].amp_prior
                     logL += prior.trailing_terms(used)
                     g_hyper[comps[c].comp_name] += prior.hyper_grad(x_cond[c], diag_Ainv[c], used)
-        return logL, g_beta, g_hyper, False
+                    c_mu[comps[c].comp_name] += prior.mu_curvature(diag_Ainv[c], used)
+        return logL, g_beta, g_hyper, c_mu, False
 
     # -- the collective evaluation -------------------------------------------------------------
 
@@ -550,13 +646,16 @@ class RegionIndexLikelihood:
             rejected = not all(np.all(np.isfinite(b)) for b in betas.values())
         if rejected:
             logL, g_beta, g_hyper = 0.0, {n: np.zeros(layout.nreg) for n in layout.index_slices}, \
-                {n: np.zeros(2) for n in layout.hier_names}
+                {n: np.zeros(layout.hier_dims[n]) for n in layout.hier_names}
+            c_mu = {n: np.zeros(layout.hier_dims[n] - 1) for n in layout.hier_names}
         else:
-            logL, g_beta, g_hyper, rejected = self._local_terms(betas, hypers)
-        # One allreduce: [rejected flag, log L, g_beta blocks..., g_hyper blocks...].
+            logL, g_beta, g_hyper, c_mu, rejected = self._local_terms(betas, hypers)
+        # One allreduce: [rejected flag, log L, g_beta blocks..., g_hyper blocks..., mu
+        # curvature blocks...].
         local = np.concatenate([[1.0 if rejected else 0.0, logL]]
                                + [g_beta[s.comp_name] for s in layout.specs]
-                               + [g_hyper[n] for n in layout.hier_names])
+                               + [g_hyper[n] for n in layout.hier_names]
+                               + [c_mu[n] for n in layout.hier_names])
         total = np.empty_like(local)
         self.compsep_comm.Allreduce(local, total, op=MPI.SUM)
         if total[0] > 0.0 or not np.isfinite(total[1]):
@@ -592,8 +691,17 @@ class RegionIndexLikelihood:
                 self.n_rejected += 1
                 return -np.inf, np.zeros(layout.dim)
             logp += lp_h
-            grad[sl] = total[pos:pos + 2] + np.array(prior.log_hyperprior_grad())
-            pos += 2
+            k = layout.hier_dims[name]
+            if prior.hyper_dim != k:
+                raise ValueError(f"Hier prior of {name!r} has {prior.hyper_dim} hyperparameters, "
+                                 f"the layout {k} (mu_nside must agree on every rank).")
+            grad[sl] = total[pos:pos + k] + prior.log_hyperprior_grad()
+            pos += k
+        for name in layout.hier_names:
+            k = layout.hier_dims[name] - 1
+            prior = self._hier_prior(name)
+            self.mu_curvature[name] = total[pos:pos + k] + 1.0 / prior.mu_prior[1]**2
+            pos += k
         if not np.isfinite(logp):
             self.n_rejected += 1
             return -np.inf, np.zeros(layout.dim)
@@ -609,10 +717,20 @@ class RegionIndexLikelihood:
         return self._hier_defaults[name]
 
     def set_hier_defaults(self, defaults: dict[str, AmpPrior]) -> None:
-        """Hier prior objects (hyperprior settings only) for components this rank does not hold,
-        so the hyperprior terms can be evaluated on every rank; their (mu, log s) are set from the
-        state before use."""
+        """Hier prior objects (hyperprior settings and mu_nside) for components this rank does
+        not hold, so the hyperprior terms can be evaluated on every rank; their (mu, log s) are
+        set from the state before use."""
         self._hier_defaults = dict(defaults)
+        for name, prior in self._hier_defaults.items():
+            if name in self.layout.hier_names and prior.is_hier:
+                self._check_hyper_dim(name, prior)
+
+    def _check_hyper_dim(self, name: str, prior: AmpPrior) -> None:
+        k = self.layout.hier_dims[name]
+        if prior.hyper_dim != k:
+            raise ValueError(f"Hier prior of {name!r} has {prior.hyper_dim} hyperparameters "
+                             f"(mu_nside {prior.mu_nside}), the layout {k}; mu_nside must agree "
+                             "on every rank and with the layout.")
 
     @classmethod
     def from_arrays(cls, freqs: NDArray, maps_sky: NDArray, maps_inv_var: NDArray,

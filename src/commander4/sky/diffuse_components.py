@@ -375,8 +375,25 @@ class DiffuseComponent(Component):
                 logger.warning(f"Component {self.comp_name!r}: chain index field at nside "
                                f"{stored_nside}, run asks for {nside_beta}; starting constant.")
         if self.amp_prior is not None and self.amp_prior.is_hier and "amp_prior" in group:
-            self.amp_prior.mu = float(group["amp_prior/mu"][()])
-            self.amp_prior.log_s = float(group["amp_prior/log_s"][()])
+            # mu is a scalar or a map of template multipliers (amp_prior mu_nside); a map read
+            # into a scalar run gives its mean, a scalar read into a map run is broadcast, a map
+            # of another size is ignored with a warning (the run starts from its initial mu).
+            stored = np.atleast_1d(np.asarray(group["amp_prior/mu"][()], dtype=np.float64))
+            prior = self.amp_prior
+            if prior.mu_nside == 0:
+                if stored.size > 1:
+                    logger.warning(f"Component {self.comp_name!r}: chain amp_prior mu is a map of "
+                                   f"{stored.size}, run asks for a scalar; using its mean.")
+                prior.mu = float(stored.mean())
+            elif stored.size == 1:
+                prior.mu = np.full(prior.n_mu, float(stored[0]))
+            elif stored.size == prior.n_mu:
+                prior.mu = stored.copy()
+            else:
+                logger.warning(f"Component {self.comp_name!r}: chain amp_prior mu has "
+                               f"{stored.size} entries, run asks for mu_nside {prior.mu_nside} "
+                               f"({prior.n_mu}); keeping the initial mu.")
+            prior.log_s = float(group["amp_prior/log_s"][()])
 
     def _realize_alms_as_map(self, component_alms, nside: int, fwhm: float = 0):
         """Realize component alms as a map.

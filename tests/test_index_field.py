@@ -608,3 +608,98 @@ def test_region_index_likelihood_rejects_singular_and_overflowing_states() -> No
     comps3[1].amp_prior.mu, comps3[1].amp_prior.log_s = 1.3, -0.7
     like3.logp_and_grad(np.array([-3.0, 0.8, -1.5, 1.1, -1.1]))
     assert (comps3[1].amp_prior.mu, comps3[1].amp_prior.log_s) == (1.3, -0.7)
+
+
+# --- hier prior with a mu map (template multiplier per region, E025 / D023) -------------------
+
+def test_hier_mu_map_pseudo_band_and_hyperprior() -> None:
+    rng = np.random.default_rng(5)
+    g = np.exp(rng.normal(size=NPIX))
+    prior = ifd.AmpPrior("hier", template=g, mu=1.2, log_s=-1.0, mu_nside=1)
+    assert prior.n_mu == 12 and prior.hyper_dim == 13
+    np.testing.assert_array_equal(prior.mu, np.full(12, 1.2))
+    mu = 1.0 + 0.3 * rng.standard_normal(12)
+    prior.mu = mu
+    m, inv_T = prior.pseudo_band(NPIX)
+    region = ifd.region_map(1, NSIDE)
+    np.testing.assert_allclose(m, mu[region] * g)
+    np.testing.assert_allclose(inv_T, 1.0 / (np.exp(-1.0) * g)**2)
+    expected = -0.5 * np.sum(((mu - 1.0) / 0.5)**2) - 0.5 * ((-1.0 - np.log(0.3)) / 1.0)**2
+    assert prior.log_hyperprior() == pytest.approx(expected)
+    grad = prior.log_hyperprior_grad()
+    assert grad.shape == (13,)
+    h = 1e-6
+    for k in range(13):
+        if k < 12:
+            prior.mu[k] += h
+            up = prior.log_hyperprior()
+            prior.mu[k] -= 2 * h
+            down = prior.log_hyperprior()
+            prior.mu[k] += h
+        else:
+            prior.log_s += h
+            up = prior.log_hyperprior()
+            prior.log_s -= 2 * h
+            down = prior.log_hyperprior()
+            prior.log_s += h
+        assert grad[k] == pytest.approx((up - down) / (2 * h), rel=1e-5, abs=1e-8)
+    with pytest.raises(ValueError):
+        ifd.AmpPrior("hier", template=g, mu=np.ones(5), mu_nside=1)
+    scalar = ifd.AmpPrior("hier", template=g, mu=0.9)
+    assert scalar.n_mu == 1 and scalar.hyper_dim == 2 and isinstance(scalar.mu, float)
+
+
+def test_hier_mu_map_hyper_grad_matches_finite_differences() -> None:
+    """With a mu map the per-region dF/dmu_r and dF/dlog s from the kernel extras equal central
+    differences of the augmented target."""
+    maps_sky, inv_var = _stream(seed=6)
+    comps = _components()
+    rng = np.random.default_rng(7)
+    g = np.exp(rng.normal(size=NPIX))
+    comps[1].amp_prior = ifd.AmpPrior("hier", template=g, mu=1.0 + 0.2 * rng.standard_normal(12),
+                                      log_s=-0.8, mu_nside=1)
+    comps[2].amp_prior = ifd.AmpPrior("gaussian", mean=0.0, rms=50.0)
+    comps[0].amp_prior = ifd.AmpPrior("gaussian", mean=0.0, rms=70.0)
+    region = ifd.region_map(0, NSIDE)
+    M_aug, dM_aug = ifd.augment_mixing(*ifd.mixing_regions(FREQS, comps, 1, True))
+
+    def target(extras=False):
+        sky_aug, w_aug = ifd.augment_stream(maps_sky, inv_var, comps)
+        out = cpp_compsep.marginal_loglike_regions(sky_aug, w_aug, region, M_aug, dM_aug, 1,
+                                                   want_extras=extras)
+        used = np.ones(NPIX, dtype=bool) if not extras else out[5]
+        value = float(out[0].sum()) + comps[1].amp_prior.trailing_terms(used)
+        return (value, out) if extras else value
+
+    value, out = target(extras=True)
+    assert out[5].all()
+    grad = comps[1].amp_prior.hyper_grad(out[3][1], out[4][1], out[5])
+    assert grad.shape == (13,)
+    h = 1e-5
+    prior = comps[1].amp_prior
+    for k in range(13):
+        if k < 12:
+            prior.mu[k] += h
+            up = target()
+            prior.mu[k] -= 2 * h
+            down = target()
+            prior.mu[k] += h
+        else:
+            prior.log_s += h
+            up = target()
+            prior.log_s -= 2 * h
+            down = target()
+            prior.log_s += h
+        assert grad[k] == pytest.approx((up - down) / (2 * h), rel=1e-6, abs=1e-6)
+
+
+def test_state_layout_hier_dims_round_trip() -> None:
+    specs = [ifd.IndexSpec("sync", None, -3.0, 0.2)]
+    layout = ifd.StateLayout(specs, ["sync", "dust"], {"sync": 13})
+    assert layout.dim == 1 + 13 + 2 and layout.hier_dims == {"sync": 13, "dust": 2}
+    mu = np.linspace(0.8, 1.2, 12)
+    x = layout.pack({"sync": np.array([-2.9])}, {"sync": (mu, -1.1), "dust": (1.05, -1.3)})
+    hyp = layout.hypers(x)
+    np.testing.assert_array_equal(hyp["sync"][0], mu)
+    assert hyp["sync"][1] == -1.1 and hyp["dust"] == (1.05, -1.3)
+    assert isinstance(hyp["dust"][0], float)

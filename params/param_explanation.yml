@@ -433,7 +433,9 @@ compsep:
       #                       # at 10, non-positive curvature directions set to 1. Follows the
       #                       # couplings between the field mean, the field coefficients and the
       #                       # hyperparameters that a diagonal metric cannot; needs adapt_mass
-      #                       # false. Same target.
+      #                       # false. Same target. Both Hessian options cost 2 gradient
+      #                       # evaluations per swept coordinate; mu-map coordinates (amp_prior
+      #                       # mu_nside > 0) are not swept, their curvature is analytic.
       #   refresh_inv_mass_at: []  # transition counts at which the diagonal inverse mass is recomputed
       #                            # from the finite-difference Hessian at the current state and the
       #                            # step size re-found (the start-state Hessian is stale once the
@@ -662,6 +664,10 @@ components:
       #   template_floor: 1.0     # g floored here (default 1e-3 of its mean), g must be > 0
       #   mu_prior: [1.0, 0.5]    # mu ~ N(mean, sd^2); log s ~ N(mean, sd^2); mu and log s
       #   log_s_prior: [-1.204, 1.0]   # are sampled by the hier group. Intensity only.
+      #   mu_nside: 0             # 0: one template multiplier mu. > 0: one mu per HEALPix region
+      #                           # of that nside (a template-error field at the region scale,
+      #                           # each entry with the mu_prior above; E025 / D023), sampled
+      #                           # with the index fields. Adds 12 nside^2 parameters.
 
       # Mean mu of the Gaussian amplitude prior (C3 COMP_AMP_PRIOR_MAP). Where the data
       # constrain nothing -- outside a survey patch, say -- the solution is pulled to this

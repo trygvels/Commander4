@@ -185,3 +185,54 @@ def test_process_compsep_runs_a_hier_group_end_to_end(tmp_path, monkeypatch) -> 
     assert stats["state"]["sync"]["amp_prior"]["mu"] == sync.amp_prior.mu
     assert all(np.isfinite(c.alms).all() for c in comp_list)
     ifs.reset_sampler_states()
+
+
+def test_chain_round_trip_of_a_mu_map(tmp_path) -> None:
+    """A hier prior with mu_nside 1 writes its 12 multipliers to the chain and reads them back;
+    a scalar run reads their mean, a run at another mu_nside keeps its initial mu, and a
+    scalar chain read into a mu-map run is broadcast."""
+    path, _ = _template(tmp_path)
+    params = Bunch(output=Bunch(dir=str(tmp_path), chains=Bunch(write=[1], maps_nside=2)))
+    params.parameter_file_as_string = "parameters"
+    paths.create_output_dirs(params.output)
+
+    def with_mu_nside(comp_list, mu_nside):
+        ifs.load_amp_priors(comp_list, "per_pixel")
+        for comp in comp_list:
+            if comp.comp_name == "sync":
+                comp.amp_prior = ifd.AmpPrior("hier", template=comp.amp_prior.template,
+                                              mu_nside=mu_nside)
+        return comp_list
+
+    comp_list = with_mu_nside(_comp_list(template_path=path), 1)
+    for comp in comp_list:
+        comp.allocate_empty_alms()
+    sync = [c for c in comp_list if c.comp_name == "sync"][0]
+    mu_map = 1.0 + 0.1 * np.arange(12)
+    sync.amp_prior.mu = mu_map.copy()
+    sync.amp_prior.log_s = -1.33
+    write_compsep_chain_to_file(comp_list, params, chain=1, iter=1, diagnostics={},
+                                band_frequencies={"b": 30.0})
+    file = os.path.join(paths.subdir(params, paths.CHAINS_COMPSEP), "chain01_iter0001.h5")
+    with h5py.File(file) as f:
+        np.testing.assert_array_equal(f["comps/sync/amp_prior/mu"][()], mu_map)
+    for mu_nside, expected in ((1, mu_map), (0, mu_map.mean()), (2, np.ones(48))):
+        fresh = with_mu_nside(_comp_list(template_path=path), mu_nside)
+        fresh.load_initial_state(file, apply_init_from=False)
+        got = [c for c in fresh if c.comp_name == "sync"][0].amp_prior
+        np.testing.assert_allclose(got.mu, expected)
+        assert got.log_s == -1.33
+    # scalar chain into a mu-map run: broadcast
+    scalar_list = _comp_list(template_path=path)
+    ifs.load_amp_priors(scalar_list, "per_pixel")
+    for comp in scalar_list:
+        comp.allocate_empty_alms()
+    s = [c for c in scalar_list if c.comp_name == "sync"][0]
+    s.amp_prior.mu, s.amp_prior.log_s = 1.07, -1.0
+    write_compsep_chain_to_file(scalar_list, params, chain=1, iter=2, diagnostics={},
+                                band_frequencies={"b": 30.0})
+    file2 = os.path.join(paths.subdir(params, paths.CHAINS_COMPSEP), "chain01_iter0002.h5")
+    fresh = with_mu_nside(_comp_list(template_path=path), 1)
+    fresh.load_initial_state(file2, apply_init_from=False)
+    np.testing.assert_allclose([c for c in fresh if c.comp_name == "sync"][0].amp_prior.mu,
+                               np.full(12, 1.07))

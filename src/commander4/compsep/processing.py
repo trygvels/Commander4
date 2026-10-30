@@ -781,7 +781,7 @@ def _run_hier_group(mpi_info: Bunch, compsep_state: CompSepState, detector_data:
             logger.verbose(f"MCMC group {group.name!r} (hier) has nothing to sample; skipping.")
         return {}
     hier_names = ifs.hier_component_names(comp_list, amp_group.comps)
-    layout = ifd.StateLayout(specs, hier_names)
+    layout = ifd.StateLayout(specs, hier_names, ifs.hier_component_dims(comp_list, hier_names))
     band_is_active = _sampling_group_selects_band(
         amp_group.bands, compsep_state.band_name, compsep_state.band_identifier)
     active_sublist = _filter_sampling_group_components(

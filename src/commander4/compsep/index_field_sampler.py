@@ -98,16 +98,22 @@ FD_MASS_MAX = 10.0
 
 
 def fd_inverse_mass(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
-                    cap: float = FD_MASS_MAX) -> NDArray:
+                    cap: float = FD_MASS_MAX, fixed_diag: dict | None = None) -> NDArray:
     """Initial diagonal inverse mass from a central finite-difference estimate of the diagonal
     of the negative Hessian at x: inv_mass_j = 1 / H_jj where H_jj = -(g_j(x + h e_j) - g_j(x -
     h e_j)) / 2h > 0, else 1 (the prior scale of the non-centred blocks), capped at `cap`.
     This only sets the starting point of the mass adaptation; the target is unchanged. Costs
     2 dim gradient evaluations. A stencil point with non-finite density (a rejected state,
-    whose gradient is zero by the likelihood's contract) leaves that coordinate at 1."""
+    whose gradient is zero by the likelihood's contract) leaves that coordinate at 1.
+    `fixed_diag` maps coordinates to a known curvature (the analytic mu block of the hier
+    priors); those coordinates are not swept."""
     x = np.asarray(x, dtype=float)
+    fixed = fixed_diag or {}
     diag = np.full(x.size, np.nan)
     for j in range(x.size):
+        if j in fixed:
+            diag[j] = float(fixed[j])
+            continue
         xp, xm = x.copy(), x.copy()
         xp[j] += h
         xm[j] -= h
@@ -124,13 +130,15 @@ def fd_inverse_mass(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
 def _dense_note(summ: dict) -> str:
     return (f"curvature eigenvalues {summ['lam_min']:.3g} to {summ['lam_max']:.3g} "
             f"({summ['n_negative']} negative, {summ['n_capped']} capped, {summ['n_rejected']} "
-            f"coordinates rejected and decoupled), finite-difference asymmetry "
+            f"coordinates rejected and decoupled, {summ.get('n_fixed', 0)} analytic mu "
+            f"coordinates), finite-difference asymmetry "
             f"{summ['asymmetry']:.3g}, inverse-mass eigenvalues {summ['m_min']:.3g} to "
             f"{summ['m_max']:.3g} (condition {summ['condition']:.3g})")
 
 
 def fd_inverse_mass_dense(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
-                          cap: float = FD_MASS_MAX) -> tuple[NDArray, dict]:
+                          cap: float = FD_MASS_MAX,
+                          fixed_diag: dict | None = None) -> tuple[NDArray, dict]:
     """Initial dense inverse mass from a central finite-difference estimate of the full negative
     Hessian at x, H_ij = -(g_j(x + h e_i) - g_j(x - h e_i)) / 2h, symmetrized and eigendecomposed
     H = U diag(lam) U^T; the inverse mass is U diag(m) U^T with m_k = min(1 / |lam_k|, cap)
@@ -141,14 +149,23 @@ def fd_inverse_mass_dense(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
     the same 2 dim gradient evaluations as the diagonal estimate, plus an O(dim^3)
     eigendecomposition. A stencil point with non-finite density (a rejected state, whose
     gradient is zero by the likelihood's contract) would corrupt its row; such a coordinate is
-    decoupled and left at unit inverse mass instead, and counted. Returns the inverse mass and
-    a summary dict (counts, eigenvalue ranges, the finite-difference asymmetry of H before
-    symmetrization, the metric condition number)."""
+    decoupled and left at unit inverse mass instead, and counted. `fixed_diag` maps coordinates
+    to a known curvature (the analytic mu block of the hier priors, `RegionIndexLikelihood.
+    mu_curvature`); those coordinates are not swept and enter the metric as a decoupled
+    diagonal block. Returns the inverse mass and a summary dict (counts, eigenvalue ranges, the
+    finite-difference asymmetry of H before symmetrization, the metric condition number)."""
     x = np.asarray(x, dtype=float)
     n = x.size
+    fixed = fixed_diag or {}
     H = np.empty((n, n))
     rejected = np.zeros(n, dtype=bool)
+    is_fixed = np.zeros(n, dtype=bool)
     for i in range(n):
+        if i in fixed:
+            is_fixed[i] = True
+            H[i] = 0.0
+            H[i, i] = float(fixed[i])
+            continue
         xp, xm = x.copy(), x.copy()
         xp[i] += h
         xm[i] -= h
@@ -162,6 +179,10 @@ def fd_inverse_mass_dense(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
     if np.any(rejected):
         H[:, rejected] = 0.0
         H[rejected, rejected] = 1.0
+    if np.any(is_fixed):
+        fixed_vals = np.diag(H)[is_fixed].copy()
+        H[:, is_fixed] = 0.0
+        H[is_fixed, is_fixed] = fixed_vals
     if not np.all(np.isfinite(H)):
         raise ValueError("The finite-difference Hessian is not finite.")
     asymmetry = float(np.abs(H - H.T).max())
@@ -172,7 +193,8 @@ def fd_inverse_mass_dense(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
     inv = 0.5 * (inv + inv.T)
     summary = {"n_negative": int(np.sum(lam < 0.0)),
                "n_capped": int(np.sum(np.abs(lam) < 1.0 / cap)),
-               "n_rejected": int(np.sum(rejected)), "lam_min": float(lam.min()),
+               "n_rejected": int(np.sum(rejected)), "n_fixed": int(np.sum(is_fixed)),
+               "lam_min": float(lam.min()),
                "lam_max": float(lam.max()), "m_min": float(m.min()), "m_max": float(m.max()),
                "asymmetry": asymmetry, "condition": float(m.max() / m.min())}
     return inv, summary
@@ -274,11 +296,21 @@ def hier_component_names(comp_list: CompList, amp_comps: list[str] | None) -> li
     return names
 
 
+def hier_component_dims(comp_list: CompList, hier_names: list[str]) -> dict[str, int]:
+    """Hyperparameter count (n_mu + 1) of every named hier component, from its I view."""
+    dims = {}
+    for comp in comp_list:
+        if comp.comp_name in hier_names and component_prior(comp).is_hier:
+            dims[comp.comp_name] = component_prior(comp).hyper_dim
+    return dims
+
+
 def amp_prior_from_params(comp: DiffuseComponent) -> AmpPrior | None:
     """The component's `amp_prior` block as an `AmpPrior`, or None when absent.
 
     `{type: gaussian, mean, rms}` (scalars, uK_RJ at the component's nu_ref) or `{type: hier,
-    template: <fits>, template_floor, mu_prior: [mean, sd], log_s_prior: [mean, sd]}`. The hier
+    template: <fits>, template_floor, mu_prior: [mean, sd], log_s_prior: [mean, sd], mu_nside}`
+    (mu_nside 0: one template multiplier; > 0: one per region of that nside). The hier
     template is a HEALPix map (field 0) in uK_RJ at the component's nu_ref; it is floored at
     `template_floor` (default: 1e-3 of its mean) so that it is strictly positive, and ud_graded
     to the data nside when the prior is used.
@@ -299,7 +331,8 @@ def amp_prior_from_params(comp: DiffuseComponent) -> AmpPrior | None:
         return AmpPrior("gaussian", mean=float(mean), rms=float(rms))
     if kind == "hier":
         import healpy as hp
-        unknown = set(block) - {"type", "template", "template_floor", "mu_prior", "log_s_prior"}
+        unknown = set(block) - {"type", "template", "template_floor", "mu_prior", "log_s_prior",
+                                "mu_nside"}
         if unknown:
             raise ValueError(f"Component {comp.comp_name!r}: unknown amp_prior keys "
                              f"{sorted(unknown)}.")
@@ -325,8 +358,11 @@ def amp_prior_from_params(comp: DiffuseComponent) -> AmpPrior | None:
         if len(mu_prior) != 2 or len(log_s_prior) != 2 or mu_prior[1] <= 0 or log_s_prior[1] <= 0:
             raise ValueError(f"Component {comp.comp_name!r}: mu_prior and log_s_prior are "
                              "[mean, sd] with sd > 0.")
+        mu_nside = int(_read_param(block, "mu_nside", 0) or 0)
+        if mu_nside < 0 or (mu_nside > 0 and (mu_nside & (mu_nside - 1)) != 0):
+            raise ValueError(f"Component {comp.comp_name!r}: mu_nside must be 0 or a power of 2.")
         return AmpPrior("hier", template=template, mu=mu_prior[0], log_s=log_s_prior[0],
-                        mu_prior=mu_prior, log_s_prior=log_s_prior)
+                        mu_prior=mu_prior, log_s_prior=log_s_prior, mu_nside=mu_nside)
     raise ValueError(f"Component {comp.comp_name!r}: amp_prior type must be 'gaussian' or "
                      f"'hier', got {kind!r}.")
 
@@ -483,6 +519,23 @@ class IndexFieldSamplingGroup:
         self.comm.bcast((_TOKEN_EVAL, x), root=self.root)
         return self.likelihood.logp_and_grad(x)
 
+    def _mu_fixed_diag(self, x: NDArray) -> dict:
+        """Analytic curvature of the mu-map coordinates at x (hier components with mu_nside > 0),
+        for the finite-difference metric initializers, which then skip those coordinates
+        (`RegionIndexLikelihood.mu_curvature`, filled by one collective evaluation). Scalar mu
+        coordinates stay in the sweep."""
+        fixed = {}
+        maps = [n for n in self.layout.hier_names if self.layout.hier_dims[n] > 2]
+        if not maps:
+            return fixed
+        self._logp_and_grad_root(x)
+        for name in maps:
+            curv = self.likelihood.mu_curvature[name]
+            start = self.layout.hier_slices[name].start
+            for j, c in enumerate(curv):
+                fixed[start + j] = float(c) if np.isfinite(c) and c > 0 else 1.0
+        return fixed
+
     def run(self, *, numstep: int, chain: int, group_name: str, rng: np.random.Generator) -> dict:
         """Take `numstep` transitions and apply the final state. Returns the diagnostics of the
         iteration (root) or {} (other ranks)."""
@@ -495,14 +548,16 @@ class IndexFieldSamplingGroup:
             try:
                 if not st.mass_initialized and self.nuts.init_inv_mass == "fd_hessian":
                     # Serving ranks are in _serve() by now; every evaluation below is collective.
-                    inv = fd_inverse_mass(self._logp_and_grad_root, x)
+                    inv = fd_inverse_mass(self._logp_and_grad_root, x,
+                                          fixed_diag=self._mu_fixed_diag(x))
                     st.sampler.inv_mass = inv
                     logger.info(f"Index-field group {group_name!r}: initial inverse mass from "
                                 f"the finite-difference Hessian, {2 * x.size} gradients, range "
                                 f"{inv.min():.3g} to {inv.max():.3g}, "
                                 f"{int(np.sum(inv == 1.0))} coordinates left at 1")
                 elif not st.mass_initialized and self.nuts.init_inv_mass == "fd_hessian_dense":
-                    inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x)
+                    inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x,
+                                                      fixed_diag=self._mu_fixed_diag(x))
                     st.sampler.inv_mass = inv
                     logger.info(f"Index-field group {group_name!r}: initial dense inverse mass "
                                 f"from the finite-difference Hessian, {2 * x.size} gradients, "
@@ -517,11 +572,13 @@ class IndexFieldSamplingGroup:
                     # (the start-state Hessian is stale once the chain has left the transient)
                     # and the step size is re-found; same target.
                     st.refreshed.update(due)
+                    fixed = self._mu_fixed_diag(x)
                     if self.nuts.init_inv_mass == "fd_hessian_dense":
-                        inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x)
+                        inv, summ = fd_inverse_mass_dense(self._logp_and_grad_root, x,
+                                                          fixed_diag=fixed)
                         rng_note = _dense_note(summ)
                     else:
-                        inv = fd_inverse_mass(self._logp_and_grad_root, x)
+                        inv = fd_inverse_mass(self._logp_and_grad_root, x, fixed_diag=fixed)
                         rng_note = f"range {inv.min():.3g} to {inv.max():.3g}"
                     st.sampler.reset_metric(inv, x, self._logp_and_grad_root)
                     logger.info(f"Index-field group {group_name!r}: inverse mass refreshed from "

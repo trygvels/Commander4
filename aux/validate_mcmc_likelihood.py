@@ -529,9 +529,9 @@ def _hf_read_chain(outdir: str, tag: str) -> dict | None:
                     out[k].append(float(fld[k][()]))
             else:
                 out["beta"].append(np.atleast_1d(np.asarray(st["Synchrotron/beta"][()])))
-            out["mu_s"].append(float(st["Synchrotron/amp_prior/mu"][()]))
+            out["mu_s"].append(float(np.mean(st["Synchrotron/amp_prior/mu"][()])))
             out["log_s_s"].append(float(st["Synchrotron/amp_prior/log_s"][()]))
-            out["mu_d"].append(float(st["ThermalDust/amp_prior/mu"][()]))
+            out["mu_d"].append(float(np.mean(st["ThermalDust/amp_prior/mu"][()])))
             out["log_s_d"].append(float(st["ThermalDust/amp_prior/log_s"][()]))
             for k in ("divergent", "n_leapfrog", "step_size", "accept_stat"):
                 out[k].append(float(nuts[k][()]))

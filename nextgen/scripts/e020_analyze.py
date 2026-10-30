@@ -94,7 +94,8 @@ def read_run(outdir: str, tag: str, burn: int) -> dict | None:
                 else:
                     out["beta"][c].append(np.atleast_1d(np.asarray(g["beta"][()])))
                     out["kind"] = "scalar"
-                out["amp"][c].append([float(g["amp_prior/mu"][()]), float(g["amp_prior/log_s"][()])])
+                out["amp"][c].append([float(np.mean(g["amp_prior/mu"][()])),
+                                      float(g["amp_prior/log_s"][()])])
             out["cmb_alms"].append(np.asarray(f["comps/cmb/alms"][()])[0])
             out["chi2"].append(float(f["chi2/reduced"][()]))
             nuts = f[f"mcmc/{GROUP}/nuts"]

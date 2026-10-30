@@ -407,3 +407,135 @@ def test_refresh_inv_mass_at_config_and_refresh_during_warmup(caplog, init_inv_m
     assert not np.array_equal(second, first) or np.array_equal(second, first)
     np.testing.assert_array_equal(st.sampler.inv_mass, second)
     assert st.refreshed == {1, 3}
+
+
+def test_region_index_likelihood_gradient_and_group_with_a_mu_map() -> None:
+    """A hier prior with mu per nside-1 region (12 template multipliers): the joint target's
+    gradient matches central differences in every hyperparameter and in field coordinates, the
+    group samples it, and the state round-trips through the components and the unpacked
+    output with the mu map intact."""
+    ifs.reset_sampler_states()
+    comps = _components()
+    rng = np.random.default_rng(11)
+    comps[1].amp_prior = ifd.AmpPrior("hier", template=comps[1].amp_prior.template,
+                                      mu=1.0 + 0.1 * rng.standard_normal(12), log_s=-1.1,
+                                      mu_nside=1)
+    maps_sky, inv_var, _ = _data(comps)
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    dims = ifs.hier_component_dims(comps, ["sync", "dust"])
+    assert dims == {"sync": 13, "dust": 2}
+    layout = ifd.StateLayout(specs, ["sync", "dust"], dims)
+    like = ifd.RegionIndexLikelihood.from_arrays(NU, maps_sky, inv_var, comps, layout, NSIDE)
+    priors = {"sync": comps[1].amp_prior, "dust": comps[2].amp_prior}
+    x0 = ifs.initial_state(layout, views, priors)
+    np.testing.assert_array_equal(layout.hypers(x0)["sync"][0], comps[1].amp_prior.mu)
+    x = x0 + 0.02 * rng.standard_normal(layout.dim)
+    logp, grad = like.logp_and_grad(x)
+    assert np.isfinite(logp)
+    h = 1e-5
+    sl = layout.hier_slices["sync"]
+    coords = list(range(sl.start, sl.stop)) + list(range(layout.hier_slices["dust"].start,
+                                                          layout.hier_slices["dust"].stop)) \
+        + [0, 5, layout.index_slices["sync"].stop - 1]
+    for j in coords:
+        xp, xm = x.copy(), x.copy()
+        xp[j] += h; xm[j] -= h
+        fd = (like.logp_and_grad(xp)[0] - like.logp_and_grad(xm)[0]) / (2 * h)
+        assert grad[j] == pytest.approx(fd, rel=2e-5, abs=1e-4), j
+    group = ifs.IndexFieldSamplingGroup(MPI.COMM_SELF, like, layout, views,
+                                        {"sync": [comps[1]], "dust": [comps[2]]}, priors,
+                                        ifs.NUTSConfig(n_warmup=6, max_depth=5))
+    stats = group.run(numstep=3, chain=1, group_name="g", rng=np.random.default_rng(3))
+    mu_out = group.unpacked(stats["x"])["sync"]["amp_prior"]["mu"]
+    assert mu_out.shape == (12,) and np.all(np.isfinite(mu_out))
+    np.testing.assert_array_equal(comps[1].amp_prior.mu, mu_out)
+    assert isinstance(group.unpacked(stats["x"])["dust"]["amp_prior"]["mu"], float)
+
+
+def test_mu_map_with_masked_pixels_and_a_different_mu_nside() -> None:
+    """mu_nside 2 (48 multipliers) with nside_beta 1, a chisq mask (region -1), an unobserved and
+    an under-determined pixel: the joint gradient matches central differences over the whole
+    mu block; a mu entry whose region has no used pixel sees the hyperprior gradient only; the
+    analytic mu curvature equals the second difference of the target; the prior's mu array is
+    restored, not aliased, after an evaluation."""
+    ifs.reset_sampler_states()
+    comps = _components()
+    rng = np.random.default_rng(21)
+    n_mu = 12 * 2**2
+    comps[1].amp_prior = ifd.AmpPrior("hier", template=comps[1].amp_prior.template,
+                                      mu=1.0 + 0.2 * rng.standard_normal(n_mu), log_s=-0.9,
+                                      mu_nside=2)
+    maps_sky, inv_var, _ = _data(comps)
+    inv_var[:, 0] = 0.0          # unobserved pixel
+    inv_var[1:, 1] = 0.0         # under-determined pixel
+    keep = rng.random(NPIX) > 0.3
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    layout = ifd.StateLayout(specs, ["sync", "dust"],
+                             ifs.hier_component_dims(comps, ["sync", "dust"]))
+    like = ifd.RegionIndexLikelihood.from_arrays(NU, maps_sky, inv_var, comps, layout, NSIDE,
+                                                 keep_mask=keep)
+    priors = {"sync": comps[1].amp_prior, "dust": comps[2].amp_prior}
+    x = ifs.initial_state(layout, views, priors) + 0.03 * rng.standard_normal(layout.dim)
+    mu_before = comps[1].amp_prior.mu.copy(); mu_id = id(comps[1].amp_prior.mu)
+    logp, grad = like.logp_and_grad(x)
+    assert np.isfinite(logp) and like.nskipped_last == 0
+    np.testing.assert_array_equal(comps[1].amp_prior.mu, mu_before)
+    assert id(comps[1].amp_prior.mu) == mu_id
+    sl = layout.hier_slices["sync"]
+    h = 1e-5
+    for j in range(sl.start, sl.stop):
+        xp, xm = x.copy(), x.copy()
+        xp[j] += h; xm[j] -= h
+        fd = (like.logp_and_grad(xp)[0] - like.logp_and_grad(xm)[0]) / (2 * h)
+        assert grad[j] == pytest.approx(fd, rel=2e-5, abs=1e-4), j
+    # regions of the mu map without a used pixel: hyperprior gradient only
+    used = keep & (inv_var.sum(axis=0) > 0)
+    mu_region = ifd.region_map(2, NSIDE)
+    empty = [r for r in range(n_mu) if not np.any(used & (mu_region == r))]
+    hyp = layout.hypers(x)["sync"]
+    from dataclasses import replace
+    hg = replace(comps[1].amp_prior, mu=hyp[0], log_s=hyp[1]).log_hyperprior_grad()
+    for r in empty:
+        assert grad[sl.start + r] == pytest.approx(hg[r], abs=1e-12)
+    # analytic curvature of the mu block against the second difference of the target
+    like.logp_and_grad(x)
+    curv = like.mu_curvature["sync"]
+    assert curv.shape == (n_mu,)
+    f0 = logp
+    for r in (0, 7, n_mu - 1):
+        j = sl.start + r
+        xp, xm = x.copy(), x.copy()
+        xp[j] += 1e-3; xm[j] -= 1e-3
+        second = (like.logp_and_grad(xp)[0] - 2 * f0 + like.logp_and_grad(xm)[0]) / 1e-6
+        assert -second == pytest.approx(curv[r], rel=1e-3, abs=1e-6), r
+    for r in empty:
+        assert curv[r] == pytest.approx(1.0 / 0.5**2)
+    with pytest.raises(ValueError, match="mu_nside"):
+        ifd.AmpPrior("hier", template=comps[1].amp_prior.template, mu_nside=3)
+    with pytest.raises(ValueError, match="mu_nside"):
+        ifd.AmpPrior("hier", template=comps[1].amp_prior.template, mu_nside=8).mu_regions(NPIX)
+    # a layout built for a scalar mu rejects a mu-map prior at construction
+    bad_layout = ifd.StateLayout(specs, ["sync", "dust"])
+    with pytest.raises(ValueError, match="mu_nside"):
+        ifd.RegionIndexLikelihood.from_arrays(NU, maps_sky, inv_var, comps, bad_layout, NSIDE)
+
+
+def test_fd_metrics_skip_fixed_coordinates() -> None:
+    """Coordinates given in fixed_diag are not swept: their curvature enters the diagonal
+    estimate directly and the dense estimate as a decoupled diagonal block."""
+    H = np.array([[4.0, 1.0, 0.0], [1.0, 2.0, 0.5], [0.0, 0.5, 3.0]])
+    calls = []
+
+    def f(x):
+        calls.append(x.copy())
+        return -0.5 * x @ H @ x, -H @ x
+    inv = ifs.fd_inverse_mass(f, np.zeros(3), fixed_diag={2: 10.0})
+    np.testing.assert_allclose(inv, [1 / 4.0, 1 / 2.0, 1 / 10.0], rtol=1e-6)
+    assert len(calls) == 4                     # 2 coordinates swept
+    calls.clear()
+    dense, summ = ifs.fd_inverse_mass_dense(f, np.zeros(3), fixed_diag={2: 10.0})
+    assert len(calls) == 4 and summ["n_fixed"] == 1
+    expected = np.zeros((3, 3))
+    expected[:2, :2] = np.linalg.inv(H[:2, :2])
+    expected[2, 2] = 1 / 10.0
+    np.testing.assert_allclose(dense, expected, rtol=1e-6, atol=1e-9)
