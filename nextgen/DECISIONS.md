@@ -336,3 +336,23 @@ the sky is the template's error.
 map version is validated. Dropping the hier prior for dust at high S/N: not needed if the
 multiplier field works in the chain.
 
+## D024 (2026-10-31): index-field chains at realistic noise run in the non-centred parameterization; the centred E026 chains are kept as the record of the funnel
+
+**Decision.** The E026 chains (and any index-field run where the per-region data are weak, i.e.
+realistic noise at nside 16) use `parameterization: noncentred`; the three E026 runs are
+repeated so, exact templates first; the centred chains are recorded but not read for
+calibration. The centred parameterization stays for the high-S/N regime (E021 at 0.03 x noise,
+where it was validated and the dense metric fixed its one weakness).
+
+**Why.** In the centred E026 chains the field scale sigma went to the funnel neck during
+warm-up (sync 0.001 to 0.002 against a truth of 0.063) and the refreshed Hessian metrics locked
+the chain there (log sigma ESS 4 to 13 of 700); the fields came out constant over the sky and
+biased against every regional reference even with exact templates. E018 (F20) showed the
+non-centred NUTS reaches and leaves the small-sigma tail at low S/N while the centred one does
+not, and that both are exact for the same target.
+
+**Alternatives considered.** More warm-up or later refreshes in centred coordinates: the neck
+is an attractor for the centred geometry, not a transient. Fixing sigma: changes the model.
+Marginalizing sigma: not available for the GMRF field in closed form; a fallback if the
+non-centred chains also stick.
+

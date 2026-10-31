@@ -2,6 +2,32 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-10-31 (Mac mini, 13:40): E026 centred chains invalid (funnel at realistic noise); non-centred reruns started (D024)
+
+**Learned**
+- The three E026 chains ran clean (7.5 to 16 h each, dense metric at dim 12,300 with analytic mu
+  blocks) but their GMRF field hyperparameters did not mix: sync sigma collapsed to 0.001 to
+  0.002 (truth 0.063) during warm-up and stayed, log sigma ESS 4 to 13 of 700. The fields are
+  constant over the sky and biased against the region-fit reference even with exact templates
+  (sync +0.05, dust +0.06 in the brightest quartile); the cs templates add +0.04 (sync) and
+  +0.03 (dust) on top, and the scalar law shows the predicted large bias (sync z -4, dust RMSE
+  0.3). This is the E018 funnel at a depth where regions are not constrained individually; the
+  E023/E025 scans could not see it (field fixed, no index prior). The per-pixel GLS CMB at this
+  depth is noise (92 uK), so the CMB metric is uninformative at realistic noise.
+- D024: realistic-noise chains run non-centred; the three runs are repeating (exact first, from
+  13:28; about 30 to 40 h).
+
+**Running**
+- E026 non-centred: gmrf16_exact_mumap_nc, then cs_mumap_nc, then cs_scalar_nc.
+
+**Next**
+- Early funnel diagnostic on the exact_nc run (sigma trace at 150 iterations); if it sticks, a
+  sigma-marginalized or alternating scheme before more chains.
+- E026 reading once valid chains exist; Paper A: the realistic-noise regime boundary.
+
+**Needs Trygve**
+- Unchanged.
+
 ## 2026-10-30 (Mac mini, 04:45): mu-map hier prior merged after stats review; E026 stage-2 chains started
 
 **Learned**
