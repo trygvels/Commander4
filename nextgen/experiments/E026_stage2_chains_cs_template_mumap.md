@@ -119,7 +119,12 @@ E025 residual. Decision (D024): rerun the three chains in the non-centred parame
 of calibration; the centred chains are kept as the record of the failure mode.
 
 **Non-centred runs:** started 2026-10-31 13:28 (`param_*_nc.yml`, output `chains_*_nc/`), exact
-first. (pending)
+first. Early diagnostic at 150 iterations of gmrf16_exact_mumap_nc (15:20): the field
+hyperparameters move. Sync log sigma between -2.6 and -1.4 (sigma 0.07 to 0.21 over the last
+50 iterations against a truth of 0.063), u between -0.6 and 3.0, field mean -2.80 to -2.90;
+dust sigma 0.06 to 0.12, u 0.25 to 2.4, mean 1.56 to 1.61; 15 to 63 leapfrogs per transition
+(one at 1023). The dense metric at the non-centred start had 4 negative directions, 2 at the
+transition-50 refresh. The chain is out of the neck; the rest is pending.
 
 ## Negative control
 gmrf16_cs_scalar (the scalar law the scans showed biased) must show the predicted dust and sync
