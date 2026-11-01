@@ -1,0 +1,29 @@
+E020 analysis of /Users/trygvels/data/e023_pysm_n1 (burn 500; nside 64; truth sd beta_s 0.0629, beta_d 0.0374, beta_eff 0.0439; beta_eff - beta_d rms 0.0283)
+reference GLS CMB residuals (rms all / hi uK; power fractions l 2-30, 30-100): gls_true_sed: 93.18 / 92.67, 0.0630, 0.8550; gls_at_truth_fixedT: 93.25 / 92.90, 0.0687, 0.8579; gls_at_beta_eff: 93.20 / 92.64, 0.0633, 0.8554; gls_at_beta_eff3: 93.34 / 92.54, 0.0663, 0.8587; gls_at_region_means_nside4: 93.87 / 92.60, 0.0742, 0.8855; gls_at_region_means_nside8: 93.56 / 92.62, 0.0662, 0.8737; gls_at_region_means_nside16: 93.36 / 92.63, 0.0633, 0.8637 (gls_true_sed is the noise floor; the fixed-T ones carry the dust misfit)
+
+run          n   rmse_s all/hi   rmse_d all/hi rmse_d(fixT)     floor_s/d       rmse draw s/d     sd_s/sd_d  z_s med/mad  z_d med/mad  cmb rms all/hi    P<30 P<100 coef<30   chi2  grad  s/it    ESS_s/d  div
+gmrf16_exact_mumap_nc   700 0.1467/0.1479 0.0597/0.0588 0.0607/0.0591 0.0130/0.0187 0.2013+-0.0459/0.0808+-0.0089 0.1462/0.0562 +0.91/0.27 +0.68/0.46   93.60/ 92.91 0.0750 0.8651   1.006  1.088  62.9  17.9   28/  20    2
+    rmse by S/N quartile (low to high): sync 0.1520 0.1607 0.1563 0.1130 (truth sd 0.0511 0.0516 0.0579 0.0839); dust 0.0318 0.0635 0.0741 0.0610 (truth sd 0.0160 0.0230 0.0339 0.0446); |z_w|<1,<2: sync 0.60/0.99, dust 0.61/0.93
+    dust rmse against beta_eff3 0.0653/0.0616; cmb per-draw rms 94.14 +- 0.69; amp-hyper ESS min 163/215
+    region-level rmse (floor removed) sync 0.1461 dust 0.0625; MC inflation of the rmse sync 0.0117 dust 0.0051; rmse of the Fisher-weighted sky mean (single-index target) sync 0.0652 dust 0.0790
+    sync field: mu -2.8680 +- 0.0421, field mean -2.8680, sigma 0.1521 +- 0.0473, rho 58.9 +- 38.5 deg, amp mu 0.997 log s -3.44; ESS hyper min 48
+    dust field: mu 1.5781 +- 0.0122, field mean 1.5781, sigma 0.0623 +- 0.0085, rho 39.7 +- 10.8 deg, amp mu 1.029 log s -3.82; ESS hyper min 42
+gmrf16_cs_mumap_nc   700 0.3346/0.3740 0.0888/0.0942 0.0858/0.0923 0.0130/0.0187 0.4241+-0.0690/0.1212+-0.0190 0.2751/0.0850 +1.02/0.38 +0.52/0.62   95.25/ 94.71 0.0771 0.8981   1.008  1.090  31.0  13.6   24/  12    1
+    rmse by S/N quartile (low to high): sync 0.3409 0.3977 0.3468 0.2304 (truth sd 0.0511 0.0516 0.0579 0.0839); dust 0.0683 0.1050 0.1005 0.0759 (truth sd 0.0160 0.0230 0.0339 0.0446); |z_w|<1,<2: sync 0.49/0.92, dust 0.63/0.93
+    dust rmse against beta_eff3 0.0875/0.0931; cmb per-draw rms 95.33 +- 1.08; amp-hyper ESS min 70/284
+    region-level rmse (floor removed) sync 0.3343 dust 0.0854; MC inflation of the rmse sync 0.0167 dust 0.0086; rmse of the Fisher-weighted sky mean (single-index target) sync 0.0652 dust 0.0790
+    sync field: mu -2.7227 +- 0.0551, field mean -2.7227, sigma 0.3463 +- 0.0804, rho 58.7 +- 37.9 deg, amp mu 0.971 log s -2.91; ESS hyper min 13
+    dust field: mu 1.5847 +- 0.0189, field mean 1.5847, sigma 0.1175 +- 0.0322, rho 56.8 +- 28.5 deg, amp mu 1.030 log s -2.69; ESS hyper min 4
+gmrf16_cs_scalar_nc   700 0.6222/0.5747 0.3172/0.3402 0.3113/0.3312 0.0130/0.0187 0.8990+-0.0472/0.3768+-0.0276 0.6601/0.1902 -0.51/0.50 +1.07/0.82   94.57/ 88.67 0.2764 0.8765   0.979  1.155  31.0   5.5  307/ 320    0
+    rmse by S/N quartile (low to high): sync 0.5001 0.5380 0.6429 0.7718 (truth sd 0.0511 0.0516 0.0579 0.0839); dust 0.3527 0.3546 0.2884 0.2627 (truth sd 0.0160 0.0230 0.0339 0.0446); |z_w|<1,<2: sync 0.69/0.93, dust 0.36/0.73
+    dust rmse against beta_eff3 0.3097/0.3280; cmb per-draw rms 96.43 +- 1.69; amp-hyper ESS min 614/700
+    region-level rmse (floor removed) sync 0.6221 dust 0.3091; MC inflation of the rmse sync 0.0246 dust 0.0081; rmse of the Fisher-weighted sky mean (single-index target) sync 0.0652 dust 0.0790
+    sync field: mu -3.3086 +- 0.0624, field mean -3.3086, sigma 0.8691 +- 0.0564, rho 22.6 +- 2.5 deg, amp mu 0.781 log s -2.48; ESS hyper min 108
+    dust field: mu 1.7228 +- 0.0273, field mean 1.7228, sigma 0.3713 +- 0.0414, rho 42.2 +- 5.8 deg, amp mu 1.070 log s -1.79; ESS hyper min 24
+
+paired differences (run minus best, block bootstrap SE over 192 nside-4 blocks): sync RMSE vs PySM | dust RMSE vs beta_eff3 | GLS CMB residual rms
+  gmrf16_exact_mumap_nc +0.0000 +- 0.0000 (vs gmrf16_exact_mumap_nc) | +0.0000 +- 0.0000 (vs gmrf16_exact_mumap_nc) | +0.0000 +- 0.0000 (vs gmrf16_exact_mumap_nc)
+  gmrf16_cs_mumap_nc +0.1879 +- 0.0119 (vs gmrf16_exact_mumap_nc) | +0.0222 +- 0.0034 (vs gmrf16_exact_mumap_nc) | +1.6355 +- 0.1714 (vs gmrf16_exact_mumap_nc)
+  gmrf16_cs_scalar_nc +0.4755 +- 0.0250 (vs gmrf16_exact_mumap_nc) | +0.2444 +- 0.0109 (vs gmrf16_exact_mumap_nc) | +0.9986 +- 1.1711 (vs gmrf16_exact_mumap_nc)
+  best cmb run minus the true-SED GLS floor: +0.426 +- 0.135 uK
+

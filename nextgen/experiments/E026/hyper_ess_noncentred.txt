@@ -1,0 +1,41 @@
+== hyper ess
+gmrf16_exact_mumap_nc: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -2.86796 sd 0.04207 ESS   120.1
+  Synchrotron/index_field/log_sigma        mean -1.93477 sd 0.32999 ESS    76.6
+  Synchrotron/index_field/u                mean +0.85571 sd 1.01466 ESS    48.0
+  Synchrotron/amp_prior/mu                 mean +0.99736 sd 0.00786 ESS   164.3
+  Synchrotron/amp_prior/log_s              mean -3.44214 sd 0.38217 ESS   438.1
+  ThermalDust/index_field/mu               mean +1.57809 sd 0.01221 ESS   131.4
+  ThermalDust/index_field/log_sigma        mean -2.78485 sd 0.13422 ESS    59.5
+  ThermalDust/index_field/u                mean +0.42518 sd 0.29063 ESS    42.9
+  ThermalDust/amp_prior/mu                 mean +1.02855 sd 0.00698 ESS   323.0
+  ThermalDust/amp_prior/log_s              mean -3.82330 sd 0.08430 ESS   217.9
+  dust beta_map: 3072 regions, ESS min 21 5% 54 median 136
+  sync beta_map: 3072 regions, ESS min 29 5% 57 median 234
+gmrf16_cs_mumap_nc: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -2.72266 sd 0.05512 ESS    43.4
+  Synchrotron/index_field/log_sigma        mean -1.08811 sd 0.23873 ESS    23.7
+  Synchrotron/index_field/u                mean +0.90363 sd 1.01580 ESS    13.3
+  Synchrotron/amp_prior/mu                 mean +0.97094 sd 0.00860 ESS    71.9
+  Synchrotron/amp_prior/log_s              mean -2.91499 sd 0.18463 ESS   332.6
+  ThermalDust/index_field/mu               mean +1.58466 sd 0.01887 ESS    33.7
+  ThermalDust/index_field/log_sigma        mean -2.17502 sd 0.25486 ESS     5.7
+  ThermalDust/index_field/u                mean +0.81661 sd 0.63083 ESS     4.9
+  ThermalDust/amp_prior/mu                 mean +1.02986 sd 0.00780 ESS   285.4
+  ThermalDust/amp_prior/log_s              mean -2.68617 sd 0.03246 ESS   354.7
+  dust beta_map: 3072 regions, ESS min 14 5% 40 median 152
+  sync beta_map: 3072 regions, ESS min 27 5% 110 median 339
+gmrf16_cs_scalar_nc: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -3.30855 sd 0.06242 ESS   569.9
+  Synchrotron/index_field/log_sigma        mean -0.14237 sd 0.06479 ESS   142.9
+  Synchrotron/index_field/u                mean -0.13898 sd 0.11326 ESS   108.5
+  Synchrotron/amp_prior/mu                 mean +0.78113 sd 0.01056 ESS  1362.2
+  Synchrotron/amp_prior/log_s              mean -2.48276 sd 0.12112 ESS   615.1
+  ThermalDust/index_field/mu               mean +1.72282 sd 0.02733 ESS   168.9
+  ThermalDust/index_field/log_sigma        mean -0.99670 sd 0.10791 ESS    37.6
+  ThermalDust/index_field/u                mean +0.51452 sd 0.14811 ESS    25.2
+  ThermalDust/amp_prior/mu                 mean +1.06982 sd 0.00531 ESS  1062.4
+  ThermalDust/amp_prior/log_s              mean -1.79476 sd 0.02049 ESS  1577.6
+  dust beta_map: 3072 regions, ESS min 323 5% 556 median 972
+  sync beta_map: 3072 regions, ESS min 315 5% 745 median 1072
+

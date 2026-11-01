@@ -124,7 +124,53 @@ hyperparameters move. Sync log sigma between -2.6 and -1.4 (sigma 0.07 to 0.21 o
 50 iterations against a truth of 0.063), u between -0.6 and 3.0, field mean -2.80 to -2.90;
 dust sigma 0.06 to 0.12, u 0.25 to 2.4, mean 1.56 to 1.61; 15 to 63 leapfrogs per transition
 (one at 1023). The dense metric at the non-centred start had 4 negative directions, 2 at the
-transition-50 refresh. The chain is out of the neck; the rest is pending.
+transition-50 refresh. The chain is out of the neck.
+
+**Non-centred runs complete (13:28 to 2026-11-01 06:48; 7.5, 6.4 and 3.4 h; 1200 iterations,
+700 post-burn; `E026/e026nc_analysis.txt`, `e026nc_e020_analysis.txt`,
+`hyper_ess_noncentred.txt`).** Hyperparameters mix: log sigma ESS 77 / 24 / 143 (sync) and
+60 / 6 / 38 (dust) for exact_mumap, cs_mumap, cs_scalar; u 48 / 13 / 109 and 43 / 5 / 25; field
+means 120 / 43 / 570 and 131 / 34 / 169; region index ESS medians 234 / 339 / 1072 (sync) and
+136 / 152 / 972 (dust), minima 29 / 27 / 315 and 21 / 14 / 323; 63 / 31 / 31 gradients per
+iteration. cs_mumap's dust hyperparameters (ESS 5 to 6) are the weakest; the others are usable.
+Fields: exact sigma_s 0.152 +- 0.047 (sky sd 0.063), rho 59 +- 39 deg, mean -2.868 +- 0.042;
+sigma_d 0.062 +- 0.009, rho 40 +- 11 deg, mean 1.578 +- 0.012 (sky mean 1.540); cs_mumap
+sigma_s 0.35, mean -2.72; sigma_d 0.12, mean 1.585; cs_scalar sigma_s 0.87 (!), mean -3.31,
+sigma_d 0.37, mean 1.72. Amplitude hyperparameters: exact mu_s map mean 0.997, mu_d map mean
+1.029 +- 0.007 (should be 1.000), s 0.034 / 0.022; cs_mumap mu maps 0.971 / 1.030 with
+correlation to the realized exp(-f) 0.71 / 0.89 in the brightest quartiles and 0.2 to 0.4 in
+the others (posterior sds 0.25 to 0.48 there), s 0.055 / 0.068 (E025: 0.06); cs_scalar amp mu
+0.78 / 1.07, s 0.084 / 0.166.
+
+Against the region-fit reference per template-S/N quartile (Q1 bright to Q4 faint; z median /
+|z| < 1 / RMSE; sync posterior sd medians 0.13 to 0.15 for exact, 0.22 to 0.29 for cs_mumap,
+0.50 to 0.72 for cs_scalar; dust 0.04 to 0.06, 0.055 to 0.10, 0.08 to 0.27):
+- exact_mumap: sync +0.50 / 0.83 / 0.10, +0.82 / 0.65 / 0.13, +0.90 / 0.60 / 0.15, +0.94 / 0.56 /
+  0.16 (MAD 0.25 to 0.40: the whole field sits about +0.9 of its sd, +0.13, above the
+  reference, with a per-region scatter smaller than its sd); dust +1.44 / 0.30 / 0.072, +1.34 /
+  0.28 / 0.080, +0.72 / 0.63 / 0.063, +0.17 / 0.82 / 0.047.
+- cs_mumap: sync +0.51 / 0.76 / 0.19, +0.95 / 0.53 / 0.30, +1.07 / 0.45 / 0.37, +1.19 / 0.35 /
+  0.41; dust +0.90 / 0.51 / 0.069, +0.88 / 0.54 / 0.102, +0.58 / 0.66 / 0.099, +0.26 / 0.78 /
+  0.080. Paired against exact: pixel-level +0.188 +- 0.012 (sync), +0.022 +- 0.003 (dust).
+- cs_scalar: sync -1.02 / 0.40 / 0.83, -0.72 / 0.64 / 0.65, -0.42 / 0.84 / 0.50, -0.24 / 0.86 /
+  0.50; dust +0.74 / 0.24 / 0.27, +0.99 / 0.40 / 0.29, +1.14 / 0.43 / 0.33, +1.16 / 0.40 / 0.35.
+  Paired against exact +0.476 +- 0.025 and +0.244 +- 0.011.
+GLS CMB residual 94 to 95 uK in all three against a true-SED floor of 93: uninformative at
+this depth, as in the centred runs.
+
+Two features of the exact-template reference need an exact-target check before the reading:
+the sync field's aggregate sits 0.13 (3 of its own sd of 0.042) above the sky's mean index
+(and above every quartile's reference), and the bright dust quartiles sit +0.06 to +0.07 (1.4
+sd per region, systematic) with the dust mu map at 1.029. A whole-sky shift scan of the exact
+target on this realization (expected and realization modes, global and per-region mu) is
+running (`e026_allsky_scan.txt`). A second finding on the way: the template-S/N quartiles are
+built from the data-built 23 GHz template, so on this realization the faint sync quartile is
+where the 23 GHz noise is low (mean noise -12 standard errors in that quartile against -0.7
+over the sky), which is why the realization-mode faint-sync scans of E023 and E025 preferred a
+flatter index by up to +1.4 at 68 nats; the expected-mode scans (noiseless sky) and the chains
+(which know no quartiles) are not affected, but every per-quartile statistic on a single
+realization carries this selection, on real data too when regions are selected by a template
+built from the same data.
 
 ## Negative control
 gmrf16_cs_scalar (the scalar law the scans showed biased) must show the predicted dust and sync

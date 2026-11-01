@@ -384,10 +384,13 @@ def main():
             scans = [(f"{c}_Q{q+1}", c, q, fine) for c in ("s", "d") for q in range(4)]
             if wide.size:
                 scans.append(("s_Q4_wide", "s", 3, wide))
+            scans += [("s_all", "s", -1, fine), ("d_all", "d", -1, fine)]   # whole-sky shifts
             if a.scans:
                 scans = [sc for sc in scans if sc[0] in a.scans]
+            else:
+                scans = [sc for sc in scans if sc[2] >= 0]
             for label, comp, q, deltas in scans:
-                sel = (qs64 if comp == "s" else qd64) == q
+                sel = ((qs64 if comp == "s" else qd64) == q) if q >= 0 else np.ones(npix, bool)
                 th = th0.copy(); rows = []
                 lap_idx = set(np.linspace(0, len(deltas) - 1, a.laplace_at).round().astype(int).tolist()) if use_lap else set()
                 t1 = time.time()
