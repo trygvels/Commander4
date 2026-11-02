@@ -680,6 +680,13 @@ class ThermalDust(DiffuseComponent):
         self.beta = comp_params.beta
         self.T = comp_params.T
         self.nu_ref = self._reference_frequency(comp_params)
+        # A fixed temperature map (E028 stage A): a FITS path or an array of one T per HEALPix
+        # pixel at some nside, held fixed unless `sample_T` is on (then it is the start).
+        T_map = comp_params.T_map if "T_map" in comp_params else None
+        if T_map is not None:
+            T_map = np.asarray(hp.read_map(T_map, field=0) if isinstance(T_map, str) else T_map,
+                               dtype=np.float64)
+            self.set_T_map(T_map, hp.npix2nside(T_map.size))
 
     @staticmethod
     def _broadcast_nu_params(nu, *params):

@@ -13,7 +13,7 @@ from commander4.backend import compsep as cpp_compsep
 from commander4.compsep import index_field as ifd
 from commander4.compsep.perpix_solver import solve_compsep_perpix, solve_perpix_with_priors
 from commander4.data_models.detector_map import DetectorMap
-from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust
+from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust, h_over_k
 
 NSIDE, NSIDE_BETA = 4, 1
 NPIX = 12 * NSIDE**2
@@ -479,18 +479,22 @@ def test_scalar_index_target_matches_prototype_scalar_hier_posterior(proto) -> N
 
 # --- independent covariance-form check (from the 2026-10-27 stats review) ----------------------
 
-def _covariance_form_target(comps, d, w, region, layout, g_s, g_d):
+def _covariance_form_target(comps, d, w, region, layout, g_s, g_d, sigma_scale=0.3):
     """log p(x | d) written from scratch: per pixel the Gaussian marginal
     log N(d_p; M m, N + M T M^T) over the observed bands, plus the hyperpriors and the field
-    prior, with the pixel set {region >= 0, at least one observed band} (proper priors)."""
+    prior, with the pixel set {region >= 0, at least one observed band} (proper priors). The
+    single spec is the sync index field, or (param "logT") a dust log-temperature field with
+    the sync index fixed at the component's beta."""
     spec = layout.specs[0]
     fld = spec.field
+    is_T = spec.param == "logT"
 
     def sync_sed(nu, b):
         return (nu / 30.0)**b
 
     def dust_sed(nu, b=BETA_D, T=T_D):
-        h_over_k = 0.0479924466
+        # The code's physical constant (a 3e-7 relative difference would not cancel between
+        # states once T varies); the formula is written independently.
         x, x0 = h_over_k * nu / T, h_over_k * 545.0 / T
         return (nu / 545.0)**(b + 1) * np.expm1(x0) / np.expm1(x)
 
@@ -508,8 +512,8 @@ def _covariance_form_target(comps, d, w, region, layout, g_s, g_d):
             spectrum = (8.0 / rho**2 + fld.basis.lam)**(-1.0)
             wgt = spectrum / np.sqrt(np.sum(spectrum**2) / fld.n_beta)
             beta = mu + sigma * fld.basis.V @ (wgt * z)
-            lp_field = -0.5 * z @ z - 0.5 * ((mu - MU0) / S_MU)**2 - 0.5 * (sigma / 0.3)**2 + ls \
-                + np.log(L) + np.log(s) + np.log(1 - s)
+            lp_field = -0.5 * z @ z - 0.5 * ((mu - spec.prior_mean) / spec.prior_sd)**2 \
+                - 0.5 * (sigma / sigma_scale)**2 + ls + np.log(L) + np.log(s) + np.log(1 - s)
         mu_s, ls_s, mu_d, ls_d = x[-4:]
         if ls_s < -8 or ls_d < -8:
             return -np.inf
@@ -519,8 +523,12 @@ def _covariance_form_target(comps, d, w, region, layout, g_s, g_d):
             obs = w[:, p] > 0
             if r < 0 or obs.sum() == 0:
                 continue
-            M = np.stack([comps[0].get_sed(NU_PROTO[obs]), sync_sed(NU_PROTO[obs], beta[r]),
-                          dust_sed(NU_PROTO[obs])], axis=1)
+            if is_T:
+                M = np.stack([comps[0].get_sed(NU_PROTO[obs]), sync_sed(NU_PROTO[obs], comps[1].beta),
+                              dust_sed(NU_PROTO[obs], comps[2].beta, np.exp(beta[r]))], axis=1)
+            else:
+                M = np.stack([comps[0].get_sed(NU_PROTO[obs]), sync_sed(NU_PROTO[obs], beta[r]),
+                              dust_sed(NU_PROTO[obs])], axis=1)
             m = np.array([0.0, mu_s * g_s[p], mu_d * g_d[p]])
             T = np.diag([70.0**2, (np.exp(ls_s) * g_s[p])**2, (np.exp(ls_d) * g_d[p])**2])
             C = np.diag(1.0 / w[obs, p]) + M @ T @ M.T
@@ -580,6 +588,68 @@ def test_region_index_likelihood_matches_covariance_form_marginal(scalar, mask) 
         f = [mine(x + k * e) for k in (-2, -1, 1, 2)]
         fd[i] = (f[0] - 8 * f[1] + 8 * f[2] - f[3]) / (12 * h)
     np.testing.assert_allclose(grad, fd, rtol=1e-6, atol=1e-4)
+
+
+def test_region_index_likelihood_with_temperature_field_matches_covariance_form(proto=None) -> None:
+    """E028: a dust log-temperature field (sync and dust indices fixed) against the independent
+    covariance-form target: code minus target constant over random states to 1e-9 relative, the
+    code gradient equal to 4th-order finite differences of the target, the likelihood sensitive
+    to the temperature, and a fixed `T_map` at the same values giving the same likelihood."""
+    rng = np.random.default_rng(321)
+    g_s = 10**(1 + 0.5 * rng.random(NPIX))
+    g_d = 10**(1.5 + 0.5 * rng.random(NPIX))
+    comps = _proto_like_components(np.stack([np.ones(NPIX), g_s, g_d], axis=1))
+    comps[2].comp_params.sample_T = True
+    d = rng.normal(size=(NU_PROTO.size, NPIX)) * 30 + 50
+    w = 1.0 / (5.0 * (0.5 + rng.random((NU_PROTO.size, NPIX))))**2
+    w[:, 0] = 0.0
+    w[1:, 1] = 0.0
+    log20 = float(np.log(20.0))
+    field = gmrf_field.IndexFieldPrior(
+        gmrf_field.MaternField(gmrf_field.GraphLaplacianBasis(NSIDE_BETA)),
+        gmrf_field.HyperPrior(mu0=log20, s_mu=0.2, sigma_scale=0.15))
+    layout = ifd.StateLayout([ifd.IndexSpec("dust", field, log20, 0.2, param="logT")], ["sync", "dust"])
+    assert list(layout.index_slices) == ["dust:logT"]
+    like = ifd.RegionIndexLikelihood.from_arrays(NU_PROTO, d, w, comps, layout, NSIDE)
+    region = ifd.region_map(NSIDE_BETA, NSIDE)
+    mine = _covariance_form_target(comps, d, w, region, layout, g_s, g_d, sigma_scale=0.15)
+    rng2 = np.random.default_rng(8)
+    xs = [np.concatenate([rng2.normal(size=field.K), [log20 + 0.05 * rng2.normal(), np.log(0.1) + 0.2 * rng2.normal(),
+                                                      rng2.normal()],
+                          [1 + 0.2 * rng2.normal(), np.log(0.3) + 0.3 * rng2.normal(),
+                           1 + 0.2 * rng2.normal(), np.log(0.3) + 0.3 * rng2.normal()]]) for _ in range(3)]
+    diff = np.array([like.logp_and_grad(x)[0] - mine(x) for x in xs])
+    assert np.all(np.isfinite(diff))
+    np.testing.assert_allclose(diff - diff[0], 0.0, atol=1e-9 * abs(diff[0]) + 1e-6)
+    # Sensitivity: the data term changes with the temperature (not a T-independent target).
+    lps = [like.logp_and_grad(x)[0] for x in xs]
+    assert np.std(lps) > 1.0
+    x = xs[0]
+    grad = like.logp_and_grad(x)[1]
+    h = 1e-4
+    fd = np.empty_like(x)
+    for i in range(x.size):
+        e = np.zeros_like(x)
+        e[i] = h
+        f = [mine(x + k * e) for k in (-2, -1, 1, 2)]
+        fd[i] = (f[0] - 8 * f[1] + 8 * f[2] - f[3]) / (12 * h)
+    np.testing.assert_allclose(grad, fd, rtol=1e-6, atol=1e-4)
+    # A fixed T map (not sampled) at the same per-region temperatures: the same data term. The
+    # layout then has no index block, so the state is the four hier hyperparameters.
+    comps_fixed = _proto_like_components(np.stack([np.ones(NPIX), g_s, g_d], axis=1))
+    T_reg = np.exp(layout.betas(x)["dust:logT"])
+    comps_fixed[2].set_T_map(T_reg, NSIDE_BETA)
+    layout_fixed = ifd.StateLayout([], ["sync", "dust"])
+    like_fixed = ifd.RegionIndexLikelihood.from_arrays(NU_PROTO, d, w, comps_fixed, layout_fixed, NSIDE)
+    lp_fixed = like_fixed.logp_and_grad(x[-4:])[0]
+    K = field.K
+    prior_T = field.logp_and_grad(x[:K + 3], loglike=lambda b: (0.0, np.zeros_like(b)))[0]
+    assert like.logp_and_grad(x)[0] - prior_T == pytest.approx(lp_fixed, rel=1e-10, abs=1e-6)
+    # A fixed T map at the wrong nside is refused.
+    comps_bad = _proto_like_components(np.stack([np.ones(NPIX), g_s, g_d], axis=1))
+    comps_bad[2].set_T_map(20.0 * np.ones(12 * 4), 2)
+    with pytest.raises(ValueError, match="T_map"):
+        ifd.RegionIndexLikelihood.from_arrays(NU_PROTO, d, w, comps_bad, layout_fixed, NSIDE)
 
 
 def test_region_index_likelihood_rejects_singular_and_overflowing_states() -> None:

@@ -1,7 +1,7 @@
 # E028: A sampled dust temperature field (log T_d per region) in the collapsed hier index-field likelihood
 
 - **Date started / finished:** 2026-11-02 /
-- **Branch and commit:** nextgen, 4282505 (design; no code yet)
+- **Branch and commit:** nextgen, 4282505 (design), code from 71c3be7 (SED) and fbcfb6c (layout, likelihood, sampler, component state)
 - **Open question addressed:** Q16 (F30: the per-region multiplier field turns the fixed-T misfit into a bright-sky dust-index bias), M2.6 (sampled T_d per region), Q3 (joint fields for beta_d and T_d)
 - **Validation level:** L0 to L1 for the code (finite-difference and exact-target checks), then L4 on the PySM noise-1 sky against the fixed-T chain of E026
 
@@ -37,6 +37,62 @@ d sed_d / d tau = T d sed_d / dT = sed_d [x e^x / expm1(x) - x0 e^x0 / expm1(x0)
 x0 = h nu_ref / k T (stable form x / (1 - e^-x)). The CG amplitude step and the band projections
 use the region T map through the same mixing matrices (the fixed scalar T stays the parameter
 file's value when T is not sampled; default behaviour unchanged).
+
+## Stats review of the target (2026-11-02, independent stats-reviewer, before any chain)
+Verdicts: target and derivative sound with three specification gaps (now fixed above and
+here); validation plan insufficient as first written; pre-registered reading not falsifiable
+in part and, decisively, the experiment as designed cannot answer its question on this data set.
+- Log T versus T: the prior is Gaussian in tau, so the induced prior on T_r is log-normal
+  (median exp(mu_tau), one-sd range 16.4 to 24.4 K at the field mean); no Jacobian is needed
+  in tau coordinates. The field is tau = mu_tau + sigma_tau V diag(s_i(rho)) z, the Matern
+  weights of the index field (`gmrf_field.py`), not an iid field.
+- Degeneracy: with s_d at the guard the dust model per region is mu_r g_p sed(nu; beta_r, T_r)
+  with three free numbers, and mu_r is the amplitude at 545 GHz, outside the 23 to 353 GHz
+  bands. Reviewer's Fisher analysis on the E023 sky (true amplitudes, CMB profiled, sync
+  pinned; its known-amplitude beta sds reproduce `fisher_sd_dust_16`): corr(log mu_r, tau_r)
+  +0.91, corr(beta_r, tau_r) -0.97; Fisher sd of T_r with (mu_r, beta_r) free 52 / 310 / 852 /
+  3141 K per quartile (medians), minimum 2.75 K over 3072 regions, against a prior sd of
+  about 3 K from sigma_tau 0.15: **at nside 16 the temperature field is prior-dominated in
+  every region of this sky.** A sky-wide scalar tau with per-region (mu, beta) free has sd(T)
+  0.7 K; at nside 4, 5 of 192 regions are below 2 K; adding 545 and 857 GHz (rms 1/2 and 1/4
+  of the 353 GHz rms in uK_RJ) gives 157 of 3072 regions below 2 K at nside 16 (corr still
+  -0.97). A 10 percent T error moves sed(353)/sed(545) by 3 percent: the F30 multiplier
+  offset of 1.029 is this mechanism.
+- Validation: (i) a T-independent target (a key mismatch or the cached scalar-T SED) would pass
+  a finite-difference test with 0 = 0; a sensitivity check and the independent covariance-form
+  target at several T states are required (added: `test_region_index_likelihood_with_temperature_field_matches_covariance_form`).
+  (ii) The amplitude step (`mixing_regions`, `get_sed_map`, `needs_region_solver`) and the
+  index step build the mixing matrix separately; if T reached only one, the Gibbs chain would
+  have no joint target (added: the state round-trip test checks `mixing_regions` against the
+  component's SED at the T map, and the covariance-form test checks a fixed `T_map` against the
+  sampled field at the same values). (iii) The toy grid must be the numpy marginal times the
+  priors, not the code's own density. (iv) The most informative additional check is an
+  exact-model recovery run at the production nside (sky drawn from the model, full Gibbs
+  chain, coverage of (T_r, beta_r, mu_r) and the D025 check along tau).
+- Reading: criterion (c) was vacuous (no region with Fisher sd of T below 1 K); the beta-only
+  criterion (a) against `bd_trueT` measures the tau prior centre when T is prior-dominated
+  (corr -0.97); both chains must be read against the same reference.
+
+**Design after the review (D026).** The question "does a sampled T field remove the F30 dust
+offsets" cannot be answered by a prior-dominated field with 23 to 353 GHz. Three stages:
+- **Stage A (oracle fixed T map; runs first, after E027):** `T_map` = the true T_d region means
+  at nside 16 (`/Users/trygvels/data/e023_pysm_n1/truth.npz` T_d, ud_grade to 16), everything
+  else as E026 gmrf16_exact_mumap_nc. Tests whether the fixed-T misfit is the cause of the
+  +0.06 bright-quartile dust offset and the 1.029 multipliers. Pre-registered: both the
+  fixed-T chain and this chain read against `bd_trueT` (region fit at the true per-pixel T) in
+  the bright dust quartile; the oracle chain's z median must be within 0.5 and the mu_d map
+  mean within 0.01 of 1; if the offsets remain, the fixed T is not their cause and F30's
+  mechanism statement is withdrawn.
+- **Stage B (sampled scalar log T):** `sample_T: true`, `T_nside: 0`, prior N(log 20, 0.2^2):
+  identifiable (sd 0.7 K) and the production exercise of the code path with the D025 check
+  along tau. Pre-registered: posterior T within 2 sd of the Fisher-weighted truth T (to be
+  computed from the truth file with the dust amplitude weights); the Gibbs-consistency check
+  passes; a scalar T cannot remove a bias from spatial T variation, so (a) and (b) are not
+  criteria here.
+- **Stage C (sampled T field):** needs 545 and 857 GHz in the simulation (a new E023-type sky
+  `e023_pysm_n1_hfi` with 14 bands) and T at nside 4 to 8; the exact-model recovery run is the
+  L3 rung before it. Deferred until E027 and stage A are read. For real data this is the
+  configuration that matters (Planck 545 and 857 GHz exist in intensity).
 
 ## Setup
 Code: `ThermalDust.get_sed(nu, beta, T)` and `get_dsed_dT`; a per-(component, parameter)

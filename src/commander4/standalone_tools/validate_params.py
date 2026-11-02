@@ -124,7 +124,7 @@ def _validate_components(params) -> None:
         }
         class_fields = {
             CMB: {"nu_ref"},
-            ThermalDust: {"beta", "T", "nu_ref", "sample_T", "T_nside", "T_prior", "T_field"}
+            ThermalDust: {"beta", "T", "nu_ref", "T_map", "sample_T", "T_nside", "T_prior", "T_field"}
             | spectral_index_fields,
             Synchrotron: {"beta", "nu_ref"} | spectral_index_fields,
             FreeFree: {"T", "nu_ref"},

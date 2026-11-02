@@ -533,6 +533,12 @@ class RegionIndexLikelihood:
             if spec.comp_name in names and not hasattr(
                     self.active_comps[names.index(spec.comp_name)], spec.attr):
                 raise ValueError(f"Component {spec.comp_name!r} has no {spec.attr!r} to sample.")
+        for comp in self.active_comps:
+            T_map = getattr(comp, "T_map", None)
+            if T_map is not None and T_map.shape != (layout.nreg,):
+                raise ValueError(f"Component {comp.comp_name!r}: T_map at nside {comp.T_nside} "
+                                 f"but the index-field group has {layout.nreg} regions (nside "
+                                 f"{layout.nside_beta}); a fixed T map must be at that nside.")
         for name in layout.hier_names:
             if name in names:
                 view = self.active_comps[names.index(name)]
@@ -628,6 +634,8 @@ class RegionIndexLikelihood:
                         kw["beta"] = betas[comp.comp_name]
                     if c in T_keys:
                         kw["T"] = np.exp(betas[T_keys[c]])
+                    elif getattr(comp, "T_map", None) is not None:      # a fixed T map
+                        kw["T"] = comp.T_map
                     if kw:
                         M_reg[:, :, c] = comp.get_sed(freqs, **kw)
                         if "beta" in kw:

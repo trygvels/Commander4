@@ -377,3 +377,27 @@ as a biased method.
 **Alternatives considered.** Reading off scans only: they measure a smooth field's level (F29).
 A second independent sampler at dimension 12,300: not available; the conditional-CDF test is
 exact for the implemented target at 0.1 s per evaluation.
+
+## D026 (2026-11-02): the sampled dust temperature enters in three stages; a per-region T field is not run on 23 to 353 GHz data
+
+**Decision.** The E028 code (a second sampled spectral parameter per component: log T as a
+scalar or a GMRF field, a fixed `T_map` option, chain I/O, band projections) is kept, but the
+experiment is staged: (A) an oracle fixed T map (true region means at nside 16) to test whether
+the fixed-T misfit causes the F30 dust offsets; (B) a sampled scalar log T (identifiable, sd
+0.7 K) as the production exercise of the code with the D025 check; (C) a sampled T field only
+on a simulation with 545 and 857 GHz, at T nside 4 to 8, after an exact-model recovery run.
+Stage A runs after E027; B and C are scheduled after A is read.
+
+**Why.** The independent stats review of the E028 target showed that with the hier amplitude
+prior (amplitude pinned to mu_r g_p at 545 GHz) and bands to 353 GHz the per-region (mu_r,
+beta_r, T_r) are degenerate (corr(beta, tau) -0.97, corr(log mu, tau) +0.91) and the Fisher sd
+of T_r is 52 K or more in every nside-16 region (minimum 2.75 K) against a prior sd of 3 K:
+a sampled T field at nside 16 would be the prior everywhere and could not answer whether the
+fixed T causes the +0.06 bright-dust offset. The oracle map answers that directly; the scalar
+is the identifiable production test; 545 and 857 GHz make 157 regions identifiable, which is
+the real-data configuration anyway.
+
+**Alternatives considered.** Running the field at nside 16 regardless: a prior-dominated result
+read against a beta reference would measure the prior centre (the review's point). Sampling T
+per pixel: not supported by the region kernel and worse identified. Fixing T from an external
+map on real data: this is stage A's mechanism and remains the fallback (Planck GNILC T).

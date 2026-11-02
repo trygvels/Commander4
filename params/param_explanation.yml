@@ -655,7 +655,10 @@ components:
       # same model as the index (T_nside > 0), with T_prior the Gaussian (hyper)prior on
       # log T in K and T_field the field settings (sigma_scale default 0.15 in log T). The
       # map is written to the chain as T_field/T_map (in K); sed/T stays its mean. The
-      # default is a fixed T.
+      # default is a fixed T. T_map (a FITS map, K, at the index-field nside) fixes a
+      # per-region temperature instead of the scalar T (and starts the sampler when sample_T
+      # is on).
+      # T_map: "/path/to/dust_T_nside16.fits"
       # sample_T: True
       # T_nside: 4
       # T_prior:
