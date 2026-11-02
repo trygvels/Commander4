@@ -122,7 +122,9 @@ mean 1.029 (unchanged from nside 16), s 0.036 / 0.022.
   fewer-regions hypothesis.
 - Dust (c): the mu_d map stays at 1.029 and the bright quartile at +1.44 z against the fixed-T
   reference: the fixed-T absorption is independent of the index resolution, as predicted.
-- The D025 Gibbs-consistency check (K = 100) is running (`conditional_check_gmrf8.txt`).
+- D025 Gibbs-consistency check, K = 100, dust step 0.5 sd (`conditional_check_gmrf8.txt`, 19:10):
+  sync PIT mean 0.490, KS p 0.62, optimum minus draw +0.07 sd; dust 0.481, p 0.49, +0.08 sd:
+  passes.
 
 ## Negative control
 None beyond E026's: the comparison is between valid chains of the same target class. The
