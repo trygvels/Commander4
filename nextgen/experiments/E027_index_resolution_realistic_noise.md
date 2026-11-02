@@ -45,9 +45,15 @@ passed at 17:19 (E026 items 6 and 7; D025). Each rung gets the same check before
    the fixed T), as E021 (`e020_analyze.py --tags`), the metric that includes the
    representation error of a coarse field.
 2. Noise-free region fits at the run's nside (fixed T, the E023 `region_fit`, started at the
-   region mean of beta_s and beta_eff3), per template-S/N quartile at that nside
-   (`e027_refs.py`, written before the analysis): the pseudo-true value of a flat-amplitude
-   region model, as in E026. z and RMSE per quartile with `e026_analyze.py --refs`.
+   region mean of beta_s and beta_eff3), per S/N quartile at that nside (`e027_refs.py`,
+   written before the analysis): the pseudo-true value of a flat-amplitude region model, as in
+   E026. z and RMSE per quartile with `e026_analyze.py --refs`. The quartiles are by the
+   region Fisher sd of the index with the true amplitudes, not by the data-built template as
+   in E023 and E026 (those carry the noise selection recorded in E026: the faint sync quartile
+   sits where the 23 GHz noise is low). At nside 16 the two labellings agree for 51 percent
+   (sync) and 66 percent (dust) of the regions, so the nside-16 rung is re-analysed with the
+   E027 labels (`E027/refs_nside16.npz`; the fixed-T region fits are identical to E023's) and
+   the E026 per-quartile numbers are not compared directly with E027's.
 3. The E026 gmrf16_exact_mumap_nc chain as the nside-16 rung (same data, priors and sampler).
 4. The Fisher-weighted truth means per quartile for the sync aggregate (E026 check: -2.973 in
    the bright quartile, -2.994 in the three faint ones).
