@@ -1,0 +1,2 @@
+realization mode: formula chi -116.756217; quadrature -116.756217; difference -5.23e-12
+expected mode: formula chi+tr -117.0680; mean over 400 noise draws of realization marginals -116.9959 +- 0.4786

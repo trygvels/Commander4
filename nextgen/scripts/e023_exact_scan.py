@@ -78,7 +78,14 @@ class Hyper:
     def __init__(self, kind, qs, qd, reg=None):
         self.kind, self.qs, self.qd = kind, qs, qd
         n = qs.size
-        if kind == "perregmu":
+        self.marg = kind == "perregmarg"
+        if self.marg:
+            # F31: the per-region multipliers of both components are integrated analytically under
+            # N(MU_PRIOR) inside Sky.terms; theta holds only the scatters per quartile
+            self.reg = reg; self.nreg = int(reg.max()) + 1
+            self.nmu = 0
+            self.imu = {"s": np.zeros(n, int), "d": np.zeros(n, int)}
+        elif kind == "perregmu":
             # one mean per nside-16 region (a template-error field at the region scale with a
             # weak prior), one scatter per quartile
             self.nmu = int(reg.max()) + 1
@@ -87,13 +94,14 @@ class Hyper:
             self.nmu = 4 if kind == "perqmu" else 1
             self.imu = {"s": qs if self.nmu == 4 else np.zeros(n, int),
                         "d": qd if self.nmu == 4 else np.zeros(n, int)}
-        self.ns = 4 if kind in ("perq", "perqmu", "perregmu") else 1
+        self.ns = 4 if kind in ("perq", "perqmu", "perregmu", "perregmarg") else 1
         self.dim = 2 * (self.nmu + self.ns)
         self.ils = {"s": qs if self.ns == 4 else np.zeros(n, int), "d": qd if self.ns == 4 else np.zeros(n, int)}
         o = 0
         self.sl = {}
         for name, k in (("mu_s", self.nmu), ("ls_s", self.ns), ("mu_d", self.nmu), ("ls_d", self.ns)):
-            self.sl[name] = slice(o, o + k); o += k
+            if k:
+                self.sl[name] = slice(o, o + k); o += k
 
     def theta0(self):
         return np.concatenate([[1.0] * self.nmu, [LOGS_PRIOR[0]] * self.ns, [1.0] * self.nmu, [LOGS_PRIOR[0]] * self.ns])
@@ -102,20 +110,26 @@ class Hyper:
         return [(None, None)] * self.nmu + [(LOGS_MIN, 3.0)] * self.ns + [(None, None)] * self.nmu + [(LOGS_MIN, 3.0)] * self.ns
 
     def expand(self, th):
+        if self.marg:      # means are placeholders (integrated out in Sky.terms)
+            return (np.ones(self.qs.size), th[self.sl["ls_s"]][self.ils["s"]],
+                    np.ones(self.qs.size), th[self.sl["ls_d"]][self.ils["d"]])
         return (th[self.sl["mu_s"]][self.imu["s"]], th[self.sl["ls_s"]][self.ils["s"]],
                 th[self.sl["mu_d"]][self.imu["d"]], th[self.sl["ls_d"]][self.ils["d"]])
 
     def reduce(self, dmu_s, dls_s, dmu_d, dls_d):
         g = np.empty(self.dim)
-        g[self.sl["mu_s"]] = np.bincount(self.imu["s"], dmu_s, self.nmu)
+        if not self.marg:
+            g[self.sl["mu_s"]] = np.bincount(self.imu["s"], dmu_s, self.nmu)
+            g[self.sl["mu_d"]] = np.bincount(self.imu["d"], dmu_d, self.nmu)
         g[self.sl["ls_s"]] = np.bincount(self.ils["s"], dls_s, self.ns)
-        g[self.sl["mu_d"]] = np.bincount(self.imu["d"], dmu_d, self.nmu)
         g[self.sl["ls_d"]] = np.bincount(self.ils["d"], dls_d, self.ns)
         return g
 
     def hyperprior(self, th):
         lp, g = 0.0, np.zeros(self.dim)
         for name in ("mu_s", "mu_d"):
+            if name not in self.sl:
+                continue
             x = th[self.sl[name]]; lp += np.sum(-0.5 * ((x - MU_PRIOR[0]) / MU_PRIOR[1])**2)
             g[self.sl[name]] = -(x - MU_PRIOR[0]) / MU_PRIOR[1]**2
         for name in ("ls_s", "ls_d"):
@@ -130,6 +144,9 @@ class Hyper:
             if x.size > 8:
                 return f"[{x.size} values: mean {x.mean():.4f} sd {x.std():.4f} min {x.min():.3f} max {x.max():.3f}]"
             return str(np.round(x, 4).tolist())
+        if self.marg:
+            return (f"[multipliers integrated, prior sd {MU_PRIOR[1]}] s_s {f(np.exp(th[self.sl['ls_s']]))} "
+                    f"s_d {f(np.exp(th[self.sl['ls_d']]))}")
         return (f"mu_s {f(th[self.sl['mu_s']])} s_s {f(np.exp(th[self.sl['ls_s']]))} "
                 f"mu_d {f(th[self.sl['mu_d']])} s_d {f(np.exp(th[self.sl['ls_d']]))}")
 
@@ -149,9 +166,12 @@ class Sky:
         Tv = np.stack([np.full(self.n, CMB_SD**2), (np.exp(ls_s) * self.gs)**2,
                        (np.exp(ls_d) * self.gd)**2], -1)
         C = np.einsum("nij,nj,nkj->nik", M, Tv, M) + self.rms2[:, None, :] * np.eye(12)[None]
-        r = (self.sky if expected else self.d) - np.einsum("nij,nj->ni", M, m)
         L = np.linalg.cholesky(C)
         ld = -np.log(np.einsum("nii->ni", L)).sum()
+        if getattr(hyper, "marg", False):
+            chi_m, tr_m, _ = self._marginal_terms(M, C, L, hyper, expected)
+            return chi_m, ld, tr_m, None
+        r = (self.sky if expected else self.d) - np.einsum("nij,nj->ni", M, m)
         sol = np.linalg.solve(C, r[..., None])[..., 0]
         chi = -0.5 * np.einsum("ni,ni->", r, sol)
         tr = 0.0
@@ -173,7 +193,47 @@ class Sky:
             dls_d = dls_d + Tv[:, 2] * vNv[:, 2]
         return chi, ld, tr, hyper.reduce(dmu_s, dls_s, dmu_d, dls_d)
 
+    def _marginal_terms(self, M, C, L, hyper, expected):
+        """(chi with the per-region multipliers of both hier components integrated analytically,
+        trace, None): per pixel d = G mu_r + rest with G = [M_s g_s, M_d g_d] (12 x 2); the exponent
+        is quadratic in mu_r = (mu_s, mu_d) of the pixel's region, so with the prior N(MU_PRIOR)
+        per entry the integral per region is 1/2 beta^T Q^-1 beta - 1/2 log det Q with
+        Q = sum_p G^T C^-1 G + I / sd^2 and beta = sum_p G^T C^-1 d + 1 / sd^2 (F31). In the
+        expected mode d is the noiseless sky and the noise adds 1/2 tr(Q^-1 Cov_r) with
+        Cov_r = sum_p G^T C^-1 N C^-1 G, plus the usual -1/2 tr(C^-1 N). Returns (chi, tr, None)
+        with the order of `terms` restored by the caller."""
+        reg, nreg = hyper.reg, hyper.nreg
+        sd2 = MU_PRIOR[1]**2
+        d = self.sky if expected else self.d
+        G = np.stack([M[:, :, 1] * self.gs[:, None], M[:, :, 2] * self.gd[:, None]], -1)   # (n, 12, 2)
+        Cid = np.linalg.solve(C, d[..., None])[..., 0]
+        CiG = np.linalg.solve(C, G)                                           # (n, 12, 2)
+        c_p = -0.5 * np.einsum("ni,ni->n", d, Cid)
+        b_p = np.einsum("nij,ni->nj", G, Cid)                                 # (n, 2)
+        A_p = np.einsum("nij,nik->njk", G, CiG)                               # (n, 2, 2)
+        c_r = np.bincount(reg, c_p, nreg)
+        b_r = np.stack([np.bincount(reg, b_p[:, k], nreg) for k in range(2)], -1) + MU_PRIOR[0] / sd2
+        Q = np.stack([np.bincount(reg, A_p[:, j, k], nreg) for j in range(2) for k in range(2)], -1).reshape(nreg, 2, 2)
+        Q[:, 0, 0] += 1.0 / sd2; Q[:, 1, 1] += 1.0 / sd2
+        Qinv = np.linalg.inv(Q)
+        chi = float(c_r.sum() + 0.5 * np.einsum("ri,rij,rj->", b_r, Qinv, b_r)
+                    - 0.5 * np.linalg.slogdet(Q)[1].sum() - nreg * (MU_PRIOR[0]**2 / sd2 + np.log(sd2)))
+        tr = 0.0
+        if expected:
+            Cov_p = np.einsum("ni,nij,nik->njk", self.rms2, CiG, CiG)        # (n, 2, 2)
+            Cov_r = np.stack([np.bincount(reg, Cov_p[:, j, k], nreg) for j in range(2) for k in range(2)], -1).reshape(nreg, 2, 2)
+            chi += 0.5 * float(np.einsum("rij,rji->", Qinv, Cov_r))
+            Cinv_diag = np.einsum("nij,nij->ni", np.linalg.inv(L).transpose(0, 2, 1), np.linalg.inv(L).transpose(0, 2, 1))
+            tr = -0.5 * float(np.einsum("ni,ni->", self.rms2, Cinv_diag))
+        return chi, tr, None
+
     def objective(self, Ms, Md, hyper, expected):
+        if getattr(hyper, "marg", False):
+            def f0(th):
+                chi, ld, tr, _ = self.terms(Ms, Md, th, hyper, expected)
+                lp, _ = hyper.hyperprior(th)
+                return -(chi + ld + tr + lp)
+            return f0
         def f(th):
             chi, ld, tr, g = self.terms(Ms, Md, th, hyper, expected, grad=True)
             lp, gp = hyper.hyperprior(th)
@@ -182,6 +242,12 @@ class Sky:
 
     def profile(self, Ms, Md, th0, hyper, expected):
         f = self.objective(Ms, Md, hyper, expected)
+        if getattr(hyper, "marg", False):       # 8 scatters, finite-difference gradient
+            res = minimize(f, th0, method="L-BFGS-B", bounds=hyper.bounds(),
+                           options={"maxiter": 200, "ftol": 1e-12, "gtol": 1e-4, "eps": 1e-5})
+            chi, ld, tr, _ = self.terms(Ms, Md, res.x, hyper, expected)
+            lp, _ = hyper.hyperprior(res.x)
+            return res.x, dict(chi=float(chi), ld=float(ld), tr=float(tr), lp=float(lp)), res.nfev
         res = minimize(f, th0, jac=True, method="L-BFGS-B", bounds=hyper.bounds(),
                        options={"maxiter": 300 if hyper.dim < 100 else 3000, "ftol": 1e-13,
                                 "gtol": 1e-5, "maxcor": 10 if hyper.dim < 100 else 50})
@@ -244,7 +310,7 @@ def quartiles(f):
 
 
 def main():
-    global CMB_SD
+    global CMB_SD, MU_PRIOR
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", required=True)
     ap.add_argument("--out", required=True)
@@ -268,10 +334,15 @@ def main():
                          "redone at that T and the expected target profiled at the reference for every cell "
                          "in --cells (fixT cells only); prints the total per T, whose argmax is the pseudo-true "
                          "scalar T of the pinned-amplitude model. Then exits.")
+    ap.add_argument("--mu-sd", type=float, default=None, help="hyperprior sd of the template multipliers (default 0.5)")
+    ap.add_argument("--marg-fixed-s", type=int, default=1,
+                    help="perregmarg cells: hold the scatters at their delta-0 profile along a scan (1) or re-profile (0)")
     ap.add_argument("--ref-npz", default=None,
                     help="npz with bs, bd (nside-16 region values) replacing the noise-free region-fit reference for every SED level (e.g. a chain posterior-mean state)")
     a = ap.parse_args()
     CMB_SD = a.cmb_sd
+    if a.mu_sd is not None:
+        MU_PRIOR = (MU_PRIOR[0], float(a.mu_sd))
     D = a.dir
     t = np.load(f"{D}/truth.npz")
     nside = int(t["nside"]); npix = hp.nside2npix(nside)
@@ -393,7 +464,7 @@ def main():
             t0 = time.time()
             th0, p0, nfev = sky.profile(sync_sed(bs0), dust_sed(bd0, T), hyper.theta0(), hyper, expected)
             tot0 = p0["chi"] + p0["ld"] + p0["tr"] + p0["lp"]
-            use_lap = a.laplace_at and hyper.dim <= 100      # no finite-difference Hessian of 6000 parameters
+            use_lap = a.laplace_at and hyper.dim <= 100 and not hyper.marg   # no FD Hessian of 6000 parameters
             lap0 = sky.laplace(sync_sed(bs0), dust_sed(bd0, T), th0, hyper, expected) if use_lap else 0.0
             say(f"\n== cell {cell} [{mode}]: profiled at the reference field ({nfev} evals, {time.time()-t0:.1f} s): "
                 f"{hyper.fmt(th0)}; chi2 {p0['chi']:.1f}, logdet {p0['ld']:.1f}, trace {p0['tr']:.1f}, "
@@ -401,8 +472,10 @@ def main():
             if kind != "global":
                 for c in ("s", "d"):
                     comp = "sync" if c == "s" else "dust"
-                    sq = np.exp(th0[hyper.sl[f"ls_{c}"]]); mq = th0[hyper.sl[f"mu_{c}"]]
-                    if kind == "perregmu":
+                    sq = np.exp(th0[hyper.sl[f"ls_{c}"]]); mq = th0[hyper.sl[f"mu_{c}"]] if not hyper.marg else np.array([])
+                    if hyper.marg:
+                        mq_desc = "multipliers integrated"
+                    elif kind == "perregmu":
                         q16 = qs16 if c == "s" else qd16
                         mq_desc = "per-quartile mean/sd of the region means " + " ".join(
                             f"{mq[q16 == k].mean():.3f}/{mq[q16 == k].std():.3f}" for k in range(4))
@@ -429,7 +502,12 @@ def main():
                     bs = bs0 + dl * sel if comp == "s" else bs0
                     bd = bd0 + dl * sel if comp == "d" else bd0
                     Ms, Md = sync_sed(bs), dust_sed(bd, T)
-                    th, p, nfev = sky.profile(Ms, Md, th, hyper, expected)
+                    if hyper.marg and a.marg_fixed_s:      # scatters held at the delta-0 profile
+                        chi_, ld_, tr_, _ = sky.terms(Ms, Md, th0, hyper, expected)
+                        lp_, _ = hyper.hyperprior(th0)
+                        th, p = th0, dict(chi=float(chi_), ld=float(ld_), tr=float(tr_), lp=float(lp_))
+                    else:
+                        th, p, nfev = sky.profile(Ms, Md, th, hyper, expected)
                     lap = sky.laplace(Ms, Md, th, hyper, expected) - lap0 if k in lap_idx else float("nan")
                     rows.append(dict(delta=float(dl), chi=p["chi"] - p0["chi"], ld=p["ld"] - p0["ld"], tr=p["tr"] - p0["tr"],
                                      lp=p["lp"] - p0["lp"], total=p["chi"] + p["ld"] + p["tr"] + p["lp"] - tot0, laplace=lap, theta=th.copy()))
