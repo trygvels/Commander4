@@ -378,6 +378,11 @@ as a biased method.
 A second independent sampler at dimension 12,300: not available; the conditional-CDF test is
 exact for the implemented target at 0.1 s per evaluation.
 
+**Addendum (2026-11-02, 20:27).** Negative control done on the E027 gmrf4 chain: three
+corrupted targets (narrowed field-mean prior, 1.5 x noise, wrong template) fail the check at
+K = 100 while the true target passes (`E027/negctrl_gmrf4_*.txt`); the check is quotable as
+evidence under the VALIDATION conditions.
+
 ## D026 (2026-11-02): the sampled dust temperature enters in three stages; a per-region T field is not run on 23 to 353 GHz data
 
 **Decision.** The E028 code (a second sampled spectral parameter per component: log T as a

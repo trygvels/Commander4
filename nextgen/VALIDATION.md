@@ -60,7 +60,12 @@ be traced to a cause (method, prior, model, data) before it is claimed.
   (`nextgen/scripts/e026_conditional_check.py`). A chain that fails is not read. Stats-review
   additions (E026): K >= 100 draws (K = 20 detects only KS D > 0.3), a scan step of at most
   one conditional sd, and a negative control (a deliberately corrupted target or chain must
-  fail the check) before the check is quoted as evidence.
+  fail the check) before the check is quoted as evidence. Negative control done (E027, 2026-11-02,
+  `E027/negctrl_gmrf4_*.txt`): a narrowed prior on the field mean (optimum 1.4 conditional sd
+  off), 1.5 times the noise rms, and a wrong template all fail at K = 100 (`--index-prior-rms`,
+  `--noise-scale` in the script); a corruption that leaves the scanned conditional unchanged is
+  not detected, so scan every field mean and, where a claim rests on a hyperparameter, that
+  coordinate too.
 - Marginal, not profile, for nuisance multipliers in exact-target scans (F31): per-region
   amplitude multipliers are integrated analytically (closed form in mu_r); profiled scans are
   biased (Neyman-Scott) and global-multiplier scans are a different model. The roughness

@@ -22,7 +22,8 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 
 **Next**
 - E029 reading against its pre-registered criteria, then stage A and B readings against
-  `bd_trueT`; the conditional-CDF negative control (corrupted target) required by VALIDATION.
+  `bd_trueT`. Done 20:27: the conditional-CDF negative control (three corrupted targets fail
+  at K = 100, the true target passes; VALIDATION and D025 updated).
 
 **Needs Trygve**
 - Unchanged: the multiplier hyperprior width as a default (pending E029), the Paper A reporting

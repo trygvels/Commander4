@@ -167,8 +167,26 @@ rho 123 +- 32 deg, mu 1.581 +- 0.013; mu_s map mean 0.997, mu_d map mean 1.030, 
   the mu maps at nside 16); only the whole-map mu-map line is meaningful there.
 
 ## Negative control
-None beyond E026's: the comparison is between valid chains of the same target class. The
-nside-16 rung (E026) carries the pre-registered reading (a) to (c) as its baseline.
+The comparison is between valid chains of the same target class; the nside-16 rung (E026)
+carries the pre-registered reading (a) to (c) as its baseline.
+
+Negative control of the D025 check itself (VALIDATION requirement, run 20:25 to 20:27 on the
+gmrf4 chain with K = 100, the same grid as the passing check; `--index-prior-rms` and
+`--noise-scale` added to `e026_conditional_check.py` for this): the check evaluated against a
+deliberately corrupted target must fail.
+- Prior on the field mean narrowed from rms 0.3 to 0.05 (`negctrl_gmrf4_indexprior005.txt`):
+  sync PIT mean 0.824, KS p 0.000, optimum minus draw -1.37 conditional sd (predicted from the
+  prior pull toward -3.1: about -1.7 sd); dust unchanged (p 0.25, -0.06 sd) because the dust
+  field mean 1.58 sits at the prior mean 1.6, so this corruption does not move its conditional.
+- Noise rms scaled by 1.5 (`negctrl_gmrf4_noise15.txt`): dust PIT mean 0.249, KS p 0.000,
+  optimum +0.83 sd (the Occam and hyperprior terms gain weight against a weaker likelihood);
+  sync p 0.033 (the conditional sd widens from 0.018 to 0.026, a mild over-concentration of
+  the PIT values).
+- cs synchrotron template in place of the exact one (`negctrl_gmrf4_cstemplate.txt`): both
+  components fail completely (sync optimum +35 sd from the draw, dust -10.5 sd, KS D 1.0).
+A change of the target as small as 1.4 conditional sd along the scanned coordinate is
+detected at K = 100; a corruption that leaves the scanned conditional unchanged (the dust case
+under the narrowed prior) is not, which is the known limit of a one-coordinate check.
 
 ## Conclusion
 At the E012 noise depth with exact templates, the index-field resolution between nside 4 and

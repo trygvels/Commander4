@@ -8,6 +8,8 @@ draw's own mu_c must be uniform on (0, 1) over draws if the chain samples its ta
 is, conditionally on the rest, a draw from this 1-d density). Reports the CDF values, a KS
 statistic, and the conditional optimum relative to the draw.
 usage: e026_conditional_check.py --dir DIR --tag TAG --sync-template F --dust-template F [--k 20]
+Negative controls (VALIDATION, D025): --index-prior-rms, --noise-scale or a wrong template corrupt
+the target; the check must then fail.
 """
 import argparse, glob, sys, time
 ap = argparse.ArgumentParser(); ap.add_argument("--dir", required=True); ap.add_argument("--tag", required=True)
@@ -16,6 +18,8 @@ ap.add_argument("--mu-nside", type=int, default=16); ap.add_argument("--cmb-sd",
 ap.add_argument("--k", type=int, default=20); ap.add_argument("--burn", type=int, default=500); ap.add_argument("--nside-beta", type=int, default=16)
 ap.add_argument("--half-width", type=float, nargs=2, default=[0.10, 0.015], help="scan half-widths (sync, dust)")
 ap.add_argument("--points", type=int, default=11)
+ap.add_argument("--index-prior-rms", type=float, default=0.3, help="negative control: rms of the Gaussian prior on the field mean (chains use 0.3)")
+ap.add_argument("--noise-scale", type=float, default=1.0, help="negative control: multiply the noise rms (chains use 1.0)")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
 import numpy as np, healpy as hp, h5py
 from scipy.stats import kstest
@@ -27,13 +31,13 @@ from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust
 D = a.dir; NSIDE, NB = 64, a.nside_beta
 bands = [23, 30, 33, 41, 44, 61, 70, 94, 100, 143, 217, 353]; freqs = np.array(bands, float)
 maps = np.array([hp.read_map(f"{D}/band{b:03d}_map.fits", field=0) for b in bands])
-inv_var = 1.0 / np.array([hp.read_map(f"{D}/band{b:03d}_rms.fits", field=0) for b in bands])**2
+inv_var = 1.0 / (a.noise_scale * np.array([hp.read_map(f"{D}/band{b:03d}_rms.fits", field=0) for b in bands]))**2
 t = np.load(f"{D}/truth.npz"); T_fixed = float(t["T_fixed"])
 
 def comp(cls, name, short, beta0, **sed):
     p = Bunch(polarization="I", shortname=short, spatially_varying_MM=False, Cl_prior_amplitude=None,
               lmax=191, units="uK_RJ", sample_spectral_index=True, spectral_index_nside=NB,
-              spectral_index_prior=Bunch(type="gaussian", mean=beta0, rms=0.3),
+              spectral_index_prior=Bunch(type="gaussian", mean=beta0, rms=a.index_prior_rms),
               spectral_index_field=Bunch(type="gmrf", basis="graph", alpha=2.0, sigma_scale=0.3,
                                          rho_prior="loguniform"), beta=beta0, **sed)
     object.__setattr__(p, "_name", name)
