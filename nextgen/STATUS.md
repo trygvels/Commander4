@@ -2,6 +2,41 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-02 (Mac mini, 14:10): E026 non-centred chains valid; exact-template offsets traced to the model at realistic noise; single-sync-index check running
+
+**Learned**
+- Non-centred E026 chains mix (field hyperparameter ESS 24 to 143, worst dust cs_mumap at 5). Against
+  the exact-template run, the cs template with per-region multipliers costs +0.19 (sync) and
+  +0.02 (dust) pixel-level RMSE; the scalar law +0.48 and +0.24 (sync field scale 0.87, a
+  catastrophe). Dust with cs templates: bright quartile as good as exact (0.069 against 0.072),
+  fainter quartiles 1.3 to 1.7 times worse, no extra bias; sync with cs templates: 2 to 3 times
+  worse RMSE, field scale 0.35.
+- The exact-template run itself is off: sync aggregate -2.868 +- 0.042 (truth -3.00; data-term
+  optimum -3.00 +- 0.03 by whole-sky scan), bright dust +0.06 with the dust mu map at 1.029.
+  Full-target evaluation: the chain's posterior-mean state is 2696 nats above the reference
+  state, so these are model properties at this depth: the fixed-T misfit is absorbed by the
+  per-region multipliers and the bright dust index (1191 + 375 nats), which a global mu could
+  not do (E025 saw +0.5 percent); the sync field is prior-dominated in every region (posterior
+  sd 0.13 to 0.15 from a field scale of 0.14 +- 0.05 that the data barely constrain).
+- The template-S/N quartiles are built from the data-built 23 GHz template, so on one
+  realization the faint sync quartile selects low 23 GHz noise (-12 SE there): per-quartile
+  statistics of single realizations carry this selection; the posterior does not.
+- The per-pixel GLS CMB at realistic noise is noise (93 uK): the CMB metric of the analyzer is
+  uninformative in this regime.
+
+**Running**
+- exact_syncscalar_mumap_nc (one sync index, dust field and mu maps as before; from 13:54, a
+  few hours): does the field model's freedom produce the +0.13 sync aggregate?
+
+**Next**
+- Read the sync-scalar check; E026 Conclusion. Likely E027: index resolution at realistic noise
+  (gmrf4 and gmrf8 with exact templates, parameter files ready) to place the regime boundary for
+  Paper A; sampled or at least region-wise T_d before per-region multipliers are used for dust.
+
+**Needs Trygve**
+- Unchanged; the realistic-noise regime boundary (sync regions at nside 16 unconstrained at
+  E012 noise) is a Paper A framing question.
+
 ## 2026-10-31 (Mac mini, 13:40): E026 centred chains invalid (funnel at realistic noise); non-centred reruns started (D024)
 
 **Learned**
