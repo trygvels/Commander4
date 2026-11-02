@@ -1,0 +1,36 @@
+E023 exact-target scans (v2) on /Users/trygvels/data/e023_pysm_n1: nside 64, noise scale 1.0, CMB prior sd 10000, T_fixed 20.929 K; truth sd beta_s 0.0629, beta_eff3 0.0516, beta_d 0.0374
+  sync quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 1.0021 2.5343 3.2427 3.6588; block sd (quartile, amplitudes known) 0.01801 0.07830 0.10093 0.11643
+  dust quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 0.0599 0.2895 0.7586 1.4540; block sd (quartile, amplitudes known) 0.00065 0.00887 0.01966 0.03014
+  data template sync: g/true at |b|>20 16/50/84 pct 0.199/0.991/1.793
+  data template dust: g/true at |b|>20 16/50/84 pct 0.023/1.078/2.614
+  cs template: log error field rms 0.3, FWHM 10.0 deg, seed 11; realized exp(-f) mean/sd sync 1.007/0.309, dust 1.060/0.319
+  realized a/g (data template, sync) mean/sd per quartile: 0.865/0.278 0.796/0.359 2.264/21.793 140.607/212.228
+  realized a/g (data template, dust) mean/sd per quartile: 0.879/0.346 0.876/5.851 5.914/29.806 48.258/63.291
+  realized a/g (exact template, sync) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (exact template, dust) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (cs template, sync) mean/sd per quartile: 0.994/0.299 1.032/0.317 0.994/0.306 1.008/0.314
+  realized a/g (cs template, dust) mean/sd per quartile: 1.063/0.300 1.056/0.305 1.061/0.336 1.061/0.333
+  reference (fixT): region fit in 11 s; fit minus region mean: sync rms 0.0564 max 0.4537, dust rms 0.0117 max 0.1224; at the bounds: 0 sync, 0 dust
+  reference (trueT): region fit in 10 s; fit minus region mean: sync rms 0.0209 max 0.4886, dust rms 0.0094 max 0.1184; at the bounds: 0 sync, 0 dust
+== T grid for cell exact_fixT_global [expected]: scalar T, region fit redone per T, hyperparameters profiled
+   T  18.00 K: total -3606372.26 (chi2 -258.2 logdet -3336016.7 trace -270092.6 hyperprior -4.68); bd fit mean 1.5997, bs fit mean -3.0108; 23 evals, 18 s
+   T  19.00 K: total -3606362.42 (chi2 -249.0 logdet -3336011.7 trace -270097.0 hyperprior -4.74); bd fit mean 1.5737, bs fit mean -2.9991; 26 evals, 18 s
+   T  20.00 K: total -3606356.43 (chi2 -243.4 logdet -3336008.5 trace -270099.7 hyperprior -4.77); bd fit mean 1.5505, bs fit mean -2.9888; 27 evals, 20 s
+   T  20.50 K: total -3606354.56 (chi2 -241.7 logdet -3336007.5 trace -270100.6 hyperprior -4.78); bd fit mean 1.5398, bs fit mean -2.9841; 27 evals, 22 s
+   T  20.93 K: total -3606353.44 (chi2 -240.7 logdet -3336006.8 trace -270101.2 hyperprior -4.78); bd fit mean 1.5310, bs fit mean -2.9802; 63 evals, 37 s
+   T  21.50 K: total -3606352.57 (chi2 -240.0 logdet -3336006.1 trace -270101.7 hyperprior -4.78); bd fit mean 1.5199, bs fit mean -2.9755; 30 evals, 25 s
+   T  22.00 K: total -3606352.30 (chi2 -239.8 logdet -3336005.8 trace -270102.0 hyperprior -4.78); bd fit mean 1.5107, bs fit mean -2.9715; 29 evals, 26 s
+   T  22.50 K: total -3606352.42 (chi2 -240.0 logdet -3336005.6 trace -270102.1 hyperprior -4.77); bd fit mean 1.5019, bs fit mean -2.9677; 28 evals, 26 s
+   T  23.00 K: total -3606352.88 (chi2 -240.5 logdet -3336005.6 trace -270102.0 hyperprior -4.76); bd fit mean 1.4935, bs fit mean -2.9642; 29 evals, 26 s
+   T  24.00 K: total -3606354.64 (chi2 -242.4 logdet -3336006.0 trace -270101.6 hyperprior -4.73); bd fit mean 1.4779, bs fit mean -2.9576; 31 evals, 25 s
+== T grid for cell exact_fixT_perregmu [expected]: scalar T, region fit redone per T, hyperparameters profiled
+   T  18.00 K: total -3606275.38 (chi2 -182.6 logdet -3336064.2 trace -270020.1 hyperprior -8.52); bd fit mean 1.5997, bs fit mean -3.0108; 300 evals, 135 s
+   T  19.00 K: total -3606275.47 (chi2 -182.5 logdet -3336066.2 trace -270018.7 hyperprior -8.15); bd fit mean 1.5737, bs fit mean -2.9991; 312 evals, 136 s
+   T  20.00 K: total -3606276.92 (chi2 -183.4 logdet -3336068.3 trace -270017.0 hyperprior -8.27); bd fit mean 1.5505, bs fit mean -2.9888; 319 evals, 138 s
+   T  20.50 K: total -3606278.02 (chi2 -184.0 logdet -3336069.2 trace -270016.4 hyperprior -8.46); bd fit mean 1.5398, bs fit mean -2.9841; 321 evals, 141 s
+   T  20.93 K: total -3606279.12 (chi2 -184.7 logdet -3336070.1 trace -270015.7 hyperprior -8.68); bd fit mean 1.5310, bs fit mean -2.9802; 316 evals, 121 s
+   T  21.50 K: total -3606280.76 (chi2 -185.7 logdet -3336071.2 trace -270014.8 hyperprior -9.04); bd fit mean 1.5199, bs fit mean -2.9755; 296 evals, 124 s
+   T  22.00 K: total -3606282.34 (chi2 -186.7 logdet -3336072.1 trace -270014.1 hyperprior -9.41); bd fit mean 1.5107, bs fit mean -2.9715; 310 evals, 118 s
+   T  22.50 K: total -3606284.02 (chi2 -187.8 logdet -3336073.1 trace -270013.3 hyperprior -9.82); bd fit mean 1.5019, bs fit mean -2.9677; 318 evals, 123 s
+   T  23.00 K: total -3606285.78 (chi2 -188.9 logdet -3336074.0 trace -270012.6 hyperprior -10.26); bd fit mean 1.4935, bs fit mean -2.9642; 320 evals, 123 s
+   T  24.00 K: total -3606289.49 (chi2 -191.3 logdet -3336075.9 trace -270011.1 hyperprior -11.23); bd fit mean 1.4779, bs fit mean -2.9576; 323 evals, 124 s
