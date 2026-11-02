@@ -143,6 +143,13 @@ a_dust^2-weighted 22.64 K, the |a_dust|-weighted 20.10 K; the value a scalar T e
 the pinned-amplitude model is computed before the chain is read (noise-free fit of one T with
 per-region (mu_r, beta_r) free, the reviewer's construction), and the 2-sd criterion refers to
 that value.
+Grid scan (`E028/Tgrid_scan_global_and_profiled.txt`, 18:17, expected mode, region fit redone
+at every T): under the global law (one multiplier per component) the optimum is at 22.1 K with
+a curvature sd of 0.8 K (the a_dust^2-weighted truth is 22.6 K; the dust index fit drops from
+1.600 at 18 K to 1.478 at 24 K, the beta-T degeneracy). The per-region-profiled rows of that
+file are invalid (F31: the profiled multipliers prefer the low end monotonically); the
+pseudo-true value under the chain's own law (multipliers integrated, `perregmarg`) is being
+computed (`Tgrid_scan_marginal.txt`) and is the stage B reference.
 ```bash
 python -m pytest -q tests/test_components.py tests/test_index_field.py tests/test_index_field_sampler.py tests/test_hier_group_wiring.py
 mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_mumap_nc_T.yml
