@@ -200,6 +200,34 @@ the data-term optimum -3.00 +- 0.03. A run with a single sync index on the same 
 field and mu maps unchanged, `chains_exact_syncscalar_mumap_nc/`, started 13:54) tests whether
 the field model's extra freedom produces that offset.
 
+**Where the +0.13 sync aggregate comes from (2026-11-02 16:44 to 17:30; `E026/sync_level_check.txt`,
+`nextgen/scripts/e026_sync_level_check.py`; chain-state scan `E026/chainstate_scan_exact.txt`).**
+(1) The single-sync-index run (`chains_exact_syncscalar_mumap_nc`, 1200 iterations, 0 post-burn
+divergences, dust field and mu maps as in the field run: dust field mean 1.5785, mu_d map 1.028)
+gives beta_s = -2.944 +- 0.031 (ESS 130), +0.039 (1.3 sd) above its pseudo-true value, the
+Fisher-weighted truth mean -2.983 (the sky's unweighted mean -3.000 is not what a scalar fit
+estimates). No significant offset for a single index. (2) The field run's aggregate posterior
+is symmetric (skew 0.04 for mu and for the field mean; per-region skew 0.08), so the offset is
+not the mean of a skewed marginal. (3) The bright quartile holds 90 percent of the sync Fisher
+weight, and there the field agrees with the region-fit reference: the 10 / 30 / 100 / 300
+regions with the largest Fisher weight (31 / 50 / 67 / 82 percent of it; region Fisher sds 0.10
+to 0.55, posterior sds 0.08 to 0.12) sit -0.02 / +0.03 / +0.03 / +0.03 from the reference with
+z medians -0.6 / +0.2 / 0.0 / +0.2 and 77 to 90 percent inside |z| < 1. The Fisher-weighted
+level of the posterior-mean field is -2.978 against a Fisher-weighted truth of -2.988 and
+reference of -3.009. (4) The unweighted field mean (mu, the constant mode the basis excludes)
+is +0.13 because the three faint quartiles (10 percent of the Fisher weight, region Fisher sds
+2.5 to 3.7, posterior sds 0.15 set by the field scale) float at +0.12 to +0.14 above their
+references, while the bright quartile sits at -0.034 below mu. So at this depth the field's
+unweighted mean is not a data-determined quantity; the data determine the Fisher-weighted
+level, and that is right to 0.01 (truth) and 0.03 (one sd of the full-sky constraint,
+reference). The E026 statement "sync aggregate 3 sd high" compared a prior-dominated quantity
+(mu) with the truth; the sd 0.042 is the posterior sd of the floating level, not of a data
+constraint, and the comparison that matters is (3). What sets the faint level at +0.13 rather
+than at the truth is checked by a whole-sky shift scan of the exact target around the chain's
+posterior-mean state (`--ref-npz`): with one global multiplier the data term prefers a shift
+of -0.14 (12 nats, curvature sd 0.030) in both modes, which cannot be read directly because the
+chain's law has 3072 multipliers; the per-region-multiplier cells are recorded below.
+
 ## Negative control
 gmrf16_cs_scalar (the scalar law the scans showed biased) must show the predicted dust and sync
 biases; if it does not, either the scans or the chains are wrong and the record says which.

@@ -3,7 +3,7 @@
 region-fit reference, per template-S/N quartile, plus the hier hyperparameters (scalar mu or mu
 map against the realized template error) and the ESS of every block.
 
-usage: e026_analyze.py --dir DIR --refs E023/scan_n1_refs.npz --tags TAG [TAG ...] [--burn 500]
+usage: e026_analyze.py --dir DIR --refs E023/scan_n1_refs.npz (or E027/refs_nside8.npz: the reference sets the index nside) --tags TAG [TAG ...] [--burn 500]
        [--cs-scatter 0.3 --cs-fwhm 10 --cs-seed 11]   (the cs template's error field, for the mu map)
 """
 import argparse, glob
@@ -34,14 +34,15 @@ def main():
     refs = np.load(a.refs)
     ref = {"sync": refs["bs_fixT"], "dust": refs["bd_fixT"]}
     quart = {"sync": refs["qs16"], "dust": refs["qd16"]}
-    truth16 = {"sync": hp.ud_grade(np.asarray(t["beta_s"], float), 16),
-               "dust": hp.ud_grade(np.asarray(t["beta_eff3"], float), 16)}
+    nside_b = hp.npix2nside(ref["sync"].size)          # the index nside of the reference (16, 8 or 4)
+    truth16 = {"sync": hp.ud_grade(np.asarray(t["beta_s"], float), nside_b),
+               "dust": hp.ud_grade(np.asarray(t["beta_eff3"], float), nside_b)}
     # the cs template's error field (same construction as the FITS writer): exp(-f) per region
     lmax = 3 * nside - 1; sig_b = np.radians(a.cs_fwhm) / np.sqrt(8 * np.log(2)); ell = np.arange(lmax + 1)
     cl = np.exp(-ell * (ell + 1) * sig_b**2); np.random.seed(a.cs_seed); expf = {}
     for k in ("sync", "dust"):
         f = hp.synfast(cl, nside, lmax=lmax, new=True); f = f / f.std() * a.cs_scatter
-        expf[k] = hp.ud_grade(np.exp(-f), 16)       # region mean of exp(-f) (the realized a/g)
+        expf[k] = hp.ud_grade(np.exp(-f), nside_b)  # region mean of exp(-f) (the realized a/g)
     comp_of = {"sync": "Synchrotron", "dust": "ThermalDust"}
     for tag in a.tags:
         files = sorted(glob.glob(f"{a.dir}/chains_{tag}/chains_compsep/chain01_iter*.h5"))
@@ -78,14 +79,14 @@ def main():
                 print(f"      mu (scalar): mean {M[:, 0].mean():.4f} sd {M[:, 0].std():.4f} ESS {ess(M[:, 0]):.0f}")
             else:
                 mm = M.mean(0); ms = M.std(0); me = np.array([ess(M[:, r]) for r in range(M.shape[1])])
-                nside_mu = hp.npix2nside(M.shape[1]); target = hp.ud_grade(expf[k], nside_mu) if nside_mu != 16 else expf[k]
+                nside_mu = hp.npix2nside(M.shape[1]); target = hp.ud_grade(expf[k], nside_mu) if nside_mu != nside_b else expf[k]
                 zmu = (mm - target) / ms
                 print(f"      mu map ({M.shape[1]}): ESS min {me.min():.0f} median {np.median(me):.0f}; mean {mm.mean():.4f}; "
                       f"against the realized exp(-f) region means: correlation {np.corrcoef(mm, target)[0, 1]:.3f}, "
                       f"rms diff {np.sqrt(np.mean((mm - target)**2)):.4f}, z median {np.median(zmu):+.2f} MAD "
                       f"{np.median(np.abs(zmu - np.median(zmu))):.2f}")
                 for q in range(4):
-                    sel = quart[k] == q if nside_mu == 16 else np.ones(M.shape[1], bool)
+                    sel = quart[k] == q if nside_mu == nside_b else np.ones(M.shape[1], bool)
                     print(f"         Q{q+1}: corr {np.corrcoef(mm[sel], target[sel])[0, 1]:.3f} rms diff "
                           f"{np.sqrt(np.mean((mm - target)[sel]**2)):.4f} sd median {np.median(ms[sel]):.4f}")
 
