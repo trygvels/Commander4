@@ -200,7 +200,9 @@ def fd_inverse_mass_dense(logp_and_grad, x: NDArray, h: float = FD_MASS_STEP,
     return inv, summary
 
 
-def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
+def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool,
+                            prior_key: str = "spectral_index_prior",
+                            field_key: str = "spectral_index_field", sigma_scale: float = 0.3
                             ) -> gmrf_field.IndexFieldPrior | gmrf_field.IndependentIndexPrior:
     """The spatial prior of a component's index field from its `spectral_index_field` block and
     the required `spectral_index_prior` (mu0, sd0). `type: gmrf` (default): `IndexFieldPrior`,
@@ -208,44 +210,45 @@ def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
     hyperprior of the field mean. `type: independent`: `IndependentIndexPrior`, every region
     index iid N(mu0, sd0^2), no index hyperparameters (the fixed-nside ladder). `type: iid`:
     `IndexFieldPrior` over an `IidField`, beta = mu 1 + sigma z with the GMRF hyperpriors on mu
-    and sigma and no spatial coupling (the exchangeable analogue of the GMRF)."""
-    prior = _read_param(comp_params, "spectral_index_prior")
+    and sigma and no spatial coupling (the exchangeable analogue of the GMRF). `prior_key`,
+    `field_key` and the default `sigma_scale` select the parameter block (the dust temperature
+    field reads `T_prior` / `T_field`, E028)."""
+    prior = _read_param(comp_params, prior_key)
     if prior is None or _read_param(prior, "mean") is None or _read_param(prior, "rms") is None:
-        raise ValueError("A spectral-index field needs 'spectral_index_prior' with 'mean' and "
-                         "'rms' (the hyperprior of the field mean, or the per-region prior of "
-                         "an independent field).")
-    settings = dict(_read_param(comp_params, "spectral_index_field", {}) or {})
+        raise ValueError(f"A field needs '{prior_key}' with 'mean' and 'rms' (the hyperprior "
+                         "of the field mean, or the per-region prior of an independent field).")
+    settings = dict(_read_param(comp_params, field_key, {}) or {})
     kind = str(settings.pop("type", "gmrf"))
     if kind == "independent":
         if settings:
-            raise ValueError(f"spectral_index_field type independent takes no other settings; "
+            raise ValueError(f"{field_key} type independent takes no other settings; "
                              f"got {sorted(settings)}.")
         return gmrf_field.IndependentIndexPrior(nside_beta, float(prior["mean"]),
                                                 float(prior["rms"]))
     if kind == "iid":
         unknown = set(settings) - {"sigma_scale"}
         if unknown:
-            raise ValueError(f"spectral_index_field type iid takes only sigma_scale; got "
+            raise ValueError(f"{field_key} type iid takes only sigma_scale; got "
                              f"{sorted(unknown)}.")
         hyper = gmrf_field.HyperPrior(mu0=float(prior["mean"]), s_mu=float(prior["rms"]),
-                                      sigma_scale=float(settings.get("sigma_scale", 0.3)))
+                                      sigma_scale=float(settings.get("sigma_scale", sigma_scale)))
         return gmrf_field.IndexFieldPrior(gmrf_field.IidField(gmrf_field.IidBasis(nside_beta)),
                                           hyper, centred=centred)
     if kind != "gmrf":
-        raise ValueError(f"spectral_index_field.type must be 'gmrf', 'iid' or 'independent', "
+        raise ValueError(f"{field_key}.type must be 'gmrf', 'iid' or 'independent', "
                          f"got {kind!r}.")
     unknown = set(settings) - {"basis", "alpha", "sigma_scale", "rho_prior", "rho_max"}
     if unknown:
-        raise ValueError(f"Unknown spectral_index_field settings {sorted(unknown)}.")
+        raise ValueError(f"Unknown {field_key} settings {sorted(unknown)}.")
     if settings.get("basis", "graph") != "graph":
-        raise ValueError("spectral_index_field.basis: only 'graph' is implemented.")
+        raise ValueError(f"{field_key}.basis: only 'graph' is implemented.")
     if nside_beta > NSIDE_BETA_MAX:
-        raise ValueError(f"spectral_index_nside {nside_beta} exceeds {NSIDE_BETA_MAX} (dense "
+        raise ValueError(f"field nside {nside_beta} exceeds {NSIDE_BETA_MAX} (dense "
                          "eigendecomposition).")
     basis = gmrf_field.graph_laplacian_basis(nside_beta)
     fld = gmrf_field.MaternField(basis, alpha=float(settings.get("alpha", 2.0)))
     hyper = gmrf_field.HyperPrior(mu0=float(prior["mean"]), s_mu=float(prior["rms"]),
-                                  sigma_scale=float(settings.get("sigma_scale", 0.3)),
+                                  sigma_scale=float(settings.get("sigma_scale", sigma_scale)),
                                   rho_prior=settings.get("rho_prior", "loguniform"),
                                   rho_max=float(settings.get("rho_max", np.pi)))
     return gmrf_field.IndexFieldPrior(fld, hyper, centred=centred)
@@ -253,10 +256,12 @@ def field_prior_from_params(comp_params: Bunch, nside_beta: int, centred: bool
 
 def discover_index_specs(comp_list: CompList, selected_comps: list[str] | None, centred: bool
                          ) -> tuple[list[IndexSpec], dict[str, list[DiffuseComponent]]]:
-    """The sampled indices of a hier group: one `IndexSpec` per logical component (its I and QU
-    views share the index) with `sample_spectral_index: true` (and in `selected_comps` if
-    given); `spectral_index_nside` > 0 gives a field, 0 or absent a single index. Returns the
-    specs and the views of each sampled component by name."""
+    """The sampled spectral parameters of a hier group: one `IndexSpec` per logical component
+    (its I and QU views share the parameters) with `sample_spectral_index: true` (the index;
+    `spectral_index_nside` > 0 gives a field, 0 or absent a single index) and one more with
+    `sample_T: true` (the log dust temperature, E028; `T_nside`, `T_prior` with mean and rms on
+    log T, `T_field`), for components in `selected_comps` if given. Returns the specs and the
+    views of each sampled component by name."""
     selected = None if selected_comps is None else set(selected_comps)
     views: dict[str, list[DiffuseComponent]] = {}
     specs: list[IndexSpec] = []
@@ -265,23 +270,38 @@ def discover_index_specs(comp_list: CompList, selected_comps: list[str] | None, 
             continue
         if selected is not None and comp.comp_name not in selected:
             continue
-        if not bool(_read_param(comp.comp_params, "sample_spectral_index", False)):
+        sample_beta = bool(_read_param(comp.comp_params, "sample_spectral_index", False))
+        sample_T = bool(_read_param(comp.comp_params, "sample_T", False))
+        if not (sample_beta or sample_T):
             continue
         if comp.comp_name in views:
             views[comp.comp_name].append(comp)
             continue
         views[comp.comp_name] = [comp]
-        nside_beta = int(_read_param(comp.comp_params, "spectral_index_nside", 0) or 0)
-        prior = _read_param(comp.comp_params, "spectral_index_prior")
-        if prior is None:
-            raise ValueError(f"Component {comp.comp_name!r}: 'likelihood: hier' needs a "
-                             "'spectral_index_prior' (gaussian, mean and rms).")
-        mean, rms = float(prior["mean"]), float(prior["rms"])
-        if nside_beta > 0:
-            fld = field_prior_from_params(comp.comp_params, nside_beta, centred)
-        else:
-            fld = None
-        specs.append(IndexSpec(comp.comp_name, fld, mean, rms))
+        if sample_beta:
+            nside_beta = int(_read_param(comp.comp_params, "spectral_index_nside", 0) or 0)
+            prior = _read_param(comp.comp_params, "spectral_index_prior")
+            if prior is None:
+                raise ValueError(f"Component {comp.comp_name!r}: 'likelihood: hier' needs a "
+                                 "'spectral_index_prior' (gaussian, mean and rms).")
+            mean, rms = float(prior["mean"]), float(prior["rms"])
+            fld = field_prior_from_params(comp.comp_params, nside_beta, centred) \
+                if nside_beta > 0 else None
+            specs.append(IndexSpec(comp.comp_name, fld, mean, rms))
+        if sample_T:
+            if not hasattr(comp, "T"):
+                raise ValueError(f"Component {comp.comp_name!r}: sample_T needs a component with "
+                                 "a temperature (ThermalDust).")
+            nside_T = int(_read_param(comp.comp_params, "T_nside", 0) or 0)
+            prior = _read_param(comp.comp_params, "T_prior")
+            if prior is None:
+                raise ValueError(f"Component {comp.comp_name!r}: sample_T needs a 'T_prior' "
+                                 "(gaussian, mean and rms of log T in K).")
+            mean, rms = float(prior["mean"]), float(prior["rms"])
+            fld = field_prior_from_params(comp.comp_params, nside_T, centred, prior_key="T_prior",
+                                          field_key="T_field", sigma_scale=0.15) \
+                if nside_T > 0 else None
+            specs.append(IndexSpec(comp.comp_name, fld, mean, rms, param="logT"))
     return specs, views
 
 
@@ -410,18 +430,18 @@ def initial_state(layout: StateLayout, views: dict[str, list[DiffuseComponent]],
     blocks = {}
     for spec in layout.specs:
         comp = views[spec.comp_name][0]
+        value, beta_map = _param_state(comp, spec)
         if spec.field is None:
-            blocks[spec.comp_name] = np.array([float(comp.beta)])
+            blocks[spec.key] = np.array([value])
             continue
         fld = spec.field
-        beta_map = getattr(comp, "beta_map", None)
         if isinstance(fld, gmrf_field.IndependentIndexPrior):
-            # Independent regions: the state is beta itself; restart from the stored map, else
-            # the constant start at the component's beta.
+            # Independent regions: the state is the parameter itself; restart from the stored
+            # map, else the constant start at the component's value.
             if beta_map is not None and beta_map.shape == (fld.n_beta,):
-                blocks[spec.comp_name] = np.asarray(beta_map, dtype=float).copy()
+                blocks[spec.key] = np.asarray(beta_map, dtype=float).copy()
             else:
-                blocks[spec.comp_name] = np.full(fld.n_beta, float(comp.beta))
+                blocks[spec.key] = np.full(fld.n_beta, value)
             continue
         hyper = fld.hyper
         if beta_map is not None and beta_map.shape == (fld.n_beta,):
@@ -435,14 +455,22 @@ def initial_state(layout: StateLayout, views: dict[str, list[DiffuseComponent]],
             var_unit = float(np.mean(fld.field.pixel_variances(rho)))
             sigma = max(float(np.sqrt(max(np.mean(resid**2), 1e-12) / var_unit)), 1e-3)
             x_c = fld.pack(y, mu, np.log(sigma), u)
-            blocks[spec.comp_name] = x_c if fld.centred else fld.to_noncentred(x_c)
+            blocks[spec.key] = x_c if fld.centred else fld.to_noncentred(x_c)
         else:
             sigma = INIT_SIGMA_FRACTION * hyper.sigma_scale
-            blocks[spec.comp_name] = fld.pack(np.zeros(fld.K), float(comp.beta), np.log(sigma),
-                                              0.0)
+            blocks[spec.key] = fld.pack(np.zeros(fld.K), value, np.log(sigma), 0.0)
     hypers = {name: (hier_priors[name].mu, hier_priors[name].log_s)
               for name in layout.hier_names}
     return layout.pack(blocks, hypers)
+
+
+def _param_state(comp: DiffuseComponent, spec: IndexSpec) -> tuple[float, NDArray | None]:
+    """(scalar value, stored map or None) of the spec's parameter in its sampled coordinate:
+    (beta, beta_map) for an index, (log T, log T_map) for a temperature."""
+    if spec.param == "beta":
+        return float(comp.beta), getattr(comp, "beta_map", None)
+    T_map = getattr(comp, "T_map", None)
+    return float(np.log(comp.T)), (None if T_map is None else np.log(np.asarray(T_map, float)))
 
 
 def apply_state(x: NDArray, layout: StateLayout, views: dict[str, list[DiffuseComponent]],
@@ -453,9 +481,15 @@ def apply_state(x: NDArray, layout: StateLayout, views: dict[str, list[DiffuseCo
     for spec in layout.specs:
         for comp in views.get(spec.comp_name, []):
             if spec.field is None:
-                comp.beta = float(x[layout.index_slices[spec.comp_name]][0])
+                value = float(x[layout.index_slices[spec.key]][0])
+                if spec.param == "beta":
+                    comp.beta = value
+                else:
+                    comp.T = float(np.exp(value))
+            elif spec.param == "beta":
+                comp.set_beta_map(betas[spec.key], layout.nside_beta)
             else:
-                comp.set_beta_map(betas[spec.comp_name], layout.nside_beta)
+                comp.set_T_map(np.exp(betas[spec.key]), layout.nside_beta)
     for name, (mu, log_s) in layout.hypers(x).items():
         for comp in hier_views.get(name, []):
             comp.amp_prior.mu, comp.amp_prior.log_s = mu, log_s
@@ -623,23 +657,32 @@ class IndexFieldSamplingGroup:
         out: dict = {}
         betas = self.layout.betas(x)
         for spec in self.layout.specs:
-            block = x[self.layout.index_slices[spec.comp_name]]
+            block = x[self.layout.index_slices[spec.key]]
+            entry = out.setdefault(spec.comp_name, {})
+            if spec.param == "beta":
+                group, map_key, nside_key = "index_field", "beta_map", "beta_nside"
+                values = betas[spec.key]
+            else:       # log T sampled; the chain stores T in K (and the field in log T)
+                group, map_key, nside_key = "T_field", "T_map", "T_nside"
+                values = np.exp(betas[spec.key])
             if spec.field is None:
-                out[spec.comp_name] = {"beta": float(block[0])}
+                if spec.param == "beta":
+                    entry["beta"] = float(block[0])
+                else:
+                    entry["T"] = float(np.exp(block[0]))
             elif isinstance(spec.field, gmrf_field.IndependentIndexPrior):
-                out[spec.comp_name] = {"index_field": {
-                    "beta_map": betas[spec.comp_name], "beta_nside": self.layout.nside_beta,
-                    "parameterization": "independent"}}
+                entry[group] = {map_key: values, nside_key: self.layout.nside_beta,
+                                "parameterization": "independent"}
             else:
                 fld = spec.field
                 x_nc = fld.to_noncentred(block) if fld.centred else block
                 z, mu, ls, u = fld.split(x_nc)
-                out[spec.comp_name] = {"index_field": {
-                    "beta_map": betas[spec.comp_name], "beta_nside": self.layout.nside_beta,
+                entry[group] = {
+                    map_key: values, nside_key: self.layout.nside_beta,
                     "mu": mu, "log_sigma": ls, "u": u, "z": z.copy(),
                     "parameterization": "centred" if fld.centred else "noncentred",
                     "field_type": "iid" if isinstance(fld.field, gmrf_field.IidField)
-                    else "gmrf"}}
+                    else "gmrf"}
         for name, (mu, log_s) in self.layout.hypers(x).items():
             out.setdefault(name, {})["amp_prior"] = {"mu": mu, "log_s": log_s}
         return out

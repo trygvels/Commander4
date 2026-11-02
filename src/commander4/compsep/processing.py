@@ -342,8 +342,7 @@ def _validate_mcmc_sampled_components(mcmc_groups: dict[str, MCMCSamplingGroupCo
     """
     sampling_off = set()
     for comp in comp_list.joined():
-        if "sample_spectral_index" not in comp.comp_params \
-                or not bool(comp.comp_params.sample_spectral_index):
+        if not _samples_spectral_parameters(comp):
             sampling_off.add(comp.comp_name)
 
     for group in mcmc_groups.values():
@@ -367,8 +366,9 @@ def _validate_index_fields(mcmc_groups: dict[str, MCMCSamplingGroupConfig],
     exactly one MCMC group with `likelihood: hier`; any other likelihood is an error at startup,
     since the MH groups propose a single index."""
     field_comps = {comp.comp_name for comp in comp_list.joined()
-                   if hasattr(comp, "beta") and "spectral_index_nside" in comp.comp_params
-                   and comp.comp_params.spectral_index_nside}
+                   if hasattr(comp, "beta") and any(
+                       key in comp.comp_params and comp.comp_params[key]
+                       for key in ("spectral_index_nside", "T_nside"))}
     for name in sorted(field_comps):
         samplers = [g.name for g in mcmc_groups.values()
                     if name in _sampled_component_names(g, comp_list)]
@@ -387,12 +387,18 @@ def _sampled_component_names(group: MCMCSamplingGroupConfig, comp_list: CompList
     """Names of the components whose spectral index this MCMC group proposes."""
     names = set()
     for comp in comp_list.joined():
-        if "sample_spectral_index" not in comp.comp_params \
-                or not bool(comp.comp_params.sample_spectral_index):
+        if not _samples_spectral_parameters(comp):
             continue
         if group.comps is None or comp.comp_name in group.comps:
             names.add(comp.comp_name)
     return names
+
+
+def _samples_spectral_parameters(comp) -> bool:
+    """Whether the component asks for its spectral index (`sample_spectral_index`) or its dust
+    temperature (`sample_T`, E028) to be sampled."""
+    return any(key in comp.comp_params and bool(comp.comp_params[key])
+               for key in ("sample_spectral_index", "sample_T"))
 
 
 def _marginal_unavailable_reason(group: MCMCSamplingGroupConfig,

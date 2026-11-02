@@ -539,3 +539,152 @@ def test_fd_metrics_skip_fixed_coordinates() -> None:
     expected[:2, :2] = np.linalg.inv(H[:2, :2])
     expected[2, 2] = 1 / 10.0
     np.testing.assert_allclose(dense, expected, rtol=1e-6, atol=1e-9)
+
+
+# ---- E028: a sampled log dust temperature as a second spectral parameter ----------------------
+
+def _dust_T_params(nside_T=NSIDE_BETA, **extra):
+    return dict(beta=1.6, T=20.0, nu_ref=545.0, sample_T=True, T_nside=nside_T,
+                T_prior=Bunch(type="gaussian", mean=float(np.log(20.0)), rms=0.2), **extra)
+
+
+def _components_with_T(nside_beta=NSIDE_BETA, sample_beta_d=False):
+    cmb = _component(CMB, "cmb", nu_ref=1e-3)
+    sync = _component(Synchrotron, "sync", **_sync_params(spectral_index_nside=nside_beta))
+    extra = dict(sample_spectral_index=True, spectral_index_nside=nside_beta,
+                 spectral_index_prior=Bunch(type="gaussian", mean=1.6, rms=0.2)) \
+        if sample_beta_d else {}
+    dust = _component(ThermalDust, "dust", **_dust_T_params(nside_beta, **extra))
+    rng = np.random.default_rng(1)
+    cmb.amp_prior = ifd.AmpPrior("gaussian", mean=0.0, rms=70.0)
+    sync.amp_prior = ifd.AmpPrior("hier", template=10**(1.0 + 0.5 * rng.random(NPIX)))
+    dust.amp_prior = ifd.AmpPrior("hier", template=10**(1.5 + 0.5 * rng.random(NPIX)))
+    return [cmb, sync, dust]
+
+
+def test_discover_index_specs_with_a_temperature_field() -> None:
+    comps = _components_with_T(sample_beta_d=True)
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    assert [s.key for s in specs] == ["sync", "dust", "dust:logT"]
+    assert [s.param for s in specs] == ["beta", "beta", "logT"]
+    assert specs[2].attr == "T" and specs[2].prior_mean == pytest.approx(np.log(20.0))
+    assert specs[2].field is not None and specs[2].field.hyper.sigma_scale == 0.15
+    assert views == {"sync": [comps[1]], "dust": [comps[2]]}
+    # T alone (beta_d fixed) is allowed; a scalar log T when T_nside is 0; errors.
+    specs, _ = ifs.discover_index_specs(_components_with_T(), None, centred=False)
+    assert [s.key for s in specs] == ["sync", "dust:logT"]
+    scalar = _component(ThermalDust, "dust", **_dust_T_params(nside_T=0))
+    specs, _ = ifs.discover_index_specs([scalar], None, centred=False)
+    assert specs[0].field is None and specs[0].param == "logT"
+    with pytest.raises(ValueError, match="T_prior"):
+        ifs.discover_index_specs([_component(ThermalDust, "dust", beta=1.6, T=20.0, nu_ref=545.0,
+                                             sample_T=True, T_nside=1)], None, centred=False)
+    with pytest.raises(ValueError, match="temperature"):
+        ifs.discover_index_specs([_component(Synchrotron, "sync", beta=-3.0, nu_ref=30.0,
+                                             sample_T=True, T_nside=1,
+                                             T_prior=Bunch(mean=3.0, rms=0.2))], None, centred=False)
+    with pytest.raises(ValueError, match="unknown parameter"):
+        ifd.IndexSpec("dust", None, 3.0, 0.2, param="rho")
+    layout = ifd.StateLayout(specs, [])
+    assert "dust:logT" in layout.index_slices and layout.spec("dust:logT").param == "logT"
+
+
+def _data_with_T(comps, seed=5):
+    """Data from a sync index field and a dust (beta, T) per region."""
+    rng = np.random.default_rng(seed)
+    region = ifd.region_map(NSIDE_BETA, NSIDE)
+    beta_s = -3.0 + 0.15 * rng.standard_normal(12)
+    beta_d = 1.6 + 0.1 * rng.standard_normal(12)
+    T = 20.0 * np.exp(0.1 * rng.standard_normal(12))
+    a = np.stack([70.0 * rng.standard_normal(NPIX),
+                  comps[1].amp_prior.template * 10**(0.1 * rng.standard_normal(NPIX)),
+                  comps[2].amp_prior.template * 10**(0.1 * rng.standard_normal(NPIX))], axis=1)
+    M = np.stack([np.broadcast_to(comps[0].get_sed(NU), (NPIX, NU.size)),
+                  comps[1].get_sed(NU, beta=beta_s[region]),
+                  comps[2].get_sed(NU, beta=beta_d[region], T=T[region])], axis=2)
+    rms = 5.0 * (0.5 + rng.random((NPIX, NU.size)))
+    d = np.einsum("pbc,pc->pb", M, a) + rms * rng.standard_normal((NPIX, NU.size))
+    return d.T.copy(), (1.0 / rms**2).T.copy()
+
+
+def test_likelihood_gradient_with_temperature_field_matches_finite_differences() -> None:
+    """Fourth-order central differences of the full target in every coordinate, with a sync
+    index field, a dust index field and a dust log T field (three fields, two hier priors)."""
+    comps = _components_with_T(sample_beta_d=True)
+    specs, _ = ifs.discover_index_specs(comps, None, centred=False)
+    layout = ifd.StateLayout(specs, ["sync", "dust"])
+    d, inv_var = _data_with_T(comps)
+    like = ifd.RegionIndexLikelihood.from_arrays(NU, d, inv_var, comps, layout, NSIDE)
+    rng = np.random.default_rng(7)
+    blocks = {}
+    for spec in specs:
+        fld = spec.field
+        blocks[spec.key] = fld.pack(0.5 * rng.standard_normal(fld.K), spec.prior_mean + 0.03,
+                                    np.log(0.1), 0.2)
+    x = layout.pack(blocks, {"sync": (1.02, -1.4), "dust": (0.97, -1.2)})
+    lp, grad = like.logp_and_grad(x)
+    assert np.isfinite(lp)
+    h = 1e-4
+    fd = np.empty_like(x)
+    for i in range(x.size):
+        e = np.zeros_like(x); e[i] = h
+        f = [like.logp_and_grad(x + k * e)[0] for k in (-2, -1, 1, 2)]
+        fd[i] = (f[0] - 8 * f[1] + 8 * f[2] - f[3]) / (12 * h)
+    np.testing.assert_allclose(grad, fd, rtol=1e-6, atol=1e-4)
+    # The log T block carries information: its gradient is not identically zero.
+    sl = layout.index_slices["dust:logT"]
+    assert np.max(np.abs(grad[sl])) > 1e-3
+    # Fixed-T regression: with the T block absent the target equals the pre-E028 target (the
+    # same data, the dust SED at the scalar T).
+    comps0 = _components_with_T(sample_beta_d=True)
+    comps0[2].comp_params.sample_T = False
+    specs0, _ = ifs.discover_index_specs(comps0, None, centred=False)
+    layout0 = ifd.StateLayout(specs0, ["sync", "dust"])
+    like0 = ifd.RegionIndexLikelihood.from_arrays(NU, d, inv_var, comps0, layout0, NSIDE)
+    x0 = layout0.pack({k: blocks[k] for k in ("sync", "dust")}, {"sync": (1.02, -1.4), "dust": (0.97, -1.2)})
+    # At log T = log(T_scalar) everywhere (z = 0, mu = log 20, any sigma) the two targets differ
+    # only by the T field's prior terms.
+    fldT = layout.spec("dust:logT").field
+    blocks_T0 = dict(blocks); blocks_T0["dust:logT"] = fldT.pack(np.zeros(fldT.K), np.log(20.0), np.log(0.1), 0.2)
+    xT0 = layout.pack(blocks_T0, {"sync": (1.02, -1.4), "dust": (0.97, -1.2)})
+    lp_T0, _ = like.logp_and_grad(xT0)
+    lp0, _ = like0.logp_and_grad(x0)
+    prior_T, _ = fldT.logp_and_grad(blocks_T0["dust:logT"], loglike=lambda b: (0.0, np.zeros_like(b)))
+    assert lp_T0 - prior_T == pytest.approx(lp0, rel=1e-10, abs=1e-6)
+
+
+def test_temperature_field_state_round_trip_and_chain_keys() -> None:
+    comps = _components_with_T(sample_beta_d=True)
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    layout = ifd.StateLayout(specs, ["sync", "dust"])
+    hier = {"sync": comps[1].amp_prior, "dust": comps[2].amp_prior}
+    x0 = ifs.initial_state(layout, views, hier)
+    betas = layout.betas(x0)
+    np.testing.assert_allclose(np.exp(betas["dust:logT"]), 20.0)      # constant start at T
+    rng = np.random.default_rng(3)
+    x = x0 + 0.05 * rng.standard_normal(x0.size)
+    ifs.apply_state(x, layout, views, {"sync": [comps[1]], "dust": [comps[2]]})
+    dust = comps[2]
+    assert dust.T_map is not None and dust.T_nside == NSIDE_BETA and dust.T_map.shape == (12,)
+    np.testing.assert_allclose(dust.T_map, np.exp(layout.betas(x)["dust:logT"]))
+    assert dust.T == pytest.approx(float(dust.T_map.mean()))
+    # The amplitude-step mixing matrices use both maps.
+    M = ifd.mixing_regions(NU, comps, 12)
+    np.testing.assert_allclose(M[:, :, 2], dust.get_sed(NU, beta=dust.beta_map, T=dust.T_map))
+    assert ifd.needs_region_solver([dust]) and ifd.field_nside([dust]) == NSIDE_BETA
+    # Restart from the maps reproduces the field values.
+    x1 = ifs.initial_state(layout, views, hier)
+    b1, b = layout.betas(x1), layout.betas(x)
+    np.testing.assert_allclose(b1["dust:logT"], b["dust:logT"], atol=1e-8)
+    np.testing.assert_allclose(b1["dust"], b["dust"], atol=1e-8)
+    # Chain-file keys of the unpacked state.
+    group = ifs.IndexFieldSamplingGroup.__new__(ifs.IndexFieldSamplingGroup)
+    group.layout = layout
+    out = group.unpacked(x)
+    assert set(out["dust"]) == {"index_field", "T_field", "amp_prior"}
+    np.testing.assert_allclose(out["dust"]["T_field"]["T_map"], dust.T_map)
+    assert out["dust"]["T_field"]["T_nside"] == NSIDE_BETA
+    assert set(out["sync"]) == {"index_field", "amp_prior"}
+    # A positive-T check in set_T_map.
+    with pytest.raises(ValueError, match="positive"):
+        dust.set_T_map(-np.ones(12), NSIDE_BETA)

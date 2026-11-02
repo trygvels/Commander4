@@ -276,14 +276,15 @@ def needs_region_solver(comps: list[DiffuseComponent]) -> bool:
     """Whether the amplitude draw must go through the region kernel: some component has a
     `beta_map` or a non-flat amplitude prior. Otherwise the plain `solve_perpix` path is used, so
     runs without fields or priors reproduce today's draws for the same random state."""
-    return any(getattr(c, "beta_map", None) is not None or not component_prior(c).is_flat
-               for c in comps)
+    return any(getattr(c, "beta_map", None) is not None or getattr(c, "T_map", None) is not None
+               or not component_prior(c).is_flat for c in comps)
 
 
 def field_nside(comps: list[DiffuseComponent]) -> int:
     """The common `beta_nside` of the components carrying a `beta_map` (0 if none). Stage 1
     requires one index resolution per amplitude group."""
     nsides = {int(c.beta_nside) for c in comps if getattr(c, "beta_map", None) is not None}
+    nsides |= {int(c.T_nside) for c in comps if getattr(c, "T_map", None) is not None}
     if len(nsides) > 1:
         raise ValueError(f"The components of one amplitude group must share one "
                          f"spectral_index_nside; got {sorted(nsides)}.")
@@ -318,16 +319,20 @@ def mixing_regions(freqs: NDArray, comps: list[DiffuseComponent], nreg: int,
     M_reg = np.empty((nreg, nband, len(comps)))
     dM_reg = np.zeros_like(M_reg)
     for c, comp in enumerate(comps):
-        beta_map = getattr(comp, "beta_map", None)
-        if beta_map is None:
+        kw = {}
+        for name, arg in (("beta_map", "beta"), ("T_map", "T")):
+            m = getattr(comp, name, None)
+            if m is not None:
+                if m.shape != (nreg,):
+                    raise ValueError(f"Component {comp.comp_name!r}: {name} has {m.size} "
+                                     f"pixels, the amplitude group has {nreg} regions.")
+                kw[arg] = m
+        if not kw:
             M_reg[:, :, c] = comp.get_sed(freqs)[None, :]
         else:
-            if beta_map.shape != (nreg,):
-                raise ValueError(f"Component {comp.comp_name!r}: beta_map has {beta_map.size} "
-                                 f"pixels, the amplitude group has {nreg} regions.")
-            M_reg[:, :, c] = comp.get_sed(freqs, beta=beta_map)
-            if with_derivative:
-                dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, beta=beta_map)
+            M_reg[:, :, c] = comp.get_sed(freqs, **kw)
+            if with_derivative and "beta" in kw:
+                dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, **kw)
     if with_derivative:
         return M_reg, dM_reg
     return M_reg
@@ -349,8 +354,14 @@ class IndexSpec:
     field: IndexFieldPrior | IndependentIndexPrior | None
     prior_mean: float
     prior_sd: float
+    param: str = "beta"      # "beta" (spectral index) or "logT" (log dust temperature, E028)
+
+    PARAMS = {"beta": "beta", "logT": "T"}       # sampled coordinate -> component attribute
 
     def __post_init__(self) -> None:
+        if self.param not in self.PARAMS:
+            raise ValueError(f"IndexSpec {self.comp_name!r}: unknown parameter {self.param!r}; "
+                             f"one of {sorted(self.PARAMS)}.")
         # For a field the (mu0, sd0) live in field.hyper; the spec's copy must agree, so that one
         # source of configuration cannot drift from the other.
         if self.field is not None and (self.prior_mean != self.field.hyper.mu0
@@ -358,6 +369,17 @@ class IndexSpec:
             raise ValueError(f"IndexSpec {self.comp_name!r}: prior ({self.prior_mean}, "
                              f"{self.prior_sd}) differs from the field hyperprior "
                              f"({self.field.hyper.mu0}, {self.field.hyper.s_mu}).")
+
+    @property
+    def key(self) -> str:
+        """Name of this spec's block: the component name for the index (every pre-E028 caller),
+        'comp:param' for any other parameter."""
+        return self.comp_name if self.param == "beta" else f"{self.comp_name}:{self.param}"
+
+    @property
+    def attr(self) -> str:
+        """The component attribute holding the parameter's scalar value ('beta' or 'T')."""
+        return self.PARAMS[self.param]
 
     @property
     def dim(self) -> int:
@@ -379,8 +401,8 @@ class StateLayout:
 
     def __init__(self, specs: list[IndexSpec], hier_names: list[str],
                  hier_dims: dict[str, int] | None = None):
-        if len({s.comp_name for s in specs}) != len(specs):
-            raise ValueError("Each component may carry one sampled index.")
+        if len({s.key for s in specs}) != len(specs):
+            raise ValueError("Each component may carry one sampled block per parameter.")
         self.specs = list(specs)
         self.hier_names = list(hier_names)
         # Hyperparameters per hier component: (mu entries..., log s); 2 for a scalar mu.
@@ -389,7 +411,7 @@ class StateLayout:
         self.hier_slices: dict[str, slice] = {}
         pos = 0
         for spec in self.specs:
-            self.index_slices[spec.comp_name] = slice(pos, pos + spec.dim)
+            self.index_slices[spec.key] = slice(pos, pos + spec.dim)
             pos += spec.dim
         for name in self.hier_names:
             self.hier_slices[name] = slice(pos, pos + self.hier_dims[name])
@@ -402,19 +424,20 @@ class StateLayout:
         self.nside_beta = nsides.pop() if nsides else 0
         self.nreg = 12 * self.nside_beta**2 if self.nside_beta > 0 else 1
 
-    def spec(self, comp_name: str) -> IndexSpec:
-        return next(s for s in self.specs if s.comp_name == comp_name)
+    def spec(self, key: str) -> IndexSpec:
+        return next(s for s in self.specs if s.key == key)
 
     def betas(self, x: NDArray) -> dict[str, NDArray]:
-        """The index per region (nreg,) of every sampled component at state x (a scalar index is
-        broadcast over the regions)."""
+        """The sampled parameter per region (nreg,) of every spec at state x, keyed by
+        `spec.key` (the component name for its index, 'comp:logT' for a log temperature); a
+        scalar is broadcast over the regions."""
         out = {}
         for spec in self.specs:
-            block = x[self.index_slices[spec.comp_name]]
+            block = x[self.index_slices[spec.key]]
             if spec.field is None:
-                out[spec.comp_name] = np.full(self.nreg, float(block[0]))
+                out[spec.key] = np.full(self.nreg, float(block[0]))
             else:
-                out[spec.comp_name] = spec.field.beta(block)
+                out[spec.key] = spec.field.beta(block)
         return out
 
     def hypers(self, x: NDArray) -> dict[str, tuple]:
@@ -433,7 +456,7 @@ class StateLayout:
     def pack(self, index_blocks: dict[str, NDArray], hypers: dict[str, tuple]) -> NDArray:
         x = np.empty(self.dim)
         for spec in self.specs:
-            x[self.index_slices[spec.comp_name]] = np.atleast_1d(index_blocks[spec.comp_name])
+            x[self.index_slices[spec.key]] = np.atleast_1d(index_blocks[spec.key])
         for name in self.hier_names:
             mu, log_s = hypers[name]
             x[self.hier_slices[name]] = np.concatenate([np.atleast_1d(np.asarray(mu, dtype=float)),
@@ -508,8 +531,8 @@ class RegionIndexLikelihood:
         names = [c.comp_name for c in self.active_comps]
         for spec in layout.specs:
             if spec.comp_name in names and not hasattr(
-                    self.active_comps[names.index(spec.comp_name)], "beta"):
-                raise ValueError(f"Component {spec.comp_name!r} has no spectral index to sample.")
+                    self.active_comps[names.index(spec.comp_name)], spec.attr):
+                raise ValueError(f"Component {spec.comp_name!r} has no {spec.attr!r} to sample.")
         for name in layout.hier_names:
             if name in names:
                 view = self.active_comps[names.index(name)]
@@ -589,21 +612,35 @@ class RegionIndexLikelihood:
         ncomp = len(comps)
         hier_cols = self._hier_views(hypers)
         any_hier = bool(hier_cols)
+        # Temperature blocks (E028): a second derivative column per component with a sampled
+        # log T, evaluated by a second kernel call (the kernel takes one derivative per column).
+        T_keys = {c: f"{comp.comp_name}:logT" for c, comp in enumerate(comps)
+                  if f"{comp.comp_name}:logT" in betas}
         for freqs, maps_sky, maps_inv_var in self.streams:
             nband = freqs.size
             M_reg = np.empty((layout.nreg, nband, ncomp))
             dM_reg = np.zeros_like(M_reg)
+            dM_T = np.zeros_like(M_reg) if T_keys else None
             with np.errstate(over="ignore", invalid="ignore"):
                 for c, comp in enumerate(comps):
+                    kw = {}
                     if comp.comp_name in betas:
-                        M_reg[:, :, c] = comp.get_sed(freqs, beta=betas[comp.comp_name])
-                        dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, beta=betas[comp.comp_name])
+                        kw["beta"] = betas[comp.comp_name]
+                    if c in T_keys:
+                        kw["T"] = np.exp(betas[T_keys[c]])
+                    if kw:
+                        M_reg[:, :, c] = comp.get_sed(freqs, **kw)
+                        if "beta" in kw:
+                            dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, **kw)
+                        if "T" in kw:
+                            dM_T[:, :, c] = comp.get_dsed_dlogT(freqs, **kw)
                     else:
                         key = (id(freqs), c)
-                        if key not in self._fixed_sed:     # beta-independent SED, built once
+                        if key not in self._fixed_sed:     # parameter-free SED, built once
                             self._fixed_sed[key] = np.asarray(comp.get_sed(freqs), dtype=float)
                         M_reg[:, :, c] = self._fixed_sed[key][None, :]
-            if not (np.all(np.isfinite(M_reg)) and np.all(np.isfinite(dM_reg))):
+            if not (np.all(np.isfinite(M_reg)) and np.all(np.isfinite(dM_reg))
+                    and (dM_T is None or np.all(np.isfinite(dM_T)))):
                 return logL, g_beta, g_hyper, c_mu, True   # zero density at this state
             sky_aug, w_aug = augment_stream(maps_sky, maps_inv_var, comps)
             M_aug, dM_aug = augment_mixing(M_reg, dM_reg)
@@ -617,6 +654,15 @@ class RegionIndexLikelihood:
             for c, comp in enumerate(comps):
                 if comp.comp_name in betas:
                     g_beta[comp.comp_name] += grad_reg[:, c]
+            if T_keys:
+                _, dM_T_aug = augment_mixing(M_reg, dM_T)
+                out_T = cpp_compsep.marginal_loglike_regions(
+                    sky_aug, w_aug, self.region, M_aug, dM_T_aug, self.nthreads, True, True, False)
+                grad_T, nskipped_T = out_T[1], out_T[2]
+                if nskipped_T or not np.all(np.isfinite(grad_T)):
+                    return logL, g_beta, g_hyper, c_mu, True
+                for c, key in T_keys.items():
+                    g_beta[key] += grad_T[:, c]
             if any_hier:
                 x_cond, diag_Ainv, used = out[3], out[4], out[5]
                 for c in hier_cols:
@@ -653,7 +699,7 @@ class RegionIndexLikelihood:
         # One allreduce: [rejected flag, log L, g_beta blocks..., g_hyper blocks..., mu
         # curvature blocks...].
         local = np.concatenate([[1.0 if rejected else 0.0, logL]]
-                               + [g_beta[s.comp_name] for s in layout.specs]
+                               + [g_beta[s.key] for s in layout.specs]
                                + [g_hyper[n] for n in layout.hier_names]
                                + [c_mu[n] for n in layout.hier_names])
         total = np.empty_like(local)
@@ -667,7 +713,7 @@ class RegionIndexLikelihood:
         for spec in layout.specs:
             g = total[pos:pos + layout.nreg]
             pos += layout.nreg
-            sl = layout.index_slices[spec.comp_name]
+            sl = layout.index_slices[spec.key]
             if spec.field is None:
                 r = (float(x[sl][0]) - spec.prior_mean) / spec.prior_sd
                 logp += -0.5 * r * r

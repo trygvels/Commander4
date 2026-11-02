@@ -650,6 +650,21 @@ components:
       #   alpha: 2.0
       #   sigma_scale: 0.3
       #   rho_prior: loguniform
+      # Sampled dust temperature (likelihood: hier only; ThermalDust): log T is sampled as a
+      # second spectral parameter, a single value (T_nside 0 or absent) or a field with the
+      # same model as the index (T_nside > 0), with T_prior the Gaussian (hyper)prior on
+      # log T in K and T_field the field settings (sigma_scale default 0.15 in log T). The
+      # map is written to the chain as T_field/T_map (in K); sed/T stays its mean. The
+      # default is a fixed T.
+      # sample_T: True
+      # T_nside: 4
+      # T_prior:
+      #   type: gaussian
+      #   mean: 2.9957        # log(20 K)
+      #   rms: 0.2
+      # T_field:
+      #   type: gmrf
+      #   sigma_scale: 0.15
 
       # Per-pixel amplitude prior (per-pixel amplitude solver only), in uK_RJ at nu_ref.
       # Enters the amplitude draw and the hier likelihood as an extra pseudo-band per

@@ -100,6 +100,8 @@ class DiffuseComponent(Component):
         # per-pixel amplitude prior of compsep/index_field.py (None: flat, today's behaviour).
         self.beta_map = None
         self.beta_nside = 0
+        self.T_map = None            # per-region dust temperature field (E028), K
+        self.T_nside = 0
         self.amp_prior = None
         self._data = None  # Alm data is not allocated by default.
         if allocate_empty_alms:
@@ -338,6 +340,9 @@ class DiffuseComponent(Component):
         if self.beta_map is not None:
             group["index_field/beta_map"] = self.beta_map
             group["index_field/beta_nside"] = self.beta_nside
+        if self.T_map is not None:
+            group["T_field/T_map"] = self.T_map
+            group["T_field/T_nside"] = self.T_nside
         if self.amp_prior is not None and self.amp_prior.is_hier:
             group["amp_prior/mu"] = self.amp_prior.mu
             group["amp_prior/log_s"] = self.amp_prior.log_s
@@ -374,6 +379,17 @@ class DiffuseComponent(Component):
             else:
                 logger.warning(f"Component {self.comp_name!r}: chain index field at nside "
                                f"{stored_nside}, run asks for {nside_beta}; starting constant.")
+        # The sampled temperature field (E028), gated the same way by sample_T and T_nside.
+        sampling_T = "sample_T" in self.comp_params and bool(self.comp_params.sample_T)
+        nside_T = int(self.comp_params.T_nside) if "T_nside" in self.comp_params \
+            and self.comp_params.T_nside else 0
+        if sampling_T and hasattr(self, "T") and "T_field" in group:
+            stored_nside = int(group["T_field/T_nside"][()])
+            if stored_nside == nside_T and nside_T > 0:
+                self.set_T_map(np.asarray(group["T_field/T_map"][()]), nside_T)
+            else:
+                logger.warning(f"Component {self.comp_name!r}: chain temperature field at nside "
+                               f"{stored_nside}, run asks for {nside_T}; starting constant.")
         if self.amp_prior is not None and self.amp_prior.is_hier and "amp_prior" in group:
             # mu is a scalar or a map of template multipliers (amp_prior mu_nside); a map read
             # into a scalar run gives its mean, a scalar read into a map run is broadcast, a map
@@ -465,22 +481,45 @@ class DiffuseComponent(Component):
         self.beta = float(beta_map.mean())
         self.spatially_varying_MM = True
 
+    def set_T_map(self, T_map, nside: int) -> None:
+        """Give the component a per-region temperature field (K) at `nside` (E028), the
+        counterpart of `set_beta_map`: `T` becomes the map mean and the mixing matrix becomes
+        pixel-dependent."""
+        if not hasattr(self, "T"):
+            raise ValueError(f"Component {self.comp_name!r} has no temperature to vary.")
+        T_map = np.asarray(T_map, dtype=np.float64)
+        if T_map.shape != (12 * nside * nside,):
+            raise ValueError(f"Component {self.comp_name!r}: T_map has shape {T_map.shape}, "
+                             f"expected ({12 * nside * nside},) for nside {nside}.")
+        if not np.all(T_map > 0.0):
+            raise ValueError(f"Component {self.comp_name!r}: T_map must be positive.")
+        self.T_map = T_map
+        self.T_nside = int(nside)
+        self.T = float(T_map.mean())
+        self.spatially_varying_MM = True
+
     def get_sed_map(self, nu, nside: int):
-        """The SED at `nu` per pixel of an nside map, from `beta_map` brought to that nside.
+        """The SED at `nu` per pixel of an nside map, from `beta_map` (and `T_map`) brought to
+        that nside.
 
         Going up in resolution (the usual case, nside >= beta_nside) every fine pixel takes the
-        index of its parent pixel, the region convention of the index-field likelihood; going down
-        averages the index over the children.
+        parameter of its parent pixel, the region convention of the index-field likelihood; going
+        down averages the parameter over the children.
         """
-        if self.beta_map is None:
-            raise ValueError(f"Component {self.comp_name!r} has no beta_map.")
-        beta = self.beta_map if nside == self.beta_nside else hp.ud_grade(self.beta_map, nside)
-        return self.get_sed(nu, beta=beta)
+        if self.beta_map is None and self.T_map is None:
+            raise ValueError(f"Component {self.comp_name!r} has no beta_map or T_map.")
+        kw = {}
+        if self.beta_map is not None:
+            kw["beta"] = self.beta_map if nside == self.beta_nside \
+                else hp.ud_grade(self.beta_map, nside)
+        if self.T_map is not None:
+            kw["T"] = self.T_map if nside == self.T_nside else hp.ud_grade(self.T_map, nside)
+        return self.get_sed(nu, **kw)
 
     def _band_sed(self, band: Band):
         """The mixing coefficient(s) at a band: a scalar, or a map at the band's nside when the
-        component has a `beta_map`."""
-        if self.beta_map is not None:
+        component has a `beta_map` or a `T_map`."""
+        if self.beta_map is not None or self.T_map is not None:
             return self.get_sed_map(band.nu, band.nside)
         return self.get_sed(band.nu)
 
