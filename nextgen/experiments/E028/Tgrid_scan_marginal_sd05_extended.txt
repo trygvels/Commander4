@@ -1,0 +1,20 @@
+E023 exact-target scans (v2) on /Users/trygvels/data/e023_pysm_n1: nside 64, noise scale 1.0, CMB prior sd 10000, T_fixed 20.929 K; truth sd beta_s 0.0629, beta_eff3 0.0516, beta_d 0.0374
+  sync quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 1.0021 2.5343 3.2427 3.6588; block sd (quartile, amplitudes known) 0.01801 0.07830 0.10093 0.11643
+  dust quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 0.0599 0.2895 0.7586 1.4540; block sd (quartile, amplitudes known) 0.00065 0.00887 0.01966 0.03014
+  data template sync: g/true at |b|>20 16/50/84 pct 0.199/0.991/1.793
+  data template dust: g/true at |b|>20 16/50/84 pct 0.023/1.078/2.614
+  cs template: log error field rms 0.3, FWHM 10.0 deg, seed 11; realized exp(-f) mean/sd sync 1.007/0.309, dust 1.060/0.319
+  realized a/g (data template, sync) mean/sd per quartile: 0.865/0.278 0.796/0.359 2.264/21.793 140.607/212.228
+  realized a/g (data template, dust) mean/sd per quartile: 0.879/0.346 0.876/5.851 5.914/29.806 48.258/63.291
+  realized a/g (exact template, sync) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (exact template, dust) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (cs template, sync) mean/sd per quartile: 0.994/0.299 1.032/0.317 0.994/0.306 1.008/0.314
+  realized a/g (cs template, dust) mean/sd per quartile: 1.063/0.300 1.056/0.305 1.061/0.336 1.061/0.333
+  reference (fixT): region fit in 10 s; fit minus region mean: sync rms 0.0564 max 0.4537, dust rms 0.0117 max 0.1224; at the bounds: 0 sync, 0 dust
+  reference (trueT): region fit in 10 s; fit minus region mean: sync rms 0.0209 max 0.4886, dust rms 0.0094 max 0.1184; at the bounds: 0 sync, 0 dust
+== T grid for cell exact_fixT_perregmarg [expected]: scalar T, region fit redone per T, hyperparameters profiled
+   T  24.00 K: total -3607983.97 (chi2 -1882.3 logdet -3336060.1 trace -270035.0 hyperprior -6.56); bd fit mean 1.4779, bs fit mean -2.9576; 261 evals, 109 s
+   T  26.00 K: total -3607982.38 (chi2 -1880.0 logdet -3336063.9 trace -270032.1 hyperprior -6.46); bd fit mean 1.4503, bs fit mean -2.9462; 216 evals, 87 s
+   T  28.00 K: total -3607982.50 (chi2 -1879.4 logdet -3336067.3 trace -270029.3 hyperprior -6.37); bd fit mean 1.4268, bs fit mean -2.9366; 225 evals, 90 s
+   T  30.00 K: total -3607983.65 (chi2 -1880.0 logdet -3336070.5 trace -270026.9 hyperprior -6.30); bd fit mean 1.4066, bs fit mean -2.9286; 270 evals, 105 s
+   T  34.00 K: total -3607987.54 (chi2 -1882.8 logdet -3336076.0 trace -270022.5 hyperprior -6.18); bd fit mean 1.3735, bs fit mean -2.9157; 270 evals, 107 s

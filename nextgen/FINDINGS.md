@@ -544,8 +544,11 @@ diluted by the full-sky curvature) and an exact 1-d marginal of -2.951 +- 0.025:
 Consequences: the unweighted mean of a prior-dominated index field is not a reportable
 quantity under this hyperprior; the multiplier hyperprior width is a scientific choice that
 sets the faint-sky index; the dust state is a sync confounder at this depth (with the dust at
-the truth and mu_d at 1 the scalar pseudo-true value moves to -2.83). Scope: one sky, one
-noise realization; six to eight simulated noise realizations for the pseudo-true values.
+the truth and mu_d at 1 the scalar pseudo-true value moves to -2.83). The same push acts on
+the dust temperature: with the multipliers integrated, the expected target over a scalar T
+peaks at 27 K (sd 1.7) under the sd-0.5 hyperprior and at 20.2 K (sd 0.5; sky 20.9) under sd
+0.1 (E028 T grids). Scope: one sky, one noise realization; six to eight simulated noise
+realizations for the pseudo-true values.
 
 **F30. With the per-region template multiplier field at realistic noise, a
 component-separation-quality template is usable for dust and not for synchrotron, the scalar

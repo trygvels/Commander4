@@ -25,9 +25,15 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   K = 100 with a 0.5-sd step it passes cleanly (KS p 0.51 sync, 0.30 dust; optimum offsets 0.08
   and -0.03 conditional sd); VALIDATION updated (K >= 100, step <= 1 sd, negative control).
 
+- The multiplier Occam push also sets the dust temperature: a scalar T's expected target peaks
+  at 27 K (sd 1.7) under the sd-0.5 hyperprior and at 20.2 K (sd 0.5) under sd 0.1; E028 stage
+  B now runs with sd 0.1 (prediction 20.2 +- 0.5 K). E027 gmrf8 done (1.75 h): sync pixel
+  RMSE 0.135 against 0.147 at nside 16, dust 0.063 against 0.060; the sync level offset (+0.12)
+  and the mu_d map (1.029) do not depend on the index resolution; D025 check passes.
+
 **Running**
-- E027 gmrf8 (then gmrf4); queued: E029 (mu_prior sd 0.1; prediction: faint sync offset within
-  +-0.05), E028 stage A (oracle T map), stage B (scalar T). Scalar-T grid scan for stage B's
+- E027 gmrf4 (from 19:05); queued: E029 (mu_prior sd 0.1; prediction: faint sync offset within
+  +-0.05), E028 stage A (oracle T map), stage B (scalar T, sd 0.1). Scalar-T grid scan for stage B's
   pseudo-true T; the F28 recheck with the analytic multiplier marginal (chain-state validation,
   then the cs-template cells at 1 x and 0.03 x noise).
 

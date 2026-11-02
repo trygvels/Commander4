@@ -159,7 +159,17 @@ the sd-0.1 hyperprior. Stage B prediction, written before the chain: under sd 0.
 posterior sits well above 22 K (where exactly, the extended grid says), with the dust index
 field lower than the truth in step (the region fit gives 1.478 at 24 K against 1.531 at 20.9 K);
 this is the identifiability failure of the review in its scalar form, and stage B is read as a
-measurement of it, not as a recovery test.
+measurement of it, not as a recovery test. Extended grids (19:22; `Tgrid_scan_marginal_sd05_extended.txt`,
+`Tgrid_scan_marginal_sd01.txt`): under the sd-0.5 multiplier hyperprior the optimum is at 27 K
+(curvature sd about 1.7 K; totals -83.97, -82.38, -82.50, -83.65, -87.54 at 24, 26, 28, 30, 34 K),
+a +6 K Occam push of the marginalized multipliers on the temperature, with the region-fit dust
+index at 1.44 against a truth of 1.54; under the sd-0.1 hyperprior the optimum is at 20.2 K
+(sd 0.5 K; -598.1, -597.0, -604.1 at 19, 20.5, 22 K), at the sky's 20.9 K within 1.5 sd. Stage
+B's pseudo-true scalar T is therefore 27 +- 2 K under the queued parameter file (sd 0.5) and
+the chain is predicted there; a stage B run with `mu_prior [1, 0.1]` (the E029 setting) is
+predicted at 20.2 +- 0.5 K and is the configuration that can recover T. Decision: stage B runs
+with the sd-0.1 hyperprior (parameter file updated before the queue reaches it), the sd-0.5
+version is dropped (its prediction is recorded and does not need a chain).
 ```bash
 python -m pytest -q tests/test_components.py tests/test_index_field.py tests/test_index_field_sampler.py tests/test_hier_group_wiring.py
 mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_mumap_nc_T.yml
