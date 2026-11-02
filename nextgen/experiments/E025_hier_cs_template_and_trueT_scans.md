@@ -118,3 +118,21 @@ E021 control sky has been run for the scan code.
   (gmrf16, noise-1 sky, cs template, flat CMB prior, dense metric) with the E021 metrics.
 - A template with errors at all scales (true amplitude times a field with a power law to the
   pixel scale) to set the within-region error the method tolerates.
+
+## F31 recheck with the analytic multiplier marginal (2026-11-02, 18:05 to 18:21)
+The per-region multipliers are now integrated analytically (`perregmarg`, F31) instead of
+profiled. First pass against the fixed-T region fit (`E025/f28_recheck/marginal_n*_vs_fixT_ref.txt`,
+expected mode, scatters profiled at delta 0 and held; grid +-0.10, step 0.02):
+- 0.03 x noise: sync shifts 0.000 in every quartile for both templates (s_Q4 +0.02 at 0.4 nats
+  for exact); dust: exact Q4 +0.06 (16.8 nats, 5.5 sd), cs Q3 +0.02 (8.4 nats), Q4 +0.04 (5.6
+  nats); Q1 and Q2 zero.
+- 1 x noise: sync prefers flatter indices for both templates: Q1 +0.06 (1.7 and 2.4 nats, 2 sd),
+  the faint quartiles at the grid edge +0.10 (0.6 to 3.4 nats); the wide cs scan +0.4 (5.6
+  nats); the F29 Occam push of the marginalized multipliers is in the expected target itself.
+  Dust: exact Q1 +0.02 (1.2 nats, 5 sd), Q2 +0.10 (11.6 nats, edge), Q3 +0.10 (2.3), Q4 +0.08;
+  cs Q1 0.000, Q2 to Q4 +0.10 (3.7 to 7.1 nats, edge).
+The dust shifts of the exact-template cells are the F30 effect, not a template effect: with
+free multipliers at the 545 GHz pivot the hier model estimates beta_d, and the fixed-T region
+fit is beta_eff (the chain's bright quartile sits +0.060 above bd_fixT and +0.006 above
+bd_trueT). The recheck proper, against the true-T dust region fit (`--dust-ref trueT`) with a
+wider grid, is running; F28 is read from it.

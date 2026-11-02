@@ -337,6 +337,9 @@ def main():
     ap.add_argument("--mu-sd", type=float, default=None, help="hyperprior sd of the template multipliers (default 0.5)")
     ap.add_argument("--marg-fixed-s", type=int, default=1,
                     help="perregmarg cells: hold the scatters at their delta-0 profile along a scan (1) or re-profile (0)")
+    ap.add_argument("--dust-ref", default="fixT", choices=["fixT", "trueT"],
+                    help="reference dust index for the fixT cells: the fixed-T region fit (beta_eff) or the true-T "
+                         "region fit (beta_d; the hier model with free multipliers estimates beta_d, F30)")
     ap.add_argument("--ref-npz", default=None,
                     help="npz with bs, bd (nside-16 region values) replacing the noise-free region-fit reference for every SED level (e.g. a chain posterior-mean state)")
     a = ap.parse_args()
@@ -419,6 +422,9 @@ def main():
             f"{np.sqrt(np.mean((bs_ref-bs_mean)**2)):.4f} max {np.max(np.abs(bs_ref-bs_mean)):.4f}, dust rms "
             f"{np.sqrt(np.mean((bd_ref-bd_mean)**2)):.4f} max {np.max(np.abs(bd_ref-bd_mean)):.4f}; "
             f"at the bounds: {int(np.sum((bs_ref <= -3.999) | (bs_ref >= -2.001)))} sync, {int(np.sum((bd_ref <= 1.101) | (bd_ref >= 2.099)))} dust")
+    if a.dust_ref == "trueT":
+        refs["fixT"] = (refs["fixT"][0], refs["trueT"][1])
+        say("  fixT cells read against the true-T dust region fit (beta_d)")
     if a.ref_npz:
         rr = np.load(a.ref_npz)
         for sed in refs:
