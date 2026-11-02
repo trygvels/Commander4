@@ -512,6 +512,11 @@ hier prior needs mu as a region map (a template-error field), after which a temp
 within-region error is at the few-percent level is admissible; sampled T_d is deprioritized.
 Scope: one sky, one error realization, one error scale (10 deg), the data term without the
 index prior.
+**Recheck under the analytic multiplier marginal (F31; E025 second pass, 2026-11-02):** the
+template effect (cs minus exact) is at most 0.02 at 0.03 x and 0.04 at 1 x in every quartile,
+so this finding stands; the absolute shifts of the hier target against the true-T region fit
+are model properties (the fixed-T misfit at 0.03 x, the F29 Occam push at 1 x: +0.10 to +0.16
+sync, +0.02 to +0.10 dust in the expected target), which the profiled scans had hidden.
 
 **F29. At realistic noise the nside-16 GMRF synchrotron index field is prior-dominated over
 three quarters of the sky, and there the hierarchical amplitude prior's per-region multipliers

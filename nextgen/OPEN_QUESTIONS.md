@@ -246,7 +246,9 @@ original numbering.
   bias of the marginalized per-region multipliers under the N(1, 0.5^2) hyperprior (F29, as
   corrected by the stats review; +0.15 +- 0.05 by the exact marginal, zero within noise at sd
   0.1): E029 tests the tight hyperprior in a chain. The profiled per-region scan cells of E025
-  are biased (F31) and F28 is to be redone with the analytic marginal.
+  are biased (F31); F28 redone with the analytic marginal: the template conclusion stands
+  (cs minus exact at most 0.02 / 0.04), the absolute offsets are the fixed-T misfit (0.03 x)
+  and the Occam push (1 x, also on dust: +0.02 to +0.10 against beta_d).
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is

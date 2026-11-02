@@ -136,3 +136,24 @@ free multipliers at the 545 GHz pivot the hier model estimates beta_d, and the f
 fit is beta_eff (the chain's bright quartile sits +0.060 above bd_fixT and +0.006 above
 bd_trueT). The recheck proper, against the true-T dust region fit (`--dust-ref trueT`) with a
 wider grid, is running; F28 is read from it.
+
+Second pass (18:36 to 18:55; `marginal_n*_vs_trueT_ref.txt`): the fixed-T cells read against
+(bs_fixT, bd_trueT), sync grid +-0.16 at 1 x. Per quartile Q1 to Q4, exact then cs, expected
+mode (argmax; gain in nats):
+- 1 x sync: exact +0.10 (6.6), +0.16 (1.9, edge), +0.16 (1.0), +0.14 (0.7); cs +0.12 (7.9),
+  +0.16 (4.7), +0.16 (4.3), +0.16 (3.5). 1 x dust: exact +0.02 (20), +0.10 (7.8), +0.08 (2.1),
+  +0.08 (0.8); cs +0.02 (16), +0.08 (4.0), +0.12 (4.1), +0.16 (4.7).
+- 0.03 x sync: exact +0.04 (1357), -0.08 (200), -0.06 (41), -0.02 (2.6); cs +0.04, -0.08,
+  -0.06, -0.04 (14). 0.03 x dust: exact +0.02 (11027), -0.02 (111), 0.00, +0.08 (34); cs +0.02,
+  -0.02, +0.02 (9.4), +0.06 (18).
+Reading. (1) Template effect (cs minus exact, the F28 question) under the marginal law: at most
+0.02 at 0.03 x and 0.04 at 1 x in every quartile, inside the curvature sds (0.004 to 0.06) except
+dust Q3 at 0.03 x (+0.02 at 4.7 sd) and the faint sync at 1 x, where both templates sit at the
+grid edge: F28's conclusion that the region-scale multiplier field removes the template bias
+stands under the marginal. (2) The absolute offsets are model properties, not template effects:
+at 0.03 x the fixed-T hier target sits at the fixed-T region fit (zero shifts against bs/bd_fixT
+in the first pass) and so 0.02 to 0.08 from beta_d; at 1 x the F29 Occam push of the marginalized
+multipliers adds +0.10 to +0.16 to the sync index and +0.02 to +0.10 to the dust index (relative
+to bd_trueT) in the expected target, which is where the E026 chain's faint dust (+0.06 against
+bd_trueT) and sync (+0.13) offsets come from. (3) The realization-mode faint-sync wide scans
+(+1.0, 58 to 74 nats) are the noise selection of the data-template quartiles recorded in E026.

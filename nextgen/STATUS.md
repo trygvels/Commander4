@@ -32,8 +32,11 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   then the cs-template cells at 1 x and 0.03 x noise).
 
 **Next**
-- Analytic multiplier marginal in the scan script and the F28 recheck (cs template, both
-  depths); E027 reading; E029 reading against its pre-registered criteria.
+- E027 reading; E029 reading against its pre-registered criteria; the extended scalar-T grids
+  (stage B prediction). Done since 18:05: the marginal scan law (validated at the chain state)
+  and the F28 recheck: the template conclusion stands (cs minus exact at most 0.02 at 0.03 x,
+  0.04 at 1 x); the absolute offsets are the fixed-T misfit at 0.03 x and the Occam push at
+  1 x (sync +0.10 to +0.16, dust +0.02 to +0.10 against beta_d in the expected target).
 
 **Needs Trygve**
 - The multiplier hyperprior width is now a scientific choice that sets the faint-sky index
