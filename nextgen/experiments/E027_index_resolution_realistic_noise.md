@@ -35,6 +35,11 @@ Fisher sds on this sky (`sim_report.txt`, amplitudes known, medians): sync 0.65 
 1.33 (8), 2.68 (16) against a sky sd of 0.063; dust 0.096, 0.21, 0.45 against 0.037 (16/84
 percentiles 0.013/0.36 at nside 4, 0.084/1.7 at nside 16).
 
+Run log: the queue started gmrf8 at 17:14 on 2026-11-02, was stopped at 17:20 while the E026
+chain was tested for sampler bias (the exact-target scan at the chain's state preferred a
+sync level 0.12 to 0.18 steeper), and restarted at 17:35 after the Gibbs-consistency check
+passed (E026 items 6 and 7; D025). Each rung gets the same check before it is read.
+
 ## Reference
 1. Pixel-level RMSE and bias against the truth at nside 64 (beta_s, and beta_eff3 for dust at
    the fixed T), as E021 (`e020_analyze.py --tags`), the metric that includes the
@@ -53,7 +58,15 @@ Pre-registered reading:
   the aggregate against the Fisher-weighted truth. If the +0.13 of nside 16 is a property of
   the hier model at this depth (the free multipliers, the fixed-T dust), it should persist at
   nside 8 and 4 within the aggregate's sd; if it comes from the number of weakly constrained
-  regions, it should shrink with their number (768, 192).
+  regions, it should shrink with their number (768, 192). Sharpened after E026 item 7
+  (written before any E027 result): the offset is the coupling of the level to the field's
+  roughness, and the roughness is set by the prior-dominated field scale (sigma_s 0.15 +- 0.05
+  against 0.063). At nside 8 and 4 the region Fisher sds (1.33, 0.65 medians) still exceed the
+  sky sd, but fewer regions and more data per region should constrain sigma better; the
+  prediction is that the offset of the unweighted mean falls with the posterior sd of sigma,
+  and that the roughness check (block-shift optimum at the draw against the smoothed state)
+  shrinks accordingly. If sigma stays prior-dominated at nside 4 the fix is an informative
+  prior on sigma, not resolution.
 - (b) Dust: the bright quartile is data-dominated at every rung; the pixel-level RMSE against
   the truth should fall from nside 16 to 8 in the faint quartiles (less prior shrinkage
   needed) and rise again where the within-region variation of the truth (sd of beta_eff3

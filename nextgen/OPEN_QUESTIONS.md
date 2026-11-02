@@ -79,6 +79,14 @@ original numbering.
   structure (D019; E023 and Q16). Still open inside Q3: the alm GRF and heavy-tailed
   (edge-preserving) variants and the clustering baselines were not run; joint fields for beta_d
   and T_d.
+- **Status 2026-11-02 (E026, F29):** at realistic noise (E012 levels, nside 64 data) the
+  nside-16 GMRF sync field has region Fisher sds 1 to 3.7 against a sky sd of 0.063: the
+  data-dominated bright quartile is recovered, the rest of the field floats at a level set by
+  the prior-dominated field scale through the likelihood's nonlinearity (+0.13 on the
+  unweighted mean). The resolution question at realistic noise is therefore where the region
+  Fisher sd crosses the sky's index sd (nside 4 to 8 for sync, 16 for dust on this sky); E027
+  (nside 8 and 4, running) measures it. The optimal model at this depth may need an
+  informative prior on the field scale.
 - **Status 2026-10-28:** E020 (PySM sky at 0.03 x E012 noise) closed as a design flaw (F21: the
   misspecified sky dominates); the ten-option comparison runs as E021 on a model-consistent sky.
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather
@@ -227,6 +235,14 @@ original numbering.
   noise (leakage of the correlated CMB). Next (E025): component-separation-quality templates
   and the true-T dust SED by the same scans, then the first stage-2 chain; sampled T_d as the
   structural fix. At realistic noise the faint half of the sky is prior-dominated at nside 16.
+- **Status 2026-11-02 (E026, F29, F30, D025):** first valid chains at realistic noise
+  (non-centred; Gibbs-consistency check passed). With per-region multipliers the cs template
+  is usable for dust (+0.02 RMSE against exact) and not for sync (+0.19); the scalar law fails
+  (+0.48 / +0.24). With exact templates the multiplier field absorbs the fixed-T misfit jointly
+  with the bright dust index (+0.06, mu_d map 1.029): region-wise or sampled T_d comes back
+  before the multiplier field is used for dust on real data (M2.6). The sync field at nside 16
+  is prior-dominated over three quarters of the sky and its unweighted mean is set by the
+  prior on the field scale (F29); E027 tests coarser regions.
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is

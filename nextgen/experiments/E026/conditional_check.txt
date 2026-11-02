@@ -1,0 +1,45 @@
+700 post-burn draws, 20 used (every 35th)
+one evaluation 0.1 s; first draw log target 1275513.32
+draw  0 chain01_iter0501.h5 Synchrotron : mu -2.8648; conditional optimum at -0.0247 (sd 0.0178, -1.4 sd from the draw); CDF at the draw 0.898; log target range 24.4; edge check lp(-hw)-max -9.0 lp(+hw)-max -24.4
+draw  0 chain01_iter0501.h5 ThermalDust : mu +1.5900; conditional optimum at -0.0007 (sd 0.0014, -0.5 sd from the draw); CDF at the draw 0.610; log target range 59.3; edge check lp(-hw)-max -49.0 lp(+hw)-max -59.3
+draw  1 chain01_iter0536.h5 Synchrotron : mu -2.8722; conditional optimum at -0.0032 (sd 0.0175, -0.2 sd from the draw); CDF at the draw 0.573; log target range 17.3; edge check lp(-hw)-max -15.4 lp(+hw)-max -17.3
+draw  1 chain01_iter0536.h5 ThermalDust : mu +1.5830; conditional optimum at -0.0012 (sd 0.0014, -0.9 sd from the draw); CDF at the draw 0.692; log target range 68.3; edge check lp(-hw)-max -49.7 lp(+hw)-max -68.3
+draw  2 chain01_iter0571.h5 Synchrotron : mu -2.8631; conditional optimum at -0.0013 (sd 0.0178, -0.1 sd from the draw); CDF at the draw 0.534; log target range 16.2; edge check lp(-hw)-max -15.5 lp(+hw)-max -16.2
+draw  2 chain01_iter0571.h5 ThermalDust : mu +1.5915; conditional optimum at +0.0013 (sd 0.0014, +0.9 sd from the draw); CDF at the draw 0.304; log target range 66.1; edge check lp(-hw)-max -66.1 lp(+hw)-max -46.8
+draw  3 chain01_iter0606.h5 Synchrotron : mu -2.9446; conditional optimum at +0.0113 (sd 0.0174, +0.6 sd from the draw); CDF at the draw 0.293; log target range 20.3; edge check lp(-hw)-max -20.3 lp(+hw)-max -12.7
+draw  3 chain01_iter0606.h5 ThermalDust : mu +1.5991; conditional optimum at +0.0024 (sd 0.0014, +1.7 sd from the draw); CDF at the draw 0.100; log target range 76.8; edge check lp(-hw)-max -76.8 lp(+hw)-max -39.8
+draw  4 chain01_iter0641.h5 Synchrotron : mu -2.8528; conditional optimum at -0.0252 (sd 0.0178, -1.4 sd from the draw); CDF at the draw 0.903; log target range 24.7; edge check lp(-hw)-max -8.9 lp(+hw)-max -24.7
+draw  4 chain01_iter0641.h5 ThermalDust : mu +1.5778; conditional optimum at +0.0003 (sd 0.0014, +0.2 sd from the draw); CDF at the draw 0.470; log target range 58.5; edge check lp(-hw)-max -58.5 lp(+hw)-max -54.4
+draw  5 chain01_iter0676.h5 Synchrotron : mu -2.8963; conditional optimum at -0.0040 (sd 0.0176, -0.2 sd from the draw); CDF at the draw 0.588; log target range 17.4; edge check lp(-hw)-max -15.0 lp(+hw)-max -17.4
+draw  5 chain01_iter0676.h5 ThermalDust : mu +1.5799; conditional optimum at +0.0009 (sd 0.0014, +0.7 sd from the draw); CDF at the draw 0.372; log target range 66.4; edge check lp(-hw)-max -66.4 lp(+hw)-max -51.7
+draw  6 chain01_iter0711.h5 Synchrotron : mu -2.8648; conditional optimum at +0.0022 (sd 0.0178, +0.1 sd from the draw); CDF at the draw 0.465; log target range 16.5; edge check lp(-hw)-max -16.5 lp(+hw)-max -15.0
+draw  6 chain01_iter0711.h5 ThermalDust : mu +1.5950; conditional optimum at -0.0016 (sd 0.0014, -1.2 sd from the draw); CDF at the draw 0.783; log target range 70.8; edge check lp(-hw)-max -45.6 lp(+hw)-max -70.8
+draw  7 chain01_iter0746.h5 Synchrotron : mu -2.8964; conditional optimum at +0.0267 (sd 0.0174, +1.5 sd from the draw); CDF at the draw 0.087; log target range 26.6; edge check lp(-hw)-max -26.6 lp(+hw)-max -8.7
+draw  7 chain01_iter0746.h5 ThermalDust : mu +1.5698; conditional optimum at +0.0019 (sd 0.0014, +1.3 sd from the draw); CDF at the draw 0.186; log target range 70.1; edge check lp(-hw)-max -70.1 lp(+hw)-max -42.1
+draw  8 chain01_iter0781.h5 Synchrotron : mu -2.8295; conditional optimum at -0.0047 (sd 0.0174, -0.3 sd from the draw); CDF at the draw 0.604; log target range 18.0; edge check lp(-hw)-max -15.0 lp(+hw)-max -18.0
+draw  8 chain01_iter0781.h5 ThermalDust : mu +1.5697; conditional optimum at +0.0020 (sd 0.0014, +1.4 sd from the draw); CDF at the draw 0.162; log target range 71.1; edge check lp(-hw)-max -71.1 lp(+hw)-max -41.1
+draw  9 chain01_iter0816.h5 Synchrotron : mu -2.8359; conditional optimum at +0.0095 (sd 0.0174, +0.5 sd from the draw); CDF at the draw 0.323; log target range 19.6; edge check lp(-hw)-max -19.6 lp(+hw)-max -13.2
+draw  9 chain01_iter0816.h5 ThermalDust : mu +1.5792; conditional optimum at +0.0045 (sd 0.0014, +3.3 sd from the draw); CDF at the draw 0.002; log target range 102.0; edge check lp(-hw)-max -102.0 lp(+hw)-max -29.2
+draw 10 chain01_iter0851.h5 Synchrotron : mu -2.8728; conditional optimum at +0.0065 (sd 0.0172, +0.4 sd from the draw); CDF at the draw 0.380; log target range 19.1; edge check lp(-hw)-max -19.1 lp(+hw)-max -14.6
+draw 10 chain01_iter0851.h5 ThermalDust : mu +1.5676; conditional optimum at +0.0007 (sd 0.0014, +0.5 sd from the draw); CDF at the draw 0.411; log target range 60.7; edge check lp(-hw)-max -60.7 lp(+hw)-max -50.6
+draw 11 chain01_iter0886.h5 Synchrotron : mu -2.8774; conditional optimum at +0.0024 (sd 0.0180, +0.1 sd from the draw); CDF at the draw 0.460; log target range 16.3; edge check lp(-hw)-max -16.3 lp(+hw)-max -14.7
+draw 11 chain01_iter0886.h5 ThermalDust : mu +1.5935; conditional optimum at -0.0002 (sd 0.0014, -0.1 sd from the draw); CDF at the draw 0.529; log target range 56.8; edge check lp(-hw)-max -54.2 lp(+hw)-max -56.8
+draw 12 chain01_iter0921.h5 Synchrotron : mu -2.9174; conditional optimum at +0.0120 (sd 0.0175, +0.7 sd from the draw); CDF at the draw 0.279; log target range 20.3; edge check lp(-hw)-max -20.3 lp(+hw)-max -12.4
+draw 12 chain01_iter0921.h5 ThermalDust : mu +1.5829; conditional optimum at +0.0000 (sd 0.0014, +0.0 sd from the draw); CDF at the draw 0.499; log target range 54.2; edge check lp(-hw)-max -54.2 lp(+hw)-max -53.5
+draw 13 chain01_iter0956.h5 Synchrotron : mu -2.8515; conditional optimum at +0.0247 (sd 0.0178, +1.4 sd from the draw); CDF at the draw 0.109; log target range 24.6; edge check lp(-hw)-max -24.6 lp(+hw)-max -8.9
+draw 13 chain01_iter0956.h5 ThermalDust : mu +1.5894; conditional optimum at +0.0013 (sd 0.0014, +0.9 sd from the draw); CDF at the draw 0.309; log target range 70.7; edge check lp(-hw)-max -70.7 lp(+hw)-max -50.2
+draw 14 chain01_iter0991.h5 Synchrotron : mu -2.8521; conditional optimum at +0.0241 (sd 0.0173, +1.4 sd from the draw); CDF at the draw 0.111; log target range 25.6; edge check lp(-hw)-max -25.6 lp(+hw)-max -9.4
+draw 14 chain01_iter0991.h5 ThermalDust : mu +1.5784; conditional optimum at -0.0002 (sd 0.0014, -0.1 sd from the draw); CDF at the draw 0.525; log target range 56.5; edge check lp(-hw)-max -54.3 lp(+hw)-max -56.5
+draw 15 chain01_iter1026.h5 Synchrotron : mu -2.9080; conditional optimum at -0.0082 (sd 0.0175, -0.5 sd from the draw); CDF at the draw 0.669; log target range 19.0; edge check lp(-hw)-max -13.8 lp(+hw)-max -19.0
+draw 15 chain01_iter1026.h5 ThermalDust : mu +1.5739; conditional optimum at -0.0007 (sd 0.0014, -0.5 sd from the draw); CDF at the draw 0.602; log target range 61.6; edge check lp(-hw)-max -51.5 lp(+hw)-max -61.6
+draw 16 chain01_iter1061.h5 Synchrotron : mu -2.8049; conditional optimum at -0.0039 (sd 0.0176, -0.2 sd from the draw); CDF at the draw 0.585; log target range 17.3; edge check lp(-hw)-max -15.0 lp(+hw)-max -17.3
+draw 16 chain01_iter1061.h5 ThermalDust : mu +1.5666; conditional optimum at +0.0015 (sd 0.0014, +1.1 sd from the draw); CDF at the draw 0.259; log target range 71.2; edge check lp(-hw)-max -71.2 lp(+hw)-max -47.3
+draw 17 chain01_iter1096.h5 Synchrotron : mu -2.9442; conditional optimum at +0.0074 (sd 0.0176, +0.4 sd from the draw); CDF at the draw 0.364; log target range 18.5; edge check lp(-hw)-max -18.5 lp(+hw)-max -13.6
+draw 17 chain01_iter1096.h5 ThermalDust : mu +1.5924; conditional optimum at -0.0002 (sd 0.0014, -0.1 sd from the draw); CDF at the draw 0.525; log target range 56.7; edge check lp(-hw)-max -54.5 lp(+hw)-max -56.7
+draw 18 chain01_iter1131.h5 Synchrotron : mu -2.8874; conditional optimum at +0.0173 (sd 0.0178, +1.0 sd from the draw); CDF at the draw 0.197; log target range 21.8; edge check lp(-hw)-max -21.8 lp(+hw)-max -10.7
+draw 18 chain01_iter1131.h5 ThermalDust : mu +1.5770; conditional optimum at +0.0016 (sd 0.0013, +1.2 sd from the draw); CDF at the draw 0.235; log target range 76.7; edge check lp(-hw)-max -76.7 lp(+hw)-max -49.4
+draw 19 chain01_iter1166.h5 Synchrotron : mu -2.9305; conditional optimum at +0.0218 (sd 0.0180, +1.2 sd from the draw); CDF at the draw 0.142; log target range 22.8; edge check lp(-hw)-max -22.8 lp(+hw)-max -9.3
+draw 19 chain01_iter1166.h5 ThermalDust : mu +1.5646; conditional optimum at +0.0004 (sd 0.0014, +0.3 sd from the draw); CDF at the draw 0.450; log target range 59.9; edge check lp(-hw)-max -59.9 lp(+hw)-max -53.6
+Synchrotron: CDF values mean 0.428 (uniform: 0.5 +- 0.065), fraction > 0.5 0.40, KS D 0.246 p 0.150; conditional optimum minus draw: mean +0.0045 sd over draws 0.0143, in conditional sds mean +0.26; conditional sd median 0.0176
+ThermalDust: CDF values mean 0.401 (uniform: 0.5 +- 0.065), fraction > 0.5 0.35, KS D 0.290 p 0.055; conditional optimum minus draw: mean +0.0007 sd over draws 0.0014, in conditional sds mean +0.51; conditional sd median 0.0014
+DONE

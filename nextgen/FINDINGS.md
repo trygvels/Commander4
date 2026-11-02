@@ -513,3 +513,44 @@ within-region error is at the few-percent level is admissible; sampled T_d is de
 Scope: one sky, one error realization, one error scale (10 deg), the data term without the
 index prior.
 
+**F29. At realistic noise the nside-16 GMRF synchrotron index field is prior-dominated over
+three quarters of the sky, and its unweighted mean is set by the field's roughness through the
+likelihood's nonlinearity, not by the data** (E026, gmrf16_exact_mumap_nc: PySM d1s1c1 at the
+E012 noise, exact templates, per-region multipliers, flat CMB prior, non-centred NUTS, chain
+validated by a Gibbs-consistency check). The bright template-S/N quartile holds 90 percent of
+the sync Fisher weight and agrees with the noise-free region-fit reference (the 10 to 300
+regions with the largest weight: -0.02 to +0.03 from the reference, z medians -0.6 to +0.2,
+77 to 90 percent inside |z| < 1); the Fisher-weighted level of the field is -2.978 against a
+Fisher-weighted truth of -2.988; a single sync index on the same data is -2.944 +- 0.031, 1.3
+sd from its pseudo-true value -2.983. The unweighted field mean is -2.868 +- 0.042, +0.13
+above the sky mean, because the 2300 regions with region Fisher sd 2.5 to 3.7 (posterior sd
+0.15, set by the field scale) float at +0.12 to +0.14. That level is coupled to the field's
+roughness: with every other coordinate at a posterior draw, the data-preferred whole-sky
+shift is 0.00 +- 0.02 at the draw's field (sd 0.08 to 0.17) and -0.065 to -0.13 for the same
+state smoothed to a constant field, -0.18 at the posterior-mean state. The field scale sigma_s
+= 0.15 +- 0.05 is itself prior-dominated (sky 0.063), so the faint-sky level is a function of
+the prior on sigma. The dust field (sigma 0.062 +- 0.009, data-constrained) shows no such
+coupling. Consequences: the unweighted mean of a prior-dominated index field is not a
+reportable quantity; exact-target scans at a smooth reference measure a smooth field's level
+and miss this (E023, E025, and the E026 whole-sky scans); the regime boundary (region Fisher
+sd against the sky's index sd) and the fix (coarser regions, E027, or an informative prior on
+sigma) are open. Scope: one sky, one noise realization.
+
+**F30. With the per-region template multiplier field at realistic noise, a
+component-separation-quality template is usable for dust and not for synchrotron, the scalar
+law fails, and the fixed-T dust misfit becomes a bright-sky dust-index bias through the
+multipliers** (E026 non-centred chains, same setting as F29). Against exact templates the cs
+template (true amplitude times a 10-degree, 30 percent log-normal error field) costs +0.19
+(sync) and +0.02 (dust) pixel-level RMSE; dust's bright quartile is as good as with exact
+templates (0.069 against 0.072), the fainter quartiles 1.3 to 1.7 times worse with no extra
+bias, while sync is 2 to 3 times worse everywhere with the field scale at 0.35; the
+multiplier maps track the realized error with correlation 0.7 to 0.9 in the bright quartiles
+and 0.2 to 0.4 elsewhere (posterior sds 0.25 to 0.48). The scalar law (one multiplier and
+scatter per component) gives +0.48 and +0.24 with a sync field scale of 0.87: the predicted
+failure (F27, F28), now in a valid chain. With exact templates the bright dust quartile sits
++0.06 above the reference with the dust mu map at 1.029 +- 0.007 (should be 1): the fixed-T
+misfit (beta_eff3 minus beta_d rms 0.04) is absorbed jointly by the multipliers and the index,
+1191 + 375 nats better than the reference, a path the global law could not take (E025: +0.5
+percent, no index shift). So the region-scale multiplier field, which removes the template
+bias (F28), converts an SED misfit into an index bias where the data are strong: region-wise
+or sampled T_d comes before the multiplier field is used for dust on real data (M2.6).

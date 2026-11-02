@@ -50,3 +50,15 @@ be traced to a cause (method, prior, model, data) before it is claimed.
 - Number of independent samples (ESS) behind every mean and width.
 - Negative control, where one exists.
 - Experiment ID, commit hash, command line.
+
+## Standard checks on production chains (D025)
+- Gibbs-consistency (conditional CDF) check: for K >= 20 post-burn draws, scan the full target
+  along one coordinate (at least the field mean of every index field) with every other
+  coordinate at the draw's value; the conditional CDF at the draw must be consistent with
+  uniform (KS test) and the conditional optimum with the draw. Exact for the implemented
+  target, independent of the sampler; 0.1 s per evaluation at nside 64
+  (`nextgen/scripts/e026_conditional_check.py`). A chain that fails is not read.
+- Roughness check for prior-dominated fields: the data-preferred level at the sampled field
+  against the level of the same state smoothed to a constant (`e026_roughness_check.py`);
+  a difference above the conditional sd means the field's mean is set by the prior on its
+  scale (F29) and must be reported as such.

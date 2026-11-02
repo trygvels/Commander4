@@ -1,6 +1,6 @@
 # E026: Stage-2 chains on the realistic-noise PySM sky: hier prior with a region-scale template multiplier field against the scalar law, component-separation-quality templates
 
-- **Date started / finished:** 2026-10-30 /
+- **Date started / finished:** 2026-10-30 / 2026-11-02
 - **Branch and commit:** nextgen (mu-map prior under stats review before the runs)
 - **Open question addressed:** Q16 (D022, D023), Q3 / M2.5 (first chains at realistic noise), M2.4 (dense metric at nside 16 with the reviewed code)
 - **Validation level:** L3 (misspecified simulation with known truth; the sky is not from the model class: indices vary inside regions, template errors are log-normal and smooth)
@@ -228,15 +228,87 @@ posterior-mean state (`--ref-npz`): with one global multiplier the data term pre
 of -0.14 (12 nats, curvature sd 0.030) in both modes, which cannot be read directly because the
 chain's law has 3072 multipliers; the per-region-multiplier cells are recorded below.
 
+**Chain-state scan, Gibbs-consistency check and the roughness coupling (2026-11-02 17:00 to
+17:45; `E026/chainstate_scan_exact.txt`, `conditional_check.txt`, `roughness_check.txt`;
+`nextgen/scripts/e026_conditional_check.py`, `e026_roughness_check.py`).** (5) The exact-target
+scan around the chain's posterior-mean state prefers a whole-sky sync shift of -0.14 (global
+law, 12 nats), -0.12 (per-region multipliers, expected mode, 8 nats) and -0.18 (per-region
+multipliers, realization mode, 23 nats; curvature sd 0.028). (6) Gibbs-consistency check of
+the chain: for 20 post-burn draws (every 35th) the full Commander4 target was scanned along
+the field mean of one component with every other coordinate at the draw's value; the
+conditional CDF at the draw is consistent with uniform (sync: mean 0.43 +- 0.065, KS p 0.15;
+dust: 0.40, KS p 0.055), and the conditional optimum sits at the draw within +0.005 +- 0.014
+(sync; conditional sd 0.018) and +0.0007 +- 0.0014 (dust; sd 0.0014). The chain samples its
+target along the mean directions; the sampler is not the cause. (7) Why (5) and (6) differ:
+the data-preferred common level depends on the field's roughness. For six draws, scaling the
+non-centred coefficients z by 1, 0.5, 0.25 and 0 (the draw's field, sd 0.08 to 0.17 over the
+sky, down to a constant field at mu) moves the block-shift optimum from -0.025 to +0.026
+(at the draw) to -0.065 to -0.130 (constant field), and at the posterior-mean state (z and
+multipliers averaged, a smooth field) from -0.072 to -0.180 (z x 0). The scans of E023, E025
+and the whole-sky scans above were all made at smooth fields (the region-fit reference or the
+posterior mean) and so measured the level of a smooth field, which is 0.1 steeper than the
+level the posterior gives a field of the sampled roughness. The likelihood is nonlinear in
+the index over the 0.15 the prior-dominated field fluctuates by, and its optimum for the
+common level shifts with that fluctuation; the field scale sigma_s = 0.15 +- 0.05 is itself
+prior-dominated (sky 0.063), so the level of the faint sky is set by the prior on sigma
+through this coupling, not by the data. The dust field (sigma 0.062 +- 0.009, data-constrained)
+shows no such offset: its conditional optima sit at the draws.
+
 ## Negative control
 gmrf16_cs_scalar (the scalar law the scans showed biased) must show the predicted dust and sync
 biases; if it does not, either the scans or the chains are wrong and the record says which.
 
 ## Conclusion
-(pending)
+1. **Valid chains at realistic noise need the non-centred parameterization** (D024): the centred
+   chains stuck in the funnel neck; the non-centred ones mix (hyperparameter ESS 24 to 143, 2
+   divergences in 700) and pass a Gibbs-consistency check along both field means (conditional
+   CDF uniform, KS p 0.15 and 0.055; conditional optima at the draws). The check costs 0.1 s
+   per evaluation at nside 64 and is adopted as the standard validity check of production
+   index-field chains (D025).
+2. **Templates.** With the per-region multiplier field, a component-separation-quality template
+   (30 percent smooth error) costs +0.19 (sync) and +0.02 (dust) pixel-level RMSE against exact
+   templates; the multiplier maps track the realized error where the data allow (correlation
+   0.7 to 0.9 in the bright quartiles). For dust the cs template is usable at this depth (bright
+   quartile as good as exact, fainter quartiles 1.3 to 1.7 times worse, no extra bias); for sync
+   it is not (RMSE 2 to 3 times worse, field scale 0.35). The scalar law is a catastrophe
+   (+0.48 and +0.24; sync field scale 0.87): the negative control fails as predicted, in a
+   valid chain. F30.
+3. **The exact-template chain is right where the data speak and prior-set where they do not.**
+   Sync: the data-dominated regions (90 percent of the Fisher weight in the bright quartile)
+   agree with the region-fit reference (z medians -0.6 to +0.2, 77 to 90 percent inside |z| <
+   1); the Fisher-weighted level is right to 0.01; the single-index run is 1.3 sd from its
+   pseudo-true value. The unweighted field mean (+0.13, 3 sd of its posterior sd) is the
+   floating level of the 2300 regions with region Fisher sd 2.5 to 3.7, and that level is set
+   by the field's roughness through the nonlinearity of the likelihood: a smooth field wants
+   it 0.1 steeper than the rough field the posterior samples (sigma 0.15 +- 0.05,
+   prior-dominated, against a sky sd of 0.063). F29. Dust: the bright quartile sits +0.06 with
+   the mu_d map at 1.029 because the fixed-T misfit is absorbed jointly by the multipliers and
+   the index (1191 + 375 nats better than the reference), a path the global law could not take
+   (E025 saw +0.5 percent).
+4. **Consequences.** (a) At realistic noise the unweighted mean of the nside-16 sync field is
+   not a reportable quantity; Paper A reports the Fisher-weighted level and the data-dominated
+   regions, with the faint sky labelled prior-dominated (the posterior there is the prior on
+   sigma). (b) The regime boundary is where the region Fisher sd exceeds the sky's index sd;
+   E027 (nside 8 and 4) tests whether coarser regions make sigma data-determined and remove the
+   level coupling, or whether an informative prior on sigma is needed. (c) The per-region
+   multiplier field turns the fixed-T misfit into a dust-index bias of 0.06 in the bright sky;
+   region-wise or sampled T_d comes before the multiplier field is used for dust on real data
+   (M2.6), in the opposite order to D023's deprioritization. (d) Scans at a smooth reference
+   field measure a smooth field's level; a prior-dominated field's level needs the chain (or a
+   scan at the sampled roughness). (e) The per-pixel GLS CMB metric is uninformative at this
+   depth; a posterior-CMB metric is needed (follow-up).
+5. **Scope.** One sky (PySM d1s1c1), one noise realization (seed 2027), one template-error
+   realization (seed 11), the E012 noise levels at nside 64; the template-S/N quartiles of a
+   single realization correlate with the 23 GHz noise (faint sync quartile at -12 SE), which
+   touches per-quartile statistics but not the posterior.
 
 ## Follow-ups
-- Funnel diagnostics for the production setting at realistic noise: sigma trace of the
-  non-centred runs; if they also stick, a sigma-marginalized or alternating scheme.
+- E027: the resolution ladder (nside 8, 4) with the Gibbs-consistency check on each rung; does
+  the sync level coupling vanish when sigma is data-determined.
+- An informative prior on the field scale (or sigma fixed at a measured value) as the
+  alternative fix for the faint-sky level; test by the roughness check before a chain.
+- Region-wise or sampled T_d before per-region multipliers are used for dust (M2.6).
 - The CMB metric at realistic noise: the per-pixel GLS is noise; use the posterior CMB from the
   amplitude step or a smoothed GLS.
+- A second noise realization of the PySM noise-1 sky to separate realization effects from
+  model properties in the per-quartile numbers.

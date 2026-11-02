@@ -356,3 +356,24 @@ is an attractor for the centred geometry, not a transient. Fixing sigma: changes
 Marginalizing sigma: not available for the GMRF field in closed form; a fallback if the
 non-centred chains also stick.
 
+## D025 (2026-11-02): Gibbs-consistency check as the standard validity test of production index-field chains; E027 proceeds; reporting rule for prior-dominated fields
+
+**Decision.** Every production index-field chain (realistic noise, nside 8 or finer) is checked
+by the conditional-CDF test of `nextgen/scripts/e026_conditional_check.py` along at least the
+field means of every component (20 or more post-burn draws; the CDF values must be consistent
+with uniform and the conditional optima with the draws) before its posterior is read; the test
+is added to VALIDATION.md. E027 (resolution ladder at realistic noise) runs with this check on
+each rung. Results from a prior-dominated index field report the Fisher-weighted level and the
+data-dominated regions, never the unweighted field mean, and label the faint sky as
+prior-dominated.
+
+**Why.** F29: the E026 exact-template chain had its unweighted sync mean 3 sd of its own sd
+above the truth while exact-target scans at smooth fields preferred the truth; the
+conditional-CDF test showed the chain samples its target and the roughness check showed the
+level is a property of the posterior under a prior-dominated field scale. Without the test
+the result would have been read as a sampler bug; without the reporting rule it would be read
+as a biased method.
+
+**Alternatives considered.** Reading off scans only: they measure a smooth field's level (F29).
+A second independent sampler at dimension 12,300: not available; the conditional-CDF test is
+exact for the implemented target at 0.1 s per evaluation.

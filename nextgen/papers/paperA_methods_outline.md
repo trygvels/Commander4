@@ -142,6 +142,24 @@ model component rather than a preprocessing choice.
   basis coefficients are invisible to a diagonal metric); efficiency per gradient;
   the funnel at low S/N (E018 L1 diagnostic: the centred reference chain does not reach the
   small-sigma tail where NUTS in non-centred coordinates does). MAMS comparison (M2.3, pending).
+- The realistic-noise regime (E026, F29, F30): at the E012 noise with nside-64 data the
+  nside-16 sync field is prior-dominated over three quarters of the sky (region Fisher sd 1 to
+  3.7 against a sky sd of 0.063); the data-dominated quartile is recovered (z medians within
+  0.6), the Fisher-weighted level is right to 0.01, and the unweighted field mean floats at a
+  level set by the prior on the field scale through the nonlinearity of the likelihood (+0.13
+  here; a smooth field wants it 0.1 steeper than the sampled rough field). Statement for the
+  paper: the unweighted mean of a prior-dominated index field is not an estimate of anything;
+  report the Fisher-weighted level and the data-dominated regions, and either coarsen the field
+  until the scale is data-determined (E027) or state an informative prior on the scale. The
+  per-region template multiplier field (F28) converts the fixed-T misfit into a bright-sky
+  dust-index bias (+0.06, multipliers at 1.03), so the dust SED needs T_d region-wise or
+  sampled before the multiplier field is used on real data; a cs-quality template is usable
+  for dust (+0.02 RMSE) and not for synchrotron (+0.19) at this depth; the scalar law fails
+  (+0.48 / +0.24). Figure candidate: block-shift optimum against field roughness (E026
+  roughness check); Table candidate: exact / cs_mumap / cs_scalar per quartile.
+- Validity of production chains (D025): the conditional-CDF (Gibbs-consistency) check along
+  the field means, exact for the implemented target and independent of the sampler; the
+  centred chains' funnel at realistic noise (E026) as the motivating failure.
 - Figure 3: recovered index field and hyperparameters against truth on template skies (E016).
 
 ## 6. Implementation in Commander4 and end-to-end validation

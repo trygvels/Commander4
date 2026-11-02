@@ -1,0 +1,11 @@
+draw 0 chain01_iter0501.h5: mu -2.8648, field sd 0.103, sigma 0.068; z x 1.00: optimum -0.025 (sd 0.018, gain over 0 1.0); z x 0.50: optimum -0.063 (sd 0.018, gain over 0 6.2); z x 0.25: optimum -0.082 (sd 0.018, gain over 0 10.7); z x 0.00: optimum -0.101 (sd 0.018, gain over 0 16.1)
+draw 1 chain01_iter0617.h5: mu -2.8981, field sd 0.081, sigma 0.095; z x 1.00: optimum -0.006 (sd 0.018, gain over 0 0.0); z x 0.50: optimum -0.036 (sd 0.018, gain over 0 1.9); z x 0.25: optimum -0.051 (sd 0.018, gain over 0 4.2); z x 0.00: optimum -0.065 (sd 0.017, gain over 0 6.7)
+draw 2 chain01_iter0733.h5: mu -2.8601, field sd 0.142, sigma 0.238; z x 1.00: optimum -0.018 (sd 0.017, gain over 0 0.5); z x 0.50: optimum -0.062 (sd 0.017, gain over 0 6.2); z x 0.25: optimum -0.084 (sd 0.017, gain over 0 11.4); z x 0.00: optimum -0.105 (sd 0.017, gain over 0 17.9)
+draw 3 chain01_iter0849.h5: mu -2.8044, field sd 0.144, sigma 0.136; z x 1.00: optimum -0.006 (sd 0.018, gain over 0 0.0); z x 0.50: optimum -0.069 (sd 0.018, gain over 0 7.6); z x 0.25: optimum -0.100 (sd 0.018, gain over 0 15.9); z x 0.00: optimum -0.130 (sd 0.018, gain over 0 26.9)
+draw 4 chain01_iter0965.h5: mu -2.9015, field sd 0.165, sigma 0.191; z x 1.00: optimum +0.026 (sd 0.018, gain over 0 1.1); z x 0.50: optimum -0.031 (sd 0.018, gain over 0 1.5); z x 0.25: optimum -0.058 (sd 0.018, gain over 0 5.2); z x 0.00: optimum -0.085 (sd 0.018, gain over 0 11.2)
+draw 5 chain01_iter1081.h5: mu -2.8862, field sd 0.125, sigma 0.125; z x 1.00: optimum +0.009 (sd 0.017, gain over 0 0.0); z x 0.50: optimum -0.035 (sd 0.018, gain over 0 1.9); z x 0.25: optimum -0.056 (sd 0.017, gain over 0 5.1); z x 0.00: optimum -0.077 (sd 0.017, gain over 0 9.6)
+posterior-mean state (z, mu, hyperparameters, multipliers averaged): z x 1.00: optimum -0.072 (sd 0.018, gain over 0 8.3); field sd at this z scale nan
+posterior-mean state (z, mu, hyperparameters, multipliers averaged): z x 0.50: optimum -0.127 (sd 0.018, gain over 0 25.5); field sd at this z scale nan
+posterior-mean state (z, mu, hyperparameters, multipliers averaged): z x 0.25: optimum -0.154 (sd 0.018, gain over 0 37.3); field sd at this z scale nan
+posterior-mean state (z, mu, hyperparameters, multipliers averaged): z x 0.00: optimum -0.180 (sd 0.018, gain over 0 51.1); field sd at this z scale nan
+DONE
