@@ -554,3 +554,15 @@ misfit (beta_eff3 minus beta_d rms 0.04) is absorbed jointly by the multipliers 
 percent, no index shift). So the region-scale multiplier field, which removes the template
 bias (F28), converts an SED misfit into an index bias where the data are strong: region-wise
 or sampled T_d comes before the multiplier field is used for dust on real data (M2.6).
+**Correction (2026-11-02, E028 baseline, `E028/fixedT_baseline_vs_trueT.txt`):** the +0.06 is
+relative to the fixed-T region fit (`bd_fixT`, whose pseudo-true value is the effective index
+beta_eff3 of a fixed-T fit). Against the region fit at the true per-pixel T (`bd_trueT`, the
+true beta_d) the same chain's bright quartile has z median -0.06 (mean offset +0.006, RMSE
+0.055): with the per-region multipliers taking the T misfit at the 545 GHz pivot (the 1.029),
+the chain's bright-sky dust index is the true beta_d, not beta_eff. The fainter quartiles sit
++0.06 above bd_trueT (z +1.0 to +1.2; the field mean 1.578 against a sky mean of 1.540), a
+prior-side effect to be read with E027. So the multiplier field does not bias the bright-sky
+index; it changes which index the chain estimates (beta_d instead of beta_eff) and moves the
+T misfit into the multipliers. The recommendation stands for a different reason: on real data
+the multiplier absorbs any pivot-frequency mismatch, so its 3 percent is not interpretable as
+a template error, and a T model is needed to separate the two.

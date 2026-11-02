@@ -284,7 +284,10 @@ biases; if it does not, either the scans or the chains are wrong and the record 
    prior-dominated, against a sky sd of 0.063). F29. Dust: the bright quartile sits +0.06 with
    the mu_d map at 1.029 because the fixed-T misfit is absorbed jointly by the multipliers and
    the index (1191 + 375 nats better than the reference), a path the global law could not take
-   (E025 saw +0.5 percent).
+   (E025 saw +0.5 percent). Corrected 2026-11-02 (E028 baseline): against the true-T region
+   fit the bright quartile is unbiased (z median -0.06); the +0.06 is the difference between
+   beta_eff (fixed-T fit) and beta_d (true), and the chain estimates the latter because the
+   multipliers absorb the T misfit at the pivot. See F30's correction.
 4. **Consequences.** (a) At realistic noise the unweighted mean of the nside-16 sync field is
    not a reportable quantity; Paper A reports the Fisher-weighted level and the data-dominated
    regions, with the faint sky labelled prior-dominated (the posterior there is the prior on

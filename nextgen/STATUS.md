@@ -21,6 +21,12 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   causes the F30 dust offsets. B: sampled scalar log T (identifiable) with the D025 check.
   C: a T field only with 545 and 857 GHz (new simulation), after an exact-model recovery run.
 
+- Correction to F30 from the E028 baseline: the fixed-T chain's bright dust quartile is at the
+  true-T reference (z median -0.06 against bd_trueT; +1.46 against the fixed-T fit). The
+  multipliers absorb the T misfit at the 545 GHz pivot (1.029) and the chain estimates the
+  true beta_d, not beta_eff; the bright-sky index is not biased. Stage A's prediction: index
+  unchanged, mu_d map to 1.00.
+
 **Running**
 - E027 gmrf8_exact_mumap_nc (184 of 1200 at 19:05; about 6.5 h total), then gmrf4.
 - Queued behind it: E028 stage A (`_Tmap`) and stage B (`_Tscalar`), about 7 h each.

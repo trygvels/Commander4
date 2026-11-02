@@ -150,7 +150,15 @@ mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_
 
 ## Result
 Baseline for stage A (fixed-T chain against both references, E027 quartile labels):
-`E028/fixedT_baseline_vs_trueT.txt`, computed before the oracle chain ran.
+`E028/fixedT_baseline_vs_trueT.txt`, computed before the oracle chain ran. The fixed-T chain's
+bright dust quartile is already at the true-T reference (z median -0.06, mean +0.006 against
+`bd_trueT`; +1.46, +0.060 against `bd_fixT`): the +0.06 of F30 is beta_eff minus beta_d, and
+the chain with free multipliers estimates beta_d. Stage A's prediction is therefore sharpened
+before it runs: the oracle T map should leave the bright-quartile index where it is (z within
+0.5 of bd_trueT, as now) and move the mu_d map from 1.029 to 1.00 +- 0.01; the fainter
+quartiles (+0.06 against bd_trueT, z +1.0 to +1.2) are expected to stay, being a field-prior
+effect (E027). If the mu_d map stays at 1.03 with the true T, the multipliers absorb something
+other than the T misfit and F30's mechanism is wrong.
 
 ## Negative control
 The fixed-T chain (E026 gmrf16_exact_mumap_nc) is the control: its +0.06 / 1.029 must be
