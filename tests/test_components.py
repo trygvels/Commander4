@@ -866,6 +866,35 @@ def test_get_dsed_dbeta_matches_finite_difference() -> None:
         assert comp.get_dsed_dbeta(nu).shape == nu.shape
 
 
+def test_thermal_dust_sed_with_temperature_field_and_its_derivatives() -> None:
+    dust, _ = _index_components()
+    nu = np.array([30.0, 70.0, 143.0, 353.0, 545.0, 857.0])
+    betas = np.array([1.5, 1.7, 1.45])
+    Ts = np.array([18.0, 22.0, 27.5])
+    sed = dust.get_sed(nu, beta=betas, T=Ts)
+    assert sed.shape == (3, 6)
+    for i in range(3):
+        dust_i = _index_components()[0]
+        dust_i.beta, dust_i.T = betas[i], Ts[i]
+        np.testing.assert_allclose(sed[i], dust_i.get_sed(nu), rtol=1e-14)
+    # T alone (beta from the component), scalar nu with array T (per-pixel shape)
+    assert dust.get_sed(nu, T=Ts).shape == (3, 6)
+    assert dust.get_sed(100.0, beta=betas, T=Ts).shape == (3,)
+    np.testing.assert_allclose(dust.get_sed(nu, beta=dust.beta, T=dust.T), dust.get_sed(nu), rtol=1e-14)
+    # Derivatives against central differences, with and without a temperature field.
+    h = 1e-4
+    fd_T = (dust.get_sed(nu, beta=betas, T=Ts + h) - dust.get_sed(nu, beta=betas, T=Ts - h)) / (2 * h)
+    np.testing.assert_allclose(dust.get_dsed_dT(nu, beta=betas, T=Ts), fd_T, rtol=1e-6)
+    np.testing.assert_allclose(dust.get_dsed_dlogT(nu, beta=betas, T=Ts), Ts[:, None] * fd_T, rtol=1e-6)
+    fd_b = (dust.get_sed(nu, beta=betas + h, T=Ts) - dust.get_sed(nu, beta=betas - h, T=Ts)) / (2 * h)
+    np.testing.assert_allclose(dust.get_dsed_dbeta(nu, beta=betas, T=Ts), fd_b, rtol=1e-6)
+    fd_T0 = (dust.get_sed(nu, T=dust.T + h) - dust.get_sed(nu, T=dust.T - h)) / (2 * h)
+    np.testing.assert_allclose(dust.get_dsed_dT(nu), fd_T0, rtol=1e-6)
+    assert dust.get_dsed_dT(nu).shape == nu.shape
+    # Extreme temperatures stay finite (x / (1 - e^-x) form).
+    assert np.all(np.isfinite(dust.get_dsed_dT(np.array([10.0, 3000.0]), beta=1.5, T=np.array([5.0, 60.0]))))
+
+
 def test_set_beta_map_sets_mean_index_and_varying_mixing_matrix() -> None:
     dust, _ = _index_components()
     assert dust.beta_map is None and dust.beta_nside == 0 and not dust.spatially_varying_MM

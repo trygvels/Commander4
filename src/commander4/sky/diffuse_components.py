@@ -642,29 +642,61 @@ class ThermalDust(DiffuseComponent):
         self.T = comp_params.T
         self.nu_ref = self._reference_frequency(comp_params)
 
-    def get_sed(self, nu, beta=None):
+    @staticmethod
+    def _broadcast_nu_params(nu, *params):
+        """Arrange `nu` and the SED parameters so that their products have the shapes stated in
+        `DiffuseComponent.get_sed`: with a 1-d `nu` and any 1-d parameter (nreg,), `nu` becomes
+        (1, nband) and every 1-d parameter (nreg, 1); otherwise the arrays are returned as given
+        (scalars, or per-pixel parameters with a scalar `nu`)."""
+        nu = np.asarray(nu, dtype=np.float64)
+        params = [np.asarray(p, dtype=np.float64) for p in params]
+        if nu.ndim == 1 and any(p.ndim == 1 for p in params):
+            return (nu[None, :], *[p[:, None] if p.ndim == 1 else p for p in params])
+        return (nu, *params)
+
+    def _mbb_terms(self, nu, beta, T):
+        """(nu_b, beta_b, T_b, x, x0): the broadcast inputs and the dimensionless h nu / k T at
+        `nu` and at the reference frequency."""
+        nu_b, beta_b, T_b = self._broadcast_nu_params(nu, self.beta if beta is None else beta,
+                                                      self.T if T is None else T)
+        return nu_b, beta_b, T_b, h_over_k * nu_b / T_b, h_over_k * self.nu_ref / T_b
+
+    def get_sed(self, nu, beta=None, T=None):
         """Calculates the spectral energy distribution (SED) for Thermal Dust emission.
            The result is unitless, but meant to be multiplied by a RJ brightness temperature.
         Args:
             nu (float or np.ndarray): Frequency in GHz at which to evaluate the SED.
             beta (float or np.ndarray, optional): emissivity index instead of `self.beta`; see
                 `DiffuseComponent.get_sed` for the shapes.
+            T (float or np.ndarray, optional): temperature in K instead of `self.T`, with the
+                same shape rules as `beta` (a per-region or per-pixel temperature field).
         Returns:
             The SED scaling factor (float or np.ndarray).
         """
         # Modified blackbody, in uK_CMB
-        x = (h_over_k*nu)/(self.T)
-        x0 = (h_over_k*self.nu_ref)/(self.T)
-        if beta is None:
+        if beta is None and T is None:
+            x = (h_over_k*nu)/(self.T)
+            x0 = (h_over_k*self.nu_ref)/(self.T)
             return (nu / self.nu_ref)**(self.beta + 1.0) * np.expm1(x0) / np.expm1(x)
-        nu_b, beta_b = self._broadcast_nu_beta(nu, beta)
-        x = (h_over_k*nu_b)/(self.T)
+        nu_b, beta_b, _, x, x0 = self._mbb_terms(nu, beta, T)
         return (nu_b / self.nu_ref)**(beta_b + 1.0) * np.expm1(x0) / np.expm1(x)
 
-    def get_dsed_dbeta(self, nu, beta=None):
-        """d sed / d beta = sed ln(nu / nu_ref) (the temperature is fixed)."""
-        nu_b, _ = self._broadcast_nu_beta(nu, self.beta if beta is None else beta)
-        return self.get_sed(nu, beta) * np.log(nu_b / self.nu_ref)
+    def get_dsed_dbeta(self, nu, beta=None, T=None):
+        """d sed / d beta = sed ln(nu / nu_ref) at fixed temperature."""
+        nu_b, _, _, _, _ = self._mbb_terms(nu, beta, T)
+        return self.get_sed(nu, beta, T) * np.log(nu_b / self.nu_ref)
+
+    def get_dsed_dT(self, nu, beta=None, T=None):
+        """d sed / d T = sed / T [x e^x / expm1(x) - x0 e^x0 / expm1(x0)], x = h nu / k T, x0 at
+        the reference frequency, computed as x / (1 - e^-x) (finite for every x > 0)."""
+        _, _, T_b, x, x0 = self._mbb_terms(nu, beta, T)
+        f = lambda y: y / (-np.expm1(-y))
+        return self.get_sed(nu, beta, T) / T_b * (f(x) - f(x0))
+
+    def get_dsed_dlogT(self, nu, beta=None, T=None):
+        """d sed / d log T = T d sed / dT (the derivative with respect to the sampled log T)."""
+        _, _, T_b, _, _ = self._mbb_terms(nu, beta, T)
+        return T_b * self.get_dsed_dT(nu, beta, T)
 
 
 class Synchrotron(DiffuseComponent):
