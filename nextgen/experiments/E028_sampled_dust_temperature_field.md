@@ -128,6 +128,21 @@ may put T on the prior in the faint half and let beta carry the fit, in which ca
 decide whether the bright sky, where the data constrain both, is repaired.
 
 ## Command
+Stage A and B (queued behind E027 by `run_e028_queue.sh`, 2026-11-02 19:05; parameter files
+differ from `param_gmrf16_exact_mumap_nc.yml` only in the output directory and the ThermalDust
+lines shown):
+```bash
+# stage A: T_map: "/Users/trygvels/data/e023_pysm_n1/truth_Td_nside16.fits" (true T_d region means
+#          at nside 16: mean 20.93 K, sd 2.05, range 15.5 to 26.5)
+mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_mumap_nc_Tmap.yml
+# stage B: sample_T: true, T_nside: 0, T_prior gaussian mean log 20 rms 0.2
+mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_mumap_nc_Tscalar.yml
+```
+Stage B's pseudo-true scalar T is not the sky mean: the unweighted truth T is 20.93 K, the
+a_dust^2-weighted 22.64 K, the |a_dust|-weighted 20.10 K; the value a scalar T estimates under
+the pinned-amplitude model is computed before the chain is read (noise-free fit of one T with
+per-region (mu_r, beta_r) free, the reviewer's construction), and the 2-sd criterion refers to
+that value.
 ```bash
 python -m pytest -q tests/test_components.py tests/test_index_field.py tests/test_index_field_sampler.py tests/test_hier_group_wiring.py
 mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_mumap_nc_T.yml

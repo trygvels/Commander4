@@ -2,6 +2,39 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-02 (Mac mini, 19:10): E028 code in (sampled or fixed dust temperature), target stats-reviewed, staged (D026); E027 gmrf8 at 184 of 1200
+
+**Learned**
+- Independent review of the E028 target: with the hier amplitude prior (amplitude pinned at 545
+  GHz) and bands to 353 GHz, per-region (mu_r, beta_r, T_r) are degenerate (corr(beta, tau)
+  -0.97) and the Fisher sd of T_r at nside 16 is 52 K or more in every region (minimum 2.75 K)
+  against a 3 K prior sd: a sampled T field would be the prior everywhere on this data set. A
+  scalar T has sd 0.7 K; with 545 and 857 GHz 157 of 3072 regions become identifiable. The
+  derivative and the target are sound; two validation gaps (T-independent target passing a
+  finite-difference test; amplitude and index steps building the mixing matrix separately)
+  are now covered by tests against an independent covariance-form target.
+- Code (965 tests pass): a second sampled spectral parameter per component (log T as scalar or
+  GMRF field), a fixed `T_map` option that also sets the region grid, chain I/O, band
+  projections; the kernel is called once per derivative column. Default behaviour unchanged
+  (fixed-T regression test).
+- D026: E028 in stages. A: oracle fixed T map (true region means) to test whether the fixed T
+  causes the F30 dust offsets. B: sampled scalar log T (identifiable) with the D025 check.
+  C: a T field only with 545 and 857 GHz (new simulation), after an exact-model recovery run.
+
+**Running**
+- E027 gmrf8_exact_mumap_nc (184 of 1200 at 19:05; about 6.5 h total), then gmrf4.
+- Queued behind it: E028 stage A (`_Tmap`) and stage B (`_Tscalar`), about 7 h each.
+- Stats review of F29 (the roughness coupling) in progress.
+
+**Next**
+- E027 analysis per rung with the D025 checks; E028 A and B readings against `bd_trueT`;
+  then the informative-sigma alternative or the 545/857 simulation depending on E027 and A.
+
+**Needs Trygve**
+- Unchanged from 17:25 (Paper A reporting rule for prior-dominated fields; order of T_d work
+  against the multiplier field). New: whether a 14-band simulation with 545 and 857 GHz (stage
+  C) is the right next investment, given that real-data intensity work needs it anyway.
+
 ## 2026-11-02 (Mac mini, 17:25): E026 closed (F29, F30, D025); E027 resolution ladder running
 
 **Learned**
