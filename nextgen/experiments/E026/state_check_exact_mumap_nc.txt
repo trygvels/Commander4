@@ -1,0 +1,13 @@
+posterior means over 700 draws: field means -2.8680 1.5781, sigma 0.1445 0.0617, beta-map means -2.8680 1.5781, mu_d map mean 1.0286
+posterior-mean state: log target 1281690.10
+region-fit reference                      : log target 1278994.24  (chain minus this: +2695.86)  field means -2.9803 1.5310
+reference, dust only (sync at chain)      : log target 1279883.08  (chain minus this: +1807.02)  field means -2.8680 1.5310
+reference, sync only (dust at chain)      : log target 1280802.70  (chain minus this: +887.40)  field means -2.9803 1.5781
+chain with sync field shifted by -0.130: log target 1281695.98 (chain minus this -5.88)
+chain with sync field shifted by -0.065: log target 1281699.78 (chain minus this -9.68)
+chain with sync field shifted by +0.065: log target 1281667.30 (chain minus this +22.80)
+chain with dust field shifted by -0.040: log target 1281314.90 (chain minus this +375.20)
+chain with dust field shifted by -0.020: log target 1281606.03 (chain minus this +84.07)
+chain with dust field shifted by +0.020: log target 1281571.97 (chain minus this +118.13)
+chain with dust mu map set to 1: log target 1280498.83 (chain minus this +1191.27); chain mu_d map mean 1.0286
+chain with dust mu map 1 and dust field -0.04: log target 1280505.60 (chain minus this +1184.50)

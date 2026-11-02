@@ -172,6 +172,34 @@ flatter index by up to +1.4 at 68 nats; the expected-mode scans (noiseless sky) 
 realization carries this selection, on real data too when regions are selected by a template
 built from the same data.
 
+**Exact-target checks of the exact-template offsets (2026-11-02; `E026/allsky_scan_exact.txt`,
+`state_check_exact_mumap_nc.txt`, `nextgen/scripts/e026_state_check.py`).** (1) Whole-sky
+shift scans of the exact target with the index fields held at the region-fit reference (flat
+CMB prior; global or per-region mu profiled; expected and realization modes): sync -0.02
+(curvature sd 0.029, gain 0.2 to 0.5 nats) and dust 0.000 (sd 0.0037) in every cell except the
+realization mode with per-region mu, where the sync optimum is -0.10 (7 nats; the 3072 free
+multipliers absorb this realization's noise). The data term at the reference prefers neither
+the +0.13 sync nor the +0.04 dust offset. (2) The full target (likelihood, GMRF priors at the
+chain's posterior-mean hyperparameters, hier priors with the posterior-mean mu maps) at the
+chain's posterior-mean state against the same state with the fields at the reference: the
+chain's state is 2696 nats higher (1807 from the dust field, 887 from the sync field); setting
+the posterior-mean dust mu map (1.0286) to 1 costs 1191 nats, moving the dust field down by
+0.04 costs 375; moving the sync field mean by -0.065 gains 10 nats and by +0.065 costs 23. So
+the chain is where its target puts the mass: the offsets are properties of the model at this
+depth, not of the sampler, and they are not visible to block-shift scans at a reference field.
+Reading: (a) dust: with the exact template at the 545 GHz reference and a fixed T, the SED is
+misspecified pixel by pixel; the flat-amplitude reference absorbs that per pixel, the hier
+model cannot (s 0.022), so the per-region multipliers (+2.9 percent) and the bright-quartile
+index (+0.06) absorb it jointly, 1191 + 375 nats better than the reference; the E025 scans with
+one global mu could not take that path (+0.5 percent) and so did not see it. The region-scale
+multiplier field makes the fixed-T misfit a bias where a scalar mu kept it a misfit. (b) sync:
+every region is prior-dominated (region Fisher sd 1 to 3.7; posterior sd 0.13 to 0.15 set by
+the field scale, itself prior-dominated at 0.14 +- 0.05 against a sky sd of 0.063); the data
+constrain only the aggregate, and the aggregate posterior mean -2.868 +- 0.042 sits 3 sd above
+the data-term optimum -3.00 +- 0.03. A run with a single sync index on the same data (dust
+field and mu maps unchanged, `chains_exact_syncscalar_mumap_nc/`, started 13:54) tests whether
+the field model's extra freedom produces that offset.
+
 ## Negative control
 gmrf16_cs_scalar (the scalar law the scans showed biased) must show the predicted dust and sync
 biases; if it does not, either the scans or the chains are wrong and the record says which.
