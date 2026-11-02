@@ -1,0 +1,4 @@
+fixed-T chain, 700 post-burn draws; dust mu map mean 1.0286 +- 0.0070
+against bd_trueT: Q1 z median -0.06 mean(pm-ref) +0.006 rmse 0.055; Q2 z median +1.17 mean(pm-ref) +0.061 rmse 0.071; Q3 z median +0.97 mean(pm-ref) +0.059 rmse 0.065; Q4 z median +0.46 mean(pm-ref) +0.030 rmse 0.035
+against bd_fixT: Q1 z median +1.46 mean(pm-ref) +0.060 rmse 0.072; Q2 z median +1.48 mean(pm-ref) +0.080 rmse 0.086; Q3 z median +0.91 mean(pm-ref) +0.055 rmse 0.065; Q4 z median -0.13 mean(pm-ref) -0.007 rmse 0.031
+stage A criterion (pre-registered): oracle-T chain bright quartile (Q1) z median against bd_trueT within 0.5, mu_d map mean within 0.01 of 1.

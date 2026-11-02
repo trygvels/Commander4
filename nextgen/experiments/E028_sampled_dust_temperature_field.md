@@ -149,7 +149,8 @@ mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_
 ```
 
 ## Result
-(design stage)
+Baseline for stage A (fixed-T chain against both references, E027 quartile labels):
+`E028/fixedT_baseline_vs_trueT.txt`, computed before the oracle chain ran.
 
 ## Negative control
 The fixed-T chain (E026 gmrf16_exact_mumap_nc) is the control: its +0.06 / 1.029 must be
