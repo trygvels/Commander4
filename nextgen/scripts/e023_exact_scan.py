@@ -263,6 +263,8 @@ def main():
                     help="rms of the log error field of the 'cs' (component-separation-quality) template")
     ap.add_argument("--cs-fwhm", type=float, default=10.0, help="correlation FWHM in degrees of that field")
     ap.add_argument("--cs-seed", type=int, default=11)
+    ap.add_argument("--ref-npz", default=None,
+                    help="npz with bs, bd (nside-16 region values) replacing the noise-free region-fit reference for every SED level (e.g. a chain posterior-mean state)")
     a = ap.parse_args()
     CMB_SD = a.cmb_sd
     D = a.dir
@@ -341,6 +343,11 @@ def main():
             f"{np.sqrt(np.mean((bs_ref-bs_mean)**2)):.4f} max {np.max(np.abs(bs_ref-bs_mean)):.4f}, dust rms "
             f"{np.sqrt(np.mean((bd_ref-bd_mean)**2)):.4f} max {np.max(np.abs(bd_ref-bd_mean)):.4f}; "
             f"at the bounds: {int(np.sum((bs_ref <= -3.999) | (bs_ref >= -2.001)))} sync, {int(np.sum((bd_ref <= 1.101) | (bd_ref >= 2.099)))} dust")
+    if a.ref_npz:
+        rr = np.load(a.ref_npz)
+        for sed in refs:
+            refs[sed] = (np.asarray(rr["bs"], float), np.asarray(rr["bd"], float))
+        say(f"  reference replaced by {a.ref_npz}: sync mean {refs['fixT'][0].mean():.4f} sd {refs['fixT'][0].std():.4f}, dust mean {refs['fixT'][1].mean():.4f} sd {refs['fixT'][1].std():.4f}")
     np.savez(a.out.replace(".txt", "_refs.npz"), bs_fixT=refs["fixT"][0], bd_fixT=refs["fixT"][1],
              bs_trueT=refs["trueT"][0], bd_trueT=refs["trueT"][1], qs16=qs16, qd16=qd16)
     summary = {"quartiles": {"sync": qs16.tolist(), "dust": qd16.tolist()}, "realized": realized, "cells": {}}
