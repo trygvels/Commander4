@@ -128,7 +128,7 @@ may put T on the prior in the faint half and let beta carry the fit, in which ca
 decide whether the bright sky, where the data constrain both, is repaired.
 
 ## Command
-Stage A and B (queued behind E027 by `run_e028_queue.sh`, 2026-11-02 19:05; parameter files
+Stage A and B (queued behind E027 by `run_e028_queue.sh`, 2026-11-02 17:49; parameter files
 differ from `param_gmrf16_exact_mumap_nc.yml` only in the output directory and the ThermalDust
 lines shown):
 ```bash

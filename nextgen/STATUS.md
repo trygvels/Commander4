@@ -2,7 +2,7 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
-## 2026-11-02 (Mac mini, 20:10): F29 corrected by the stats review (multiplier Occam bias, not roughness); F31 (profiled scans invalid); E029 queued first
+## 2026-11-02 (Mac mini, 18:05): F29 corrected by the stats review (multiplier Occam bias, not roughness); F31 (profiled scans invalid); E029 queued first
 
 **Learned**
 - The independent review of the E026 sync-level claims refuted the roughness mechanism (the
@@ -21,14 +21,15 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   realization -2.951 +- 0.025, chain -2.944: consistent (my earlier yardstick was wrong). With
   the dust at the truth the scalar pseudo-true moves to -2.83: the dust state is a sync
   confounder at this depth.
-- D025 check: valid; dust borderline at K = 20 (optimum offset 2.3 se, step too coarse); a
-  K = 100 run with a finer step is running; VALIDATION updated (K >= 100, step <= 1 sd,
-  negative control).
+- D025 check: valid; dust borderline at K = 20 (optimum offset 2.3 se, step too coarse); at
+  K = 100 with a 0.5-sd step it passes cleanly (KS p 0.51 sync, 0.30 dust; optimum offsets 0.08
+  and -0.03 conditional sd); VALIDATION updated (K >= 100, step <= 1 sd, negative control).
 
 **Running**
 - E027 gmrf8 (then gmrf4); queued: E029 (mu_prior sd 0.1; prediction: faint sync offset within
-  +-0.05), E028 stage A (oracle T map), stage B (scalar T). K = 100 conditional check; scalar-T
-  grid scan for stage B's pseudo-true T.
+  +-0.05), E028 stage A (oracle T map), stage B (scalar T). Scalar-T grid scan for stage B's
+  pseudo-true T; the F28 recheck with the analytic multiplier marginal (chain-state validation,
+  then the cs-template cells at 1 x and 0.03 x noise).
 
 **Next**
 - Analytic multiplier marginal in the scan script and the F28 recheck (cs template, both
@@ -39,7 +40,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   (sd 0.5 biases, sd 0.1 does not, if E029 confirms): a default change needs your call. Earlier
   items unchanged.
 
-## 2026-11-02 (Mac mini, 19:10): E028 code in (sampled or fixed dust temperature), target stats-reviewed, staged (D026); E027 gmrf8 at 184 of 1200
+## 2026-11-02 (Mac mini, 17:50): E028 code in (sampled or fixed dust temperature), target stats-reviewed, staged (D026); E027 gmrf8 at 184 of 1200
 
 **Learned**
 - Independent review of the E028 target: with the hier amplitude prior (amplitude pinned at 545
@@ -65,7 +66,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   unchanged, mu_d map to 1.00.
 
 **Running**
-- E027 gmrf8_exact_mumap_nc (184 of 1200 at 19:05; about 6.5 h total), then gmrf4.
+- E027 gmrf8_exact_mumap_nc (184 of 1200 at 17:49; about 6.5 h total), then gmrf4.
 - Queued behind it: E028 stage A (`_Tmap`) and stage B (`_Tscalar`), about 7 h each.
 - Stats review of F29 (the roughness coupling) in progress.
 

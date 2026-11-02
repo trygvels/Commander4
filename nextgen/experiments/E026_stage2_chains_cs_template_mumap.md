@@ -254,10 +254,12 @@ prior-dominated (sky 0.063), so the level of the faint sky is set by the prior o
 through this coupling, not by the data. The dust field (sigma 0.062 +- 0.009, data-constrained)
 shows no such offset: its conditional optima sit at the draws.
 
-**Independent stats review of items 1 to 7 (2026-11-02 19:40; `E026/stats_review_sync_level.md`,
+**Independent stats review of items 1 to 7 (2026-11-02 17:50; `E026/stats_review_sync_level.md`,
 `E026/review_scripts/`).** (8) The Gibbs-consistency check is valid and passes for sync; dust is
-borderline (optimum minus draw +0.0007 at 2.3 se, step too coarse); a K = 100 run with a finer
-dust step is in progress. (9) The roughness coupling of item 7 is withdrawn: the optimum shift
+borderline (optimum minus draw +0.0007 at 2.3 se, step too coarse). Rerun with K = 100 and a
+dust step of 0.5 conditional sd (`E026/conditional_check_k100.txt`, 18:03): sync PIT mean 0.474
++- 0.029, KS p 0.51, optimum minus draw +0.0014 (0.08 sd); dust PIT mean 0.517, KS p 0.30,
+optimum minus draw -0.0001 (-0.03 sd): the check passes at the reviewer's standard. (9) The roughness coupling of item 7 is withdrawn: the optimum shift
 is linear in the z scale (a first-order effect of the data-pinned bright regions being pulled
 off their optima; z x 0 is the scalar model), and with the multipliers integrated analytically
 the faint-region data level is -2.79 +- 0.065 for constant, reference, chain, shuffled and iid

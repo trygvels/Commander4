@@ -1,4 +1,4 @@
-# Independent stats review of the E026 sync-level claims (stats-reviewer, 2026-11-02, 19:40)
+# Independent stats review of the E026 sync-level claims (stats-reviewer, 2026-11-02, 17:50)
 
 Scripts in `review_scripts/` (run from that folder; `decomp.py` rebuilds the target in numpy and
 matches Commander4 to 1e-4 nats at draw iter0501, 1280908.95 both; the full target reproduces the
