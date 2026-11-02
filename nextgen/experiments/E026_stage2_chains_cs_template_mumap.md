@@ -259,7 +259,12 @@ shows no such offset: its conditional optima sit at the draws.
 borderline (optimum minus draw +0.0007 at 2.3 se, step too coarse). Rerun with K = 100 and a
 dust step of 0.5 conditional sd (`E026/conditional_check_k100.txt`, 18:03): sync PIT mean 0.474
 +- 0.029, KS p 0.51, optimum minus draw +0.0014 (0.08 sd); dust PIT mean 0.517, KS p 0.30,
-optimum minus draw -0.0001 (-0.03 sd): the check passes at the reviewer's standard. (9) The roughness coupling of item 7 is withdrawn: the optimum shift
+optimum minus draw -0.0001 (-0.03 sd): the check passes at the reviewer's standard. (12) The
+scan script now integrates the per-region multipliers analytically (`perregmarg` law; toy check
+against a 2-d quadrature to 5e-12, `E026/marg_check.txt`); at the chain's posterior-mean state the
+whole-sky sync shift optimum is +0.000 (curvature sd 0.026) in both modes
+(`E026/chainstate_scan_marginal.txt`, 18:07), reproducing the review's -0.003 +- 0.025: the
+chain sits at its target's optimum, and the -0.12 to -0.18 of item 5 were the profiling bias. (9) The roughness coupling of item 7 is withdrawn: the optimum shift
 is linear in the z scale (a first-order effect of the data-pinned bright regions being pulled
 off their optima; z x 0 is the scalar model), and with the multipliers integrated analytically
 the faint-region data level is -2.79 +- 0.065 for constant, reference, chain, shuffled and iid

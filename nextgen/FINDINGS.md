@@ -584,4 +584,7 @@ marginal), and the global-multiplier cells are a different model (no per-region 
 -0.109, 7.3 nats, where the marginal gives 0). Conclusions drawn from profiled per-region
 cells (F28's "within 0.02 at 0.03 x noise, insignificant at 1 x" for the cs template; the E026
 whole-sky and chain-state scans) are to be redone with the marginal before they are cited;
-the E026 chain results (F30) do not depend on the scans.
+the E026 chain results (F30) do not depend on the scans. The scan script's `perregmarg` law
+now does the integration (checked against a 2-d quadrature to 5e-12); at the E026 chain's
+posterior-mean state it gives a whole-sky optimum of +0.000 (sd 0.026) where the profiled law
+gave -0.12 to -0.18, reproducing the review.
