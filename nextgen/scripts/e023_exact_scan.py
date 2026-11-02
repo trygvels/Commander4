@@ -263,6 +263,11 @@ def main():
                     help="rms of the log error field of the 'cs' (component-separation-quality) template")
     ap.add_argument("--cs-fwhm", type=float, default=10.0, help="correlation FWHM in degrees of that field")
     ap.add_argument("--cs-seed", type=int, default=11)
+    ap.add_argument("--T-grid", type=float, nargs="*", default=None,
+                    help="E028 stage B: scalar dust temperatures (K); for each, the noise-free region fit is "
+                         "redone at that T and the expected target profiled at the reference for every cell "
+                         "in --cells (fixT cells only); prints the total per T, whose argmax is the pseudo-true "
+                         "scalar T of the pinned-amplitude model. Then exits.")
     ap.add_argument("--ref-npz", default=None,
                     help="npz with bs, bd (nside-16 region values) replacing the noise-free region-fit reference for every SED level (e.g. a chain posterior-mean state)")
     a = ap.parse_args()
@@ -350,6 +355,25 @@ def main():
         say(f"  reference replaced by {a.ref_npz}: sync mean {refs['fixT'][0].mean():.4f} sd {refs['fixT'][0].std():.4f}, dust mean {refs['fixT'][1].mean():.4f} sd {refs['fixT'][1].std():.4f}")
     np.savez(a.out.replace(".txt", "_refs.npz"), bs_fixT=refs["fixT"][0], bd_fixT=refs["fixT"][1],
              bs_trueT=refs["trueT"][0], bd_trueT=refs["trueT"][1], qs16=qs16, qd16=qd16)
+    if a.T_grid:
+        bd_mean = hp.ud_grade(np.asarray(t["beta_eff3"], float), 16)
+        for cell in a.cells:
+            tmpl, sed, kind = cell.split("_")
+            gsel = {"data": g_data, "exact": g_exact, "cs": g_cs}[tmpl]
+            sky.gs, sky.gd = gsel["sync"], gsel["dust"]
+            hyper = Hyper(kind, qs64, qd64, reg=reg)
+            say(f"== T grid for cell {cell} [expected]: scalar T, region fit redone per T, hyperparameters profiled")
+            for Tval in a.T_grid:
+                T = np.full(npix, float(Tval))
+                t0 = time.time()
+                bs_T, bd_T = region_fit(skymap, rms, T, np.asarray(sky.cm), reg, nreg, bs_mean, bd_mean)
+                th, p, nfev = sky.profile(sync_sed(bs_T[reg]), dust_sed(bd_T[reg], T), hyper.theta0(), hyper, True)
+                tot = p["chi"] + p["ld"] + p["tr"] + p["lp"]
+                say(f"   T {Tval:6.2f} K: total {tot:.2f} (chi2 {p['chi']:.1f} logdet {p['ld']:.1f} trace {p['tr']:.1f} "
+                    f"hyperprior {p['lp']:.2f}); bd fit mean {bd_T.mean():.4f}, bs fit mean {bs_T.mean():.4f}; "
+                    f"{nfev} evals, {time.time() - t0:.0f} s")
+        out.close()
+        return
     summary = {"quartiles": {"sync": qs16.tolist(), "dust": qd16.tolist()}, "realized": realized, "cells": {}}
     fine = np.arange(a.fine[0], a.fine[1] + 1e-9, a.fine[2])
     wide = np.arange(a.wide[0], a.wide[1] + 1e-9, a.wide[2])
