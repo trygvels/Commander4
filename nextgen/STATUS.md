@@ -2,6 +2,46 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-02 (Mac mini, 17:25): E026 closed (F29, F30, D025); E027 resolution ladder running
+
+**Learned**
+- The single-sync-index run gives -2.944 +- 0.031, 1.3 sd from its pseudo-true value (the
+  Fisher-weighted truth -2.983). The field run's data-dominated regions (90 percent of the sync
+  Fisher weight) agree with the region-fit reference (z medians -0.6 to +0.2); its
+  Fisher-weighted level is right to 0.01. The +0.13 is the unweighted mean, i.e. the floating
+  level of 2300 regions with region Fisher sd 2.5 to 3.7 (posterior sd 0.15 from the field
+  scale).
+- The chain is not biased: a Gibbs-consistency check (conditional CDF along each field mean at
+  20 draws, full Commander4 target, 0.1 s per evaluation) is uniform (KS p 0.15 sync, 0.055
+  dust) with the conditional optima at the draws. Adopted as the standard validity test of
+  production chains (D025, VALIDATION.md).
+- Why the exact-target scans at the chain's posterior-mean state still preferred a sync level
+  0.12 to 0.18 steeper: the data-preferred level depends on the field's roughness. Smoothing a
+  draw's field to a constant moves the block-shift optimum from 0.00 +- 0.02 to -0.065 to
+  -0.13. The field scale (0.15 +- 0.05, sky 0.063) is prior-dominated, so the faint-sky level
+  is a function of the prior on sigma (F29). All earlier scans were made at smooth fields.
+- Templates at realistic noise (F30): cs template with per-region multipliers +0.19 (sync) and
+  +0.02 (dust) RMSE against exact; scalar law +0.48 / +0.24. The multiplier field absorbs the
+  fixed-T misfit with the bright dust index (+0.06, mu_d map 1.029): T_d region-wise or sampled
+  before the multiplier field is used for dust on real data (M2.6, reversing D023's order).
+
+**Running**
+- E027: gmrf8_exact_mumap_nc from 17:19 (then gmrf4), exact templates, non-centred, dense
+  metric; references at nside 8 and 4 and the analyzer are ready (`E027/refs_nside*.npz`).
+  Pre-registered: the sync level offset should fall as sigma becomes data-determined.
+
+**Next**
+- E027 analysis with the Gibbs-consistency and roughness checks on each rung; then the
+  informative-sigma alternative if nside 4 is still prior-dominated. Region-wise T_d design
+  (M2.6). A posterior-CMB metric for realistic noise.
+
+**Needs Trygve**
+- Paper A framing: at realistic noise the unweighted mean of a prior-dominated index field is
+  not an estimate; proposed reporting rule (Fisher-weighted level plus data-dominated regions,
+  D025) and the regime-boundary statement. Order of M2.6 (T_d) against the multiplier field for
+  dust on real data. Earlier items unchanged (E022 presentation, COMP_CL_TYPE semantics, hier
+  default, Q15 zero-level model, D021 CMB prior width).
+
 ## 2026-11-02 (Mac mini, 14:10): E026 non-centred chains valid; exact-template offsets traced to the model at realistic noise; single-sync-index check running
 
 **Learned**

@@ -228,8 +228,8 @@ posterior-mean state (`--ref-npz`): with one global multiplier the data term pre
 of -0.14 (12 nats, curvature sd 0.030) in both modes, which cannot be read directly because the
 chain's law has 3072 multipliers; the per-region-multiplier cells are recorded below.
 
-**Chain-state scan, Gibbs-consistency check and the roughness coupling (2026-11-02 17:00 to
-17:45; `E026/chainstate_scan_exact.txt`, `conditional_check.txt`, `roughness_check.txt`;
+**Chain-state scan, Gibbs-consistency check and the roughness coupling (2026-11-02 16:50 to
+17:20; `E026/chainstate_scan_exact.txt`, `conditional_check.txt`, `roughness_check.txt`;
 `nextgen/scripts/e026_conditional_check.py`, `e026_roughness_check.py`).** (5) The exact-target
 scan around the chain's posterior-mean state prefers a whole-sky sync shift of -0.14 (global
 law, 12 nats), -0.12 (per-region multipliers, expected mode, 8 nats) and -0.18 (per-region
