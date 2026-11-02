@@ -149,7 +149,17 @@ a curvature sd of 0.8 K (the a_dust^2-weighted truth is 22.6 K; the dust index f
 1.600 at 18 K to 1.478 at 24 K, the beta-T degeneracy). The per-region-profiled rows of that
 file are invalid (F31: the profiled multipliers prefer the low end monotonically); the
 pseudo-true value under the chain's own law (multipliers integrated, `perregmarg`) is being
-computed (`Tgrid_scan_marginal.txt`) and is the stage B reference.
+computed (`Tgrid_scan_marginal.txt`) and is the stage B reference. Result (18:36,
+`E028/Tgrid_scan_marginal_sd05.txt`): under the chain's law the expected target rises
+monotonically over 19 to 24 K (7.3 nats from 19 to 20 K, 1.8 nats from 23 to 24 K, still rising
+at 24 K): the scalar T is not pinned near the sky's 20.9 K by this target; the marginalized
+multipliers and the re-fitted index field trade against T (the beta-T-multiplier degeneracy of
+the review, now in the target's optimum). The grid is being extended to 34 K and repeated with
+the sd-0.1 hyperprior. Stage B prediction, written before the chain: under sd 0.5 the scalar T
+posterior sits well above 22 K (where exactly, the extended grid says), with the dust index
+field lower than the truth in step (the region fit gives 1.478 at 24 K against 1.531 at 20.9 K);
+this is the identifiability failure of the review in its scalar form, and stage B is read as a
+measurement of it, not as a recovery test.
 ```bash
 python -m pytest -q tests/test_components.py tests/test_index_field.py tests/test_index_field_sampler.py tests/test_hier_group_wiring.py
 mpirun -n 12 commander4 -p /Users/trygvels/data/e023_pysm_n1/param_gmrf16_exact_mumap_nc_T.yml
