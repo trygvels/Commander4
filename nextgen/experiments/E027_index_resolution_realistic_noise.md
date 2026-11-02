@@ -95,7 +95,34 @@ python nextgen/scripts/e026_analyze.py --dir /Users/trygvels/data/e023_pysm_n1 -
 ```
 
 ## Result
-(running)
+**gmrf8 rung (17:19 to 19:05, 1.75 h, 1200 iterations, 700 post-burn, 0 tracebacks;
+`E027/gmrf8_analysis.txt`, `gmrf8_hyper_ess.txt`, `gmrf8_sync_level.txt`,
+`e020_analysis_gmrf8_16.txt`; E027 quartile labels for both rungs).** 31 gradients per
+iteration (nside 16: 63). Hyperparameter ESS: sync mu 168, log sigma 100, u 38; dust mu 125,
+log sigma 29, u 14; region index ESS medians 462 (sync) and 177 (dust), minima 82 and 24.
+Fields: sigma_s 0.130 +- 0.043, rho 63 +- 41 deg, mu -2.879 +- 0.040; sigma_d 0.065 +- 0.012,
+rho 77 +- 27 deg, mu 1.581 +- 0.014; amplitude hyperparameters mu_s map mean 0.996, mu_d map
+mean 1.029 (unchanged from nside 16), s 0.036 / 0.022.
+- Pixel-level RMSE against the truth (the metric with the representation error): sync 0.1347
+  (nside 16: 0.1467; paired difference +0.0121 +- 0.0012 in favour of nside 8), dust 0.0627
+  (nside 16: 0.0597; +0.0022 +- 0.0006 in favour of nside 16); representation floors 0.0235 /
+  0.0237 (nside 16: 0.0130 / 0.0187). Per S/N quartile (low to high) sync 0.139, 0.147, 0.144,
+  0.106 (nside 16: 0.152, 0.161, 0.156, 0.113); dust 0.039, 0.066, 0.077, 0.062 (0.032, 0.064,
+  0.074, 0.061).
+- Against the nside-8 region-fit reference (fixed T) per template-S/N quartile: sync z medians
+  +0.52, +0.92, +0.99, +0.83, RMSE 0.103, 0.127, 0.133, 0.131, posterior sd medians 0.11 to
+  0.14 (region Fisher sds 0.49, 1.06, 1.55, 2.26); dust z +1.44, +1.74, +1.03, +0.10, RMSE 0.069,
+  0.087, 0.071, 0.035 (nside 16 with the same labels: 0.072, 0.086, 0.065, 0.031).
+- Sync level: the field mean sits +0.12 above the sky mean as at nside 16 (faint quartiles
+  +0.11 to +0.12 above the reference; the bright quartile +0.055; the top 10 / 100 regions by
+  Fisher weight +0.053 / +0.043 with z medians +0.5 / +0.35); the Fisher-weighted level is
+  -2.970 against a truth of -2.999. Pre-registered reading (a): the offset does not shrink with
+  the number of index regions (768 against 3072), as the corrected F29 mechanism predicts (the
+  Occam push comes from the 3072 multipliers, which are unchanged), and against the
+  fewer-regions hypothesis.
+- Dust (c): the mu_d map stays at 1.029 and the bright quartile at +1.44 z against the fixed-T
+  reference: the fixed-T absorption is independent of the index resolution, as predicted.
+- The D025 Gibbs-consistency check (K = 100) is running (`conditional_check_gmrf8.txt`).
 
 ## Negative control
 None beyond E026's: the comparison is between valid chains of the same target class. The

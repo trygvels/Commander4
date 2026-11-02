@@ -13,7 +13,7 @@ import argparse, glob, sys, time
 ap = argparse.ArgumentParser(); ap.add_argument("--dir", required=True); ap.add_argument("--tag", required=True)
 ap.add_argument("--sync-template", required=True); ap.add_argument("--dust-template", required=True)
 ap.add_argument("--mu-nside", type=int, default=16); ap.add_argument("--cmb-sd", type=float, default=1e4)
-ap.add_argument("--k", type=int, default=20); ap.add_argument("--burn", type=int, default=500)
+ap.add_argument("--k", type=int, default=20); ap.add_argument("--burn", type=int, default=500); ap.add_argument("--nside-beta", type=int, default=16)
 ap.add_argument("--half-width", type=float, nargs=2, default=[0.10, 0.015], help="scan half-widths (sync, dust)")
 ap.add_argument("--points", type=int, default=11)
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
@@ -24,7 +24,7 @@ from commander4.compsep import index_field as ifd
 from commander4.compsep import index_field_sampler as ifs
 from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust
 
-D = a.dir; NSIDE, NB = 64, 16
+D = a.dir; NSIDE, NB = 64, a.nside_beta
 bands = [23, 30, 33, 41, 44, 61, 70, 94, 100, 143, 217, 353]; freqs = np.array(bands, float)
 maps = np.array([hp.read_map(f"{D}/band{b:03d}_map.fits", field=0) for b in bands])
 inv_var = 1.0 / np.array([hp.read_map(f"{D}/band{b:03d}_rms.fits", field=0) for b in bands])**2
