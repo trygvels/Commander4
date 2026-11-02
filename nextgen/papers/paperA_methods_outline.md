@@ -132,10 +132,15 @@ model component rather than a preprocessing choice.
   (sync) and 0.0180 to 0.0138 (dust) between nside 16 and 4, against factors 3.5 and 4.9 for
   independent regions, while the pixel-level error and the CMB residual (2.9, 4.2, 5.6 uK)
   follow what the field can represent, at 125, 63 and 39 gradients per iteration. The spatial
-  prior recovers most of the averaging coarse regions buy. A field finer than the sky's
-  structure is still to be tested (E023, Q16) before the paper states a resolution rule. Table 2
-  candidate: the ten-run E021 table (index RMSE against both references, CMB residual,
-  gradients per iteration; coverage only at nside 16).
+  prior recovers most of the averaging coarse regions buy. At Planck-like depth with exact
+  templates (E027, F32) the resolution between nside 4 and 16 moves the pixel-level error by
+  6 to 10 percent (sync best at nside 8: 0.135 against 0.143 and 0.147; dust best at nside 16:
+  0.060 against 0.063 and 0.067; CMB residual follows sync), with no rung reaching the
+  per-region Fisher sd of the sky scatter; the resolution rule is therefore "the finest field
+  the budget allows under the GMRF prior", and the level offsets (F29, F30) are independent of
+  it. Table 2 candidate: the ten-run E021 table (index RMSE against both references, CMB
+  residual, gradients per iteration; coverage only at nside 16) plus the E027 three-rung
+  realistic-noise row.
 - Sampler: NUTS with dual averaging; metric from the finite-difference Hessian, dense at high
   S/N (E024, F25: the dust field mean from ESS 9 to 331 of 700 at 1.3 times the gradients, the
   posterior unchanged; the couplings of the field mean and the hyperparameters with the global

@@ -2,6 +2,33 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-02 (Mac mini, 20:25): E027 closed (F32: resolution is second order at this depth); E029 running
+
+**Learned**
+- E027 (three valid rungs, D025 K = 100): the index-field resolution between nside 4 and 16
+  moves the pixel-level error by 6 to 10 percent (sync 0.143 / 0.135 / 0.147, dust 0.067 /
+  0.063 / 0.060 at nside 4 / 8 / 16; optimum nside 8 for sync, 16 for dust; CMB residual
+  follows sync, nside 8 best by 0.07 and 0.22 uK). No rung reaches the Fisher-sd crossing with
+  the sky scatter, yet the finer field wins or ties under the GMRF prior. The sync level offset
+  (+0.13 / +0.12 / +0.13) and the mu_d map (1.030 / 1.029 / 1.029) are the same at every rung:
+  amplitude-model properties, as the corrected F29 and F30 predict. Pre-registered dust
+  reading (b) refuted (faint quartiles improve toward finer fields). Paper A resolution rule:
+  the finest field the budget allows under the GMRF prior.
+
+**Running**
+- E029 (gmrf16_exact_mumap_nc_mu01, from 20:18; prediction: faint sync offset within +-0.05,
+  mu -3.00 +- 0.05); queued behind it: E028 stage A (oracle T map), stage B (scalar T, sd 0.1,
+  prediction 20.2 +- 0.5 K).
+
+**Next**
+- E029 reading against its pre-registered criteria, then stage A and B readings against
+  `bd_trueT`; the conditional-CDF negative control (corrupted target) required by VALIDATION.
+
+**Needs Trygve**
+- Unchanged: the multiplier hyperprior width as a default (pending E029), the Paper A reporting
+  rule for prior-dominated fields (D025), the order of T_d work against the multiplier field,
+  and whether the 14-band simulation with 545 / 857 GHz (stage C) is worth it.
+
 ## 2026-11-02 (Mac mini, 18:05): F29 corrected by the stats review (multiplier Occam bias, not roughness); F31 (profiled scans invalid); E029 queued first
 
 **Learned**

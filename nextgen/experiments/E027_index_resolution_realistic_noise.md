@@ -126,11 +126,74 @@ mean 1.029 (unchanged from nside 16), s 0.036 / 0.022.
   sync PIT mean 0.490, KS p 0.62, optimum minus draw +0.07 sd; dust 0.481, p 0.49, +0.08 sd:
   passes.
 
+**gmrf4 rung (19:05 to 20:15, 1.17 h, 1200 iterations, 700 post-burn, 0 tracebacks;
+`E027/gmrf4_analysis.txt`, `gmrf4_hyper_ess.txt`, `gmrf4_sync_level.txt`,
+`e020_analysis_gmrf4_8_16.txt`, analysed 20:21).** 30.9 gradients per iteration (nside 8:
+31.0, nside 16: 62.9). Hyperparameter ESS: sync mu 269, log sigma 24, u 49; dust mu 53,
+log sigma 47, u 64; region index ESS medians 342 (sync) and 141 (dust), minima 37 and 26.
+Fields: sigma_s 0.145 +- 0.042, rho 48 +- 34 deg, mu -2.872 +- 0.039; sigma_d 0.060 +- 0.011,
+rho 123 +- 32 deg, mu 1.581 +- 0.013; mu_s map mean 0.997, mu_d map mean 1.030, s 0.038 / 0.022
+(all three rungs agree on every hyperparameter within one sd).
+- Pixel-level RMSE against the truth: sync 0.1430 (nside 8: 0.1347, nside 16: 0.1467; paired
+  differences +0.0083 +- 0.0014 for nside 4 minus 8 and +0.0121 +- 0.0012 for 16 minus 8),
+  dust 0.0674 (0.0627, 0.0597; +0.0063 +- 0.0014 for 4 minus 16, +0.0022 +- 0.0006 for 8 minus
+  16); representation floors 0.0367 / 0.0277 (nside 8: 0.0235 / 0.0237; 16: 0.0130 / 0.0187).
+  Per S/N quartile (low to high) sync 0.145, 0.151, 0.152, 0.122; dust 0.046, 0.071, 0.082,
+  0.066 (the finer rungs are better in every dust quartile, most in the faintest: 0.046, 0.039,
+  0.032 at nside 4, 8, 16).
+- GLS CMB residual rms at thinned index draws: 93.45 uK (nside 8: 93.38, nside 16: 93.60; true-SED
+  floor 93.18); paired against nside 8: +0.07 +- 0.05 (nside 4) and +0.22 +- 0.05 (nside 16).
+- Against the nside-4 region-fit reference (fixed T) per Fisher-sd quartile: sync z medians
+  +0.58, +0.87, +0.88, +0.70, RMSE 0.125, 0.139, 0.130, 0.124, posterior sd medians 0.13 to
+  0.15 (region Fisher sds 0.22, 0.51, 0.75, 1.08); dust z +1.48, +1.72, +1.17, +0.34, RMSE
+  0.058, 0.087, 0.074, 0.048.
+- Sync level: the field mean sits +0.13 above the sky mean (nside 8: +0.12, nside 16: +0.13);
+  faint quartiles +0.11 to +0.12 above the reference, the bright quartile +0.074, the top 10
+  regions by Fisher weight (65 percent of the information at this nside) +0.051 with z median
+  +0.5; the Fisher-weighted level of the posterior-mean field is -2.964 against a region-level
+  truth of -3.020 and a reference of -3.014. Reading (a): the offset is the same at 192, 768
+  and 3072 regions, so it is not a function of the number of weakly constrained index regions;
+  the sharpened (roughness) prediction that it falls with the posterior sd of sigma_s is moot
+  (that sd is 0.042, 0.043, 0.047 across the rungs, prior-dominated everywhere) and was
+  withdrawn with F29's correction; the Occam mechanism (3072 multipliers at every rung)
+  predicts exactly this constancy.
+- Dust (c): mu_d map 1.030 and bright quartile z +0.34 against the fixed-T reference (nside 8:
+  1.029, +0.10; nside 16: 1.029, +0.1): the amplitude-side absorption is independent of nside.
+- D025 Gibbs-consistency check, K = 100, dust step 0.5 sd (`conditional_check_gmrf4.txt`, 20:22):
+  sync PIT mean 0.478, KS p 0.58, optimum minus draw +0.09 sd; dust 0.516, p 0.23, -0.07 sd:
+  passes.
+- Analyzer note: the per-quartile lines for the mu maps in `gmrf4_analysis.txt` and
+  `gmrf8_analysis.txt` repeat the whole-map numbers (the quartile labels are at the run's nside,
+  the mu maps at nside 16); only the whole-map mu-map line is meaningful there.
+
 ## Negative control
 None beyond E026's: the comparison is between valid chains of the same target class. The
 nside-16 rung (E026) carries the pre-registered reading (a) to (c) as its baseline.
 
 ## Conclusion
-(pending)
+At the E012 noise depth with exact templates, the index-field resolution between nside 4 and
+16 is a second-order choice: it moves the pixel-level index error by 6 to 10 percent, while
+the multiplier hyperprior width (F29, +0.12 on the sync level at every rung) and the fixed-T
+dust SED (F30, mu_d 1.03 at every rung) set the error budget. The optimum is component
+dependent and small: synchrotron is best at nside 8 (0.135 against 0.143 at nside 4 and 0.147
+at nside 16, both differences at 6 to 10 sigma by block bootstrap), dust at nside 16, the
+finest rung tested (0.060 against 0.063 and 0.067, monotone in every S/N quartile), and the
+GLS CMB residual follows the sync field (nside 8 best by 0.07 and 0.22 uK over a 93.2 uK
+floor). The pre-registered dust prediction (b), that the faint quartiles would improve from
+nside 16 to 8, is refuted: the GMRF prior keeps the finer field competitive even where the
+region Fisher sd (0.44 at nside 16) is twelve times the sky sd, because the representation
+floor of a coarse region (0.019 at nside 16, 0.028 at nside 4 for dust) is already half the
+sky's index sd. The "Fisher sd equals sky sd" crossing used in Q3 is not where the optimum
+lies: no rung reaches it for either component (sync 0.65 to 2.7 against 0.063, dust 0.094 to
+0.44 against 0.037; extrapolating 1/nside, it sits at nside 1 to 2), yet the finer fields win
+or tie. Readings (a) and (c) hold: neither the sync level offset nor the dust multiplier
+offset depends on the index resolution, which is what the corrected F29 and F30 mechanisms
+predict (both live in the amplitude model, whose 3072 multipliers are the same at every rung).
+Cost: 31 gradients per iteration at nside 4 and 8 against 63 at nside 16 (the dense metric's
+dimension), wall 1.17, 1.75 h for 1200 iterations against several hours at nside 16 under
+load. Recommendation for Paper A: state the resolution rule as "the finest field the budget
+allows under the GMRF prior, with the resolution contributing less than 10 percent of the
+index error at Planck-like depth", and report the sync level offset and the dust absorption
+as amplitude-model properties. All three rungs pass the D025 check (K = 100).
 
 ## Follow-ups

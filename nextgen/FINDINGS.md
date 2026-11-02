@@ -596,3 +596,21 @@ the E026 chain results (F30) do not depend on the scans. The scan script's `perr
 now does the integration (checked against a 2-d quadrature to 5e-12); at the E026 chain's
 posterior-mean state it gives a whole-sky optimum of +0.000 (sd 0.026) where the profiled law
 gave -0.12 to -0.18, reproducing the review.
+
+**F32. At Planck-like depth with exact templates the index-field resolution between nside 4
+and 16 changes the pixel-level index error by 6 to 10 percent, with the optimum at nside 8
+for synchrotron and at the finest rung (nside 16) for dust; the sync level offset (F29) and
+the dust multiplier offset (F30) do not depend on the resolution** (E027, three valid chains
+by the D025 check, paired block-bootstrap differences). Sync RMSE 0.143, 0.135, 0.147 and
+dust 0.067, 0.063, 0.060 at nside 4, 8, 16 (differences 0.008 +- 0.001, 0.012 +- 0.001;
+0.006 +- 0.001, 0.002 +- 0.001); the GLS CMB residual follows the sync field (nside 8 best by
+0.07 and 0.22 uK over the 93.2 uK floor). The region Fisher sd exceeds the sky's index sd at
+every rung for both components (sync 0.65 to 2.7 against 0.063, dust 0.094 to 0.44 against
+0.037), so "the resolution where the per-region information crosses the sky scatter" is not
+the rule; under the GMRF prior the finer field stays competitive and the coarse field pays the
+representation floor (within-region truth sd, half the sky sd at nside 4). The sync field mean
+sits +0.13, +0.12, +0.13 above the sky mean and the mu_d map at 1.030, 1.029, 1.029 at the
+three rungs: both offsets are amplitude-model properties (the 3072 multipliers are the same at
+every rung), as F29 and F30 predict. Pre-registered dust reading (b) (faint quartiles better
+at nside 8 than 16) refuted: the finer rung is better in every dust quartile, most in the
+faintest (0.046, 0.039, 0.032). Costs 31, 31, 63 gradients per iteration.

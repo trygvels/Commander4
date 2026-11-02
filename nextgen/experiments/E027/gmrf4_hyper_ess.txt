@@ -1,0 +1,13 @@
+gmrf4_exact_mumap_nc: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -2.87182 sd 0.03918 ESS   268.9
+  Synchrotron/index_field/log_sigma        mean -1.97498 sd 0.30239 ESS    24.4
+  Synchrotron/index_field/u                mean -0.70573 sd 1.56921 ESS    49.4
+  Synchrotron/amp_prior/mu                 mean +0.99695 sd 0.00763 ESS   316.5
+  Synchrotron/amp_prior/log_s              mean -3.33290 sd 0.34119 ESS   322.8
+  ThermalDust/index_field/mu               mean +1.58094 sd 0.01348 ESS    52.9
+  ThermalDust/index_field/log_sigma        mean -2.82417 sd 0.17216 ESS    46.9
+  ThermalDust/index_field/u                mean +1.97798 sd 1.23509 ESS    63.9
+  ThermalDust/amp_prior/mu                 mean +1.02955 sd 0.00727 ESS   132.9
+  ThermalDust/amp_prior/log_s              mean -3.81872 sd 0.08397 ESS   357.7
+  dust beta_map: 192 regions, ESS min 26 5% 47 median 141
+  sync beta_map: 192 regions, ESS min 37 5% 92 median 342

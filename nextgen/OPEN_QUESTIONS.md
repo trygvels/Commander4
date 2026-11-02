@@ -85,7 +85,13 @@ original numbering.
   the prior-dominated field scale through the likelihood's nonlinearity (+0.13 on the
   unweighted mean). The resolution question at realistic noise is therefore where the region
   Fisher sd crosses the sky's index sd (nside 4 to 8 for sync, 16 for dust on this sky); E027
-  (nside 8 and 4, running) measures it. The faint-sky level is set by the multiplier
+  (nside 8 and 4, running) measures it. **Answered 2026-11-02 (E027, F32):** the crossing is
+  not the rule. No rung between nside 4 and 16 reaches it (sync Fisher sd 0.65 to 2.7, dust
+  0.094 to 0.44), yet the pixel-level error is minimized at nside 8 for sync and at nside 16
+  (the finest tested) for dust, and the whole range spans only 6 to 10 percent of the error;
+  the hyperprior width (F29) and the T model (F30) dominate the budget at this depth, and
+  neither offset depends on the resolution. Resolution rule for Paper A: the finest field the
+  budget allows under the GMRF prior. The faint-sky level is set by the multiplier
   hyperprior width (F29 corrected), so the model choice at this depth is that width (E029),
   with the field scale prior second.
 - **Status 2026-10-28:** E020 (PySM sky at 0.03 x E012 noise) closed as a design flaw (F21: the

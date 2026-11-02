@@ -1,0 +1,13 @@
+truth: unweighted mean -3.0000; Fisher-weighted (amplitudes known) -2.9826; per quartile Fisher-weighted Q1 -3.0216 Q2 -3.0025 Q3 -2.9978 Q4 -2.9960; Fisher-weight share per quartile 0.903 0.060 0.025 0.012
+scalar run: beta_s mean -2.9441 median -2.9439 sd 0.0305 skew +0.04 (n 700); minus Fisher-weighted truth +0.0386 (+1.3 sd)
+field run: mu mean -2.8718 median -2.8738 sd 0.0392 skew +0.15; field mean over regions -2.8718; per-region skew of beta_r mean +0.134
+field run: Fisher-weighted level of the posterior-mean field -2.9642; reference -3.0139; truth -3.0195
+  Q1: posterior mean minus reference +0.074 (median +0.065); quartile mean minus mu -0.0247; region sd median 0.126; region Fisher sd median 0.22
+  Q2: posterior mean minus reference +0.113 (median +0.123); quartile mean minus mu +0.0133; region sd median 0.139; region Fisher sd median 0.51
+  Q3: posterior mean minus reference +0.121 (median +0.131); quartile mean minus mu +0.0078; region sd median 0.147; region Fisher sd median 0.75
+  Q4: posterior mean minus reference +0.112 (median +0.104); quartile mean minus mu +0.0036; region sd median 0.150; region Fisher sd median 1.08
+  top  10 regions by Fisher weight (share 0.65; Fisher sd median 0.095, posterior sd median 0.103): mean(post - ref) +0.051, z median +0.51, |z| < 1 0.70, |z| < 2 0.90
+  top  30 regions by Fisher weight (share 0.84; Fisher sd median 0.151, posterior sd median 0.117): mean(post - ref) +0.092, z median +0.64, |z| < 1 0.67, |z| < 2 0.90
+  top 100 regions by Fisher weight (share 0.97; Fisher sd median 0.363, posterior sd median 0.134): mean(post - ref) +0.095, z median +0.74, |z| < 1 0.68, |z| < 2 0.96
+  top 300 regions by Fisher weight (share 1.00; Fisher sd median 0.648, posterior sd median 0.142): mean(post - ref) +0.105, z median +0.78, |z| < 1 0.70, |z| < 2 0.98
+  top 768 regions by Fisher weight (share 1.00; Fisher sd median 0.648, posterior sd median 0.142): mean(post - ref) +0.105, z median +0.78, |z| < 1 0.70, |z| < 2 0.98
