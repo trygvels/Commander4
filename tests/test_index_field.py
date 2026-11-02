@@ -645,11 +645,16 @@ def test_region_index_likelihood_with_temperature_field_matches_covariance_form(
     K = field.K
     prior_T = field.logp_and_grad(x[:K + 3], loglike=lambda b: (0.0, np.zeros_like(b)))[0]
     assert like.logp_and_grad(x)[0] - prior_T == pytest.approx(lp_fixed, rel=1e-10, abs=1e-6)
-    # A fixed T map at the wrong nside is refused.
+    # Without fields the fixed map sets the region grid (nside 1 above); with a field at another
+    # nside it is refused.
+    assert like_fixed.nside_reg == NSIDE_BETA and like_fixed.nreg == 12
     comps_bad = _proto_like_components(np.stack([np.ones(NPIX), g_s, g_d], axis=1))
     comps_bad[2].set_T_map(20.0 * np.ones(12 * 4), 2)
+    layout_sync = ifd.StateLayout([ifd.IndexSpec("sync", gmrf_field.IndexFieldPrior(
+        gmrf_field.MaternField(gmrf_field.GraphLaplacianBasis(NSIDE_BETA)),
+        gmrf_field.HyperPrior(mu0=MU0, s_mu=S_MU)), MU0, S_MU)], ["sync", "dust"])
     with pytest.raises(ValueError, match="T_map"):
-        ifd.RegionIndexLikelihood.from_arrays(NU_PROTO, d, w, comps_bad, layout_fixed, NSIDE)
+        ifd.RegionIndexLikelihood.from_arrays(NU_PROTO, d, w, comps_bad, layout_sync, NSIDE)
 
 
 def test_region_index_likelihood_rejects_singular_and_overflowing_states() -> None:

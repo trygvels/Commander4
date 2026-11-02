@@ -533,12 +533,9 @@ class RegionIndexLikelihood:
             if spec.comp_name in names and not hasattr(
                     self.active_comps[names.index(spec.comp_name)], spec.attr):
                 raise ValueError(f"Component {spec.comp_name!r} has no {spec.attr!r} to sample.")
-        for comp in self.active_comps:
-            T_map = getattr(comp, "T_map", None)
-            if T_map is not None and T_map.shape != (layout.nreg,):
-                raise ValueError(f"Component {comp.comp_name!r}: T_map at nside {comp.T_nside} "
-                                 f"but the index-field group has {layout.nreg} regions (nside "
-                                 f"{layout.nside_beta}); a fixed T map must be at that nside.")
+        # Region grid of the mixing matrices: the layout's field nside, or that of a fixed T
+        # map when the group samples no field (scalars are then summed over the regions).
+        self.nside_reg, self.nreg = self._region_grid(layout, self.active_comps)
         for name in layout.hier_names:
             if name in names:
                 view = self.active_comps[names.index(name)]
@@ -558,7 +555,7 @@ class RegionIndexLikelihood:
             raise ValueError("The hier amp_prior is intensity-only in this version (its template "
                              "must be strictly positive; Q and U are signed). Give the QU view "
                              "amp_prior none or gaussian.")
-        self.region = region_map(layout.nside_beta, nside, keep_mask)
+        self.region = region_map(self.nside_reg, nside, keep_mask)
         for ipol in range(residual_data.npol):
             freqs, maps_sky, maps_inv_var = [], [], []
             for iband in range(len(all_freq)):
@@ -590,6 +587,33 @@ class RegionIndexLikelihood:
     def _restore_hypers(self, previous: dict[int, tuple]) -> None:
         for c, (mu, log_s) in previous.items():
             self.active_comps[c].amp_prior.mu, self.active_comps[c].amp_prior.log_s = mu, log_s
+
+    @staticmethod
+    def _region_grid(layout: StateLayout, comps: list[DiffuseComponent]) -> tuple[int, int]:
+        """(nside, nreg) of the per-region mixing matrices. A fixed `T_map` must sit at the
+        layout's nside when the group has fields; without fields it sets the grid."""
+        nsides = {int(c.T_nside) for c in comps if getattr(c, "T_map", None) is not None}
+        if layout.nside_beta > 0:
+            if nsides - {layout.nside_beta}:
+                raise ValueError(f"A fixed T_map at nside {sorted(nsides)} but the index-field "
+                                 f"group is at nside {layout.nside_beta}; a fixed T map must be "
+                                 "at the group's nside.")
+            return layout.nside_beta, layout.nreg
+        if len(nsides) > 1:
+            raise ValueError(f"Fixed T_map maps at different nsides {sorted(nsides)}.")
+        nside = nsides.pop() if nsides else 0
+        return nside, (12 * nside * nside if nside > 0 else 1)
+
+    def _to_grid(self, values: NDArray) -> NDArray:
+        """A spec's per-region values on the mixing grid (broadcast of a scalar spec's single
+        value when a fixed T map sets a finer grid)."""
+        return values if values.shape == (self.nreg,) else np.full(self.nreg, float(values[0]))
+
+    @staticmethod
+    def _fold(grad_reg: NDArray, target: NDArray) -> NDArray:
+        """A per-region gradient onto a spec's block: as is for a field at the region grid, the
+        sum over regions for a scalar parameter (layout.nreg 1 under a finer fixed T grid)."""
+        return grad_reg if grad_reg.shape == target.shape else np.atleast_1d(grad_reg.sum())
 
     def _local_terms(self, betas: dict[str, NDArray], hypers: dict[str, tuple]
                      ) -> tuple[float, dict[str, NDArray], dict[str, NDArray], dict[str, NDArray],
@@ -624,23 +648,23 @@ class RegionIndexLikelihood:
                   if f"{comp.comp_name}:logT" in betas}
         for freqs, maps_sky, maps_inv_var in self.streams:
             nband = freqs.size
-            M_reg = np.empty((layout.nreg, nband, ncomp))
+            M_reg = np.empty((self.nreg, nband, ncomp))
             dM_reg = np.zeros_like(M_reg)
             dM_T = np.zeros_like(M_reg) if T_keys else None
             with np.errstate(over="ignore", invalid="ignore"):
                 for c, comp in enumerate(comps):
                     kw = {}
                     if comp.comp_name in betas:
-                        kw["beta"] = betas[comp.comp_name]
+                        kw["beta"] = self._to_grid(betas[comp.comp_name])
                     if c in T_keys:
-                        kw["T"] = np.exp(betas[T_keys[c]])
+                        kw["T"] = np.exp(self._to_grid(betas[T_keys[c]]))
                     elif getattr(comp, "T_map", None) is not None:      # a fixed T map
                         kw["T"] = comp.T_map
                     if kw:
                         M_reg[:, :, c] = comp.get_sed(freqs, **kw)
                         if "beta" in kw:
                             dM_reg[:, :, c] = comp.get_dsed_dbeta(freqs, **kw)
-                        if "T" in kw:
+                        if c in T_keys:
                             dM_T[:, :, c] = comp.get_dsed_dlogT(freqs, **kw)
                     else:
                         key = (id(freqs), c)
@@ -661,7 +685,7 @@ class RegionIndexLikelihood:
             logL += float(ll_reg.sum())
             for c, comp in enumerate(comps):
                 if comp.comp_name in betas:
-                    g_beta[comp.comp_name] += grad_reg[:, c]
+                    g_beta[comp.comp_name] += self._fold(grad_reg[:, c], g_beta[comp.comp_name])
             if T_keys:
                 _, dM_T_aug = augment_mixing(M_reg, dM_T)
                 out_T = cpp_compsep.marginal_loglike_regions(
@@ -670,7 +694,7 @@ class RegionIndexLikelihood:
                 if nskipped_T or not np.all(np.isfinite(grad_T)):
                     return logL, g_beta, g_hyper, c_mu, True
                 for c, key in T_keys.items():
-                    g_beta[key] += grad_T[:, c]
+                    g_beta[key] += self._fold(grad_T[:, c], g_beta[key])
             if any_hier:
                 x_cond, diag_Ainv, used = out[3], out[4], out[5]
                 for c in hier_cols:
@@ -795,7 +819,7 @@ class RegionIndexLikelihood:
         tests and the L1 harness; the evaluation is the same as in the MPI run."""
         obj = cls(comm, None, None, comps, layout, keep_mask, nthreads)
         obj.is_solver_root = True
-        obj.region = region_map(layout.nside_beta, nside, keep_mask)
+        obj.region = region_map(obj.nside_reg, nside, keep_mask)
         obj.streams = [(np.asarray(freqs, dtype=np.float64),
                         np.asarray(maps_sky, dtype=np.float64),
                         np.asarray(maps_inv_var, dtype=np.float64))]
