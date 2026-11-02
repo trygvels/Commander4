@@ -145,18 +145,21 @@ model component rather than a preprocessing choice.
 - The realistic-noise regime (E026, F29, F30): at the E012 noise with nside-64 data the
   nside-16 sync field is prior-dominated over three quarters of the sky (region Fisher sd 1 to
   3.7 against a sky sd of 0.063); the data-dominated quartile is recovered (z medians within
-  0.6), the Fisher-weighted level is right to 0.01, and the unweighted field mean floats at a
-  level set by the prior on the field scale through the nonlinearity of the likelihood (+0.13
-  here; a smooth field wants it 0.1 steeper than the sampled rough field). Statement for the
-  paper: the unweighted mean of a prior-dominated index field is not an estimate of anything;
-  report the Fisher-weighted level and the data-dominated regions, and either coarsen the field
-  until the scale is data-determined (E027) or state an informative prior on the scale. The
+  0.6), the Fisher-weighted level is right to 0.01, and the unweighted field mean is biased
+  flatter by the marginalization volume of the 3072 per-region template multipliers under a
+  wide hyperprior (+0.15 +- 0.05 by the exact marginal; +0.13 in the chain; F29 after the
+  stats review): a steeper index gives each multiplier more leverage at 23 GHz. Statement for
+  the paper: in a prior-dominated region the hierarchical amplitude prior's hyperprior width
+  sets the index; report the Fisher-weighted level and the data-dominated regions, and state
+  the hyperprior (E029: sd 0.1 removes the bias within noise). Methodological point (F31):
+  exact-target scans must integrate nuisance multipliers analytically, not profile them. The
   per-region template multiplier field (F28) converts the fixed-T misfit into a bright-sky
   dust-index bias (+0.06, multipliers at 1.03), so the dust SED needs T_d region-wise or
   sampled before the multiplier field is used on real data; a cs-quality template is usable
   for dust (+0.02 RMSE) and not for synchrotron (+0.19) at this depth; the scalar law fails
-  (+0.48 / +0.24). Figure candidate: block-shift optimum against field roughness (E026
-  roughness check); Table candidate: exact / cs_mumap / cs_scalar per quartile.
+  (+0.48 / +0.24). Figure candidate: the Occam slope of the marginalized multipliers against the
+  hyperprior width (E026 review `occam.py`, `musd.py`) with the E029 chain; Table candidate:
+  exact / cs_mumap / cs_scalar per quartile.
 - Validity of production chains (D025): the conditional-CDF (Gibbs-consistency) check along
   the field means, exact for the implemented target and independent of the sampler; the
   centred chains' funnel at realistic noise (E026) as the motivating failure.

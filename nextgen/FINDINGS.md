@@ -514,27 +514,33 @@ Scope: one sky, one error realization, one error scale (10 deg), the data term w
 index prior.
 
 **F29. At realistic noise the nside-16 GMRF synchrotron index field is prior-dominated over
-three quarters of the sky, and its unweighted mean is set by the field's roughness through the
-likelihood's nonlinearity, not by the data** (E026, gmrf16_exact_mumap_nc: PySM d1s1c1 at the
-E012 noise, exact templates, per-region multipliers, flat CMB prior, non-centred NUTS, chain
-validated by a Gibbs-consistency check). The bright template-S/N quartile holds 90 percent of
-the sync Fisher weight and agrees with the noise-free region-fit reference (the 10 to 300
-regions with the largest weight: -0.02 to +0.03 from the reference, z medians -0.6 to +0.2,
-77 to 90 percent inside |z| < 1); the Fisher-weighted level of the field is -2.978 against a
-Fisher-weighted truth of -2.988; a single sync index on the same data is -2.944 +- 0.031, 1.3
-sd from its pseudo-true value -2.983. The unweighted field mean is -2.868 +- 0.042, +0.13
-above the sky mean, because the 2300 regions with region Fisher sd 2.5 to 3.7 (posterior sd
-0.15, set by the field scale) float at +0.12 to +0.14. That level is coupled to the field's
-roughness: with every other coordinate at a posterior draw, the data-preferred whole-sky
-shift is 0.00 +- 0.02 at the draw's field (sd 0.08 to 0.17) and -0.065 to -0.13 for the same
-state smoothed to a constant field, -0.18 at the posterior-mean state. The field scale sigma_s
-= 0.15 +- 0.05 is itself prior-dominated (sky 0.063), so the faint-sky level is a function of
-the prior on sigma. The dust field (sigma 0.062 +- 0.009, data-constrained) shows no such
-coupling. Consequences: the unweighted mean of a prior-dominated index field is not a
-reportable quantity; exact-target scans at a smooth reference measure a smooth field's level
-and miss this (E023, E025, and the E026 whole-sky scans); the regime boundary (region Fisher
-sd against the sky's index sd) and the fix (coarser regions, E027, or an informative prior on
-sigma) are open. Scope: one sky, one noise realization.
+three quarters of the sky, and there the hierarchical amplitude prior's per-region multipliers
+bias the index flatter through their marginalization volume** (E026 gmrf16_exact_mumap_nc:
+PySM d1s1c1 at the E012 noise, exact templates, one multiplier per nside-16 region with
+hyperprior N(1, 0.5^2), flat CMB prior, non-centred NUTS, chain validated by the D025 check;
+independent stats review in `E026/stats_review_sync_level.md`). The bright template-S/N quartile
+holds 90 percent of the sync Fisher weight and agrees with the noise-free region-fit reference
+(the 10 to 300 regions with the largest weight: -0.02 to +0.03 from the reference, z medians
+-0.6 to +0.2, 77 to 90 percent inside |z| < 1); the Fisher-weighted level of the field is
+-2.978 against -2.988 for the truth. The unweighted field mean is -2.868 +- 0.042, +0.13 above
+the sky mean, because the 2300 regions with region Fisher sd 2.5 to 3.7 sit at +0.12 to +0.14.
+Cause (exact marginal with the multipliers integrated analytically): the volume term -1/2
+sum_r log(-Q_r) of the 3072 marginalized multipliers rises with a steeper index (slope +130
+nats per unit beta over the faint regions; 66 percent of the sync amplitude information is at
+23 GHz, so a steeper index gives each multiplier more leverage), which puts the faint level
++0.15 +- 0.05 above the truth over simulated noise realizations (+0.19 on this one); the chain's
++0.13 is that bias held back by the field prior. The bias scales with the hyperprior variance:
+sd 0.2 gives +0.06, sd 0.1 zero within noise (E029 tests this in a chain). It is not a property
+of the field's roughness (a first version of this finding said so; refuted by the review: the
+block-shift optimum is linear in the coefficient scale, and the faint-region data level is the
+same for constant, reference, shuffled and iid patterns). A single sync index on the same data
+is -2.944 +- 0.031 against a model pseudo-true value of -2.956 +- 0.003 (the same Occam push
+diluted by the full-sky curvature) and an exact 1-d marginal of -2.951 +- 0.025: consistent.
+Consequences: the unweighted mean of a prior-dominated index field is not a reportable
+quantity under this hyperprior; the multiplier hyperprior width is a scientific choice that
+sets the faint-sky index; the dust state is a sync confounder at this depth (with the dust at
+the truth and mu_d at 1 the scalar pseudo-true value moves to -2.83). Scope: one sky, one
+noise realization; six to eight simulated noise realizations for the pseudo-true values.
 
 **F30. With the per-region template multiplier field at realistic noise, a
 component-separation-quality template is usable for dust and not for synchrotron, the scalar
@@ -566,3 +572,16 @@ index; it changes which index the chain estimates (beta_d instead of beta_eff) a
 T misfit into the multipliers. The recommendation stands for a different reason: on real data
 the multiplier absorbs any pivot-frequency mismatch, so its 3 percent is not interpretable as
 a template error, and a T model is needed to separate the two.
+
+**F31. Profiling per-region nuisance multipliers in the exact-target scans is not a valid
+stand-in for the chain's marginal; the multipliers must be integrated analytically** (E026
+stats review, `E026/review_scripts/marg.py`, `occam.py`). The per-pixel hier marginal is
+Gaussian in the region multiplier mu_r, so the integral over mu_r under its hyperprior is
+closed-form (F(mu_hat) - 1/2 log(-Q_r) per region; checked against brute force to 1e-8). The
+E025 and E026 scan cells with 3072 profiled multipliers carry a Neyman-Scott bias toward
+steeper indices (-0.2 to -0.4 on the E026 chain state against -0.003 +- 0.025 for the
+marginal), and the global-multiplier cells are a different model (no per-region volume term;
+-0.109, 7.3 nats, where the marginal gives 0). Conclusions drawn from profiled per-region
+cells (F28's "within 0.02 at 0.03 x noise, insignificant at 1 x" for the cs template; the E026
+whole-sky and chain-state scans) are to be redone with the marginal before they are cited;
+the E026 chain results (F30) do not depend on the scans.

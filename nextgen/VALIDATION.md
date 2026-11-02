@@ -57,8 +57,13 @@ be traced to a cause (method, prior, model, data) before it is claimed.
   coordinate at the draw's value; the conditional CDF at the draw must be consistent with
   uniform (KS test) and the conditional optimum with the draw. Exact for the implemented
   target, independent of the sampler; 0.1 s per evaluation at nside 64
-  (`nextgen/scripts/e026_conditional_check.py`). A chain that fails is not read.
-- Roughness check for prior-dominated fields: the data-preferred level at the sampled field
-  against the level of the same state smoothed to a constant (`e026_roughness_check.py`);
-  a difference above the conditional sd means the field's mean is set by the prior on its
-  scale (F29) and must be reported as such.
+  (`nextgen/scripts/e026_conditional_check.py`). A chain that fails is not read. Stats-review
+  additions (E026): K >= 100 draws (K = 20 detects only KS D > 0.3), a scan step of at most
+  one conditional sd, and a negative control (a deliberately corrupted target or chain must
+  fail the check) before the check is quoted as evidence.
+- Marginal, not profile, for nuisance multipliers in exact-target scans (F31): per-region
+  amplitude multipliers are integrated analytically (closed form in mu_r); profiled scans are
+  biased (Neyman-Scott) and global-multiplier scans are a different model. The roughness
+  check (`e026_roughness_check.py`) is kept as a diagnostic only: its block-shift optimum is
+  linear in the coefficient scale and measures the pull of the data-pinned regions, not a
+  roughness effect (E026 review).

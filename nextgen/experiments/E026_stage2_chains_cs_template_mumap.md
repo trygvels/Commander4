@@ -254,6 +254,30 @@ prior-dominated (sky 0.063), so the level of the faint sky is set by the prior o
 through this coupling, not by the data. The dust field (sigma 0.062 +- 0.009, data-constrained)
 shows no such offset: its conditional optima sit at the draws.
 
+**Independent stats review of items 1 to 7 (2026-11-02 19:40; `E026/stats_review_sync_level.md`,
+`E026/review_scripts/`).** (8) The Gibbs-consistency check is valid and passes for sync; dust is
+borderline (optimum minus draw +0.0007 at 2.3 se, step too coarse); a K = 100 run with a finer
+dust step is in progress. (9) The roughness coupling of item 7 is withdrawn: the optimum shift
+is linear in the z scale (a first-order effect of the data-pinned bright regions being pulled
+off their optima; z x 0 is the scalar model), and with the multipliers integrated analytically
+the faint-region data level is -2.79 +- 0.065 for constant, reference, chain, shuffled and iid
+patterns alike. The cause of the +0.13 is the marginalization over the 3072 per-region
+multipliers with hyperprior N(1, 0.5^2): its volume term -1/2 sum_r log(-Q_r) rises with a
+steeper index (slope +130 nats per unit beta over the faint regions; 66 percent of the sync
+information sits at 23 GHz), so the exact marginal of the faint level is +0.15 +- 0.05 above the
+truth over simulated noise realizations (+0.19 here); the chain's +0.13 is that bias held back
+by the field prior. With hyperprior sd 0.2 or 0.1 the bias is +0.06 or zero within noise
+(E029 tests this in a chain). (10) The scans with profiled per-region multipliers (E025, E026
+items 1 and 5) carry a Neyman-Scott bias toward steeper indices (-0.2 to -0.4), and the
+global-multiplier cells are a different model: with the multipliers integrated, the whole-sky
+optimum at the posterior-mean field is -0.003 +- 0.025, i.e. the chain sits at its target's
+optimum. F28 (scan-based) is flagged for a recheck with the analytic marginal. (11) The scalar
+run's pseudo-true value under the model is -2.956 +- 0.003 and the exact 1-d marginal for this
+realization -2.951 +- 0.025: the chain (-2.944) agrees with an exact marginal; the earlier
+reference -2.983 (amplitude-known Fisher weights) was the wrong yardstick. With the dust at the
+truth and mu_d at 1 the scalar pseudo-true moves to -2.83: the sync index is sensitive at the
+0.1 level to the fixed-T dust state.
+
 ## Negative control
 gmrf16_cs_scalar (the scalar law the scans showed biased) must show the predicted dust and sync
 biases; if it does not, either the scans or the chains are wrong and the record says which.
@@ -278,10 +302,11 @@ biases; if it does not, either the scans or the chains are wrong and the record 
    agree with the region-fit reference (z medians -0.6 to +0.2, 77 to 90 percent inside |z| <
    1); the Fisher-weighted level is right to 0.01; the single-index run is 1.3 sd from its
    pseudo-true value. The unweighted field mean (+0.13, 3 sd of its posterior sd) is the
-   floating level of the 2300 regions with region Fisher sd 2.5 to 3.7, and that level is set
-   by the field's roughness through the nonlinearity of the likelihood: a smooth field wants
-   it 0.1 steeper than the rough field the posterior samples (sigma 0.15 +- 0.05,
-   prior-dominated, against a sky sd of 0.063). F29. Dust: the bright quartile sits +0.06 with
+   floating level of the 2300 regions with region Fisher sd 2.5 to 3.7, and that level carries
+   the Occam bias of the marginalized per-region multipliers under the N(1, 0.5^2) hyperprior
+   (+0.15 +- 0.05 over noise realizations by the exact marginal; item 9), partly held back by
+   the field prior. F29 (as corrected after the stats review; the roughness mechanism first
+   written here is withdrawn). Dust: the bright quartile sits +0.06 with
    the mu_d map at 1.029 because the fixed-T misfit is absorbed jointly by the multipliers and
    the index (1191 + 375 nats better than the reference), a path the global law could not take
    (E025 saw +0.5 percent). Corrected 2026-11-02 (E028 baseline): against the true-T region
@@ -289,11 +314,12 @@ biases; if it does not, either the scans or the chains are wrong and the record 
    beta_eff (fixed-T fit) and beta_d (true), and the chain estimates the latter because the
    multipliers absorb the T misfit at the pivot. See F30's correction.
 4. **Consequences.** (a) At realistic noise the unweighted mean of the nside-16 sync field is
-   not a reportable quantity; Paper A reports the Fisher-weighted level and the data-dominated
-   regions, with the faint sky labelled prior-dominated (the posterior there is the prior on
-   sigma). (b) The regime boundary is where the region Fisher sd exceeds the sky's index sd;
-   E027 (nside 8 and 4) tests whether coarser regions make sigma data-determined and remove the
-   level coupling, or whether an informative prior on sigma is needed. (c) The per-region
+   not a reportable quantity as the model stands; Paper A reports the Fisher-weighted level and
+   the data-dominated regions, with the faint sky labelled prior-dominated. (b) The faint-sky
+   bias is a property of the multiplier hyperprior width (sd 0.5), not of the field: E029 tests
+   sd 0.1 in a chain (prediction: faint level within noise of the truth); E027 (nside 8 and 4)
+   still places the regime boundary. (b2) Exact-target scans must integrate per-region nuisance
+   multipliers analytically; profiling them is biased (item 10), and F28 is rechecked so. (c) The per-region
    multiplier field turns the fixed-T misfit into a dust-index bias of 0.06 in the bright sky;
    region-wise or sampled T_d comes before the multiplier field is used for dust on real data
    (M2.6), in the opposite order to D023's deprioritization. (d) Scans at a smooth reference

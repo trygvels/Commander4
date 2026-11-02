@@ -2,6 +2,43 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-02 (Mac mini, 20:10): F29 corrected by the stats review (multiplier Occam bias, not roughness); F31 (profiled scans invalid); E029 queued first
+
+**Learned**
+- The independent review of the E026 sync-level claims refuted the roughness mechanism (the
+  block-shift optimum is linear in the coefficient scale; the faint-region data level is the
+  same for constant, reference, shuffled and iid patterns) and found the cause of the +0.13:
+  the marginalization volume of the 3072 per-region template multipliers under N(1, 0.5^2)
+  (slope +130 nats per unit index over the faint regions; 66 percent of the sync information
+  is at 23 GHz). The exact marginal puts the faint level +0.15 +- 0.05 above the truth over
+  noise realizations; sd 0.2 gives +0.06, sd 0.1 zero within noise. The chain samples its
+  target; with the multipliers integrated the chain state is the target's optimum.
+- F31: the E025/E026 scan cells with profiled per-region multipliers are biased (Neyman-Scott,
+  -0.2 to -0.4), the global-multiplier cells are a different model; F28 (cs template admissible
+  with per-region multipliers, scan-based) is to be redone with the analytic marginal. The E026
+  chain results (F30) stand.
+- Scalar sync run: pseudo-true value under the model -2.956 +- 0.003, exact marginal for this
+  realization -2.951 +- 0.025, chain -2.944: consistent (my earlier yardstick was wrong). With
+  the dust at the truth the scalar pseudo-true moves to -2.83: the dust state is a sync
+  confounder at this depth.
+- D025 check: valid; dust borderline at K = 20 (optimum offset 2.3 se, step too coarse); a
+  K = 100 run with a finer step is running; VALIDATION updated (K >= 100, step <= 1 sd,
+  negative control).
+
+**Running**
+- E027 gmrf8 (then gmrf4); queued: E029 (mu_prior sd 0.1; prediction: faint sync offset within
+  +-0.05), E028 stage A (oracle T map), stage B (scalar T). K = 100 conditional check; scalar-T
+  grid scan for stage B's pseudo-true T.
+
+**Next**
+- Analytic multiplier marginal in the scan script and the F28 recheck (cs template, both
+  depths); E027 reading; E029 reading against its pre-registered criteria.
+
+**Needs Trygve**
+- The multiplier hyperprior width is now a scientific choice that sets the faint-sky index
+  (sd 0.5 biases, sd 0.1 does not, if E029 confirms): a default change needs your call. Earlier
+  items unchanged.
+
 ## 2026-11-02 (Mac mini, 19:10): E028 code in (sampled or fixed dust temperature), target stats-reviewed, staged (D026); E027 gmrf8 at 184 of 1200
 
 **Learned**

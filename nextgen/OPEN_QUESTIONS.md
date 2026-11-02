@@ -85,8 +85,9 @@ original numbering.
   the prior-dominated field scale through the likelihood's nonlinearity (+0.13 on the
   unweighted mean). The resolution question at realistic noise is therefore where the region
   Fisher sd crosses the sky's index sd (nside 4 to 8 for sync, 16 for dust on this sky); E027
-  (nside 8 and 4, running) measures it. The optimal model at this depth may need an
-  informative prior on the field scale.
+  (nside 8 and 4, running) measures it. The faint-sky level is set by the multiplier
+  hyperprior width (F29 corrected), so the model choice at this depth is that width (E029),
+  with the field scale prior second.
 - **Status 2026-10-28:** E020 (PySM sky at 0.03 x E012 noise) closed as a design flaw (F21: the
   misspecified sky dominates); the ten-option comparison runs as E021 on a model-consistent sky.
 - **Why:** Trygve's direction: indices as fine-grained as S/N allows, statistically optimal rather
@@ -241,8 +242,11 @@ original numbering.
   (+0.48 / +0.24). With exact templates the multiplier field absorbs the fixed-T misfit jointly
   with the bright dust index (+0.06, mu_d map 1.029): region-wise or sampled T_d comes back
   before the multiplier field is used for dust on real data (M2.6). The sync field at nside 16
-  is prior-dominated over three quarters of the sky and its unweighted mean is set by the
-  prior on the field scale (F29); E027 tests coarser regions.
+  is prior-dominated over three quarters of the sky and its unweighted mean carries the Occam
+  bias of the marginalized per-region multipliers under the N(1, 0.5^2) hyperprior (F29, as
+  corrected by the stats review; +0.15 +- 0.05 by the exact marginal, zero within noise at sd
+  0.1): E029 tests the tight hyperprior in a chain. The profiled per-region scan cells of E025
+  are biased (F31) and F28 is to be redone with the analytic marginal.
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is
