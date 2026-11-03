@@ -261,7 +261,7 @@ original numbering.
   (bright dust at beta_eff, faint dust 0.08 low, CMB residual +0.9 uK at high latitude). The
   hyperprior width is settled as a model choice for sync; the dust side needs the T model
   (E028 stage A ran with sd 0.5 as pre-registered). The index-resolution question is closed (E027, F32).
-- **Status 2026-11-03, 08:30 (E028 stage A, F34):** the oracle T map does not remove the
+- **Status 2026-11-03, 08:19 (E028 stage A, F34):** the oracle T map does not remove the
   sd-0.5 offsets: mu_d map 1.025 (criterion 1.00 +- 0.01 fails), bright dust +0.047 above
   beta_d (z +1.31; criterion within 0.5 fails), every quartile 0.04 higher than with the fixed
   T, sync unchanged. F30's mechanism is withdrawn; the dust offsets of the sd-0.5 model are

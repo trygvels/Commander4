@@ -2,7 +2,7 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
-## 2026-11-03 (Mac mini, 08:30): E028 stage A read (F34: the fixed T is not the cause of the sd-0.5 dust offsets); stage B running
+## 2026-11-03 (Mac mini, 08:19): E028 stage A read (F34: the fixed T is not the cause of the sd-0.5 dust offsets); stage B running
 
 **Learned**
 - E028 stage A (E026's chain with the oracle nside-16 T map in the dust SED, sd 0.5; passes
@@ -22,14 +22,16 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 - E028 stage B (`gmrf16_exact_mumap_nc_Tscalar`, scalar log T sampled, sd 0.1, from 08:05,
   about 6.5 h; prediction 20.2 +- 0.5 K), then stage A' (`_Tmap_mu01`, oracle T with sd 0.1,
   pre-registered in the E028 record, E029 as control).
-- Exact-marginal scans with the region T map (`e023_exact_scan.py --cells
-  exact_mapT_perregmarg exact_fixT_perregmarg`, sd 0.5 and sd 0.1): the pseudo-true dust
-  offset per quartile under each T model and hyperprior; the sd-0.1 mapT scan is the stage A'
-  prediction.
+
+- Scans done (08:27): under sd 0.5 the F29 Occam push puts the faint dust quartiles at +0.07
+  to +0.10 with either T model (the stage A chain shows it; the fixed-T chain was held back
+  by the field prior), and the bright quartile's +0.047 is the field prior transmitting that
+  level. Under sd 0.1 with the true T map the exact marginal is unbiased in every dust
+  quartile (optimum 0.000) and the sync level is +0.01: stage A' is predicted at `bd_trueT`
+  everywhere with the E029 sync field.
 
 **Next**
-- Scan reading (mechanism of F34: the F29 Occam push on dust against the field prior), then
-  stage B against 20.2 +- 0.5 K with the D025 check along tau, then A' against `bd_trueT` in
+- Stage B against 20.2 +- 0.5 K with the D025 check along tau, then A' against `bd_trueT` in
   every quartile (within 0.03) with sync unchanged from E029.
 
 **Needs Trygve**

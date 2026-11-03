@@ -655,12 +655,18 @@ mean 1.540; pixel RMSE 0.085 against 0.060) while the sync field is unchanged (f
 half (dust mu map per quartile 1.038, 1.041, 1.017, 1.005; fixed T 1.062, 1.038, 1.012, 1.002;
 sd 0.1 with fixed T 1.012, 1.000, 1.000, 1.000). Against each model's own reference the
 bright quartile is +0.047 (oracle T) and +0.060 (fixed T, where beta_eff3 minus beta_d is
-+0.054): F30's reading that the fixed-T chain estimates beta_d was a cancellation, now
+-0.054): F30's reading that the fixed-T chain estimates beta_d was a cancellation, now
 withdrawn. The flat-prior GLS CMB residual rms is not an index-quality criterion: the oracle
 chain's biased-high dust field gives 92.3 uK, 0.7 uK below the true-SED GLS floor of 93.2
 (a wrong mixing matrix trades bias for variance), and putting `bd_trueT` in its place raises it
 to 94.4. Consequence: with the N(1, 0.5^2) multiplier hyperprior the dust index and multipliers
 carry an offset that a correct T model does not remove, and the sd-0.1 hyperprior with the T
-model (stage A') is the configuration that can be unbiased; the mechanism (the F29 Occam push
-acting on dust, or the field prior) is measured by the exact-marginal scans in the E028
-record. Scope: one sky, one noise realization, exact templates.
+model (stage A') is the configuration that can be unbiased. Mechanism (exact-marginal scans
+in the E028 record, multipliers integrated, read against beta_d): under sd 0.5 the F29 Occam
+push puts the three fainter dust quartiles at +0.07 to +0.10 with either T model (the stage A
+chain shows +0.07 to +0.10, the fixed-T chain +0.03 to +0.06 held back by the field prior),
+the bright quartile's pseudo-true offset is +0.01 to +0.02, and the chain's +0.047 there is
+the GMRF prior transmitting the faint-sky level (field mean 1.616 against a bright-quartile
+level of 1.57). Under sd 0.1 with the true T map the optimum is 0.000 in every dust quartile
+and +0.01 for the sync level: the stage A' prediction. Scope: one sky, one noise realization,
+exact templates.

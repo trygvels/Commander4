@@ -203,7 +203,7 @@ The fixed-T chain (E026 gmrf16_exact_mumap_nc) is the control: its +0.06 / 1.029
 reproduced by the new code with `sample_T: false` (regression) before the sampled-T run is read.
 
 ## Conclusion
-**Stage A (oracle T map, sd 0.5), read 2026-11-03 08:10 to 08:20.** Chain
+**Stage A (oracle T map, sd 0.5), read 2026-11-03 08:10 to 08:19.** Chain
 `gmrf16_exact_mumap_nc_Tmap`, 1200 iterations in 6.4 h (01:43 to 08:05), 700 post-burn draws,
 63 gradients per iteration, 2 divergences, no tracebacks. Files `E028/stageA_*.txt`.
 
@@ -235,7 +235,7 @@ Against each model's own reference (`bd_fixT` for the fixed-T chain, `bd_trueT` 
 oracle chain) the bright quartile is +0.060 and +0.047: the sd-0.5 chain sits about +0.05
 above its own pseudo-true index whatever the T model, and the fixed-T chain's agreement with
 `bd_trueT` (the F30 correction of 2026-11-02) was a coincidence of two offsets of opposite
-sign (beta_eff3 minus beta_d is +0.054 in Q1). The multiplier offset lives in the bright half
+sign (beta_eff3 minus beta_d is -0.054 in Q1: `bd_fixT` 1.515, `bd_trueT` 1.570). The multiplier offset lives in the bright half
 (`stageA_mu_map_quartiles.txt`: dust mu map per quartile 1.038, 1.041, 1.017, 1.005 against
 1.062, 1.038, 1.012, 1.002 fixed-T; posterior sds 0.10, 0.34, 0.45, 0.49): the true T halves
 the bright-quartile multiplier offset (1.062 to 1.038) and raises the index there by 0.04.
@@ -252,7 +252,7 @@ A biased index field beats the floor because the GLS with a wrong mixing matrix 
 for variance; replacing the chain's dust field by `bd_trueT` everywhere raises the residual
 to 94.38 (`stageA_cmb_attribution_Tmap.txt`). The GLS CMB residual rms therefore rewards a
 steeper dust index and is not an index-quality criterion. **Amendment to the stage A'
-pre-registration (08:25, before A' runs):** the criterion "GLS CMB residual at or below the
+pre-registration (08:19, before A' runs):** the criterion "GLS CMB residual at or below the
 E026 control's 93.6 uK" is dropped as a quality criterion; the residual is reported, and the
 index criteria against `bd_trueT` decide.
 
@@ -261,6 +261,34 @@ to 120; sync region ESS min 179.
 
 *Exact-target scans (`stageA_scan_mapT_vs_fixT_sd05.txt`, `_sd01.txt`; the F29 machinery with
 a `mapT` model added to `e023_exact_scan.py`, multipliers integrated, scatters profiled at
-the reference, dust quartile shifts against `bd_trueT`):* (pending)
+the reference, dust quartile shifts against `bd_trueT`; 08:19 to 08:27):* the expected-target
+optimum per dust quartile (Q1 to Q4; curvature sd in Q1 0.003 to 0.004, in Q4 0.05 to 0.06)
+and the whole-sky sync shift:
+
+| model | d_Q1 | d_Q2 | d_Q3 | d_Q4 | d_all | s_all |
+|---|---|---|---|---|---|---|
+| sd 0.5, fixed T | +0.02 | +0.10 (edge) | +0.09 | +0.08 | +0.03 | +0.10 (edge) |
+| sd 0.5, region T map | +0.01 | +0.10 (edge) | +0.09 | +0.07 | +0.01 | +0.08 |
+| sd 0.1, fixed T | -0.01 | -0.03 | -0.01 | +0.01 | -0.01 | +0.03 |
+| sd 0.1, region T map | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | +0.01 |
+| chain, sd 0.5, fixed T (E026) | +0.006 | +0.061 | +0.059 | +0.030 | | |
+| chain, sd 0.5, region T map (stage A) | +0.047 | +0.095 | +0.098 | +0.066 | | |
+| chain, sd 0.1, fixed T (E029) | -0.048 | -0.017 | -0.022 | -0.045 | | |
+
+Reading. (i) The F29 Occam push of the marginalized multipliers acts on the dust index under
+sd 0.5 with either T model: +0.07 to +0.10 in the three fainter quartiles (the logdet term
+rises with a steeper index; in Q2 the gain is 12 nats at the +0.10 edge), and this is what
+the stage A chain shows in Q2 to Q4 (+0.07 to +0.10). The fixed-T chain is held back to
++0.03 to +0.06 by the field prior, as the sync field was in F29. (ii) The bright quartile's
+pseudo-true offset is +0.01 to +0.02 under sd 0.5; the chain's +0.047 with the true T is the
+GMRF field prior transmitting the faint-sky push (field mean 1.616 against a Q1 level of
+1.57; region posterior sd 0.039, field sigma 0.046), while with the fixed T the field mean
+1.578 sits at the Q1 level and there is no pull. (iii) Under sd 0.1 with the true T map the
+exact marginal has its optimum at zero in every dust quartile and +0.01 for the sync level:
+**the stage A' prediction is the dust index at `bd_trueT` in every quartile and the sync field
+as in E029.** Under sd 0.1 with the fixed T the optimum is -0.01 to -0.03 (the fixed-T misfit,
+read against beta_d), consistent with E029's -0.02 to -0.05 after the field prior. Both
+F34's mechanism and the A' prediction are therefore written before A' runs (A' is queued
+behind stage B).
 
 ## Follow-ups
