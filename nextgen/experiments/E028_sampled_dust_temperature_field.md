@@ -83,6 +83,17 @@ offsets" cannot be answered by a prior-dominated field with 23 to 353 GHz. Three
   the bright dust quartile; the oracle chain's z median must be within 0.5 and the mu_d map
   mean within 0.01 of 1; if the offsets remain, the fixed T is not their cause and F30's
   mechanism statement is withdrawn.
+- **Stage A' (added 2026-11-03 01:52 after E029, F33):** stage A's oracle T map with the
+  E029 multiplier hyperprior N(1, 0.1^2) on both components
+  (`param_gmrf16_exact_mumap_nc_Tmap_mu01.yml`, queued after stage B by
+  `run_e028_stageAprime.sh`). E029 showed the tight hyperprior fixes the sync side and
+  exposes the fixed-T dust misfit; this chain tests the combination. Pre-registered (against
+  E029 as the control): sync field mean and faint quartiles unchanged from E029 (within
+  0.03); dust bright quartile z median within 0.5 of `bd_trueT` and every quartile within
+  0.03 of `bd_trueT` (E029: -0.048, -0.017, -0.022, -0.045); mu_d map 1.00 +- 0.01; the
+  fixed-T GLS CMB residual at or below the E026 control's 93.6 uK (E029: 94.5). If the faint
+  dust quartiles stay 0.04 below `bd_trueT` with the true T, the shrinkage is a field-prior
+  effect and not the T misfit.
 - **Stage B (sampled scalar log T):** `sample_T: true`, `T_nside: 0`, prior N(log 20, 0.2^2):
   identifiable (sd 0.7 K) and the production exercise of the code path with the D025 check
   along tau. Pre-registered: posterior T within 2 sd of the Fisher-weighted truth T (to be

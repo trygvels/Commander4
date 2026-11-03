@@ -90,10 +90,19 @@ the E027 nside-16 references), `sync_level.txt`, `hyper_ess.txt`, `e020_analysis
 - **CMB.** The flat-prior GLS CMB residual at thinned index draws is worse with the tight
   hyperprior: 94.52 uK against 93.60 (paired +0.91 +- 0.07; true-SED floor 93.18), and the
   high-latitude residual 93.95 against 92.91. The excess over the floor rises from 8.9 to
-  15.8 uK rms, with the power fraction at l 30 to 100 up from 0.865 to 0.883. The sync field,
-  which improved by a factor 2.4, does not carry this; the faint-sky dust index does: an index
-  0.08 low over the high-latitude sky mis-extrapolates the 353 GHz dust to 143 GHz by 7
-  percent, which is a uK-level residual there.
+  15.8 uK rms, with the power fraction at l 30 to 100 up from 0.865 to 0.883. The chain's own
+  CMB draws degrade by half as much (per-draw rms 94.63 +- 0.43 against 94.14 +- 0.69).
+  Attribution by hybrid posterior-mean fields (`E029/cmb_attribution.txt`,
+  `nextgen/scripts/e029_cmb_attribution.py`, 01:55): the tight-prior sync field with the
+  control's dust field gives 92.47 uK (control 93.46: the better sync field is worth 1.0 uK),
+  the control's sync field with the tight-prior dust field gives 95.53 (the dust field costs
+  2.1 uK). Of the dust cost, 0.75 uK is the faint half (restoring `bd_fixT` in the two faint
+  quartiles gives 93.72; Q4 alone 93.91): an index 0.08 low over the high-latitude sky
+  mis-extrapolates the 353 GHz dust to 143 GHz by 7 percent. The rest is in the bright half,
+  where the fixed-T GLS prefers the control's dust index (0.06 to 0.08 above `bd_fixT`) to
+  `bd_fixT` itself (93.76 everywhere) or `bd_trueT` (93.51): the fixed-T GLS CMB residual is
+  not a clean index-quality metric when T is misfit, because the index that best extrapolates
+  353 GHz to the CMB bands at a wrong T is neither beta_d nor the 12-band effective index.
 - **(c) D025 check passes** (K = 100, steps 0.6 and 0.5 conditional sd): sync PIT mean 0.470,
   KS p 0.63, optimum minus draw +0.16 sd; dust 0.485, p 0.78, +0.04 sd. Mixing: sync mu ESS
   201, log sigma 32, u 38; dust mu 68, log sigma 8, u 7 (the dust field-scale hyperparameters
@@ -117,19 +126,23 @@ returns to the sky's (0.077 against 0.152, truth 0.063) and the sync pixel error
 sets the faint-sky index at this depth, and the wide default also inflated the field scale.
 The price lands on dust: without free multipliers the fixed-T misfit is carried by the dust
 index again (bright sky at beta_eff, 0.05 below beta_d) and, through the GMRF shrinkage, by
-the faint sky (0.08 below the fixed-T reference), which costs 0.9 uK of GLS CMB residual at
-high latitude. Neither hyperprior gives an unbiased dust index with a fixed T: sd 0.5 hides
-the T misfit in the multipliers and adds the Occam push, sd 0.1 exposes it. The multiplier
-field is therefore not a substitute for a dust temperature model, and the stage A chain
-(oracle T map, running) is the direct test of whether the tight hyperprior plus a correct T
+the faint sky (0.08 below the fixed-T reference); in the fixed-T GLS CMB the better sync field
+is worth 1.0 uK and the dust field costs 2.1 uK (0.75 of it the faint half), net +0.9 uK at
+high latitude, and the chain's own CMB degrades by 0.5 uK. Neither hyperprior gives an
+unbiased dust index with a fixed T: sd 0.5 hides the T misfit in the multipliers and adds the
+Occam push, sd 0.1 exposes it. The multiplier field is therefore not a substitute for a dust
+temperature model. Stage A (oracle T map, sd 0.5, running) tests the T model against the
+E026 control; a stage A' chain (oracle T map with sd 0.1, `param_gmrf16_exact_mumap_nc_Tmap_mu01.yml`,
+queued after stage B) is the direct test of whether the tight hyperprior plus a correct T
 gives both indices right. Recommendation (needs Trygve, a default change): multiplier
 hyperprior sd 0.1 for the hier amplitude prior, with a T model for dust; Paper A states the
 hyperprior width as part of the model and shows the two chains side by side.
 
 ## Follow-ups
-- Stage A (oracle T, sd 0.1) reading: bright dust at `bd_trueT` and the faint sky at the
-  truth would close the dust side; if the faint-sky shrinkage stays, it is the GMRF field
-  mean set by the bright sky and needs a region-dependent reference.
+- Stage A (oracle T, sd 0.5) and A' (oracle T, sd 0.1) readings: bright dust at `bd_trueT`
+  and the faint sky at the truth in A' would close the dust side; if the faint-sky shrinkage
+  stays, it is the GMRF field mean set by the bright sky and needs a region-dependent
+  reference.
 - The dust hyperparameter mixing (ESS 7 to 8 for log sigma and u) wants the dense metric
   rebuilt at the chain's scale or more iterations before the dust field scale is quoted.
 - The CMB residual's sensitivity to the faint-sky dust index is a Paper A point: the index

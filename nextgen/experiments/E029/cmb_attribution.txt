@@ -1,0 +1,19 @@
+GLS CMB residual (uK) at posterior-mean index fields; A = gmrf16_exact_mumap_nc_mu01, B = gmrf16_exact_mumap_nc
+A sync, A dust                                               rms all  94.476  |b|>20  93.902
+B sync, B dust                                               rms all  93.460  |b|>20  92.725
+A sync, B dust                                               rms all  92.466  |b|>20  91.684
+B sync, A dust                                               rms all  95.534  |b|>20  94.991
+A sync, dust = bd_fixT everywhere                            rms all  93.763  |b|>20  92.770
+A sync, A dust with Q1 replaced by bd_fixT                   rms all  94.502  |b|>20  93.895
+A sync, A dust with Q2 replaced by bd_fixT                   rms all  94.491  |b|>20  93.909
+A sync, A dust with Q3 replaced by bd_fixT                   rms all  94.289  |b|>20  93.631
+A sync, A dust with Q4 replaced by bd_fixT                   rms all  93.910  |b|>20  93.044
+A sync, A dust with faint half replaced by bd_fixT           rms all  93.722  |b|>20  92.771
+A sync, dust = bd_trueT everywhere                           rms all  93.510  |b|>20  93.062
+A sync, A dust with Q1 replaced by bd_trueT                  rms all  94.129  |b|>20  93.863
+A sync, A dust with Q2 replaced by bd_trueT                  rms all  94.345  |b|>20  93.817
+A sync, A dust with Q3 replaced by bd_trueT                  rms all  94.312  |b|>20  93.672
+A sync, A dust with Q4 replaced by bd_trueT                  rms all  94.156  |b|>20  93.418
+A sync, A dust with faint half replaced by bd_trueT          rms all  93.991  |b|>20  93.187
+sync = bs_fixT, A dust                                       rms all  94.567  |b|>20  93.829
+sync = bs_fixT, dust = bd_fixT                               rms all  93.883  |b|>20  92.701

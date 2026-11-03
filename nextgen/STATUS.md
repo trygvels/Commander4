@@ -13,16 +13,21 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 - The price lands on dust: the mu_d map drops from 1.029 to 1.003, the bright dust index moves
   from beta_d to the fixed-T effective index (0.054), the faint half shrinks to a field mean
   0.08 below the fixed-T reference, and the GLS CMB residual rises by 0.91 +- 0.07 uK at high
-  latitude. With a fixed T neither hyperprior width gives an unbiased dust index; the T model
-  (stage A, running with sd 0.1) is the test of the combination.
+  latitude (by hybrid fields: the better sync field is worth 1.0 uK, the dust field costs
+  2.1 uK, 0.75 of it the faint half). With a fixed T neither hyperprior width gives an
+  unbiased dust index; the T model is the test of the combination.
 
 **Running**
-- E028 stage A (gmrf16_exact_mumap_nc_Tmap, oracle T map, sd 0.1, from 01:43; about 5.5 h),
-  then stage B (scalar T, sd 0.1; prediction 20.2 +- 0.5 K).
+- E028 stage A (gmrf16_exact_mumap_nc_Tmap, oracle T map, sd 0.5 as pre-registered, from
+  01:43; about 5.5 h), then stage B (scalar T, sd 0.1; prediction 20.2 +- 0.5 K), then
+  stage A' (oracle T map with sd 0.1, `_Tmap_mu01`, queued 01:52 by
+  `run_e028_stageAprime.sh`: the combination E029 points to).
 
 **Next**
 - Stage A reading against `bd_trueT` (criteria: bright dust z within 0.5, mu_d map 1.00 +-
-  0.01) and the faint-sky dust and the CMB residual against E029; then stage B.
+  0.01) and the faint-sky dust and the CMB residual against E026; then stage B; then A'
+  against E029 (sync unchanged, dust at bd_trueT in every quartile, CMB residual at or
+  below the control's).
 
 **Needs Trygve**
 - Default change: multiplier hyperprior sd 0.1 (from 0.5) for the hier amplitude prior. E029

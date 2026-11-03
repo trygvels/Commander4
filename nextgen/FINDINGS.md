@@ -625,7 +625,9 @@ Dust: the mu_d map falls from 1.029 to 1.003, the bright quartile moves from bet
 fixed-T effective index (z -1.55 against bd_trueT, +0.11 against bd_fixT; a move of 0.054),
 the faint half shrinks to the field mean 1.506 (0.08 below the fixed-T reference), and the
 flat-prior GLS CMB residual rises by 0.91 +- 0.07 uK (high latitude 92.91 to 93.95 uK; the
-excess over the true-SED floor from 8.9 to 15.8 uK rms). The hyperprior width is a model
+excess over the true-SED floor from 8.9 to 15.8 uK rms; by hybrid fields the better sync field
+is worth 1.0 uK and the dust field costs 2.1 uK, 0.75 of it the faint half; the chain's own
+CMB draws degrade by 0.5 uK). The hyperprior width is a model
 choice that sets the faint-sky index (F29 confirmed in a chain); it does not replace a dust
 temperature model (F30): with a fixed T, sd 0.5 hides the misfit in the multipliers and sd 0.1
 exposes it in the index. The stage A chain (E028, oracle T) tests the combination.
