@@ -21,6 +21,7 @@ ap.add_argument("--points", type=int, default=11)
 ap.add_argument("--mu-sd", type=float, default=0.5, help="sd of the N(1, sd^2) hyperprior on the template multipliers (E029: 0.1)")
 ap.add_argument("--index-prior-rms", type=float, default=0.3, help="negative control: rms of the Gaussian prior on the field mean (chains use 0.3)")
 ap.add_argument("--noise-scale", type=float, default=1.0, help="negative control: multiply the noise rms (chains use 1.0)")
+ap.add_argument("--t-map", default=None, help="fixed per-region dust T map (FITS, E028 stage A); the target uses it instead of the scalar T_fixed")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
 import numpy as np, healpy as hp, h5py
 from scipy.stats import kstest
@@ -47,6 +48,8 @@ def comp(cls, name, short, beta0, **sed):
 cmb = comp(CMB, "CMB", "cmb", 0.0, nu_ref=1e-3); cmb.comp_params.sample_spectral_index = False
 sync = comp(Synchrotron, "Synchrotron", "sync", -3.1, nu_ref=30.0)
 dust = comp(ThermalDust, "ThermalDust", "dust", 1.6, T=T_fixed, nu_ref=545.0)
+if a.t_map:
+    tm = hp.read_map(a.t_map, field=0); dust.set_T_map(tm, hp.npix2nside(tm.size)); print(f"fixed T map {a.t_map}: mean {tm.mean():.3f} K")
 cmb.amp_prior = ifd.AmpPrior("gaussian", mean=0.0, rms=a.cmb_sd)
 sync.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.sync_template, field=0), 1e-3), mu_nside=a.mu_nside, mu_prior=(1.0, a.mu_sd))
 dust.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.dust_template, field=0), 1e-3), mu_nside=a.mu_nside, mu_prior=(1.0, a.mu_sd))

@@ -2,6 +2,40 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-03 (Mac mini, 08:30): E028 stage A read (F34: the fixed T is not the cause of the sd-0.5 dust offsets); stage B running
+
+**Learned**
+- E028 stage A (E026's chain with the oracle nside-16 T map in the dust SED, sd 0.5; passes
+  D025 against its own target, fails it against the fixed-T target, so the map was used):
+  both pre-registered criteria fail. The mu_d map stays at 1.025 +- 0.007 (required 1.00 +-
+  0.01) and the bright dust quartile sits +0.047 above beta_d (z +1.31; required within 0.5).
+  The dust index is 0.04 higher than with the fixed T in every quartile (+0.05 to +0.10 above
+  beta_d; pixel RMSE 0.085 against 0.060); sync is unchanged. F30's mechanism (multipliers
+  absorb the T misfit) is withdrawn: the fixed-T chain's bright-sky agreement with beta_d was
+  a cancellation of two 0.05 offsets. The sd-0.5 model carries a dust offset of its own,
+  concentrated in the bright half (mu map 1.038, 1.041, 1.017, 1.005 by quartile).
+- The flat-prior GLS CMB residual rms rewards a steeper dust field (92.3 uK with the biased
+  field, 0.7 uK below the true-SED floor, 94.4 with beta_d in its place) and is dropped as a
+  quality criterion (stage A' pre-registration amended before A' runs).
+
+**Running**
+- E028 stage B (`gmrf16_exact_mumap_nc_Tscalar`, scalar log T sampled, sd 0.1, from 08:05,
+  about 6.5 h; prediction 20.2 +- 0.5 K), then stage A' (`_Tmap_mu01`, oracle T with sd 0.1,
+  pre-registered in the E028 record, E029 as control).
+- Exact-marginal scans with the region T map (`e023_exact_scan.py --cells
+  exact_mapT_perregmarg exact_fixT_perregmarg`, sd 0.5 and sd 0.1): the pseudo-true dust
+  offset per quartile under each T model and hyperprior; the sd-0.1 mapT scan is the stage A'
+  prediction.
+
+**Next**
+- Scan reading (mechanism of F34: the F29 Occam push on dust against the field prior), then
+  stage B against 20.2 +- 0.5 K with the D025 check along tau, then A' against `bd_trueT` in
+  every quartile (within 0.03) with sync unchanged from E029.
+
+**Needs Trygve**
+- Unchanged: the multiplier hyperprior default (sd 0.1) together with the T model; the Paper A
+  reporting rule for prior-dominated fields; the stage C simulation with 545 and 857 GHz.
+
 ## 2026-11-03 (Mac mini, 01:55): E029 closed (F33: tight multiplier hyperprior fixes sync, exposes the fixed-T dust misfit); E028 stage A running
 
 **Learned**

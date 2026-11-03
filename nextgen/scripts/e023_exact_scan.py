@@ -411,9 +411,13 @@ def main():
                 + " ".join(f"{m:.3f}/{s:.3f}" for m, s in realized[tmpl][c]))
     # references: noise-free region fits per SED level
     bs_mean = hp.ud_grade(np.asarray(t["beta_s"], float), 16)
+    # E028 stage A: the chain's oracle model holds the region-mean T map at nside 16 (mapT)
+    T_map16 = hp.ud_grade(T_true, 16) if not os.path.exists(f"{a.dir}/truth_Td_nside16.fits") \
+        else hp.read_map(f"{a.dir}/truth_Td_nside16.fits", field=0)
+    T_by_sed = {"fixT": np.full(npix, T_fixed), "trueT": T_true, "mapT": np.asarray(T_map16, float)[reg]}
     refs = {}
-    for sed in ("fixT", "trueT"):
-        T = np.full(npix, T_fixed) if sed == "fixT" else T_true
+    for sed in ("fixT", "trueT", "mapT"):
+        T = T_by_sed[sed]
         bd_mean = hp.ud_grade(np.asarray(t["beta_eff3"] if sed == "fixT" else t["beta_d"], float), 16)
         t0 = time.time()
         bs_ref, bd_ref = region_fit(skymap, rms, T, np.asarray(sky.cm), reg, nreg, bs_mean, bd_mean)
@@ -430,8 +434,13 @@ def main():
         for sed in refs:
             refs[sed] = (np.asarray(rr["bs"], float), np.asarray(rr["bd"], float))
         say(f"  reference replaced by {a.ref_npz}: sync mean {refs['fixT'][0].mean():.4f} sd {refs['fixT'][0].std():.4f}, dust mean {refs['fixT'][1].mean():.4f} sd {refs['fixT'][1].std():.4f}")
+    say(f"  mapT minus trueT reference: sync mean {np.mean(refs['mapT'][0]-refs['trueT'][0]):+.4f} rms "
+        f"{np.sqrt(np.mean((refs['mapT'][0]-refs['trueT'][0])**2)):.4f}; dust mean {np.mean(refs['mapT'][1]-refs['trueT'][1]):+.4f} "
+        f"rms {np.sqrt(np.mean((refs['mapT'][1]-refs['trueT'][1])**2)):.4f}; per dust quartile mean "
+        + " ".join(f"{np.mean((refs['mapT'][1]-refs['trueT'][1])[qd16 == k]):+.4f}" for k in range(4)))
     np.savez(a.out.replace(".txt", "_refs.npz"), bs_fixT=refs["fixT"][0], bd_fixT=refs["fixT"][1],
-             bs_trueT=refs["trueT"][0], bd_trueT=refs["trueT"][1], qs16=qs16, qd16=qd16)
+             bs_trueT=refs["trueT"][0], bd_trueT=refs["trueT"][1], bs_mapT=refs["mapT"][0], bd_mapT=refs["mapT"][1],
+             qs16=qs16, qd16=qd16)
     if a.T_grid:
         bd_mean = hp.ud_grade(np.asarray(t["beta_eff3"], float), 16)
         for cell in a.cells:
@@ -460,7 +469,7 @@ def main():
         tmpl, sed, kind = cell.split("_")
         gsel = {"data": g_data, "exact": g_exact, "cs": g_cs}[tmpl]
         sky.gs, sky.gd = gsel["sync"], gsel["dust"]
-        T = np.full(npix, T_fixed) if sed == "fixT" else T_true
+        T = T_by_sed[sed]
         hyper = Hyper(kind, qs64, qd64, reg=reg)
         bs_ref, bd_ref = refs[sed]
         bs0, bd0 = bs_ref[reg], bd_ref[reg]

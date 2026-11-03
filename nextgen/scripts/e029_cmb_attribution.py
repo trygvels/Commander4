@@ -7,6 +7,7 @@ usage: e029_cmb_attribution.py --dir DIR --refs REFS.npz --a TAG_A --b TAG_B [--
 import argparse, glob, sys
 ap = argparse.ArgumentParser(); ap.add_argument("--dir", required=True); ap.add_argument("--refs", required=True)
 ap.add_argument("--a", required=True); ap.add_argument("--b", required=True); ap.add_argument("--burn", type=int, default=500)
+ap.add_argument("--t-map", default=None, help="per-region dust T map (FITS) used in the GLS instead of T_fixed (E028)")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
 import numpy as np, healpy as hp, h5py
 sys.path.insert(0, "nextgen/scripts")
@@ -14,7 +15,9 @@ from e020_analyze import gls_cmb, region_map
 truth = dict(np.load(f"{a.dir}/truth.npz")); nside = int(truth["nside"]); nu = truth["nu"]
 data = np.array([hp.read_map(f"{a.dir}/band{int(f):03d}_map.fits") for f in nu]).T
 lat = hp.pix2ang(nside, np.arange(hp.nside2npix(nside)), lonlat=True)[1]; hi = np.abs(lat) > 20
-T = float(truth["T_fixed"]); reg = region_map(16, nside); r = np.load(a.refs); qd = r["qd16"]; qs = r["qs16"]
+reg = region_map(16, nside); r = np.load(a.refs); qd = r["qd16"]; qs = r["qs16"]
+T = float(truth["T_fixed"]) if a.t_map is None else hp.read_map(a.t_map, field=0)[reg]
+print("GLS dust temperature:", f"fixed {T:.4f} K" if np.ndim(T) == 0 else f"per-region map {a.t_map} (mean {T.mean():.3f} K)")
 
 def pm(tag, comp):
     files = sorted(glob.glob(f"{a.dir}/chains_{tag}/chains_compsep/chain01_iter*.h5"))[a.burn:]

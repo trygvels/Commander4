@@ -580,6 +580,13 @@ index; it changes which index the chain estimates (beta_d instead of beta_eff) a
 T misfit into the multipliers. The recommendation stands for a different reason: on real data
 the multiplier absorbs any pivot-frequency mismatch, so its 3 percent is not interpretable as
 a template error, and a T model is needed to separate the two.
+**Withdrawn (2026-11-03, E028 stage A, F34):** the mechanism statement "the multipliers absorb
+the fixed-T misfit" and the correction's "the chain's bright-sky dust index is the true
+beta_d" do not survive the oracle-T chain: with the true region T map the mu_d map stays at
+1.025 and the bright quartile sits +0.047 above beta_d. The fixed-T chain's agreement with
+beta_d was a cancellation of two offsets of about 0.05 with opposite signs. The recommendation
+(a T model before the multiplier field is used for dust on real data) stands on the E029 and
+E028 evidence that neither hyperprior width gives an unbiased dust index with a fixed T.
 
 **F31. Profiling per-region nuisance multipliers in the exact-target scans is not a valid
 stand-in for the chain's marginal; the multipliers must be integrated analytically** (E026
@@ -631,3 +638,29 @@ CMB draws degrade by 0.5 uK). The hyperprior width is a model
 choice that sets the faint-sky index (F29 confirmed in a chain); it does not replace a dust
 temperature model (F30): with a fixed T, sd 0.5 hides the misfit in the multipliers and sd 0.1
 exposes it in the index. The stage A chain (E028, oracle T) tests the combination.
+
+**F34. The fixed dust temperature is not the cause of the dust multiplier offset (1.029) and
+the bright-sky dust-index offset of the sd-0.5 hier chain: with the true region T map the
+multipliers stay at 1.025 and the dust index rises everywhere, so the sd-0.5 model's
+pseudo-true dust index sits about 0.05 above its own reference under either T model** (E028
+stage A, `gmrf16_exact_mumap_nc_Tmap`: E026's chain with the oracle nside-16 region-mean T map
+in the dust SED, everything else equal; the chain passes the D025 check against its T-map
+target, KS p 0.12 and 0.39, and fails it against the fixed-T target, dust KS D 0.98, 1269 nats
+lower). Both pre-registered criteria fail: mu_d map 1.0254 +- 0.0073 (required 1.00 +- 0.01)
+and bright-quartile z median +1.31 against `bd_trueT` (required within 0.5). The dust index
+moves up by 0.04 in every quartile (offsets against beta_d +0.047, +0.095, +0.098, +0.066
+against +0.006, +0.061, +0.059, +0.030 with the fixed T; field mean 1.616 against 1.578, sky
+mean 1.540; pixel RMSE 0.085 against 0.060) while the sync field is unchanged (field mean
+-2.880 against -2.868, quartile offsets within 0.02). The multiplier offset lives in the bright
+half (dust mu map per quartile 1.038, 1.041, 1.017, 1.005; fixed T 1.062, 1.038, 1.012, 1.002;
+sd 0.1 with fixed T 1.012, 1.000, 1.000, 1.000). Against each model's own reference the
+bright quartile is +0.047 (oracle T) and +0.060 (fixed T, where beta_eff3 minus beta_d is
++0.054): F30's reading that the fixed-T chain estimates beta_d was a cancellation, now
+withdrawn. The flat-prior GLS CMB residual rms is not an index-quality criterion: the oracle
+chain's biased-high dust field gives 92.3 uK, 0.7 uK below the true-SED GLS floor of 93.2
+(a wrong mixing matrix trades bias for variance), and putting `bd_trueT` in its place raises it
+to 94.4. Consequence: with the N(1, 0.5^2) multiplier hyperprior the dust index and multipliers
+carry an offset that a correct T model does not remove, and the sd-0.1 hyperprior with the T
+model (stage A') is the configuration that can be unbiased; the mechanism (the F29 Occam push
+acting on dust, or the field prior) is measured by the exact-marginal scans in the E028
+record. Scope: one sky, one noise realization, exact templates.

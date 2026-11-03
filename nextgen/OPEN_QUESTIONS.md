@@ -260,7 +260,14 @@ original numbering.
   pixel RMSE 0.061 against 0.147) and exposes the fixed-T dust misfit instead of hiding it
   (bright dust at beta_eff, faint dust 0.08 low, CMB residual +0.9 uK at high latitude). The
   hyperprior width is settled as a model choice for sync; the dust side needs the T model
-  (E028 stage A running with sd 0.1). The index-resolution question is closed (E027, F32).
+  (E028 stage A ran with sd 0.5 as pre-registered). The index-resolution question is closed (E027, F32).
+- **Status 2026-11-03, 08:30 (E028 stage A, F34):** the oracle T map does not remove the
+  sd-0.5 offsets: mu_d map 1.025 (criterion 1.00 +- 0.01 fails), bright dust +0.047 above
+  beta_d (z +1.31; criterion within 0.5 fails), every quartile 0.04 higher than with the fixed
+  T, sync unchanged. F30's mechanism is withdrawn; the dust offsets of the sd-0.5 model are
+  the hyperprior's, not the T model's. Stage A' (oracle T with sd 0.1) is the configuration
+  that can be unbiased; stage B (scalar T, sd 0.1) is running. The GLS CMB residual is dropped
+  as a quality criterion (a biased field beats the true-SED floor by 0.7 uK).
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is

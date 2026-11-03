@@ -203,6 +203,64 @@ The fixed-T chain (E026 gmrf16_exact_mumap_nc) is the control: its +0.06 / 1.029
 reproduced by the new code with `sample_T: false` (regression) before the sampled-T run is read.
 
 ## Conclusion
-(pending)
+**Stage A (oracle T map, sd 0.5), read 2026-11-03 08:10 to 08:20.** Chain
+`gmrf16_exact_mumap_nc_Tmap`, 1200 iterations in 6.4 h (01:43 to 08:05), 700 post-burn draws,
+63 gradients per iteration, 2 divergences, no tracebacks. Files `E028/stageA_*.txt`.
+
+*Validity.* The chain used the T map and is a valid draw from its target: the D025
+conditional-CDF check against the T-map target (K = 100, `--t-map` added to
+`e026_conditional_check.py`) passes, sync KS p 0.12 (mean CDF 0.450, optimum +0.20
+conditional sd), dust p 0.39 (mean 0.512, optimum -0.01 sd); against the fixed-T target
+(control, K = 40) the same draws fail, dust KS D 0.98 p 0.000 (optimum -5.2 conditional sd),
+sync p 0.000, and the log target at the first draw is 1269 nats lower (1274181 against
+1275450). The region-mean T map is not a coarse stand-in: the region fit at the map T differs
+from the fit at the true per-pixel T by -0.003 in the dust index (rms 0.008; `stageA_scan_*`
+reference lines), so `bd_trueT` is the reference for this chain.
+
+*Pre-registered criteria: both fail.* The mu_d map mean is 1.0254 +- 0.0073 (required 1.00 +-
+0.01; fixed-T chain 1.0286 +- 0.0070) and the bright dust quartile sits at z median +1.31
+against `bd_trueT` (required within 0.5; fixed-T chain -0.06). By the pre-registration the
+fixed T is not the cause of the 1.029 multipliers, and F30's mechanism statement ("the
+multipliers absorb the fixed-T misfit at the 545 GHz pivot") is withdrawn. The oracle T
+makes the dust index worse, not better:
+
+| dust, against `bd_trueT` (mean offset / z median) | Q1 bright | Q2 | Q3 | Q4 faint | field mean | pixel RMSE vs truth |
+|---|---|---|---|---|---|---|
+| fixed T, sd 0.5 (E026) | +0.006 / -0.06 | +0.061 / +1.17 | +0.059 / +0.97 | +0.030 / +0.46 | 1.578 +- 0.012 | 0.060 |
+| oracle T map, sd 0.5 (stage A) | +0.047 / +1.31 | +0.095 / +2.17 | +0.098 / +2.09 | +0.066 / +1.37 | 1.616 +- 0.010 | 0.085 |
+| fixed T, sd 0.1 (E029) | -0.048 / -1.55 | -0.017 / -0.29 | -0.022 / -0.30 | -0.045 / -0.67 | 1.506 +- 0.011 | 0.056 |
+| truth (sky mean 1.540) | | | | | | |
+
+Against each model's own reference (`bd_fixT` for the fixed-T chain, `bd_trueT` for the
+oracle chain) the bright quartile is +0.060 and +0.047: the sd-0.5 chain sits about +0.05
+above its own pseudo-true index whatever the T model, and the fixed-T chain's agreement with
+`bd_trueT` (the F30 correction of 2026-11-02) was a coincidence of two offsets of opposite
+sign (beta_eff3 minus beta_d is +0.054 in Q1). The multiplier offset lives in the bright half
+(`stageA_mu_map_quartiles.txt`: dust mu map per quartile 1.038, 1.041, 1.017, 1.005 against
+1.062, 1.038, 1.012, 1.002 fixed-T; posterior sds 0.10, 0.34, 0.45, 0.49): the true T halves
+the bright-quartile multiplier offset (1.062 to 1.038) and raises the index there by 0.04.
+In the sd-0.1 chain the map is 1.012, 1.000, 1.000, 1.000.
+
+*Sync unchanged (criterion (d) met).* Field mean -2.880 +- 0.042 against -2.868 +- 0.042,
+quartile offsets against the reference +0.06, +0.11, +0.12, +0.12 (fixed T: +0.05 to +0.14),
+sigma_s 0.122 against 0.152, pixel RMSE 0.133 against 0.147; sync mu map 0.994.
+
+*CMB.* The flat-prior GLS CMB residual at the posterior-mean fields is 92.45 uK with the
+fixed-T GLS and 92.31 with the T-map GLS (fixed-T chain 93.60, sd-0.1 chain 94.52, true-SED
+floor 93.18): 1.12 +- 0.07 uK below the fixed-T chain and 0.69 +- 0.13 uK below the floor.
+A biased index field beats the floor because the GLS with a wrong mixing matrix trades bias
+for variance; replacing the chain's dust field by `bd_trueT` everywhere raises the residual
+to 94.38 (`stageA_cmb_attribution_Tmap.txt`). The GLS CMB residual rms therefore rewards a
+steeper dust index and is not an index-quality criterion. **Amendment to the stage A'
+pre-registration (08:25, before A' runs):** the criterion "GLS CMB residual at or below the
+E026 control's 93.6 uK" is dropped as a quality criterion; the residual is reported, and the
+index criteria against `bd_trueT` decide.
+
+*Mixing.* Dust region ESS min 93, median 765 (fixed T: 21, 136); dust hyperparameters ESS 39
+to 120; sync region ESS min 179.
+
+*Exact-target scans (`stageA_scan_mapT_vs_fixT_sd05.txt`, `_sd01.txt`; the F29 machinery with
+a `mapT` model added to `e023_exact_scan.py`, multipliers integrated, scatters profiled at
+the reference, dust quartile shifts against `bd_trueT`):* (pending)
 
 ## Follow-ups

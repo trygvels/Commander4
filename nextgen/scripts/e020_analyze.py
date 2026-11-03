@@ -35,7 +35,7 @@ def cmb_sed(nu: np.ndarray) -> np.ndarray:
 
 
 def gls_cmb(d: np.ndarray, rms: np.ndarray, nu: np.ndarray, beta_s: np.ndarray,
-            beta_d: np.ndarray, T: float, dust_col: np.ndarray | None = None) -> np.ndarray:
+            beta_d: np.ndarray, T, dust_col: np.ndarray | None = None) -> np.ndarray:
     """Flat-prior generalized-least-squares CMB amplitude per pixel at the given indices:
     the cmb row of (M^T N^-1 M)^-1 M^T N^-1 d, the standard parametric-fit CMB map. `dust_col`
     (npix, B) replaces the fixed-T dust column (used for the true-SED floor)."""
@@ -48,12 +48,15 @@ def gls_cmb(d: np.ndarray, rms: np.ndarray, nu: np.ndarray, beta_s: np.ndarray,
     return np.linalg.solve(A, b[..., None])[:, 0, 0]
 
 
-def sed(comp: str, nu: np.ndarray, beta: np.ndarray, T: float) -> np.ndarray:
-    """(npix, nband) mixing column of the component at its pivot (30 or 545 GHz)."""
+def sed(comp: str, nu: np.ndarray, beta: np.ndarray, T) -> np.ndarray:
+    """(npix, nband) mixing column of the component at its pivot (30 or 545 GHz). `T` is a
+    scalar or a per-pixel (npix,) array (E028: a fixed region T map)."""
     if comp == "sync":
         return (nu[None, :] / 30.0) ** beta[:, None]
-    x, x0 = H_OVER_K * nu / T, H_OVER_K * 545.0 / T
-    return (nu[None, :] / 545.0) ** (beta[:, None] + 1.0) * (np.expm1(x0) / np.expm1(x))[None, :]
+    T = np.asarray(T, dtype=np.float64)
+    T = T[:, None] if T.ndim == 1 else T
+    x, x0 = H_OVER_K * nu[None, :] / T, H_OVER_K * 545.0 / T
+    return (nu[None, :] / 545.0) ** (beta[:, None] + 1.0) * (np.expm1(x0) / np.expm1(x))
 
 
 def region_map(nside_beta: int, nside: int) -> np.ndarray:

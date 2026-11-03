@@ -1,0 +1,109 @@
+E023 exact-target scans (v2) on /Users/trygvels/data/e023_pysm_n1: nside 64, noise scale 1.0, CMB prior sd 10000, T_fixed 20.929 K; truth sd beta_s 0.0629, beta_eff3 0.0516, beta_d 0.0374
+  sync quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 1.0021 2.5343 3.2427 3.6588; block sd (quartile, amplitudes known) 0.01801 0.07830 0.10093 0.11643
+  dust quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 0.0599 0.2895 0.7586 1.4540; block sd (quartile, amplitudes known) 0.00065 0.00887 0.01966 0.03014
+  data template sync: g/true at |b|>20 16/50/84 pct 0.199/0.991/1.793
+  data template dust: g/true at |b|>20 16/50/84 pct 0.023/1.078/2.614
+  cs template: log error field rms 0.3, FWHM 10.0 deg, seed 11; realized exp(-f) mean/sd sync 1.007/0.309, dust 1.060/0.319
+  realized a/g (data template, sync) mean/sd per quartile: 0.865/0.278 0.796/0.359 2.264/21.793 140.607/212.228
+  realized a/g (data template, dust) mean/sd per quartile: 0.879/0.346 0.876/5.851 5.914/29.806 48.258/63.291
+  realized a/g (exact template, sync) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (exact template, dust) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (cs template, sync) mean/sd per quartile: 0.994/0.299 1.032/0.317 0.994/0.306 1.008/0.314
+  realized a/g (cs template, dust) mean/sd per quartile: 1.063/0.300 1.056/0.305 1.061/0.336 1.061/0.333
+  reference (fixT): region fit in 16 s; fit minus region mean: sync rms 0.0564 max 0.4537, dust rms 0.0117 max 0.1224; at the bounds: 0 sync, 0 dust
+  reference (trueT): region fit in 16 s; fit minus region mean: sync rms 0.0209 max 0.4886, dust rms 0.0094 max 0.1184; at the bounds: 0 sync, 0 dust
+  reference (mapT): region fit in 17 s; fit minus region mean: sync rms 0.0156 max 0.2470, dust rms 0.0114 max 0.1180; at the bounds: 0 sync, 0 dust
+  fixT cells read against the true-T dust region fit (beta_d)
+  mapT minus trueT reference: sync mean +0.0023 rms 0.0204; dust mean -0.0034 rms 0.0077; per dust quartile mean -0.0015 -0.0040 -0.0038 -0.0044
+
+== cell exact_mapT_perregmarg [expected]: profiled at the reference field (261 evals, 149.7 s): [multipliers integrated, prior sd 0.5] s_s [0.0465, 0.1355, 0.1602, 0.1777] s_d [0.0232, 0.0937, 0.1564, 0.1977]; chi2 -1905.7, logdet -3336062.2, trace -270032.4, hyperprior -6.64, Laplace 0.00
+   sync: profiled s_q [0.046, 0.135, 0.16, 0.178] against realized sd(a/g) [0.0, 0.0, 0.0, 0.0]; multipliers integrated against mean(a/g) [1.0, 1.0, 1.0, 1.0]
+   dust: profiled s_q [0.023, 0.094, 0.156, 0.198] against realized sd(a/g) [0.0, 0.0, 0.0, 0.0]; multipliers integrated against mean(a/g) [1.0, 1.0, 1.0, 1.0]
+-- exact_mapT_perregmarg [expected] d_Q1: 12288 pixels; argmax delta +0.010 (curvature sd 0.0039), gain over delta 0 3.91; no Laplace; hyperparameters at argmax [multipliers integrated, prior sd 0.5] s_s [0.0465, 0.1355, 0.1602, 0.1777] s_d [0.0232, 0.0937, 0.1564, 0.1977]; 12 s
+   -0.100 chi2      -391.41 logdet       -28.34 trace      19.66 hyper     0.00 total      -400.08
+   -0.090 chi2      -323.43 logdet       -25.35 trace      17.60 hyper     0.00 total      -331.18
+   -0.080 chi2      -261.74 logdet       -22.40 trace      15.57 hyper     0.00 total      -268.58
+   -0.070 chi2      -206.39 logdet       -19.48 trace      13.55 hyper     0.00 total      -212.32
+   -0.060 chi2      -157.42 logdet       -16.60 trace      11.55 hyper     0.00 total      -162.46
+   -0.050 chi2      -114.87 logdet       -13.75 trace       9.58 hyper     0.00 total      -119.04
+   -0.040 chi2       -78.79 logdet       -10.93 trace       7.62 hyper     0.00 total       -82.10
+   -0.030 chi2       -49.22 logdet        -8.15 trace       5.69 hyper     0.00 total       -51.68
+   -0.020 chi2       -26.21 logdet        -5.40 trace       3.77 hyper     0.00 total       -27.84
+   -0.010 chi2        -9.79 logdet        -2.68 trace       1.88 hyper     0.00 total       -10.60
+   -0.000 chi2         0.00 logdet         0.00 trace       0.00 hyper     0.00 total         0.00
+   +0.010 chi2         3.12 logdet         2.65 trace      -1.86 hyper     0.00 total         3.91
+   +0.020 chi2        -0.48 logdet         5.27 trace      -3.69 hyper     0.00 total         1.10
+   +0.030 chi2       -10.81 logdet         7.86 trace      -5.51 hyper     0.00 total        -8.47
+   +0.040 chi2       -27.93 logdet        10.42 trace      -7.31 hyper     0.00 total       -24.82
+   +0.050 chi2       -51.86 logdet        12.94 trace      -9.09 hyper     0.00 total       -48.01
+   +0.060 chi2       -82.64 logdet        15.44 trace     -10.85 hyper     0.00 total       -78.05
+   +0.070 chi2      -120.29 logdet        17.90 trace     -12.60 hyper     0.00 total      -114.99
+   +0.080 chi2      -164.86 logdet        20.34 trace     -14.32 hyper     0.00 total      -158.84
+   +0.090 chi2      -216.36 logdet        22.74 trace     -16.03 hyper     0.00 total      -209.64
+   +0.100 chi2      -274.83 logdet        25.12 trace     -17.72 hyper     0.00 total      -267.43
+-- exact_mapT_perregmarg [expected] d_Q2: 12288 pixels; argmax delta +0.100 (curvature sd nan), gain over delta 0 12.24; no Laplace; hyperparameters at argmax [multipliers integrated, prior sd 0.5] s_s [0.0465, 0.1355, 0.1602, 0.1777] s_d [0.0232, 0.0937, 0.1564, 0.1977]; 12 s
+   -0.100 chi2       -27.82 logdet        -4.39 trace       4.33 hyper     0.00 total       -27.88
+   -0.090 chi2       -24.35 logdet        -3.92 trace       3.86 hyper     0.00 total       -24.40
+   -0.080 chi2       -21.03 logdet        -3.45 trace       3.41 hyper     0.00 total       -21.08
+   -0.070 chi2       -17.87 logdet        -3.00 trace       2.96 hyper     0.00 total       -17.90
+   -0.060 chi2       -14.85 logdet        -2.55 trace       2.51 hyper     0.00 total       -14.88
+   -0.050 chi2       -11.99 logdet        -2.10 trace       2.08 hyper     0.00 total       -12.01
+   -0.040 chi2        -9.28 logdet        -1.67 trace       1.65 hyper     0.00 total        -9.30
+   -0.030 chi2        -6.73 logdet        -1.24 trace       1.23 hyper     0.00 total        -6.74
+   -0.020 chi2        -4.33 logdet        -0.82 trace       0.81 hyper     0.00 total        -4.34
+   -0.010 chi2        -2.09 logdet        -0.41 trace       0.40 hyper     0.00 total        -2.09
+   -0.000 chi2         0.00 logdet         0.00 trace       0.00 hyper     0.00 total         0.00
+   +0.010 chi2         1.93 logdet         0.40 trace      -0.40 hyper     0.00 total         1.93
+   +0.020 chi2         3.70 logdet         0.79 trace      -0.78 hyper     0.00 total         3.71
+   +0.030 chi2         5.32 logdet         1.18 trace      -1.17 hyper     0.00 total         5.33
+   +0.040 chi2         6.77 logdet         1.56 trace      -1.54 hyper     0.00 total         6.79
+   +0.050 chi2         8.07 logdet         1.94 trace      -1.91 hyper     0.00 total         8.10
+   +0.060 chi2         9.22 logdet         2.30 trace      -2.28 hyper     0.00 total         9.24
+   +0.070 chi2        10.20 logdet         2.67 trace      -2.64 hyper     0.00 total        10.23
+   +0.080 chi2        11.02 logdet         3.02 trace      -2.99 hyper     0.00 total        11.06
+   +0.090 chi2        11.69 logdet         3.37 trace      -3.33 hyper     0.00 total        11.73
+   +0.100 chi2        12.20 logdet         3.72 trace      -3.68 hyper     0.00 total        12.24
+-- exact_mapT_perregmarg [expected] d_Q3: 12288 pixels; argmax delta +0.090 (curvature sd 0.0437), gain over delta 0 2.31; no Laplace; hyperparameters at argmax [multipliers integrated, prior sd 0.5] s_s [0.0465, 0.1355, 0.1602, 0.1777] s_d [0.0232, 0.0937, 0.1564, 0.1977]; 13 s
+   -0.100 chi2        -7.98 logdet        -2.48 trace       2.46 hyper     0.00 total        -8.00
+   -0.090 chi2        -6.91 logdet        -2.21 trace       2.20 hyper     0.00 total        -6.93
+   -0.080 chi2        -5.91 logdet        -1.95 trace       1.94 hyper     0.00 total        -5.92
+   -0.070 chi2        -4.96 logdet        -1.69 trace       1.68 hyper     0.00 total        -4.98
+   -0.060 chi2        -4.08 logdet        -1.44 trace       1.43 hyper     0.00 total        -4.09
+   -0.050 chi2        -3.25 logdet        -1.19 trace       1.18 hyper     0.00 total        -3.26
+   -0.040 chi2        -2.48 logdet        -0.94 trace       0.94 hyper     0.00 total        -2.49
+   -0.030 chi2        -1.78 logdet        -0.70 trace       0.70 hyper     0.00 total        -1.78
+   -0.020 chi2        -1.13 logdet        -0.46 trace       0.46 hyper     0.00 total        -1.13
+   -0.010 chi2        -0.53 logdet        -0.23 trace       0.23 hyper     0.00 total        -0.54
+   -0.000 chi2         0.00 logdet         0.00 trace       0.00 hyper     0.00 total         0.00
+   +0.010 chi2         0.48 logdet         0.23 trace      -0.22 hyper     0.00 total         0.48
+   +0.020 chi2         0.90 logdet         0.45 trace      -0.45 hyper     0.00 total         0.90
+   +0.030 chi2         1.26 logdet         0.67 trace      -0.66 hyper     0.00 total         1.27
+   +0.040 chi2         1.57 logdet         0.88 trace      -0.88 hyper     0.00 total         1.58
+   +0.050 chi2         1.82 logdet         1.10 trace      -1.09 hyper     0.00 total         1.83
+   +0.060 chi2         2.02 logdet         1.30 trace      -1.29 hyper     0.00 total         2.03
+   +0.070 chi2         2.16 logdet         1.51 trace      -1.50 hyper     0.00 total         2.18
+   +0.080 chi2         2.26 logdet         1.71 trace      -1.70 hyper     0.00 total         2.27
+   +0.090 chi2         2.29 logdet         1.91 trace      -1.89 hyper     0.00 total         2.31
+   +0.100 chi2         2.28 logdet         2.10 trace      -2.09 hyper     0.00 total         2.29
+-- exact_mapT_perregmarg [expected] d_Q4: 12288 pixels; argmax delta +0.070 (curvature sd 0.0622), gain over delta 0 0.68; no Laplace; hyperparameters at argmax [multipliers integrated, prior sd 0.5] s_s [0.0465, 0.1355, 0.1602, 0.1777] s_d [0.0232, 0.0937, 0.1564, 0.1977]; 12 s
+   -0.100 chi2        -3.40 logdet        -1.70 trace       1.68 hyper     0.00 total        -3.42
+   -0.090 chi2        -2.93 logdet        -1.52 trace       1.50 hyper     0.00 total        -2.94
+   -0.080 chi2        -2.48 logdet        -1.34 trace       1.32 hyper     0.00 total        -2.49
+   -0.070 chi2        -2.06 logdet        -1.16 trace       1.15 hyper     0.00 total        -2.07
+   -0.060 chi2        -1.68 logdet        -0.99 trace       0.98 hyper     0.00 total        -1.69
+   -0.050 chi2        -1.32 logdet        -0.81 trace       0.81 hyper     0.00 total        -1.33
+   -0.040 chi2        -1.00 logdet        -0.65 trace       0.64 hyper     0.00 total        -1.01
+   -0.030 chi2        -0.71 logdet        -0.48 trace       0.48 hyper     0.00 total        -0.71
+   -0.020 chi2        -0.44 logdet        -0.32 trace       0.31 hyper     0.00 total        -0.44
+   -0.010 chi2        -0.21 logdet        -0.16 trace       0.16 hyper     0.00 total        -0.21
+   -0.000 chi2         0.00 logdet         0.00 trace       0.00 hyper     0.00 total         0.00
+   +0.010 chi2         0.18 logdet         0.16 trace      -0.15 hyper     0.00 total         0.18
+   +0.020 chi2         0.33 logdet         0.31 trace      -0.30 hyper     0.00 total         0.33
+   +0.030 chi2         0.45 logdet         0.46 trace      -0.45 hyper     0.00 total         0.45
+   +0.040 chi2         0.54 logdet         0.60 trace      -0.60 hyper     0.00 total         0.55
+   +0.050 chi2         0.61 logdet         0.75 trace      -0.74 hyper     0.00 total         0.62
+   +0.060 chi2         0.65 logdet         0.89 trace      -0.88 hyper     0.00 total         0.66
+   +0.070 chi2         0.67 logdet         1.03 trace      -1.02 hyper     0.00 total         0.68
+   +0.080 chi2         0.66 logdet         1.17 trace      -1.16 hyper     0.00 total         0.67
+   +0.090 chi2         0.62 logdet         1.31 trace      -1.29 hyper     0.00 total         0.63
+   +0.100 chi2         0.56 logdet         1.44 trace      -1.43 hyper     0.00 total         0.57
