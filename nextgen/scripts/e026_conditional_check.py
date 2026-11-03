@@ -22,6 +22,9 @@ ap.add_argument("--mu-sd", type=float, default=0.5, help="sd of the N(1, sd^2) h
 ap.add_argument("--index-prior-rms", type=float, default=0.3, help="negative control: rms of the Gaussian prior on the field mean (chains use 0.3)")
 ap.add_argument("--noise-scale", type=float, default=1.0, help="negative control: multiply the noise rms (chains use 1.0)")
 ap.add_argument("--t-map", default=None, help="fixed per-region dust T map (FITS, E028 stage A); the target uses it instead of the scalar T_fixed")
+ap.add_argument("--sample-t", action="store_true", help="the chain sampled one scalar log T (E028 stage B): read ThermalDust/T from the draws and scan the log T conditional too")
+ap.add_argument("--t-prior", type=float, nargs=2, default=[2.995732, 0.2], help="mean and rms of the Gaussian prior on log T (K) of the sampled scalar T")
+ap.add_argument("--t-half-width", type=float, default=0.02, help="scan half-width in log T for the sampled scalar T")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
 import numpy as np, healpy as hp, h5py
 from scipy.stats import kstest
@@ -50,6 +53,10 @@ sync = comp(Synchrotron, "Synchrotron", "sync", -3.1, nu_ref=30.0)
 dust = comp(ThermalDust, "ThermalDust", "dust", 1.6, T=T_fixed, nu_ref=545.0)
 if a.t_map:
     tm = hp.read_map(a.t_map, field=0); dust.set_T_map(tm, hp.npix2nside(tm.size)); print(f"fixed T map {a.t_map}: mean {tm.mean():.3f} K")
+if a.sample_t:
+    dust.comp_params.sample_T = True; dust.comp_params.T_nside = 0
+    dust.comp_params.T_prior = Bunch(type="gaussian", mean=a.t_prior[0], rms=a.t_prior[1])
+    print(f"sampled scalar log T with prior N({a.t_prior[0]:.4f}, {a.t_prior[1]}^2)")
 cmb.amp_prior = ifd.AmpPrior("gaussian", mean=0.0, rms=a.cmb_sd)
 sync.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.sync_template, field=0), 1e-3), mu_nside=a.mu_nside, mu_prior=(1.0, a.mu_sd))
 dust.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.dust_template, field=0), 1e-3), mu_nside=a.mu_nside, mu_prior=(1.0, a.mu_sd))
@@ -58,7 +65,7 @@ specs, views = ifs.discover_index_specs(comps, None, centred=False)
 names = ["Synchrotron", "ThermalDust"]
 layout = ifd.StateLayout(specs, names, ifs.hier_component_dims(comps, names))
 like = ifd.RegionIndexLikelihood.from_arrays(freqs, maps, inv_var, comps, layout, NSIDE, nthreads=8)
-fields = {s.comp_name: s.field for s in specs}
+fields = {s.comp_name: s.field for s in specs if s.param == "beta"}
 
 files = sorted(glob.glob(f"{D}/chains_{a.tag}/chains_compsep/chain01_iter*.h5"))[a.burn:]
 pick = files[:: max(1, len(files) // a.k)][: a.k]
@@ -72,18 +79,24 @@ def state_of(fn):
             fi = g[c]["index_field"]
             st[c] = dict(z=fi["z"][()], mu=float(fi["mu"][()]), ls=float(fi["log_sigma"][()]), u=float(fi["u"][()]),
                          amu=np.atleast_1d(g[c]["amp_prior/mu"][()]), als=float(g[c]["amp_prior/log_s"][()]))
+        if a.sample_t:
+            st["logT"] = float(np.log(g["ThermalDust"]["T"][()]))
     return st
 
 def pack(st, shift):
     bl = {c: fields[c].pack(st[c]["z"], st[c]["mu"] + shift.get(c, 0.0), st[c]["ls"], st[c]["u"]) for c in names}
+    if a.sample_t:
+        bl["ThermalDust:logT"] = np.array([st["logT"] + shift.get("logT", 0.0)])
     return layout.pack(bl, {c: (st[c]["amu"], st[c]["als"]) for c in names})
+coords = list(names) + (["logT"] if a.sample_t else [])
+hws = list(a.half_width) + ([a.t_half_width] if a.sample_t else [])
 
 t0 = time.time(); x0 = pack(state_of(pick[0]), {}); lp0, _ = like.logp_and_grad(x0)
 print(f"one evaluation {time.time() - t0:.1f} s; first draw log target {lp0:.2f}")
-cdf = {c: [] for c in names}; opt = {c: [] for c in names}; csd = {c: [] for c in names}
+cdf = {c: [] for c in coords}; opt = {c: [] for c in coords}; csd = {c: [] for c in coords}
 for i, fn in enumerate(pick):
     st = state_of(fn)
-    for c, hw in zip(names, a.half_width):
+    for c, hw in zip(coords, hws):
         grid = np.linspace(-hw, hw, a.points)
         lp = np.array([like.logp_and_grad(pack(st, {c: d}))[0] for d in grid])
         # quadratic fit for the conditional optimum and sd; CDF at 0 by trapezoid on the grid
@@ -91,10 +104,11 @@ for i, fn in enumerate(pick):
         p = np.exp(lp - lp.max()); cum = np.concatenate([[0], np.cumsum(0.5 * (p[1:] + p[:-1]) * np.diff(grid))])
         F0 = np.interp(0.0, grid, cum / cum[-1])
         cdf[c].append(F0); opt[c].append(mode); csd[c].append(sd)
-        print(f"draw {i:2d} {fn.split('/')[-1]} {c:12s}: mu {st[c]['mu']:+.4f}; conditional optimum at {mode:+.4f} (sd {sd:.4f}, "
+        here = st[c]["mu"] if c in names else st["logT"]
+        print(f"draw {i:2d} {fn.split('/')[-1]} {c:12s}: {'mu' if c in names else 'log T'} {here:+.4f}; conditional optimum at {mode:+.4f} (sd {sd:.4f}, "
               f"{mode / sd:+.1f} sd from the draw); CDF at the draw {F0:.3f}; log target range {lp.max() - lp.min():.1f}; "
               f"edge check lp(-hw)-max {lp[0] - lp.max():.1f} lp(+hw)-max {lp[-1] - lp.max():.1f}", flush=True)
-for c in names:
+for c in coords:
     F = np.array(cdf[c]); ks = kstest(F, "uniform")
     print(f"{c}: CDF values mean {F.mean():.3f} (uniform: 0.5 +- {1 / np.sqrt(12 * len(F)):.3f}), fraction > 0.5 {np.mean(F > 0.5):.2f}, "
           f"KS D {ks.statistic:.3f} p {ks.pvalue:.3f}; conditional optimum minus draw: mean {np.mean(opt[c]):+.4f} "
