@@ -329,6 +329,9 @@ def main():
                     help="rms of the log error field of the 'cs' (component-separation-quality) template")
     ap.add_argument("--cs-fwhm", type=float, default=10.0, help="correlation FWHM in degrees of that field")
     ap.add_argument("--cs-seed", type=int, default=11)
+    ap.add_argument("--T-grid-fields", default=None,
+                    help="npz with bs, bd (nside-16 region fields) held fixed along --T-grid instead of the per-T "
+                         "region fit (E028 stage B: the chain's posterior means)")
     ap.add_argument("--T-grid", type=float, nargs="*", default=None,
                     help="E028 stage B: scalar dust temperatures (K); for each, the noise-free region fit is "
                          "redone at that T and the expected target profiled at the reference for every cell "
@@ -450,10 +453,17 @@ def main():
             hyper = Hyper(kind, qs64, qd64, reg=reg)
             say(f"== T grid for cell {cell} [expected]: scalar T, region fit redone per T, hyperparameters profiled")
             grid_refs = []
+            fixed_fields = None if a.T_grid_fields is None else np.load(a.T_grid_fields)
+            if fixed_fields is not None:
+                say(f"   index fields held fixed from {a.T_grid_fields} (sync mean {fixed_fields['bs'].mean():.4f}, "
+                    f"dust mean {fixed_fields['bd'].mean():.4f})")
             for Tval in a.T_grid:
                 T = np.full(npix, float(Tval))
                 t0 = time.time()
-                bs_T, bd_T = region_fit(skymap, rms, T, np.asarray(sky.cm), reg, nreg, bs_mean, bd_mean)
+                if fixed_fields is None:
+                    bs_T, bd_T = region_fit(skymap, rms, T, np.asarray(sky.cm), reg, nreg, bs_mean, bd_mean)
+                else:
+                    bs_T, bd_T = np.asarray(fixed_fields["bs"], float), np.asarray(fixed_fields["bd"], float)
                 grid_refs.append((float(Tval), bs_T.copy(), bd_T.copy()))
                 th, p, nfev = sky.profile(sync_sed(bs_T[reg]), dust_sed(bd_T[reg], T), hyper.theta0(), hyper, True)
                 tot = p["chi"] + p["ld"] + p["tr"] + p["lp"]

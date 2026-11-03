@@ -1,5 +1,6 @@
 """Tests of compsep/index_field_sampler.py: configuration, discovery of sampled indices, state
 packing from and to components, and the NUTS-driven group on one rank (M2.4 stage 1)."""
+import h5py
 import numpy as np
 import pytest
 from mpi4py import MPI
@@ -688,3 +689,118 @@ def test_temperature_field_state_round_trip_and_chain_keys() -> None:
     # A positive-T check in set_T_map.
     with pytest.raises(ValueError, match="positive"):
         dust.set_T_map(-np.ones(12), NSIDE_BETA)
+
+
+def test_scalar_log_T_alongside_index_fields_production_layout() -> None:
+    """E028 stage B layout (stats review of the implementation): a scalar log T (T_nside 0)
+    beside GMRF sync and dust index fields. (1) The gradient equals 4th-order finite
+    differences in every coordinate; (2) the scalar-T target equals the T-field target at a
+    constant field (z = 0, mu = tau) up to the prior terms, and d logL / d tau equals the
+    field's d logL / d mu; (3) after `apply_state` the amplitude-step mixing matrix uses the
+    sampled T (no map, no cache); (4) the prior enters once, in log T; (5) a fixed `T_map`
+    with a scalar sampled T starts the scalar at the map mean and is dropped, so the two Gibbs
+    steps cannot hold different temperatures."""
+    comps = _components_with_T(sample_beta_d=True)
+    comps[2].comp_params.T_nside = 0
+    specs, views = ifs.discover_index_specs(comps, None, centred=False)
+    assert [s.key for s in specs] == ["sync", "dust", "dust:logT"] and specs[2].field is None
+    layout = ifd.StateLayout(specs, ["sync", "dust"])
+    assert layout.nreg == 12
+    d, inv_var = _data_with_T(comps)
+    like = ifd.RegionIndexLikelihood.from_arrays(NU, d, inv_var, comps, layout, NSIDE)
+    rng = np.random.default_rng(11)
+    blocks = {}
+    for spec in specs[:2]:
+        fld = spec.field
+        blocks[spec.key] = fld.pack(0.5 * rng.standard_normal(fld.K), spec.prior_mean + 0.03,
+                                    np.log(0.1), 0.2)
+    tau = np.log(20.0) + 0.04
+    blocks["dust:logT"] = np.array([tau])
+    hyper = {"sync": (1.02, -1.4), "dust": (0.97, -1.2)}
+    x = layout.pack(blocks, hyper)
+    lp, grad = like.logp_and_grad(x)
+    assert np.isfinite(lp)
+    h = 1e-4
+    fd = np.empty_like(x)
+    for i in range(x.size):
+        e = np.zeros_like(x); e[i] = h
+        f = [like.logp_and_grad(x + k * e)[0] for k in (-2, -1, 1, 2)]
+        fd[i] = (f[0] - 8 * f[1] + 8 * f[2] - f[3]) / (12 * h)
+    np.testing.assert_allclose(grad, fd, rtol=1e-6, atol=1e-4)
+    sl = layout.index_slices["dust:logT"]
+    # (2) against the T-field target at a constant field
+    compsF = _components_with_T(sample_beta_d=True)
+    specsF, _ = ifs.discover_index_specs(compsF, None, centred=False)
+    layoutF = ifd.StateLayout(specsF, ["sync", "dust"])
+    likeF = ifd.RegionIndexLikelihood.from_arrays(NU, d, inv_var, compsF, layoutF, NSIDE)
+    fldT = layoutF.spec("dust:logT").field
+    bF = dict(blocks); bF["dust:logT"] = fldT.pack(np.zeros(fldT.K), tau, np.log(0.1), 0.2)
+    xF = layoutF.pack(bF, hyper)
+    lpF, gF = likeF.logp_and_grad(xF)
+    no_like = lambda b: (0.0, np.zeros_like(b))
+    prior_F, gF_prior = fldT.logp_and_grad(bF["dust:logT"], loglike=no_like)
+    prior_S = -0.5 * ((tau - specs[2].prior_mean) / specs[2].prior_sd) ** 2
+    assert (lp - prior_S) == pytest.approx(lpF - prior_F, rel=1e-6)
+    K = fldT.K
+    slF = layoutF.index_slices["dust:logT"]
+    dmu_lik = gF[slF][K] - gF_prior[K]
+    dtau_lik = grad[sl][0] + (tau - specs[2].prior_mean) / specs[2].prior_sd ** 2
+    assert dtau_lik == pytest.approx(dmu_lik, rel=1e-6)
+    # (3) amplitude step and index step share the temperature
+    ifs.apply_state(x, layout, views, {"sync": [comps[1]], "dust": [comps[2]]})
+    dust = comps[2]
+    assert dust.T_map is None and dust.T == pytest.approx(float(np.exp(tau)), abs=1e-12)
+    M_amp = ifd.mixing_regions(NU, comps, 12)
+    betas = layout.betas(x)
+    M_idx = dust.get_sed(NU, beta=betas["dust"], T=np.exp(betas["dust:logT"]))
+    np.testing.assert_allclose(M_amp[:, :, 2], M_idx, rtol=1e-14)
+    x2 = x.copy(); x2[sl] += 0.05
+    assert like.logp_and_grad(x2)[0] != lp
+    # (4) the prior once, in log T
+    comps_p = _components_with_T(sample_beta_d=True)
+    comps_p[2].comp_params.T_nside = 0
+    comps_p[2].comp_params.T_prior = Bunch(type="gaussian", mean=float(np.log(20.0)), rms=0.02)
+    specs_p, _ = ifs.discover_index_specs(comps_p, None, centred=False)
+    layout_p = ifd.StateLayout(specs_p, ["sync", "dust"])
+    like_p = ifd.RegionIndexLikelihood.from_arrays(NU, d, inv_var, comps_p, layout_p, NSIDE)
+    lp_p, g_p = like_p.logp_and_grad(x)
+    r = tau - np.log(20.0)
+    assert (lp_p - lp) == pytest.approx(-0.5 * r**2 * (1 / 0.02**2 - 1 / 0.2**2), abs=1e-8)
+    assert (g_p[sl][0] - grad[sl][0]) == pytest.approx(-r * (1 / 0.02**2 - 1 / 0.2**2), rel=1e-8)
+    # (5) a fixed T_map with a scalar sampled T: the map's mean starts the scalar, the map goes
+    comps_m = _components_with_T(sample_beta_d=True)
+    comps_m[2].comp_params.T_nside = 0
+    comps_m[2].set_T_map(np.array([18.0, 19.0, 20.0, 21.0] * 3), NSIDE_BETA)
+    specs_m, views_m = ifs.discover_index_specs(comps_m, None, centred=False)
+    assert comps_m[2].T_map is None and comps_m[2].T_nside == 0
+    assert comps_m[2].T == pytest.approx(19.5)
+    layout_m = ifd.StateLayout(specs_m, ["sync", "dust"])
+    hier_m = {"sync": comps_m[1].amp_prior, "dust": comps_m[2].amp_prior}
+    x_m = ifs.initial_state(layout_m, views_m, hier_m)
+    assert np.exp(layout_m.betas(x_m)["dust:logT"][0]) == pytest.approx(19.5)
+    # and apply_state on a view that still carries a map (another rank's component) drops it
+    comps_m[2].set_T_map(np.full(12, 22.0), NSIDE_BETA)
+    ifs.apply_state(x, layout_m, views_m, {"sync": [comps_m[1]], "dust": [comps_m[2]]})
+    assert comps_m[2].T_map is None and comps_m[2].T == pytest.approx(float(np.exp(tau)))
+    np.testing.assert_allclose(ifd.mixing_regions(NU, comps_m, 12)[:, :, 2], M_idx, rtol=1e-14)
+
+
+def test_scalar_sampled_T_restarts_from_the_chain(tmp_path) -> None:
+    """E028 stage B: a chain written with a sampled scalar T (`sed/T`) restores that T on
+    read (`chain_status: append` with `sample_T: true`, `T_nside: 0`); the field case
+    (`T_field`) is covered by the round-trip test above."""
+    dust = _component(ThermalDust, "dust", **_dust_T_params(nside_T=0))
+    dust.T = 19.25
+    path = tmp_path / "chain.h5"
+    with h5py.File(path, "w") as f:
+        dust.write_chain(f.create_group("dust"), {"b100": 100.0})
+    restored = _component(ThermalDust, "dust", **_dust_T_params(nside_T=0))
+    assert restored.T == pytest.approx(20.0)
+    with h5py.File(path, "r") as f:
+        restored.read_chain(f["dust"])
+    assert restored.T == pytest.approx(19.25) and restored.T_map is None
+    # Not sampling T: the parameter-file value stays.
+    fixed = _component(ThermalDust, "dust", beta=1.6, T=20.0, nu_ref=545.0)
+    with h5py.File(path, "r") as f:
+        fixed.read_chain(f["dust"])
+    assert fixed.T == pytest.approx(20.0)

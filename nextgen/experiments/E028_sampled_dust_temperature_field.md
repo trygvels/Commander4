@@ -315,8 +315,16 @@ mean, 0.0 at 19.75, -0.7, -3.5). The chain sits 0.72 K below that optimum: 1.5 g
 posterior sd, within the pre-registered 2 sd. The offset is not Monte Carlo noise (0.07 K)
 and is read as the difference between the scan's construction (index field profiled freely
 per region) and the chain's (GMRF field prior; the same shrinkage that puts the faint dust
-quartiles 0.03 to 0.05 below their own reference, see next); the grid with the field prior
-included was not run. Against the sky's unweighted mean T (20.93 K) the posterior is 3.2 sd
+quartiles 0.03 to 0.05 below their own reference, see next). Tested (15:33 to 15:45,
+`stageB_Tgrid_marginal_sd01_chainfields.txt`, `--T-grid-fields` added to the scan): the same
+exact marginal with the chain's posterior-mean index fields held fixed along T has its optimum
+at 19.14 +- 0.12 K (totals relative to the maximum -28.1, -4.7, 0.0 at the posterior mean,
+-12.1, -54.4, -120.4 from 18.25 to 21.25 K), 0.4 sd from the chain's 19.19: the chain's T is
+at its optimum given its fields, and the 0.7 K difference to the free-refit optimum is the
+index fields' (the refit at 19.9 K is steeper in the faint half by 0.03 to 0.05 than the
+chain's shrunk field). The 0.12 K curvature here (multipliers integrated, fields fixed) against
+the 0.05 K conditional sd in the Gibbs check (multipliers and fields at their drawn values)
+and the 0.54 K posterior width shows how much of the T uncertainty is the beta-T degeneracy. Against the sky's unweighted mean T (20.93 K) the posterior is 3.2 sd
 low and against the a_dust^2-weighted mean (22.64 K) 6.4 sd low: a scalar T under this law
 is not the mean dust temperature of the sky, as the pre-registration said.
 
@@ -350,6 +358,39 @@ E029 is 1.3 uK.
 180, median 828; multiplier hyperparameters ESS 290 to 1620. The sampled scalar T costs
 nothing in gradients (62 per iteration against 63 for stage A) and improves the dust mixing
 over E029, with 22 divergences against 0.
+
+*Stats review of the implementation (15:32 to 15:44, independent stats-reviewer on the diff
+fbcfb6c, 23aa0c9, 6a92879 against the stated target; no reasoning shown).* Target and
+gradient sound (re-derived from the code: d logL/d tau through the kernel's second call with
+dM/d tau = T dsed/dT, the prior once in tau, no Jacobian; the reviewer's own check on the
+production layout, a scalar tau beside two GMRF index fields, matches 4th-order finite
+differences to 3e-7 and the T-field target at a constant field to 1e-11, and the amplitude
+step's mixing matrix after `apply_state` equals the index step's bit for bit); the stage B
+run sampled the stated target as far as code reading can tell (no `T_map`, fresh start). Two
+must-fix hazards in configurations stage B did not use, both fixed in this commit with tests:
+(i) a fixed `T_map` in the parameter file together with `sample_T: true, T_nside: 0` left the
+map in the amplitude step while the index step sampled the scalar (two temperatures, no joint
+target); now the map's mean starts the scalar and the map is dropped at discovery and in
+`apply_state`; (ii) the scalar T had no restart path (`chain_status: append` would have
+restarted at the parameter-file T silently); `read_chain` now restores `sed/T` when
+`T_nside` is 0. Should-fix items taken: the covariance-form test's sensitivity assertion
+varied the hyperparameters too and would have passed a T-independent target (now shifts
+only the T block); the production layout and the scalar restart had no test (added,
+`test_scalar_log_T_alongside_index_fields_production_layout`,
+`test_scalar_sampled_T_restarts_from_the_chain`). On the Gibbs check: valid for what it
+claims (the sampler against the target as coded; it does not test the amplitude step, which
+the collapsed target does not see), the tau coordinate consistent with the sampler's; the
+17-point scan at the stage B spacing (1.7 conditional sd per step for log T) coarsens the
+PIT by up to 0.06, which inflates KS D for a correct sampler (the reviewer's 41-point rescan
+of four draws and a Gaussian-fit PIT give D 0.05, p 0.95 for log T); a 41-point rescan and a
+negative control along tau (prior rms 0.002) were not run and are added below.
+Both run (15:48 to 15:54): the negative control (`stageB_conditional_check_tau_negative_control.txt`,
+K 40, the chain's draws read against a target whose T prior has rms 0.002 instead of 0.2)
+fails along tau only, KS D 0.95 p 0.000, optimum +16.9 conditional sd from the draws, with
+sync and dust unchanged (p 0.44, 0.45): the check is sensitive to the tau target. The
+41-point rescan (`stageB_conditional_check_41pt.txt`, K 50) passes on all three coordinates,
+sync p 0.79, dust p 0.14, log T p 0.50 (mean CDF 0.553, optimum -0.14 sd). The full test
+suite after the fixes: 967 passed, 7 skipped.
 
 *Reading.* The sampled scalar T code path (`sample_T`, `T_nside 0`, the `ThermalDust:logT`
 block, the prior, the chain output) is validated at realistic noise: the chain is a draw

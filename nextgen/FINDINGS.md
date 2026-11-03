@@ -682,8 +682,12 @@ conditional-CDF check passes along sync, dust and log T (KS p 0.59, 0.24, 0.41; 
 sd of log T 0.0024, so the 0.54 K posterior width is the beta-T-multiplier degeneracy, not
 noise). The pre-registered reference (20.2 +- 0.5 K, a coarse read of a three-point grid) was
 refined by the same construction to 19.90 +- 0.47 K before the comparison; the chain's 0.72 K
-offset below it is not Monte Carlo noise (0.07 K) and is attributed to the GMRF field prior
-absent from the scan (not tested). Against the region fit at the posterior T the dust field
+offset below it is not Monte Carlo noise (0.07 K) and lies in the index fields: with the
+chain's own posterior-mean fields held fixed the same exact marginal peaks at 19.14 +- 0.12 K,
+0.4 sd from the chain (the GMRF-shrunk faint half is 0.03 to 0.05 shallower than the free
+refit at 19.9 K). The implementation was stats-reviewed after the run (target and gradient
+sound; two hazards in unused configurations, a fixed T_map beside the scalar and the scalar
+restart, fixed with tests). Against the region fit at the posterior T the dust field
 is at its reference in the bright half and 0.03 to 0.05 low in the faint half (the E029 and
 sd-0.1 scan pattern); against beta_d it is -0.004, +0.029, +0.024, -0.002 (pixel RMSE 0.046
 against E029's 0.056) because the region fit at 19.2 K lies above beta_d by -0.016 to +0.063

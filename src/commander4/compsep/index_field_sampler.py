@@ -301,6 +301,15 @@ def discover_index_specs(comp_list: CompList, selected_comps: list[str] | None, 
             fld = field_prior_from_params(comp.comp_params, nside_T, centred, prior_key="T_prior",
                                           field_key="T_field", sigma_scale=0.15) \
                 if nside_T > 0 else None
+            if nside_T == 0 and getattr(comp, "T_map", None) is not None:
+                # A scalar log T with a fixed `T_map` in the parameter file: the map would stay
+                # in the amplitude step while the index step samples the scalar (two different
+                # temperatures, no joint target). The map's mean starts the scalar and the map
+                # is dropped (stats review of E028 stage B).
+                comp.T = float(np.mean(comp.T_map))
+                comp.T_map, comp.T_nside = None, 0
+                logger.info(f"Component {comp.comp_name!r}: sample_T with T_nside 0 starts the "
+                            f"scalar T at the T_map mean {comp.T:.4f} K; the map is dropped.")
             specs.append(IndexSpec(comp.comp_name, fld, mean, rms, param="logT"))
     return specs, views
 
@@ -486,6 +495,10 @@ def apply_state(x: NDArray, layout: StateLayout, views: dict[str, list[DiffuseCo
                     comp.beta = value
                 else:
                     comp.T = float(np.exp(value))
+                    if getattr(comp, "T_map", None) is not None:
+                        # The amplitude step and the band projections read `T_map` before
+                        # `T`; a scalar sampled T must be the only temperature.
+                        comp.T_map, comp.T_nside = None, 0
             elif spec.param == "beta":
                 comp.set_beta_map(betas[spec.key], layout.nside_beta)
             else:

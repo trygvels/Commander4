@@ -621,9 +621,17 @@ def test_region_index_likelihood_with_temperature_field_matches_covariance_form(
     diff = np.array([like.logp_and_grad(x)[0] - mine(x) for x in xs])
     assert np.all(np.isfinite(diff))
     np.testing.assert_allclose(diff - diff[0], 0.0, atol=1e-9 * abs(diff[0]) + 1e-6)
-    # Sensitivity: the data term changes with the temperature (not a T-independent target).
-    lps = [like.logp_and_grad(x)[0] for x in xs]
-    assert np.std(lps) > 1.0
+    # Sensitivity: the data term changes with the temperature alone (not a T-independent
+    # target): shift only the field mean of log T (its coordinate index K) and remove the
+    # prior terms of the T block before comparing.
+    K = field.K
+    xa = xs[0]
+    xb = xa.copy()
+    xb[K] += 0.1
+    prior_of = lambda z: field.logp_and_grad(z[:K + 3], loglike=lambda b: (0.0, np.zeros_like(b)))[0]
+    like_a = like.logp_and_grad(xa)[0] - prior_of(xa)
+    like_b = like.logp_and_grad(xb)[0] - prior_of(xb)
+    assert abs(like_b - like_a) > 1.0
     x = xs[0]
     grad = like.logp_and_grad(x)[1]
     h = 1e-4
@@ -642,7 +650,6 @@ def test_region_index_likelihood_with_temperature_field_matches_covariance_form(
     layout_fixed = ifd.StateLayout([], ["sync", "dust"])
     like_fixed = ifd.RegionIndexLikelihood.from_arrays(NU_PROTO, d, w, comps_fixed, layout_fixed, NSIDE)
     lp_fixed = like_fixed.logp_and_grad(x[-4:])[0]
-    K = field.K
     prior_T = field.logp_and_grad(x[:K + 3], loglike=lambda b: (0.0, np.zeros_like(b)))[0]
     assert like.logp_and_grad(x)[0] - prior_T == pytest.approx(lp_fixed, rel=1e-10, abs=1e-6)
     # Without fields the fixed map sets the region grid (nside 1 above); with a field at another

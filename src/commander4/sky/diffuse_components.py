@@ -390,6 +390,15 @@ class DiffuseComponent(Component):
             else:
                 logger.warning(f"Component {self.comp_name!r}: chain temperature field at nside "
                                f"{stored_nside}, run asks for {nside_T}; starting constant.")
+        if sampling_T and hasattr(self, "T") and nside_T == 0 and "sed/T" in group:
+            # A sampled scalar T (T_nside 0) restarts from the chain's last value, which
+            # `write_chain` stores as `sed/T` (the mean of a field, the scalar otherwise).
+            T = np.asarray(group["sed/T"][()])
+            if T.ndim == 1:  # Joined I and QU views with different values store [I, QU].
+                T = T[0 if self.eval_pol == "I" else 1]
+            self.T = float(T)
+            logger.debug(f"Component {self.comp_name!r} ({self.eval_pol}): restored sampled "
+                         f"T = {self.T}.")
         if self.amp_prior is not None and self.amp_prior.is_hier and "amp_prior" in group:
             # mu is a scalar or a map of template multipliers (amp_prior mu_nside); a map read
             # into a scalar run gives its mean, a scalar read into a map run is broadcast, a map
