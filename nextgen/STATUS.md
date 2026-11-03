@@ -20,6 +20,14 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   same gradient cost, 22 divergences. The sampled-T code path is validated for stage C.
 - Tooling: the Gibbs check scans a sampled log T (`--sample-t`), the exact scan saves the
   per-T region fits (`*_Tgrid_refs.npz`), the CMB attribution takes `--t-fixed`.
+- Added 15:55: the 0.7 K offset is the index fields' (the exact marginal with the chain's own
+  fields held fixed peaks at 19.14 +- 0.12 K, 0.4 sd from the chain). The sampled-T
+  implementation was stats-reviewed after the run: target and gradient sound, stage B
+  sampled its stated target; two hazards in configurations stage B did not use are fixed
+  with tests (a fixed `T_map` beside a scalar sampled T is now dropped, and the scalar T
+  restarts from the chain). The tau negative control fails as it should and a 41-point
+  rescan passes; suite 967 passed. Stage A' (fixed T map, no sampled T) is unaffected by the
+  fixes.
 
 **Running**
 - E028 stage A' (`gmrf16_exact_mumap_nc_Tmap_mu01`, oracle T map with sd 0.1, from 15:06,
