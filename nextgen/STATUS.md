@@ -2,6 +2,34 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-03 (Mac mini, 01:55): E029 closed (F33: tight multiplier hyperprior fixes sync, exposes the fixed-T dust misfit); E028 stage A running
+
+**Learned**
+- E029 (sd 0.1 on the 3072 multipliers, same data as E026, D025 passes): the faint-sky sync
+  bias is gone (field mean -2.981 +- 0.028 against -2.868; faint quartiles within 0.02 of the
+  reference against +0.12 to +0.14), the field scale returns to the sky's (sigma_s 0.077
+  against 0.152, truth 0.063) and the sync pixel RMSE drops from 0.147 to 0.061. The review's
+  Occam mechanism (F29) is confirmed in a chain.
+- The price lands on dust: the mu_d map drops from 1.029 to 1.003, the bright dust index moves
+  from beta_d to the fixed-T effective index (0.054), the faint half shrinks to a field mean
+  0.08 below the fixed-T reference, and the GLS CMB residual rises by 0.91 +- 0.07 uK at high
+  latitude. With a fixed T neither hyperprior width gives an unbiased dust index; the T model
+  (stage A, running with sd 0.1) is the test of the combination.
+
+**Running**
+- E028 stage A (gmrf16_exact_mumap_nc_Tmap, oracle T map, sd 0.1, from 01:43; about 5.5 h),
+  then stage B (scalar T, sd 0.1; prediction 20.2 +- 0.5 K).
+
+**Next**
+- Stage A reading against `bd_trueT` (criteria: bright dust z within 0.5, mu_d map 1.00 +-
+  0.01) and the faint-sky dust and the CMB residual against E029; then stage B.
+
+**Needs Trygve**
+- Default change: multiplier hyperprior sd 0.1 (from 0.5) for the hier amplitude prior. E029
+  shows it removes the sync bias and inflated field scale; it also exposes the fixed-T dust
+  misfit, so it should go together with the T model. Earlier items unchanged (Paper A reporting
+  rule for prior-dominated fields, order of T_d work, stage C simulation).
+
 ## 2026-11-02 (Mac mini, 20:25): E027 closed (F32: resolution is second order at this depth); E029 running
 
 **Learned**

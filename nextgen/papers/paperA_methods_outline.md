@@ -156,7 +156,11 @@ model component rather than a preprocessing choice.
   stats review): a steeper index gives each multiplier more leverage at 23 GHz. Statement for
   the paper: in a prior-dominated region the hierarchical amplitude prior's hyperprior width
   sets the index; report the Fisher-weighted level and the data-dominated regions, and state
-  the hyperprior (E029: sd 0.1 removes the bias within noise). Methodological point (F31):
+  the hyperprior (E029, F33: sd 0.1 removes the bias in a chain, field mean -2.981 +- 0.028,
+  faint quartiles within 0.02, sigma_s 0.077 against 0.152, pixel RMSE 0.061 against 0.147;
+  it also moves the fixed-T dust misfit from the multipliers onto the dust index and costs
+  0.9 uK of high-latitude CMB residual, so the hyperprior width and the T model are one
+  decision). Methodological point (F31):
   exact-target scans must integrate nuisance multipliers analytically, not profile them. The
   per-region template multiplier field (F28) converts the fixed-T misfit into a bright-sky
   dust-index bias (+0.06, multipliers at 1.03), so the dust SED needs T_d region-wise or

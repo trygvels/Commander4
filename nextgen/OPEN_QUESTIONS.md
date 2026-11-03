@@ -255,6 +255,12 @@ original numbering.
   are biased (F31); F28 redone with the analytic marginal: the template conclusion stands
   (cs minus exact at most 0.02 / 0.04), the absolute offsets are the fixed-T misfit (0.03 x)
   and the Occam push (1 x, also on dust: +0.02 to +0.10 against beta_d).
+- **Status 2026-11-03 (E029, F33):** the tight hyperprior N(1, 0.1^2) removes the sync bias
+  in a chain (field mean -2.981 +- 0.028, faint quartiles within 0.02, sigma_s back to 0.077,
+  pixel RMSE 0.061 against 0.147) and exposes the fixed-T dust misfit instead of hiding it
+  (bright dust at beta_eff, faint dust 0.08 low, CMB residual +0.9 uK at high latitude). The
+  hyperprior width is settled as a model choice for sync; the dust side needs the T model
+  (E028 stage A running with sd 0.1). The index-resolution question is closed (E027, F32).
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is

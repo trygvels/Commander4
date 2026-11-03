@@ -18,6 +18,7 @@ ap.add_argument("--mu-nside", type=int, default=16); ap.add_argument("--cmb-sd",
 ap.add_argument("--k", type=int, default=20); ap.add_argument("--burn", type=int, default=500); ap.add_argument("--nside-beta", type=int, default=16)
 ap.add_argument("--half-width", type=float, nargs=2, default=[0.10, 0.015], help="scan half-widths (sync, dust)")
 ap.add_argument("--points", type=int, default=11)
+ap.add_argument("--mu-sd", type=float, default=0.5, help="sd of the N(1, sd^2) hyperprior on the template multipliers (E029: 0.1)")
 ap.add_argument("--index-prior-rms", type=float, default=0.3, help="negative control: rms of the Gaussian prior on the field mean (chains use 0.3)")
 ap.add_argument("--noise-scale", type=float, default=1.0, help="negative control: multiply the noise rms (chains use 1.0)")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
@@ -47,8 +48,8 @@ cmb = comp(CMB, "CMB", "cmb", 0.0, nu_ref=1e-3); cmb.comp_params.sample_spectral
 sync = comp(Synchrotron, "Synchrotron", "sync", -3.1, nu_ref=30.0)
 dust = comp(ThermalDust, "ThermalDust", "dust", 1.6, T=T_fixed, nu_ref=545.0)
 cmb.amp_prior = ifd.AmpPrior("gaussian", mean=0.0, rms=a.cmb_sd)
-sync.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.sync_template, field=0), 1e-3), mu_nside=a.mu_nside)
-dust.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.dust_template, field=0), 1e-3), mu_nside=a.mu_nside)
+sync.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.sync_template, field=0), 1e-3), mu_nside=a.mu_nside, mu_prior=(1.0, a.mu_sd))
+dust.amp_prior = ifd.AmpPrior("hier", template=np.maximum(hp.read_map(a.dust_template, field=0), 1e-3), mu_nside=a.mu_nside, mu_prior=(1.0, a.mu_sd))
 comps = [cmb, sync, dust]
 specs, views = ifs.discover_index_specs(comps, None, centred=False)
 names = ["Synchrotron", "ThermalDust"]

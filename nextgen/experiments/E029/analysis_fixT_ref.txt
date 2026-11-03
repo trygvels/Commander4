@@ -1,0 +1,50 @@
+
+== gmrf16_exact_mumap_nc_mu01: 1200 files, 700 post-burn
+   gradients per iteration (post-burn mean) 31.0
+   sync: region ESS min 36 5pct 64 median 215; max |mean - ref| 0.592
+      Q1: rmse vs ref 0.1089 (vs region-mean truth 0.0661); z vs ref median -0.34 MAD 0.65 |z|<1 0.61 |z|<2 0.84; sd median 0.0756; z vs truth median -0.05
+      Q2: rmse vs ref 0.0753 (vs region-mean truth 0.0572); z vs ref median +0.01 MAD 0.35 |z|<1 0.83 |z|<2 0.95; sd median 0.0832; z vs truth median +0.21
+      Q3: rmse vs ref 0.0590 (vs region-mean truth 0.0586); z vs ref median +0.16 MAD 0.37 |z|<1 0.86 |z|<2 0.99; sd median 0.0863; z vs truth median +0.23
+      Q4: rmse vs ref 0.0548 (vs region-mean truth 0.0561); z vs ref median +0.19 MAD 0.44 |z|<1 0.88 |z|<2 1.00; sd median 0.0862; z vs truth median +0.26
+      s: mean 0.0342 sd 0.0121 ESS 541
+      mu map (3072): ESS min 30 median 490; mean 0.9996; against the realized exp(-f) region means: correlation 0.018, rms diff 0.3007, z median +0.38 MAD 1.91
+         Q1: corr 0.025 rms diff 0.2753 sd median 0.0922
+         Q2: corr 0.002 rms diff 0.3078 sd median 0.0978
+         Q3: corr 0.002 rms diff 0.2801 sd median 0.0985
+         Q4: corr 0.035 rms diff 0.3357 sd median 0.0990
+   dust: region ESS min 19 5pct 42 median 139; max |mean - ref| 0.177
+      Q1: rmse vs ref 0.0326 (vs region-mean truth 0.0333); z vs ref median +0.11 MAD 0.56 |z|<1 0.74 |z|<2 0.96; sd median 0.0356; z vs truth median +0.01
+      Q2: rmse vs ref 0.0338 (vs region-mean truth 0.0319); z vs ref median -0.04 MAD 0.43 |z|<1 0.90 |z|<2 0.99; sd median 0.0513; z vs truth median -0.13
+      Q3: rmse vs ref 0.0443 (vs region-mean truth 0.0459); z vs ref median -0.42 MAD 0.37 |z|<1 0.84 |z|<2 1.00; sd median 0.0618; z vs truth median -0.49
+      Q4: rmse vs ref 0.0877 (vs region-mean truth 0.0902); z vs ref median -1.27 MAD 0.27 |z|<1 0.27 |z|<2 0.96; sd median 0.0667; z vs truth median -1.30
+      s: mean 0.0220 sd 0.0018 ESS 397
+      mu map (3072): ESS min 22 median 466; mean 1.0030; against the realized exp(-f) region means: correlation -0.020, rms diff 0.3162, z median -0.19 MAD 2.25
+         Q1: corr -0.076 rms diff 0.3021 sd median 0.0686
+         Q2: corr 0.015 rms diff 0.2983 sd median 0.0961
+         Q3: corr 0.013 rms diff 0.3071 sd median 0.0988
+         Q4: corr 0.060 rms diff 0.3540 sd median 0.0996
+
+== gmrf16_exact_mumap_nc: 1200 files, 700 post-burn
+   gradients per iteration (post-burn mean) 62.9
+   sync: region ESS min 29 5pct 57 median 234; max |mean - ref| 0.552
+      Q1: rmse vs ref 0.1021 (vs region-mean truth 0.1131); z vs ref median +0.52 MAD 0.39 |z|<1 0.82 |z|<2 0.98; sd median 0.1260; z vs truth median +0.78
+      Q2: rmse vs ref 0.1401 (vs region-mean truth 0.1563); z vs ref median +0.89 MAD 0.25 |z|<1 0.61 |z|<2 1.00; sd median 0.1434; z vs truth median +1.02
+      Q3: rmse vs ref 0.1520 (vs region-mean truth 0.1598); z vs ref median +0.96 MAD 0.26 |z|<1 0.55 |z|<2 0.99; sd median 0.1505; z vs truth median +1.00
+      Q4: rmse vs ref 0.1457 (vs region-mean truth 0.1505); z vs ref median +0.84 MAD 0.26 |z|<1 0.65 |z|<2 0.99; sd median 0.1560; z vs truth median +0.86
+      s: mean 0.0342 sd 0.0116 ESS 529
+      mu map (3072): ESS min 32 median 477; mean 0.9974; against the realized exp(-f) region means: correlation 0.039, rms diff 0.3586, z median +0.06 MAD 0.63
+         Q1: corr 0.056 rms diff 0.3301 sd median 0.2525
+         Q2: corr 0.033 rms diff 0.3827 sd median 0.3845
+         Q3: corr 0.026 rms diff 0.3496 sd median 0.4339
+         Q4: corr 0.043 rms diff 0.3698 sd median 0.4624
+   dust: region ESS min 21 5pct 54 median 136; max |mean - ref| 0.232
+      Q1: rmse vs ref 0.0721 (vs region-mean truth 0.0675); z vs ref median +1.46 MAD 0.62 |z|<1 0.30 |z|<2 0.73; sd median 0.0413; z vs truth median +1.40
+      Q2: rmse vs ref 0.0861 (vs region-mean truth 0.0816); z vs ref median +1.48 MAD 0.42 |z|<1 0.20 |z|<2 0.80; sd median 0.0527; z vs truth median +1.40
+      Q3: rmse vs ref 0.0647 (vs region-mean truth 0.0584); z vs ref median +0.91 MAD 0.36 |z|<1 0.57 |z|<2 0.96; sd median 0.0592; z vs truth median +0.82
+      Q4: rmse vs ref 0.0309 (vs region-mean truth 0.0298); z vs ref median -0.13 MAD 0.29 |z|<1 0.96 |z|<2 1.00; sd median 0.0640; z vs truth median -0.17
+      s: mean 0.0219 sd 0.0018 ESS 224
+      mu map (3072): ESS min 33 median 417; mean 1.0286; against the realized exp(-f) region means: correlation 0.014, rms diff 0.3522, z median +0.02 MAD 0.69
+         Q1: corr -0.026 rms diff 0.3142 sd median 0.1005
+         Q2: corr 0.016 rms diff 0.3743 sd median 0.3359
+         Q3: corr 0.032 rms diff 0.3564 sd median 0.4464
+         Q4: corr 0.036 rms diff 0.3612 sd median 0.4874

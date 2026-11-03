@@ -614,3 +614,18 @@ three rungs: both offsets are amplitude-model properties (the 3072 multipliers a
 every rung), as F29 and F30 predict. Pre-registered dust reading (b) (faint quartiles better
 at nside 8 than 16) refuted: the finer rung is better in every dust quartile, most in the
 faintest (0.046, 0.039, 0.032). Costs 31, 31, 63 gradients per iteration.
+
+**F33. A tight multiplier hyperprior N(1, 0.1^2) removes the faint-sky synchrotron index bias
+of the hier model at Planck-like depth and restores the field scale, but moves the fixed-T
+dust misfit from the multipliers onto the dust index and the high-latitude CMB** (E029 against
+E026, same data, both chains pass D025). Sync: field mean -2.981 +- 0.028 (sd 0.5: -2.868;
+truth -3.000), faint quartiles within 0.02 of the region-fit reference (sd 0.5: +0.12 to
++0.14), sigma_s 0.077 +- 0.040 (sd 0.5: 0.152; truth 0.063), pixel RMSE 0.061 against 0.147.
+Dust: the mu_d map falls from 1.029 to 1.003, the bright quartile moves from beta_d to the
+fixed-T effective index (z -1.55 against bd_trueT, +0.11 against bd_fixT; a move of 0.054),
+the faint half shrinks to the field mean 1.506 (0.08 below the fixed-T reference), and the
+flat-prior GLS CMB residual rises by 0.91 +- 0.07 uK (high latitude 92.91 to 93.95 uK; the
+excess over the true-SED floor from 8.9 to 15.8 uK rms). The hyperprior width is a model
+choice that sets the faint-sky index (F29 confirmed in a chain); it does not replace a dust
+temperature model (F30): with a fixed T, sd 0.5 hides the misfit in the multipliers and sd 0.1
+exposes it in the index. The stage A chain (E028, oracle T) tests the combination.
