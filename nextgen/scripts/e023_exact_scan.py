@@ -449,15 +449,21 @@ def main():
             sky.gs, sky.gd = gsel["sync"], gsel["dust"]
             hyper = Hyper(kind, qs64, qd64, reg=reg)
             say(f"== T grid for cell {cell} [expected]: scalar T, region fit redone per T, hyperparameters profiled")
+            grid_refs = []
             for Tval in a.T_grid:
                 T = np.full(npix, float(Tval))
                 t0 = time.time()
                 bs_T, bd_T = region_fit(skymap, rms, T, np.asarray(sky.cm), reg, nreg, bs_mean, bd_mean)
+                grid_refs.append((float(Tval), bs_T.copy(), bd_T.copy()))
                 th, p, nfev = sky.profile(sync_sed(bs_T[reg]), dust_sed(bd_T[reg], T), hyper.theta0(), hyper, True)
                 tot = p["chi"] + p["ld"] + p["tr"] + p["lp"]
                 say(f"   T {Tval:6.2f} K: total {tot:.2f} (chi2 {p['chi']:.1f} logdet {p['ld']:.1f} trace {p['tr']:.1f} "
                     f"hyperprior {p['lp']:.2f}); bd fit mean {bd_T.mean():.4f}, bs fit mean {bs_T.mean():.4f}; "
                     f"{nfev} evals, {time.time() - t0:.0f} s")
+            # E028 stage B: the region-fit references at every grid T (read a scalar-T chain against
+            # the fit at its own posterior T)
+            np.savez(a.out.replace(".txt", f"_{cell}_Tgrid_refs.npz"), T=np.array([g[0] for g in grid_refs]),
+                     bs=np.array([g[1] for g in grid_refs]), bd=np.array([g[2] for g in grid_refs]), qs16=qs16, qd16=qd16)
         out.close()
         return
     summary = {"quartiles": {"sync": qs16.tolist(), "dust": qd16.tolist()}, "realized": realized, "cells": {}}

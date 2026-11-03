@@ -2,6 +2,41 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-03 (Mac mini, 15:29): E028 stage B read (F35: the sampled scalar T is exact and lands at its own law's optimum); stage A' running
+
+**Learned**
+- E028 stage B (E029's chain with a sampled scalar log T, sd 0.1 multipliers; 7.0 h): the
+  D025 Gibbs-consistency check passes along sync, dust and log T (KS p 0.59, 0.24, 0.41). The
+  posterior T is 19.19 +- 0.54 K against the exact-marginal optimum of its own law, refined
+  before the comparison from the coarse 20.2 to 19.90 +- 0.47 K: 1.5 sd, criterion met. The
+  0.7 K offset is not Monte Carlo noise (0.07 K) and is attributed to the GMRF field prior
+  absent from the scan (not tested). The sky's unweighted T is 20.9 K and its dust-weighted
+  T 22.6 K: a scalar T is a degeneracy-weighted compromise, not the mean temperature.
+- The dust index field moves in step along the beta-T degeneracy: at its own reference in the
+  bright half and 0.03 to 0.05 low in the faint half (the E029 pattern), which against beta_d
+  comes out within 0.03 in every quartile (pixel RMSE 0.046 against E029's 0.056) by
+  cancellation, recorded as such. Sync unchanged from E029 (-2.977 +- 0.028, RMSE 0.062);
+  multiplier maps 1.002 and 0.999; dust region ESS min 76, median 602 (E029 35, 136) at the
+  same gradient cost, 22 divergences. The sampled-T code path is validated for stage C.
+- Tooling: the Gibbs check scans a sampled log T (`--sample-t`), the exact scan saves the
+  per-T region fits (`*_Tgrid_refs.npz`), the CMB attribution takes `--t-fixed`.
+
+**Running**
+- E028 stage A' (`gmrf16_exact_mumap_nc_Tmap_mu01`, oracle T map with sd 0.1, from 15:06,
+  about 7 h): pre-registered against `bd_trueT` in every quartile (within 0.03, bright z
+  within 0.5), mu_d map 1.00 +- 0.01, sync within 0.03 of E029; scan prediction: optimum
+  0.000 in every dust quartile.
+
+**Next**
+- Read stage A' (Gibbs check with `--t-map --mu-sd 0.1`, dust against `bd_trueT`, CMB
+  attribution with `--t-map`); then close E028 stages A, A', B with a Q16 re-rank and the
+  Paper A section on the T model; decide stage C (needs the 14-band simulation).
+
+**Needs Trygve**
+- Unchanged: the multiplier hyperprior default (sd 0.1) together with the T model; the Paper A
+  reporting rule for prior-dominated fields; whether the stage C simulation with 545 and 857
+  GHz is worth building (F35 says the scalar T is not a substitute).
+
 ## 2026-11-03 (Mac mini, 08:19): E028 stage A read (F34: the fixed T is not the cause of the sd-0.5 dust offsets); stage B running
 
 **Learned**

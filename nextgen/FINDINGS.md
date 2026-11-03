@@ -670,3 +670,27 @@ the GMRF prior transmitting the faint-sky level (field mean 1.616 against a brig
 level of 1.57). Under sd 0.1 with the true T map the optimum is 0.000 in every dust quartile
 and +0.01 for the sync level: the stage A' prediction. Scope: one sky, one noise realization,
 exact templates.
+
+**F35. A sampled scalar dust temperature in the collapsed hier index-field likelihood is
+exact for its stated target and lands at the exact-marginal optimum of its own law: T =
+19.19 +- 0.54 K against a pseudo-true 19.90 +- 0.47 K (1.5 sd), on a sky whose unweighted
+mean T is 20.9 K and dust-weighted mean 22.6 K; the dust index field moves in step along the
+beta-T degeneracy and ends within 0.03 of beta_d in every quartile by cancellation** (E028
+stage B, `gmrf16_exact_mumap_nc_Tscalar`: E029's chain with `sample_T: true`, `T_nside: 0`,
+prior N(log 20, 0.2^2), sd-0.1 multiplier hyperprior; 7.0 h, 700 post-burn draws). The D025
+conditional-CDF check passes along sync, dust and log T (KS p 0.59, 0.24, 0.41; conditional
+sd of log T 0.0024, so the 0.54 K posterior width is the beta-T-multiplier degeneracy, not
+noise). The pre-registered reference (20.2 +- 0.5 K, a coarse read of a three-point grid) was
+refined by the same construction to 19.90 +- 0.47 K before the comparison; the chain's 0.72 K
+offset below it is not Monte Carlo noise (0.07 K) and is attributed to the GMRF field prior
+absent from the scan (not tested). Against the region fit at the posterior T the dust field
+is at its reference in the bright half and 0.03 to 0.05 low in the faint half (the E029 and
+sd-0.1 scan pattern); against beta_d it is -0.004, +0.029, +0.024, -0.002 (pixel RMSE 0.046
+against E029's 0.056) because the region fit at 19.2 K lies above beta_d by -0.016 to +0.063
+per quartile and the faint-half shrinkage cancels it. Sync is unchanged from E029 (field mean
+-2.977 +- 0.028, RMSE 0.062), the multiplier maps are at 1.002 and 0.999, the dust region ESS
+improves (min 76, median 602 against 35, 136) at the same gradient cost, with 22 divergences.
+Consequence: the sampled-T code path is validated at realistic noise (the L3 rung for the
+stage C T field), and a scalar T is a degeneracy-weighted compromise, not the sky's dust
+temperature; the spatial T model with 545 and 857 GHz remains the structural fix. Scope: one
+sky, one noise realization, exact templates.

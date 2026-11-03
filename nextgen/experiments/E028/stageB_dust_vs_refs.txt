@@ -1,0 +1,9 @@
+gmrf16_exact_mumap_nc_Tscalar: 700 post-burn draws; dust mu map mean 1.0020 +- 0.0017; field mean +1.5508
+  against bd_trueT: Q1 z median -0.31 mean(pm-ref) -0.004 rmse 0.058; Q2 z median +0.60 mean(pm-ref) +0.029 rmse 0.048; Q3 z median +0.41 mean(pm-ref) +0.024 rmse 0.037; Q4 z median -0.03 mean(pm-ref) -0.002 rmse 0.017
+  against bd_fixT: Q1 z median +1.29 mean(pm-ref) +0.050 rmse 0.059; Q2 z median +0.86 mean(pm-ref) +0.048 rmse 0.059; Q3 z median +0.30 mean(pm-ref) +0.020 rmse 0.041; Q4 z median -0.60 mean(pm-ref) -0.040 rmse 0.049
+gmrf16_exact_mumap_nc_mu01: 700 post-burn draws; dust mu map mean 1.0030 +- 0.0017; field mean +1.5059
+  against bd_trueT: Q1 z median -1.55 mean(pm-ref) -0.048 rmse 0.077; Q2 z median -0.29 mean(pm-ref) -0.017 rmse 0.042; Q3 z median -0.30 mean(pm-ref) -0.022 rmse 0.037; Q4 z median -0.67 mean(pm-ref) -0.045 rmse 0.049
+  against bd_fixT: Q1 z median +0.11 mean(pm-ref) +0.006 rmse 0.033; Q2 z median -0.04 mean(pm-ref) +0.002 rmse 0.034; Q3 z median -0.42 mean(pm-ref) -0.025 rmse 0.044; Q4 z median -1.27 mean(pm-ref) -0.083 rmse 0.088
+gmrf16_exact_mumap_nc_Tmap: 700 post-burn draws; dust mu map mean 1.0254 +- 0.0073; field mean +1.6157
+  against bd_trueT: Q1 z median +1.31 mean(pm-ref) +0.047 rmse 0.061; Q2 z median +2.17 mean(pm-ref) +0.095 rmse 0.099; Q3 z median +2.09 mean(pm-ref) +0.098 rmse 0.100; Q4 z median +1.37 mean(pm-ref) +0.066 rmse 0.068
+  against bd_fixT: Q1 z median +2.62 mean(pm-ref) +0.101 rmse 0.116; Q2 z median +2.52 mean(pm-ref) +0.114 rmse 0.119; Q3 z median +2.04 mean(pm-ref) +0.095 rmse 0.100; Q4 z median +0.55 mean(pm-ref) +0.029 rmse 0.041

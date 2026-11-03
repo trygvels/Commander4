@@ -1,0 +1,24 @@
+E023 exact-target scans (v2) on /Users/trygvels/data/e023_pysm_n1: nside 64, noise scale 1.0, CMB prior sd 10000, T_fixed 20.929 K; truth sd beta_s 0.0629, beta_eff3 0.0516, beta_d 0.0374
+  sync quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 1.0021 2.5343 3.2427 3.6588; block sd (quartile, amplitudes known) 0.01801 0.07830 0.10093 0.11643
+  dust quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 0.0599 0.2895 0.7586 1.4540; block sd (quartile, amplitudes known) 0.00065 0.00887 0.01966 0.03014
+  data template sync: g/true at |b|>20 16/50/84 pct 0.199/0.991/1.793
+  data template dust: g/true at |b|>20 16/50/84 pct 0.023/1.078/2.614
+  cs template: log error field rms 0.3, FWHM 10.0 deg, seed 11; realized exp(-f) mean/sd sync 1.007/0.309, dust 1.060/0.319
+  realized a/g (data template, sync) mean/sd per quartile: 0.865/0.278 0.796/0.359 2.264/21.793 140.607/212.228
+  realized a/g (data template, dust) mean/sd per quartile: 0.879/0.346 0.876/5.851 5.914/29.806 48.258/63.291
+  realized a/g (exact template, sync) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (exact template, dust) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (cs template, sync) mean/sd per quartile: 0.994/0.299 1.032/0.317 0.994/0.306 1.008/0.314
+  realized a/g (cs template, dust) mean/sd per quartile: 1.063/0.300 1.056/0.305 1.061/0.336 1.061/0.333
+  reference (fixT): region fit in 18 s; fit minus region mean: sync rms 0.0564 max 0.4537, dust rms 0.0117 max 0.1224; at the bounds: 0 sync, 0 dust
+  reference (trueT): region fit in 12 s; fit minus region mean: sync rms 0.0209 max 0.4886, dust rms 0.0094 max 0.1184; at the bounds: 0 sync, 0 dust
+  reference (mapT): region fit in 12 s; fit minus region mean: sync rms 0.0156 max 0.2470, dust rms 0.0114 max 0.1180; at the bounds: 0 sync, 0 dust
+  mapT minus trueT reference: sync mean +0.0023 rms 0.0204; dust mean -0.0034 rms 0.0077; per dust quartile mean -0.0015 -0.0040 -0.0038 -0.0044
+== T grid for cell exact_fixT_perregmarg [expected]: scalar T, region fit redone per T, hyperparameters profiled
+   T  17.50 K: total -3606613.07 (chi2 -514.0 logdet -3336076.1 trace -270016.3 hyperprior -6.64); bd fit mean 1.6138, bs fit mean -3.0172; 234 evals, 132 s
+   T  18.25 K: total -3606603.39 (chi2 -504.2 logdet -3336076.6 trace -270016.0 hyperprior -6.59); bd fit mean 1.5929, bs fit mean -3.0077; 243 evals, 120 s
+   T  19.00 K: total -3606598.13 (chi2 -498.9 logdet -3336077.3 trace -270015.4 hyperprior -6.54); bd fit mean 1.5737, bs fit mean -2.9991; 252 evals, 113 s
+   T  19.18 K: total -3606597.39 (chi2 -498.1 logdet -3336077.5 trace -270015.2 hyperprior -6.53); bd fit mean 1.5692, bs fit mean -2.9971; 252 evals, 95 s
+   T  19.75 K: total -3606596.27 (chi2 -496.9 logdet -3336078.1 trace -270014.8 hyperprior -6.49); bd fit mean 1.5561, bs fit mean -2.9912; 252 evals, 107 s
+   T  20.50 K: total -3606597.02 (chi2 -497.6 logdet -3336079.0 trace -270014.0 hyperprior -6.44); bd fit mean 1.5398, bs fit mean -2.9841; 270 evals, 129 s
+   T  21.25 K: total -3606599.78 (chi2 -500.2 logdet -3336080.1 trace -270013.1 hyperprior -6.39); bd fit mean 1.5247, bs fit mean -2.9775; 243 evals, 117 s

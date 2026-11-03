@@ -268,6 +268,13 @@ original numbering.
   the hyperprior's, not the T model's. Stage A' (oracle T with sd 0.1) is the configuration
   that can be unbiased; stage B (scalar T, sd 0.1) is running. The GLS CMB residual is dropped
   as a quality criterion (a biased field beats the true-SED floor by 0.7 uK).
+- **Status 2026-11-03, 15:29 (E028 stage B, F35):** the sampled scalar T is exact for its
+  target (D025 passes along T) and sits at the exact-marginal optimum of its own law within
+  1.5 sd (19.19 +- 0.54 against 19.90 +- 0.47 K), with the dust index within 0.03 of beta_d by
+  cancellation along the beta-T degeneracy and sync unchanged from E029. A scalar T is a
+  degeneracy-weighted compromise (the sky's dust-weighted T is 22.6 K); the code path is
+  validated for stage C. Stage A' (oracle T, sd 0.1) is running (from 15:06) against the
+  prediction `bd_trueT` in every quartile.
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is

@@ -1,0 +1,6 @@
+1200 draws; T trace: iter 1 16.535, 10 17.896, 100 19.476, 300 19.230, 500 18.928
+post-burn (700): mean 19.1850 K sd 0.5383 K; 2.5/50/97.5 pct 18.170 19.175 20.234
+halves: 19.0847 / 19.2853; log T mean 2.95374 sd 0.02807
+  against 20.2 K: posterior z -1.89; within 2.03 pre-registered sd
+  against 20.9287 K: posterior z -3.24
+  against 22.64 K: posterior z -6.42

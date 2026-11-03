@@ -1,0 +1,4 @@
+refined sd-0.1 exact-marginal T grid: optimum 19.902 K, curvature sd 0.472 K (parabola through the three points around the maximum); chain 19.185 +- 0.538: -0.717 K = -1.52 grid sd, -1.33 posterior sd
+region fit at T 19.185 K: bd mean 1.5692; minus bd_trueT mean +0.0301 rms 0.0533, per dust quartile -0.016 +0.024 +0.050 +0.063; minus bd_fixT mean +0.0382; bs minus bs_fixT mean -0.0168
+chain dust (700 post-burn draws) against the region fit at the posterior T: Q1 z median +0.25 mean +0.012 rmse 0.033; Q2 z median -0.01 mean -0.001 rmse 0.039; Q3 z median -0.50 mean -0.032 rmse 0.058; Q4 z median -0.92 mean -0.053 rmse 0.068
+chain sync against the region fit at the posterior T: Q1 z median -0.03 mean +0.004; Q2 z median +0.22 mean +0.018; Q3 z median +0.29 mean +0.028; Q4 z median +0.33 mean +0.031

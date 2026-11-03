@@ -178,7 +178,7 @@ index at 1.44 against a truth of 1.54; under the sd-0.1 hyperprior the optimum i
 (sd 0.5 K; -598.1, -597.0, -604.1 at 19, 20.5, 22 K), at the sky's 20.9 K within 1.5 sd. Stage
 B's pseudo-true scalar T is therefore 27 +- 2 K under the queued parameter file (sd 0.5) and
 the chain is predicted there; a stage B run with `mu_prior [1, 0.1]` (the E029 setting) is
-predicted at 20.2 +- 0.5 K and is the configuration that can recover T. Decision: stage B runs
+predicted at 20.2 +- 0.5 K and is the configuration that can recover T. (Refined 15:27, before the chain was read against it: the parabola through the same three grid points gives 19.95 +- 0.53 K and a finer grid of the same construction 19.90 +- 0.47 K, `stageB_Tgrid_marginal_sd01_fine.txt`; the 2-sd criterion refers to 19.90 +- 0.47.) Decision: stage B runs
 with the sd-0.1 hyperprior (parameter file updated before the queue reaches it), the sd-0.5
 version is dropped (its prediction is recorded and does not need a chain).
 ```bash
@@ -290,5 +290,75 @@ as in E029.** Under sd 0.1 with the fixed T the optimum is -0.01 to -0.03 (the f
 read against beta_d), consistent with E029's -0.02 to -0.05 after the field prior. Both
 F34's mechanism and the A' prediction are therefore written before A' runs (A' is queued
 behind stage B).
+
+**Stage B (sampled scalar log T, sd 0.1), read 2026-11-03 15:11 to 15:29.** Chain
+`gmrf16_exact_mumap_nc_Tscalar`, 1200 iterations in 7.0 h (08:05 to 15:05), 700 post-burn
+draws, 62 gradients per iteration, 22 divergences, no tracebacks. Files `E028/stageB_*.txt`.
+
+*Validity.* The D025 conditional-CDF check along all three coordinates (K = 100, `--sample-t`
+scans the sampled log T as a third coordinate, half-width 0.02) passes: sync KS p 0.59 (mean
+CDF 0.510, optimum -0.04 conditional sd), dust p 0.24 (mean 0.542, optimum -0.14 sd), log T
+p 0.41 (mean 0.532, optimum -0.05 sd; conditional sd of log T 0.0024, so the data pin T to
+0.05 K given the rest, and the 0.54 K posterior width is the beta-T-multiplier degeneracy).
+The prior N(log 20, 0.2^2) is inert (curvature 25 against 1276 from the data in log T).
+
+*Temperature (pre-registered criterion met, with a refinement of the reference).* Posterior
+T = 19.19 +- 0.54 K (median 19.18, 95 percent interval 18.17 to 20.23; ESS 59, Monte Carlo
+error of the mean 0.07 K; halves 19.08 and 19.29; trace 16.5 at iteration 1, 19.5 at 100).
+The pre-registered reference "20.2 +- 0.5 K" was a coarse reading of the three-point grid
+(19, 20.5, 22 K); the parabola through those same points has its optimum at 19.95 K
+(curvature sd 0.53), and the refined grid of the same construction (multipliers integrated,
+region fit redone per T, hyperparameters profiled, sd 0.1; 17.5 to 21.25 K in 0.75 K steps
+plus the posterior mean; `stageB_Tgrid_marginal_sd01_fine.txt`, 15:13 to 15:27) puts it at
+19.90 +- 0.47 K (totals relative to the maximum: -16.8, -7.1, -1.9, -1.1 at the posterior
+mean, 0.0 at 19.75, -0.7, -3.5). The chain sits 0.72 K below that optimum: 1.5 grid sd, 1.3
+posterior sd, within the pre-registered 2 sd. The offset is not Monte Carlo noise (0.07 K)
+and is read as the difference between the scan's construction (index field profiled freely
+per region) and the chain's (GMRF field prior; the same shrinkage that puts the faint dust
+quartiles 0.03 to 0.05 below their own reference, see next); the grid with the field prior
+included was not run. Against the sky's unweighted mean T (20.93 K) the posterior is 3.2 sd
+low and against the a_dust^2-weighted mean (22.64 K) 6.4 sd low: a scalar T under this law
+is not the mean dust temperature of the sky, as the pre-registration said.
+
+*Dust index.* Read against the region fit at the chain's own posterior T (19.19 K, from the
+refined grid's saved references; `e023_exact_scan.py` now writes the per-T region fits to
+`*_Tgrid_refs.npz`), the dust field is at its reference in the bright half and shrunk in
+the faint half: offsets +0.012, -0.001, -0.032, -0.053 (z median +0.25, -0.01, -0.50, -0.92),
+the E029 pattern (-0.02 to -0.05 against its own fixed-T reference) and the sd-0.1 scan's
+(-0.01 to -0.03). Against beta_d (`bd_trueT`) the field is within 0.03 in every quartile
+(-0.004, +0.029, +0.024, -0.002; z median -0.31, +0.60, +0.41, -0.03; field mean 1.551 +-
+0.019 against the sky mean 1.540; pixel RMSE 0.046 against 0.056 for E029 and 0.085 for stage
+A): the region fit at 19.19 K lies above beta_d by -0.016, +0.024, +0.050, +0.063 per quartile
+(the beta-T degeneracy acting on a sky whose T varies by 2 K), and the field-prior shrinkage
+of the faint half cancels most of it. This agreement with beta_d is a cancellation, not a
+recovery, and is recorded as such (compare F34). The dust mu map is 1.0020 +- 0.0017 (per
+quartile 1.008, 1.000, 1.000, 1.000; E029 1.003) and the sync mu map 0.999.
+
+*Sync (unchanged from E029).* Field mean -2.977 +- 0.028 against -2.981 (within 0.03);
+sigma_s 0.077, pixel RMSE 0.062 against 0.061; quartile offsets against the region fit at
+the posterior T +0.004, +0.018, +0.028, +0.031 (z median within 0.35). The T model does not
+touch sync, as in stage A.
+
+*CMB (reported, not a criterion).* Flat-prior GLS CMB residual at the posterior-mean fields
+93.42 uK with the fixed-T (20.93 K) GLS (E029 94.52, stage A 92.45, true-SED floor 93.18) and
+93.83 with the GLS at the posterior T (`stageB_cmb_attribution_Tpost.txt`); by hybrid fields
+the sync field of either chain is worth less than 0.05 uK and the dust field difference to
+E029 is 1.3 uK.
+
+*Mixing.* T ESS 59 (the slowest coordinate with the dust field hyperparameters, ESS 42 to
+90); dust region ESS min 76, median 602 (E029 35, 136; stage A 93, 765); sync region ESS min
+180, median 828; multiplier hyperparameters ESS 290 to 1620. The sampled scalar T costs
+nothing in gradients (62 per iteration against 63 for stage A) and improves the dust mixing
+over E029, with 22 divergences against 0.
+
+*Reading.* The sampled scalar T code path (`sample_T`, `T_nside 0`, the `ThermalDust:logT`
+block, the prior, the chain output) is validated at realistic noise: the chain is a draw
+from its stated target along T (D025), the posterior T is at the exact-marginal optimum of
+its own law within 1.5 sd, and the posterior width (0.54 K) matches the curvature of that
+optimum (0.47 K). What the scalar T estimates is a degeneracy-weighted compromise (19.2 K
+on a sky whose dust-weighted T is 22.6 K), and the dust index field moves in step along the
+beta-T degeneracy; a scalar T cannot remove a bias from spatial T variation, and the
+within-0.03 agreement with beta_d here is a cancellation. Stage C (T field with 545 and 857
+GHz) remains the structural answer; stage B is its L3 rung.
 
 ## Follow-ups

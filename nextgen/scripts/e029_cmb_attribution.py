@@ -8,6 +8,7 @@ import argparse, glob, sys
 ap = argparse.ArgumentParser(); ap.add_argument("--dir", required=True); ap.add_argument("--refs", required=True)
 ap.add_argument("--a", required=True); ap.add_argument("--b", required=True); ap.add_argument("--burn", type=int, default=500)
 ap.add_argument("--t-map", default=None, help="per-region dust T map (FITS) used in the GLS instead of T_fixed (E028)")
+ap.add_argument("--t-fixed", type=float, default=None, help="scalar dust T (K) used in the GLS instead of T_fixed (E028 stage B)")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
 import numpy as np, healpy as hp, h5py
 sys.path.insert(0, "nextgen/scripts")
@@ -17,6 +18,7 @@ data = np.array([hp.read_map(f"{a.dir}/band{int(f):03d}_map.fits") for f in nu])
 lat = hp.pix2ang(nside, np.arange(hp.nside2npix(nside)), lonlat=True)[1]; hi = np.abs(lat) > 20
 reg = region_map(16, nside); r = np.load(a.refs); qd = r["qd16"]; qs = r["qs16"]
 T = float(truth["T_fixed"]) if a.t_map is None else hp.read_map(a.t_map, field=0)[reg]
+if a.t_fixed is not None: T = float(a.t_fixed)
 print("GLS dust temperature:", f"fixed {T:.4f} K" if np.ndim(T) == 0 else f"per-region map {a.t_map} (mean {T.mean():.3f} K)")
 
 def pm(tag, comp):

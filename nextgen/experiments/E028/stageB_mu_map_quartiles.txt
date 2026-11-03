@@ -1,0 +1,5 @@
+posterior-mean template multiplier maps per quartile (Q1 bright to Q4 faint), 700 post-burn draws
+gmrf16_exact_mumap_nc_Tscalar    ThermalDust  all 1.0020  per quartile mean 1.0077 1.0001 1.0000 1.0001  median post sd 0.068 0.096 0.099 0.099  mean of (pm-1)/sd +0.11 +0.00 -0.00 +0.00
+gmrf16_exact_mumap_nc_Tscalar    Synchrotron  all 0.9991  per quartile mean 0.9966 1.0003 0.9997 1.0000  median post sd 0.092 0.098 0.099 0.099  mean of (pm-1)/sd -0.05 +0.00 -0.00 -0.00
+gmrf16_exact_mumap_nc_mu01       ThermalDust  all 1.0030  per quartile mean 1.0115 1.0005 0.9999 1.0001  median post sd 0.069 0.096 0.099 0.100  mean of (pm-1)/sd +0.21 +0.01 -0.00 +0.00
+gmrf16_exact_mumap_nc_mu01       Synchrotron  all 0.9996  per quartile mean 0.9981 1.0006 0.9995 1.0003  median post sd 0.092 0.098 0.099 0.099  mean of (pm-1)/sd -0.03 +0.01 -0.00 +0.00
