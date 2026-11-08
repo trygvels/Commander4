@@ -42,3 +42,39 @@ nside-16 rows): GMRF 0.0323 / 0.0180, iid 0.0501 / 0.0271 (paired +0.0178 +- 0.0
 0.0010), independent 0.1373 / 0.1074; CMB 2.86 / 2.91 / 3.13 uK; iid hyperparameter test fails
 (mu_d +5.6 sd), the others pass. The realization scatter of the gaps is about 0.0005; the
 table's nside-16 rows can be quoted as the mean of the two realizations.
+
+## Table 3 (candidate): the dust temperature model and the multiplier hyperprior at realistic noise (E026, E029, E028)
+
+One PySM d1s1c1 sky (`/Users/trygvels/data/e023_pysm_n1`; 12 bands 23 to 353 GHz, nside 64,
+white noise at the E012 levels), exact amplitude templates, GMRF index fields at nside 16,
+per-region template multipliers with the hyperprior N(1, sd^2), 1200 Gibbs iterations, 700
+post-burn draws; every chain passes the D025 Gibbs-consistency check. "Dust minus beta_d" is
+the mean over the regions of a dust S/N quartile (Q1 bright to Q4 faint) of the posterior-mean
+region index minus `bd_trueT` (the region fit at the true per-pixel T, E027 `refs_nside16.npz`).
+mu_d: mean of the posterior-mean multiplier map. Sync: field mean (truth -3.000). RMSE: posterior
+mean against the PySM truth over the nside-64 pixels (floors 0.013 sync, 0.019 dust). CMB: the
+flat-prior GLS CMB residual rms in uK_CMB (true-SED floor 93.18; not an index-quality criterion,
+D027). Exact-marginal optima: the expected-target shift of each dust quartile under the same
+model with the multipliers integrated (`E028/stageA_scan_mapT_vs_fixT_sd05.txt`, `_sd01.txt`).
+Sources: `E028/stageA_dust_vs_refs.txt`, `stageAprime_dust_vs_refs.txt`, `stageB_dust_vs_refs.txt`,
+`E029/dust_vs_refs.txt`, `E028/stageAprime_e020_analysis.txt`, `E028/fixedT_baseline_vs_trueT.txt`.
+
+| chain | sd | T model | dust minus beta_d Q1 / Q2 / Q3 / Q4 | mu_d | sync mean | RMSE sync / dust | CMB rms |
+|---|---|---|---|---|---|---|---|
+| E026 `gmrf16_exact_mumap_nc` | 0.5 | fixed 20.93 K | +0.006 / +0.061 / +0.059 / +0.030 | 1.029 | -2.868 | 0.147 / 0.060 | 93.60 |
+| E028 A `..._Tmap` | 0.5 | oracle map | +0.047 / +0.095 / +0.098 / +0.066 | 1.025 | -2.880 | 0.133 / 0.085 | 92.45 |
+| E029 `..._mu01` | 0.1 | fixed 20.93 K | -0.048 / -0.017 / -0.022 / -0.045 | 1.003 | -2.981 | 0.061 / 0.056 | 94.52 |
+| E028 A' `..._Tmap_mu01` | 0.1 | oracle map | +0.010 / +0.033 / +0.031 / +0.003 | 1.002 | -2.967 | 0.066 / 0.038 | 93.08 |
+| E028 B `..._Tscalar` | 0.1 | sampled scalar (19.19 +- 0.54 K) | -0.004 / +0.029 / +0.024 / -0.002 | 1.002 | -2.977 | 0.062 / 0.046 | 93.42 |
+| exact marginal | 0.5 | fixed | +0.02 / +0.10 / +0.09 / +0.08 | | | | |
+| exact marginal | 0.5 | oracle map | +0.01 / +0.10 / +0.09 / +0.07 | | | | |
+| exact marginal | 0.1 | fixed | -0.01 / -0.03 / -0.01 / +0.01 | | | | |
+| exact marginal | 0.1 | oracle map | 0.000 / 0.000 / 0.000 / 0.000 | | | | |
+
+Reading (F33 to F36): the sd-0.5 rows carry the Occam push of the marginalized multipliers
+(+0.07 to +0.10 in the faint quartiles, F29) with either T model; sd 0.1 removes it and, with a
+fixed T, exposes the T misfit in the index (E029); with the oracle T map and sd 0.1 the exact
+marginal is unbiased in every quartile and the chain's +0.03 in Q2 and Q3 is the GMRF prior's
+interpolation (true quartile means 1.570, 1.523, 1.516, 1.548 against a field mean of 1.558;
+shrinkage prediction +0.035, +0.042, +0.010 for Q2 to Q4). The scalar-T row agrees with the
+oracle-map row to 0.014 per quartile through a 1.7 K lower T (the beta-T degeneracy, F35).

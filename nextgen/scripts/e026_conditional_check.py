@@ -18,7 +18,7 @@ ap.add_argument("--mu-nside", type=int, default=16); ap.add_argument("--cmb-sd",
 ap.add_argument("--k", type=int, default=20); ap.add_argument("--burn", type=int, default=500); ap.add_argument("--nside-beta", type=int, default=16)
 ap.add_argument("--half-width", type=float, nargs=2, default=[0.10, 0.015], help="scan half-widths (sync, dust)")
 ap.add_argument("--points", type=int, default=11)
-ap.add_argument("--mu-sd", type=float, default=0.5, help="sd of the N(1, sd^2) hyperprior on the template multipliers (E029: 0.1)")
+ap.add_argument("--mu-sd", type=float, default=None, help="sd of the N(1, sd^2) hyperprior on the template multipliers; default: read from the chain's parameter file (chains_TAG/param_TAG.yml or param_TAG.yml in --dir), as the E028 stats review asked")
 ap.add_argument("--index-prior-rms", type=float, default=0.3, help="negative control: rms of the Gaussian prior on the field mean (chains use 0.3)")
 ap.add_argument("--noise-scale", type=float, default=1.0, help="negative control: multiply the noise rms (chains use 1.0)")
 ap.add_argument("--t-map", default=None, help="fixed per-region dust T map (FITS, E028 stage A); the target uses it instead of the scalar T_fixed")
@@ -34,6 +34,59 @@ from commander4.compsep import index_field_sampler as ifs
 from commander4.sky.diffuse_components import CMB, Synchrotron, ThermalDust
 
 D = a.dir; NSIDE, NB = 64, a.nside_beta
+
+
+def chain_parameter_file(D, tag):
+    """The parameter file the chain ran with: the copy in the chain directory, else next to it."""
+    import os
+    for p in (f"{D}/chains_{tag}/param_{tag}.yml", f"{D}/param_{tag}.yml"):
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def hier_settings(param_file):
+    """Walk the parameter file and return {component: (mu_sd, T_map, sample_T, class)} for every
+    component (mu_sd is None unless the amplitude prior is hier)."""
+    import yaml
+    out = {}
+
+    def walk(node, name=None):
+        if isinstance(node, dict):
+            if "component_class" in node and isinstance(node.get("params"), dict):
+                prm = node["params"]; ap_ = prm.get("amp_prior") or {}
+                mu_sd = float(ap_["mu_prior"][1]) if ap_.get("type") == "hier" and "mu_prior" in ap_ else None
+                out[name] = (mu_sd, prm.get("T_map"), bool(prm.get("sample_T", False)),
+                             node["component_class"])
+            for k, v in node.items():
+                walk(v, k)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v, name)
+    walk(yaml.safe_load(open(param_file)))
+    return out
+
+
+_pf = chain_parameter_file(D, a.tag)
+if a.mu_sd is None:
+    if _pf is None:
+        sys.exit("--mu-sd not given and no parameter file found for the chain (chains_TAG/param_TAG.yml)")
+    _sds = sorted({v[0] for v in hier_settings(_pf).values() if v[0] is not None})
+    if len(_sds) != 1:
+        sys.exit(f"the hier components of {_pf} do not share one multiplier hyperprior sd: {_sds}; pass --mu-sd")
+    a.mu_sd = _sds[0]; print(f"multiplier hyperprior sd {a.mu_sd} read from {_pf}")
+if _pf is not None:
+    for _name, (_sd, _tmap, _st, _cls) in hier_settings(_pf).items():
+        if _sd is not None and abs(_sd - a.mu_sd) > 1e-12:
+            print(f"WARNING: {_name} ran with mu_prior sd {_sd}, the target here uses {a.mu_sd}")
+        if _cls != "ThermalDust":
+            continue
+        if _tmap and not a.t_map and not _st:
+            print(f"WARNING: {_name} ran with T_map {_tmap} and --t-map is not given: the target differs from the chain's (negative control)")
+        if _st and not a.sample_t:
+            print(f"WARNING: {_name} sampled T and --sample-t is not given")
+        if a.t_map and not _tmap:
+            print(f"WARNING: --t-map given but {_name} ran without a T_map (negative control)")
 bands = [23, 30, 33, 41, 44, 61, 70, 94, 100, 143, 217, 353]; freqs = np.array(bands, float)
 maps = np.array([hp.read_map(f"{D}/band{b:03d}_map.fits", field=0) for b in bands])
 inv_var = 1.0 / (a.noise_scale * np.array([hp.read_map(f"{D}/band{b:03d}_rms.fits", field=0) for b in bands]))**2

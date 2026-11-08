@@ -169,6 +169,27 @@ model component rather than a preprocessing choice.
   (+0.48 / +0.24). Figure candidate: the Occam slope of the marginalized multipliers against the
   hyperprior width (E026 review `occam.py`, `musd.py`) with the E029 chain; Table candidate:
   exact / cs_mumap / cs_scalar per quartile.
+- The dust temperature model at realistic noise (E028 stages A, A', B with E029; F33 to F36):
+  with a fixed T the hier target has no unbiased configuration. Under sd 0.5 the T misfit is
+  hidden in the multipliers (mu_d map 1.029) and the faint dust index sits +0.06 above beta_d;
+  under sd 0.1 it is exposed in the index (bright quartile at beta_eff, faint half 0.08 low,
+  +0.9 uK of high-latitude CMB residual). With the oracle region-mean T map and sd 0.1 the chain
+  has no likelihood bias: bright dust at beta_d (+0.010, z +0.4), multiplier maps 1.002 and
+  0.999, sync at the E029 level plus the predicted +0.01, dust pixel RMSE 0.038 against 0.056
+  (floor 0.019); the fainter quartiles sit at the GMRF's stationary mean (+0.03 where their
+  true mean lies 0.04 below the field mean, reproduced by an independent-region shrinkage
+  prediction), the prior-dominated regime reported as such (F36). The oracle T with sd 0.5
+  (stage A) shows that the sd-0.5 offsets are the hyperprior's and not the T model's (F34):
+  the hyperprior width and the T model are one decision. A sampled scalar log T is exact for
+  its target (D025 along T) and lands at its own law's optimum (19.2 against 19.9 K pseudo-true,
+  on a sky whose unweighted T is 20.9 K and dust-weighted T 22.6 K); the dust index moves in
+  step along the beta-T degeneracy and agrees with the oracle-T chain to 0.014 per quartile for
+  the wrong reason, so a scalar T is a degeneracy-weighted compromise, not a substitute for a T
+  field (F35), and a per-region T field is unidentifiable with 23 to 353 GHz (D026; it needs
+  545 and 857 GHz). Table 3 candidate: dust index per S/N quartile against beta_d, multiplier
+  map, sync level, pixel RMSEs and CMB residual for the five chains with the exact-marginal
+  optima (`papers/paperA_tables.md`). Figure candidate: the exact-marginal T grid against the
+  stage B posterior, and the shrinkage prediction against the stage A' quartile offsets.
 - Validity of production chains (D025): the conditional-CDF (Gibbs-consistency) check along
   the field means, exact for the implemented target and independent of the sampler; the
   centred chains' funnel at realistic noise (E026) as the motivating failure.
@@ -198,13 +219,13 @@ model component rather than a preprocessing choice.
 - What is not shown: polarization (QU streams with the hier prior are excluded in stage 1),
   CG-solved amplitudes (Q5, M3.1), beams beyond a common resolution.
 
-## Status of the evidence (2026-10-27)
+## Status of the evidence (2026-11-08)
 | Section | Evidence in hand | Pending |
 |---|---|---|
-| 3 | E009, E010, E014 (passes 2, 3) | none |
-| 4 | E012, E014, E015, E016 | E017 Conclusion (hier modes finishing) |
-| 5 | E012 (L1, SBC), E016 (coverage) | E016 hier SBC (86 of 300), M2.3 MAMS table |
-| 6 | E018 L0, L1 | E018 L3 (running), stage-2 efficiency numbers |
+| 3 | E009, E010, E014 (passes 2, 3), E022 (F22) | Trygve's decision on the BP XV presentation |
+| 4 | E012, E014, E015, E016, E017 (F18), E022 (F22c) | none |
+| 5 | E012 (L1, SBC), E016 (coverage, hier SBC 600), E019 (F20), E021 (F24), E023 to E029 (F26 to F36) | hyperprior width against the template law (E030); the T field (E028 stage C, needs the 14-band simulation) |
+| 6 | E018 L0, L1, L3 (F19), E024 (F25), D025 check | stage-2 efficiency table at realistic noise (E026 to E029 numbers to be collected) |
 | 7 | E014 pass 4, F17 | none for the measurement; Q15 decision for the fix |
 
 ## Open decisions that change the paper

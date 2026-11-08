@@ -3,6 +3,19 @@
 Ranked by how much the answer changes what we build next. Each entry: why it matters, how to answer
 it, and what the answer decides. Mark an entry RESOLVED with the experiment ID when answered.
 
+**Ranking (2026-11-08):** Q16 stays first, now two items: (a) the multiplier hyperprior width
+against the template-error law on component-separation-quality templates (E030, exact scans
+first, then one chain if the tight width breaks), which decides the real-data default that F33
+and F36 point to; (b) the T field with 545 and 857 GHz (E028 stage C), which needs Trygve's go
+on the 14-band simulation. Then Q15 (zero levels; blocks any real-data index result and needs
+Trygve's model decision), then Q4 efficiency (the dust field hyperparameters are the slowest
+coordinates at realistic noise, ESS 21 to 41 of 700 in E028 stage A'; the dense metric of E024
+is in, the next gain is a joint or reparameterized hyperparameter update), then Q8/Q7 (M2.6),
+then Q5 (CG amplitudes) and the second half of Q14. Answered since the previous ranking: the
+resolution rule of Q3 (E027, F32: the finest field the budget allows under the GMRF prior) and
+the T-model part of Q16 (E028, F34 to F36: with a fixed T there is no unbiased configuration,
+with the true T map and sd 0.1 there is no likelihood bias, a scalar T is not a substitute).
+
 **Ranking (2026-10-29):** Q16 first (robustness of the hierarchical index posterior to template
 law, template scatter and the dust SED on the PySM skies at realistic noise: it decides whether
 Paper A's method runs on real intensity maps), then Q15 (zero levels; blocks any real-data index
