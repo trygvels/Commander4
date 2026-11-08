@@ -1,6 +1,6 @@
 # E030: multiplier hyperprior width against the template-error law on component-separation-quality templates
 
-- **Date started / finished:** 2026-11-08 20:31 / (running)
+- **Date started / finished:** 2026-11-08 20:31 / scans read 21:55; chain running
 - **Branch and commit:** `nextgen`, 8566e0a (plus the uncommitted Gibbs-check and Paper A edits of the same evening)
 - **Open question addressed:** Q16 (robustness of the hierarchical amplitude prior to the template law); feeds the real-data default of D017/E029
 - **Validation level:** L1 (exact-target scans of the implemented likelihood, no chain)
@@ -108,13 +108,85 @@ beyond the scan range, so a second pass over [-0.3, 0.3] with the stage A scan s
 per-quartile sync scans at every width (both templates) was launched at the time stamped in
 the log (`run_e030_scans2.sh`) before any conclusion is drawn.
 
+**Pass 3 (21:16 to 21:46; `scan3_sd01.txt`, `scan3_sd03.txt`, `scan3_sd05.txt`; CMB prior sd
+1e4, both templates at every width, per-quartile shifts over [-0.3, 0.3] plus the whole-sky
+s_all and d_all).** The exact-template cells at sd 0.1 and 0.5 reproduce the E028 stage A scans
+to the last digit (same profiled scatters, chi-square and optima), so the machinery is the same
+and the pass-1 and pass-2 differences were the CMB prior alone. Argmax shift against the mapT
+reference per quartile (Q1 bright to Q4 faint), gain over zero in nats in parentheses where it
+exceeds 1; "e" marks an optimum beyond +0.3:
+
+| template | sd | d_Q1 | d_Q2 | d_Q3 | d_Q4 | s_Q1 | s_Q2 | s_Q3 | s_Q4 | s_all |
+|---|---|---|---|---|---|---|---|---|---|---|
+| exact | 0.1 | 0.000 | 0.000 | 0.000 | 0.000 | +0.01 | 0.00 | 0.00 | 0.00 | +0.01 |
+| exact | 0.3 | +0.01 (2.9) | +0.04 (1.9) | +0.02 | +0.02 | +0.03 | +0.05 | +0.04 | +0.03 | +0.03 |
+| exact | 0.5 | +0.01 (3.9) | +0.13 (12.8) | +0.09 (2.3) | +0.07 | +0.06 (2.4) | +0.20 (2.6) | +0.17 (1.2) | +0.15 | +0.08 (5.2) |
+| cs | 0.1 | **-0.020 (24.2)** | +0.03 (1.9) | +0.08 (2.7) | +0.12 (2.8) | **+0.21 (37.6)** | e (13.2) | e (10.3) | e (8.4) | +0.25 (64.7) |
+| cs | 0.3 | 0.000 | +0.03 | +0.08 (1.8) | +0.13 (2.8) | +0.07 (3.0) | e (6.6) | e (6.5) | e (5.5) | +0.12 (12.1) |
+| cs | 0.5 | +0.01 (2.1) | +0.10 (7.6) | +0.13 (4.4) | +0.19 (4.6) | +0.07 (3.1) | e (7.4) | e (6.7) | e (5.3) | +0.13 (12.4) |
+
+Curvature sds: dust 0.003 (Q1), 0.017 to 0.026 (Q2), 0.035 to 0.046 (Q3), 0.053 to 0.065 (Q4);
+sync 0.024 to 0.029 (Q1), 0.08 to 0.13 (Q2 to Q4), 0.022 to 0.026 (s_all). Profiled scatters
+with the cs template at sd 0.1: sync [0.088, 0.279, 0.300, 0.345], dust [0.074, 0.198, 0.280,
+0.276] against [0.044, 0.159, 0.191, 0.213] and [0.023, 0.098, 0.182, 0.221] for the exact
+template: the tight prior pushes the template error it cannot absorb into the scatters.
+
+Reading against the pre-registered predictions. (1) holds: the exact template at sd 0.3 carries
+an Occam push of at most +0.04 (dust) and +0.05 (sync), none above 3 nats, between sd 0.1 (zero)
+and sd 0.5 (+0.07 to +0.13 dust, +0.15 to +0.20 sync). (2) holds in the bright half and fails in
+the faint half: at sd 0.3 the cs and exact optima agree to 0.01 in dust Q1 and Q2 and in the
+sync Q1 to 0.04 (1.5 curvature sd), while dust Q3 and Q4 differ by +0.06 and +0.11 and the
+faint sync quartiles run beyond +0.3 against exact's +0.03 to +0.05: at realistic noise the
+30 percent template error has an effect of its own in the prior-dominated half, at every width.
+This qualifies F28's "cs minus exact at most 0.04 in every quartile at 1 x", which was read on a
+grid of +-0.16 with both templates at the edge for the faint sync and against the fixed-T model;
+it holds for dust Q1 and Q2 and sync Q1, where the data decide. (3) is confirmed: with the cs
+template, sd 0.1 shifts the data-dominated dust quartile by -0.020 (6 curvature sd, 24 nats) and
+the data-dominated sync quartile by +0.21 (9 sd, 38 nats); the whole-sky sync level moves +0.25
+(65 nats). The misspecified tight prior is not admissible with a 30 percent template. (4) holds:
+cs at sd 0.5 gives +0.10, +0.13, +0.19 in the faint dust quartiles (E026's cs_mumap chain sits
++0.06 to +0.10 above bd_trueT there with the field prior) and +0.07 in sync Q1.
+
+The decision-relevant reading: the hyperprior width must be at least the template error's
+scale. With the width matched to a 30 percent template the bright dust index is unbiased
+(0.000), the bright sync index carries +0.07 (2.5 sd, 3 nats; +0.04 of it the template, +0.03
+the Occam push), and the faint half of both fields is set by the template error and the GMRF
+prior, not by the data. With an exact template the matched width costs under 0.05 anywhere, so
+the width is a property of the template, not of the sky; sd 0.1 is admissible only for a
+template good to about 10 percent at the region scale.
+
+**Chain (launched 2026-11-08 21:49, `gmrf16_cs_mumap_nc_Tmap_mu03`, driver and log in
+`/Users/trygvels/data/e023_pysm_n1/e030/`):** E028 stage A' with the cs templates and
+`mu_prior: [1.0, 0.3]` on both components (the matched width, the oracle T map, non-centred,
+1200 iterations, 12 ranks; about 6 h). Pre-registered, written before the chain is read:
+(a) validity: the D025 check with the cs templates, the T map and the hyperprior width read
+from the parameter file passes on sync and dust (KS p above 0.01); (b) bright dust against
+`bd_trueT`: z median within 0.5 (scan optimum 0.000); (c) bright sync against the region-fit
+reference: between 0 and +0.09 (the scan optimum +0.07 with its 0.025 curvature sd), to be read
+as the template-induced shift of a data-dominated index at the matched width, with stage A'
+(-0.015) and E029 (-0.028) as the exact-template baselines; (d) the faint quartiles are read
+against the independent-region shrinkage prediction (D027) and reported as prior-dominated, with
+the expectation that they lie between the field mean and the scan optima; (e) pixel RMSE against
+the PySM truth well below E026's cs_mumap chain at sd 0.5 with the fixed T (sync 0.335, dust
+0.089) and above stage A' (0.066, 0.038); (f) the multiplier maps track the realized template
+error (exp(-f) region means) with a correlation above 0.5 in the bright quartiles, as in E026.
+Control: E026 `gmrf16_cs_mumap_nc` (sd 0.5, fixed T; D025 passed) and stage A' (exact, sd 0.1,
+oracle T).
+
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
 sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the control for
 the template effect.
 
 ## Conclusion
-(pending)
+(from the scans, 21:55; the chain is pending) The hyperprior width of the per-region template
+multipliers must be at least the template error's scale: with a 30 percent template the tight
+sd 0.1 biases the data-dominated indices (sync +0.21, dust -0.02, tens of nats) and is not
+admissible; the matched sd 0.3 leaves the bright dust index unbiased and the bright sync index
++0.07 high, and costs under 0.05 of Occam push when the template is exact. The faint half of
+both fields is set by the template error and the GMRF prior at every width (qualifies F28).
+FINDINGS: F37, F28 qualified. OPEN_QUESTIONS: Q16 status. The real-data default is a choice
+for Trygve (D017 territory): the width follows the template quality.
 
 ## Follow-ups
 - If (3) breaks: one chain with cs templates at the matched width (sd 0.3) and the oracle T

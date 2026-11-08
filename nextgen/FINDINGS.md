@@ -517,6 +517,13 @@ template effect (cs minus exact) is at most 0.02 at 0.03 x and 0.04 at 1 x in ev
 so this finding stands; the absolute shifts of the hier target against the true-T region fit
 are model properties (the fixed-T misfit at 0.03 x, the F29 Occam push at 1 x: +0.10 to +0.16
 sync, +0.02 to +0.10 dust in the expected target), which the profiled scans had hidden.
+**Qualified (2026-11-08, E030, F37):** "at most 0.04 in every quartile at 1 x" was read on a
++-0.16 grid with both templates at the edge for the faint sync quartiles. Scanned over +-0.3
+with the oracle T map, the template effect at 1 x is at most 0.01 in dust Q1 and Q2 and 0.04 in
+sync Q1 (where the data decide), but +0.06 to +0.11 in dust Q3 and Q4 and beyond +0.25 in the
+faint sync quartiles at every hyperprior width 0.1 to 0.5: in the prior-dominated half of the
+sky a 30 percent template error is not removed by the multiplier field, and the GMRF index
+prior sets those regions in a chain.
 
 **F29. At realistic noise the nside-16 GMRF synchrotron index field is prior-dominated over
 three quarters of the sky, and there the hierarchical amplitude prior's per-region multipliers
@@ -722,3 +729,33 @@ to 0.038 against E029), what remains is prior-dominated interpolation at the fie
 that is a Paper A reporting item (D025), not a method defect; a per-quartile tolerance of 0.03
 is not a usable criterion where the quartile's true mean sits 0.04 from the field mean. Scope:
 one sky, one noise realization, exact templates, oracle T map.
+
+**F37. The hyperprior width of the per-region template multipliers must be at least the
+template error's scale: with a 30 percent region-scale template error the tight N(1, 0.1^2)
+that is unbiased with exact templates (F33, F36) biases the data-dominated sync quartile by
++0.21 (9 curvature sd, 38 nats) and the data-dominated dust quartile by -0.020 (6 sd, 24 nats)
+in the exact expected target, while the matched width 0.3 leaves the bright dust quartile at
+zero and the bright sync quartile at +0.07 (2.5 sd, 3 nats; +0.04 of it the template, +0.03
+the Occam push) and costs at most +0.04 (dust) and +0.05 (sync) when the template is exact**
+(E030 pass 3, exact scans of the collapsed hier target of Commander4's kernel with the oracle
+nside-16 T map, multipliers integrated analytically, scatters profiled, per-quartile shifts
+over +-0.3, CMB prior sd 1e4; `E030/scan3_sd{01,03,05}.txt`; the exact-template cells at sd 0.1
+and 0.5 reproduce the E028 stage A scans exactly). Optima per dust quartile Q1 to Q4 and sync
+Q1, s_all: exact sd 0.3: +0.01, +0.04, +0.02, +0.02; +0.03, +0.03. cs sd 0.1: -0.020, +0.03,
++0.08, +0.12; +0.21, +0.25. cs sd 0.3: 0.000, +0.03, +0.08, +0.13; +0.07, +0.12. cs sd 0.5:
++0.01, +0.10, +0.13, +0.19; +0.07, +0.13. The faint sync quartiles run beyond +0.3 with the cs
+template at every width (exact: +0.03 to +0.05 at sd 0.3, +0.15 to +0.20 at sd 0.5): the
+template error's own effect dominates the Occam push in the prior-dominated half (qualifies
+F28), where the GMRF index prior sets the field in a chain (E026's cs_mumap at sd 0.5 with the
+fixed T: sync RMSE 0.335, field scale 0.35). The misspecified tight prior pushes the template
+error into the profiled scatters (sync 0.09 to 0.35 against 0.04 to 0.21). Consequence: the
+hyperprior width is a property of the template, not of the sky; on real data it follows the
+template quality (sd 0.1 only for a template good to about 10 percent at the region scale), and
+at the matched width a data-dominated sync index carries a template-induced shift of order
++0.07 for a 30 percent template (a scan statement; the chain `gmrf16_cs_mumap_nc_Tmap_mu03`,
+cs templates at sd 0.3 with the oracle T, is running to read it with the field prior). Also
+recorded: two earlier passes ran with the scan script's default per-pixel CMB prior sd 100 and
+showed +0.04 to +0.12 in the faint dust quartiles with exact templates and the true T, the F26
+leakage at realistic noise; invalid as readings of the target, kept as the F26 illustration.
+Scope: one sky, one template-error realization (seed 11, 10 degrees, log-normal rms 0.3),
+expected target without the index prior.

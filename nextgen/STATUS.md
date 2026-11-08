@@ -2,6 +2,47 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-08 (Mac mini, 21:55): E030 scans (F37: the multiplier hyperprior width must match the template error; sd 0.1 is not admissible with a 30 percent template); cs-template chain at the matched width running
+
+**Learned**
+- E030 (exact scans of the collapsed hier target with the oracle T map, multipliers integrated,
+  per-quartile shifts over +-0.3): with a 30 percent region-scale template error (the E025/E026
+  cs template) the tight N(1, 0.1^2) hyperprior biases the data-dominated sync quartile by
+  +0.21 (38 nats) and the data-dominated dust quartile by -0.020 (24 nats); the matched width
+  0.3 leaves bright dust at 0.000 and bright sync at +0.07 (3 nats), and with an exact template
+  it costs at most +0.04 (dust) and +0.05 (sync) of Occam push. The faint half of both fields
+  is pushed by the template error at every width (dust +0.08 to +0.19, sync beyond +0.3), so
+  F28's "cs minus exact at most 0.04 in every quartile" is qualified to the data-dominated
+  quartiles. Rule for real data: the hyperprior width follows the template quality (sd 0.1 only
+  for templates good to 10 percent at the region scale).
+- Setup error caught: the first two scan passes ran with the scan script's default per-pixel
+  CMB prior sd 100 instead of the chains' 1e4 and showed +0.04 to +0.12 in the faint dust
+  quartiles with exact templates and the true T (the F26 leakage); recorded as invalid, kept as
+  the F26 illustration; the script now warns. Pass 3 reproduces the E028 stage A scans exactly.
+- Earlier today: E028 stage A' read (F36, see below); the Gibbs check reads the hyperprior width
+  from the chain's parameter file and warns on T-model mismatches; Paper A outline has the
+  T-model section and Table 3; questions re-ranked.
+
+**Running**
+- `gmrf16_cs_mumap_nc_Tmap_mu03` (E030 chain: cs templates, sd 0.3, oracle T map; from 21:49,
+  about 6 h): pre-registered in the E030 record (D025 with cs templates; bright dust z within
+  0.5 of beta_d; bright sync between 0 and +0.09 against the reference; faint quartiles against
+  the shrinkage prediction; RMSEs against E026 cs_mumap and stage A'; multiplier maps track the
+  realized template error). Driver and log under `/Users/trygvels/data/e023_pysm_n1/e030/`.
+
+**Next**
+- Read the E030 chain (check set as for stage A' with the cs templates), then FINDINGS, Q16,
+  Paper A (the hyperprior-width rule belongs in Sect. 5 with F29, F33, F37).
+- Then Q4 efficiency on the dust hyperparameters, or Q15 if Trygve decides the zero-level model.
+
+**Needs Trygve**
+- The real-data hyperprior default: the code default is sd 0.5; E029/E028 argue for 0.1 with
+  exact templates and E030 says the width must match the template error (0.3 for a cs-quality
+  template). Proposal: make the width a per-component parameter set from the template's
+  estimated region-scale error, no fixed default.
+- Unchanged: the 14-band simulation for E028 stage C; the Paper A reporting rule for
+  prior-dominated fields (D025/D027); earlier items.
+
 ## 2026-11-08 (Mac mini, 19:50): E028 stage A' read (F36: oracle T map plus sd 0.1 has no likelihood bias; the faint dust quartiles are the field prior's interpolation); E028 stages A, A', B closed
 
 **Learned**

@@ -297,6 +297,14 @@ original numbering.
   one. E028 stages A, A', B are closed: the T model is needed on the dust side, the scalar T is
   not a substitute (F35), and the level of prior-dominated regions is a reporting question
   (D025). Stage C (T field with 545 and 857 GHz, 14-band simulation) needs Trygve's go.
+- **Status 2026-11-08, 21:55 (E030 scans, F37):** the multiplier hyperprior width must be at
+  least the template error's scale. With a 30 percent cs template the tight sd 0.1 (F33, F36)
+  biases the data-dominated sync quartile by +0.21 and the dust quartile by -0.02 (tens of
+  nats); the matched sd 0.3 leaves bright dust at zero and bright sync +0.07, and costs under
+  0.05 with an exact template. The faint half is set by the template error and the GMRF prior
+  at every width (F28 qualified). The width follows the template quality on real data (a
+  default choice for Trygve). A chain with the cs templates at sd 0.3 and the oracle T map is
+  running (read with the field prior; done about 2026-11-09 04:00).
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is
