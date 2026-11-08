@@ -406,3 +406,28 @@ the real-data configuration anyway.
 read against a beta reference would measure the prior centre (the review's point). Sampling T
 per pixel: not supported by the region kernel and worse identified. Fixing T from an external
 map on real data: this is stage A's mechanism and remains the fallback (Planck GNILC T).
+
+## D027 (2026-11-08): E028 stages A, A' and B closed; stage C waits for Trygve; per-quartile index tolerances are likelihood-bias criteria and prior-dominated quartiles are read against the shrinkage prediction
+
+**Decision.** E028 stages A (oracle T, sd 0.5; F34), A' (oracle T, sd 0.1; F36) and B (scalar
+T, sd 0.1; F35) are closed. Stage C (sampled T field at T nside 4 to 8 on a 14-band simulation
+with 545 and 857 GHz) is not started until Trygve decides whether the simulation is worth
+building. Pre-registered per-quartile index tolerances (such as "within 0.03 of beta_d in
+every quartile") are read as likelihood-bias criteria: in a quartile whose region Fisher sd is
+far above the field sigma, the posterior is the GMRF's interpolation and the quartile is read
+against the independent-region shrinkage prediction and recorded as prior-dominated (D025).
+Long-running driver scripts, their logs and helper scripts live under the data directory, and
+waiters poll chain files, not log lines.
+
+**Why.** Stage A' met every criterion that measures the likelihood (bright dust +0.010, z
++0.42; multiplier maps 1.002 and 0.999; sync within 0.013 of E029; D025 pass) and missed the
+0.03 tolerance by 0.003 and 0.001 in the two prior-dominated quartiles whose true means sit
+0.04 below the field mean; the shrinkage prediction reproduces the pattern and the exact
+marginal of the model has its optimum at zero in every quartile. Reading that miss as a method
+defect would be wrong; silently passing it would hide what Paper A must report. The stage A'
+checks were lost for five days because the scratchpad under /private/tmp was cleaned.
+
+**Alternatives considered.** Loosening the tolerance after the fact: rejected, the miss is
+recorded as a miss with the mechanism. Running stage C now on the 7-band simulation: rejected
+by D026 (unidentifiable). Starting the 14-band simulation on my own: it is a plan change with
+real cost and a new reference construction, so it waits for Trygve.

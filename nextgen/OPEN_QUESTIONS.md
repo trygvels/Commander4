@@ -275,6 +275,15 @@ original numbering.
   degeneracy-weighted compromise (the sky's dust-weighted T is 22.6 K); the code path is
   validated for stage C. Stage A' (oracle T, sd 0.1) is running (from 15:06) against the
   prediction `bd_trueT` in every quartile.
+- **Status 2026-11-08, 19:50 (E028 stage A', F36):** with the oracle T map and sd 0.1 there is
+  no likelihood bias: bright dust at beta_d (+0.010, z +0.42), mu_d map 1.002, sync at E029's
+  level plus the predicted +0.013, dust pixel RMSE 0.038 against E029's 0.056. The fainter
+  three dust quartiles are the GMRF's interpolation (+0.03 where the quartile's true mean sits
+  0.04 below the field mean; the shrinkage prediction matches), so the pre-registered 0.03
+  per-quartile tolerance is missed by 0.003 in Q2 and Q3 for a prior reason, not a likelihood
+  one. E028 stages A, A', B are closed: the T model is needed on the dust side, the scalar T is
+  not a substitute (F35), and the level of prior-dominated regions is a reporting question
+  (D025). Stage C (T field with 545 and 857 GHz, 14-band simulation) needs Trygve's go.
 - **Status 2026-10-30, later (E025, F28, D023):** a free template multiplier per nside-16 region
   makes the hier target close to unbiased for a smooth 30 percent template error at both
   depths and both components (within 0.02 at 0.03 x, insignificant at 1 x); the global law is

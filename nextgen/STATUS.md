@@ -2,6 +2,48 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-08 (Mac mini, 19:50): E028 stage A' read (F36: oracle T map plus sd 0.1 has no likelihood bias; the faint dust quartiles are the field prior's interpolation); E028 stages A, A', B closed
+
+**Learned**
+- E028 stage A' (`gmrf16_exact_mumap_nc_Tmap_mu01`, E029's chain with the true nside-16 T map;
+  finished 3 Nov 20:37 after 5.5 h, 31 gradients per iteration, 0 divergences; read 8 Nov
+  because the armed check set was lost when macOS cleaned the session scratchpad): D025 passes
+  (KS p 0.68, 0.69). Pre-registered: sync within 0.03 of E029 passes (+0.013, the shift the
+  scan predicted); bright dust z within 0.5 of beta_d passes (+0.010, z +0.42); mu_d map
+  1.00 +- 0.01 passes (1.002); "every dust quartile within 0.03" misses by 0.003 and 0.001 in
+  Q2 and Q3 (+0.033, +0.031; Q1 +0.010, Q4 +0.003). Dust pixel RMSE 0.038 against E029's
+  0.056 (floor 0.019); GLS CMB residual 93.08 uK (E029 94.52, floor 93.18; reported only).
+- The Q2 and Q3 offsets are the GMRF prior's: the quartiles' true means are 1.523 and 1.516
+  against a field mean of 1.558 +- 0.012, their region Fisher sd (0.27, 0.66) is far above the
+  field sigma (0.049), and the independent-region shrinkage prediction gives +0.035, +0.042,
+  +0.010 against the observed +0.033, +0.031, +0.003. The exact marginal has its optimum at
+  zero in every quartile, so this is prior-dominated interpolation, not a likelihood bias
+  (D025 reporting item), recorded as a marginal miss with the mechanism, not as a pass (D027).
+- The scalar-T chain (stage B) agrees with the oracle-T chain to 0.014 per quartile, so F35's
+  "within 0.03 of beta_d by cancellation" is this same pattern seen through a 1.7 K lower T.
+- Process: nohup driver scripts, logs and helpers now go under the data directory and waiters
+  poll chain files (memory note written); `hyper_ess.py` is in `nextgen/scripts/`.
+
+**Running**
+- Nothing.
+
+**Next**
+- Paper A section on the T model from E028 stages A, A', B (F34, F35, F36): the oracle-T
+  result as the unbiased configuration, the scalar T as a degeneracy-weighted compromise, the
+  prior-dominated faint sky reported against the shrinkage prediction.
+- Should-fix left from the stats review: `e026_conditional_check.py --mu-sd` should read the
+  parameter file instead of defaulting to 0.5.
+- Then back to the Q ranking for the next experiment that does not need the 14-band simulation.
+
+**Needs Trygve**
+- Whether to build the 14-band simulation (545 and 857 GHz) for E028 stage C, the T field at
+  T nside 4 to 8: F35 says the scalar T is not a substitute, F36 says the T model is what
+  moves the dust RMSE from 0.056 to 0.038 on this sky.
+- Unchanged: the multiplier hyperprior default sd 0.1 together with the T model; the Paper A
+  reporting rule for prior-dominated fields (D025, now with the F36 shrinkage prediction as
+  the reporting device); earlier items (E022 presentation, COMP_CL_TYPE semantics, hier
+  default, Q15 zero-level, D021 CMB prior width).
+
 ## 2026-11-03 (Mac mini, 15:29): E028 stage B read (F35: the sampled scalar T is exact and lands at its own law's optimum); stage A' running
 
 **Learned**

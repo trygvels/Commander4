@@ -698,3 +698,27 @@ Consequence: the sampled-T code path is validated at realistic noise (the L3 run
 stage C T field), and a scalar T is a degeneracy-weighted compromise, not the sky's dust
 temperature; the spatial T model with 545 and 857 GHz remains the structural fix. Scope: one
 sky, one noise realization, exact templates.
+
+**F36. With the oracle dust temperature map and the tight multiplier hyperprior N(1, 0.1^2),
+the hier collapsed index-field chain has no likelihood bias in either component at realistic
+noise: the bright dust quartile is at beta_d (+0.010, z +0.42), the multiplier maps are at
+1.002 and 0.999, sync is at E029's level plus the predicted +0.013; the fainter dust quartiles
+sit up to +0.03 above beta_d where the GMRF prior interpolates, and an independent-region
+shrinkage prediction reproduces the pattern (+0.035, +0.042, +0.010 predicted against +0.033,
++0.031, +0.003 observed in Q2 to Q4)** (E028 stage A', `gmrf16_exact_mumap_nc_Tmap_mu01`:
+E029's chain with the nside-16 truth T map in the dust SED; 5.5 h, 700 post-burn draws, 31
+gradients per iteration, 0 divergences; D025 passes, KS p 0.68 and 0.69). Dust pixel RMSE
+against the PySM truth 0.038 against E029's 0.056 (floor 0.019); the GLS CMB residual 93.08 uK
+(E029 94.52, floor 93.18; not a criterion). Pre-registered criteria: sync within 0.03 of E029
+pass, bright dust z within 0.5 pass, mu_d map 1.00 +- 0.01 pass, "every dust quartile within
+0.03 of beta_d" missed by 0.003 and 0.001 in Q2 and Q3. The miss is the field prior's: the true
+quartile means are 1.570, 1.523, 1.516, 1.548 while the field mean is 1.558 +- 0.012 and the
+region Fisher sd in Q2 to Q4 (0.27 to 2.1) is far above the field sigma (0.049), so those
+regions are the GMRF's stationary interpolation; the exact marginal of the same model has its
+optimum at zero in every quartile (stage A scan, sd 0.1). The scalar-T chain (F35) agrees
+with this one to 0.014 per quartile. Consequence: on this sky the T model plus the tight
+hyperprior is the unbiased configuration (the T model is what moves the dust RMSE from 0.056
+to 0.038 against E029), what remains is prior-dominated interpolation at the field mean, and
+that is a Paper A reporting item (D025), not a method defect; a per-quartile tolerance of 0.03
+is not a usable criterion where the quartile's true mean sits 0.04 from the field mean. Scope:
+one sky, one noise realization, exact templates, oracle T map.

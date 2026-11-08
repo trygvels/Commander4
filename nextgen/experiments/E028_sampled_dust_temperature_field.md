@@ -402,4 +402,71 @@ beta-T degeneracy; a scalar T cannot remove a bias from spatial T variation, and
 within-0.03 agreement with beta_d here is a cancellation. Stage C (T field with 545 and 857
 GHz) remains the structural answer; stage B is its L3 rung.
 
+**Stage A' (oracle T map, sd 0.1), read 2026-11-08 19:40 to 19:50.** Chain
+`gmrf16_exact_mumap_nc_Tmap_mu01`, 1200 iterations in 5.5 h (2026-11-03 15:06 to 20:37), 700
+post-burn draws, 31 gradients per iteration, 0 divergences, no tracebacks. The chain finished
+on 3 Nov but its armed check set never ran: the driver log it polled for had been removed from
+the session scratchpad by the macOS temp cleanup (found 8 Nov 19:40); the checks were run
+19:41 to 19:44 on the completed chain (`E028/stageAprime_*.txt`). The reading is five days
+late and otherwise unaffected: chain and pre-registration are as written on 3 Nov.
+
+*Validity.* D025 against the T-map target (K = 100, `--t-map --mu-sd 0.1`,
+`stageAprime_conditional_check_Tmap_target.txt`): sync KS p 0.68 (mean CDF 0.512, optimum
+-0.02 conditional sd from the draws), dust p 0.69 (mean 0.515, optimum -0.04 sd).
+
+*Pre-registered criteria.* (1) Sync within 0.03 of E029: field mean -2.967 +- 0.029 against
+-2.981 (+0.013); quartiles against the reference -0.015, +0.010, +0.028, +0.029 against
+E029's -0.028, -0.004, +0.014, +0.016, a uniform +0.013 to +0.014, which is the +0.01 shift
+the sd-0.1 T-map scan predicted for the sync level; Fisher-weighted level -2.986 (E029
+-3.000, truth -2.988). Pass. (2) Dust against `bd_trueT` (`stageAprime_dust_vs_refs.txt`):
++0.010, +0.033, +0.031, +0.003 by quartile (z median +0.42, +0.81, +0.61, +0.04; E029:
+-0.048, -0.017, -0.022, -0.045; stage A: +0.047, +0.095, +0.098, +0.066). Bright z within
+0.5: pass. Every quartile within 0.03: Q1 and Q4 pass, Q2 and Q3 miss by 0.003 and 0.001
+(Monte Carlo error of a quartile mean 0.0001). (3) mu_d map 1.0016 +- 0.0017 (1.004, 1.002,
+1.000, 1.000 by quartile), sync 0.999: pass. (4) GLS CMB residual, reported and not a
+criterion (`stageAprime_cmb_attribution_Tmap.txt`): 93.08 uK with the T-map GLS at the
+posterior-mean fields (E029 94.52, true-SED floor 93.18, stage A 92.45); E029's dust field
+in place of this chain's raises it to 95.03, `bd_trueT` everywhere gives 93.57.
+
+*Where the +0.03 comes from (`stageAprime_quartile_shrinkage.txt`).* The quartile means of
+`bd_trueT` are 1.570, 1.523, 1.516, 1.548 (sky mean 1.539); the chain's field mean mu_d is
+1.558 +- 0.012 with sigma_d 0.049. The region Fisher sd at the true amplitudes is 0.06 in Q1
+and 0.27, 0.66, 2.1 in Q2 to Q4, so the fainter three quartiles are prior-dominated and the
+per-region posterior is the GMRF's interpolation. The independent-region shrinkage
+prediction (ref/fs^2 + mu/sigma^2)/(1/fs^2 + 1/sigma^2) gives +0.035, +0.042, +0.010 in Q2
+to Q4 against the observed +0.033, +0.031, +0.003, and -0.003 in Q1 against +0.010 (spatial
+correlation with the bright neighbours is ignored). The offsets follow mu_d minus the
+quartile's reference mean (+0.036, +0.042, +0.010): they are the field prior's stationary
+mean, as E027 found for the faint sky, not a likelihood bias. The exact marginal of this
+model has its optimum at zero in every quartile (the sd-0.1 T-map scan above) and the chain
+is a valid draw from the target (D025). The pre-registered 0.03 tolerance was written for a
+likelihood bias and is too tight for prior-dominated quartiles whose true means differ from
+the field mean by 0.04; recorded as a marginal miss with the mechanism identified, not as a
+pass.
+
+*Against stage B.* The scalar-T chain's posterior-mean dust field is 0.014, 0.004, 0.007,
+0.005 lower per quartile (rms over regions 0.028, below the region posterior sd): the two
+T-correct chains agree within the posterior width, and stage B's within-0.03 against beta_d
+is this shrinkage pattern seen through a 1.7 K lower T (F35).
+
+*Against E029 (fixed T, same hyperprior; `stageAprime_e020_analysis.txt`).* Dust pixel RMSE
+against the PySM truth 0.038 against 0.056 (floor 0.019); dust |z_w| < 1 0.76 against 0.70;
+sync RMSE 0.066 against 0.061 (+0.005 +- 0.0006 by block bootstrap, the +0.013 level shift);
+GLS CMB residual 93.18 per draw against 94.63.
+
+*Mixing.* Dust region ESS min 56, median 277 (E029 35, 136; stage B 76, 602); dust field
+hyperparameters ESS 21 to 41 (log_sigma 21, the slowest coordinate); sync region ESS min
+116, median 615; multiplier hyperparameters 235 to 728; 31 gradients per iteration (stage B
+62).
+
+*Reading.* With the true T map and the tight hyperprior the hier collapsed index-field
+posterior has no likelihood bias in either component at realistic noise: the dust index is
+at beta_d where the data constrain it (bright quartile +0.010, z 0.4), the multiplier maps
+are at 1.00, sync is at E029's level plus the predicted +0.01. The 0.03 structure left in the
+faint dust quartiles is the GMRF's stationary mean, which is what Paper A has to report as
+prior-dominated (D025 rule). The T model is what separates this chain from E029 on the dust
+side (RMSE 0.038 against 0.056), and the scalar T reproduces it to 0.01 per quartile on this
+sky for the wrong reason (F35). Stages A, A' and B of E028 are closed; stage C (the T field
+with 545 and 857 GHz) is the structural follow-up and needs the 14-band simulation.
+
 ## Follow-ups

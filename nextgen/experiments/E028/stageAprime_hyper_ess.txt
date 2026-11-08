@@ -1,0 +1,13 @@
+gmrf16_exact_mumap_nc_Tmap_mu01: 1200 files, 700 post-burn
+  Synchrotron/index_field/mu               mean -2.96729 sd 0.02852 ESS   244.9
+  Synchrotron/index_field/log_sigma        mean -2.90269 sd 0.80651 ESS    76.8
+  Synchrotron/index_field/u                mean +0.52363 sd 1.76589 ESS    84.9
+  Synchrotron/amp_prior/mu                 mean +0.99914 sd 0.00174 ESS   728.0  (map mean)
+  Synchrotron/amp_prior/log_s              mean -3.34451 sd 0.37079 ESS   234.5
+  ThermalDust/index_field/mu               mean +1.55833 sd 0.01192 ESS    40.7
+  ThermalDust/index_field/log_sigma        mean -3.02966 sd 0.17652 ESS    21.2
+  ThermalDust/index_field/u                mean +0.24004 sd 0.32400 ESS    23.5
+  ThermalDust/amp_prior/mu                 mean +1.00164 sd 0.00165 ESS   687.3  (map mean)
+  ThermalDust/amp_prior/log_s              mean -3.81306 sd 0.08789 ESS   625.7
+  dust beta_map: 3072 regions, ESS min 56 5% 101 median 277
+  sync beta_map: 3072 regions, ESS min 116 5% 240 median 615

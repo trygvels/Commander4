@@ -1,0 +1,10 @@
+stage A' dust field: mu 1.5583, sigma 0.0491; bd_trueT mean 1.5392; per-quartile bd_trueT means 1.5699 1.5226 1.5159 1.5481
+independent-region shrinkage prediction: pm_pred = (ref/fs^2 + mu/sigma^2)/(1/fs^2 + 1/sigma^2), fs = region Fisher sd at the true amplitudes, sigma = posterior-mean field sigma (spatial correlation ignored)
+quartile  chain-ref  pred-ref  mu-ref  median w  median fs  median post sd
+  Q1    +0.0100   -0.0034  -0.0116   0.40     0.060     0.031
+  Q2    +0.0333   +0.0346  +0.0357   0.03     0.274     0.042
+  Q3    +0.0309   +0.0421  +0.0424   0.01     0.657     0.049
+  Q4    +0.0025   +0.0102  +0.0102   0.00     2.118     0.052
+all sky  chain-ref +0.0192  pred-ref +0.0209
+MC error of a quartile mean of the posterior mean (sd/sqrt(ESS 277)/sqrt(768), regions treated as independent): 0.00010
+stage B (scalar T) minus stage A' (oracle T map) posterior-mean dust per quartile: -0.0142 -0.0038 -0.0071 -0.0049; rms over regions 0.0275
