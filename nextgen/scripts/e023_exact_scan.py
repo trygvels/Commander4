@@ -385,6 +385,9 @@ def main():
     say(f"E023 exact-target scans (v2) on {D}: nside {nside}, noise scale {float(t['noise_scale'])}, CMB prior sd {CMB_SD:g}, "
         f"T_fixed {T_fixed:.3f} K; truth sd beta_s {np.asarray(t['beta_s']).std():.4f}, "
         f"beta_eff3 {np.asarray(t['beta_eff3']).std():.4f}, beta_d {np.asarray(t['beta_d']).std():.4f}")
+    if float(t["noise_scale"]) >= 0.5 and CMB_SD < 1e3:
+        say(f"  WARNING: per-pixel CMB prior sd {CMB_SD:g} uK at realistic noise leaks the CMB realization into the "
+            "collapsed index target (F26); the chains and the E025 to E030 scans use --cmb-sd 10000")
     # quartiles from the template-based Fisher sd (real-data computable)
     qs16 = quartiles(fisher_sd_regions("sync", g_data["sync"], np.full(npix, PRIOR_MEAN["sync"]), rms, np.full(npix, T_fixed), reg, nreg))
     qd16 = quartiles(fisher_sd_regions("dust", g_data["dust"], np.full(npix, PRIOR_MEAN["dust"]), rms, np.full(npix, T_fixed), reg, nreg))

@@ -63,7 +63,50 @@ Pre-registered predictions (written before the runs):
 ```
 
 ## Result
-(pending)
+**Setup error in passes 1 and 2 (found 21:15).** Both passes ran with the scan script's default
+per-pixel CMB prior sd of 100 uK (`--cmb-sd` not given; header line "CMB prior sd 100"), not
+the 1e4 uK of the chains, of every E025 to E028 scan and of the Target section above. At
+realistic noise a finite per-pixel CMB prior leaks the correlated CMB realization into the
+collapsed index target (F26), and the exact-template sd 0.1 cell, which gives 0.000 in every
+dust quartile with sd 1e4 (E028 stage A), gives +0.04, +0.12, +0.10 in Q2 to Q4 with sd 100
+(`scan2_sd01.txt`): that is the size of the F26 leakage with exact templates and the true T on
+this realization, not a property of the hyperprior. Passes 1 and 2 are therefore not readings
+of the stated target; their files are kept (`scan_sd*.txt`, `scan2_sd*.txt`) as the F26
+illustration and nothing below is concluded from them. Pass 3 (`run_e030_scans3.sh`, launched
+21:16) repeats pass 2 with `--cmb-sd 10000`; the scan script now prints a warning when the CMB
+prior is finite at realistic noise.
+
+**Pass 1 (20:31 to 20:44; CMB prior sd 100, invalid, see above; `scan_sd03.txt`, `scan_sd01.txt`, `scan_sd05.txt`; the script's default
+scan set, per-quartile shifts of both components over [-0.1, 0.1]).** Argmax shift of the
+expected target against the mapT reference per S/N quartile (Q1 bright to Q4 faint); "e" marks
+an argmax at the scan edge (the optimum is beyond 0.1), with the gain over zero in nats:
+
+| cell | sd | d_Q1 | d_Q2 | d_Q3 | d_Q4 | s_Q1 | s_Q2 | s_Q3 | s_Q4 |
+|---|---|---|---|---|---|---|---|---|---|
+| exact (E028 stage A) | 0.1 | 0.000 | 0.000 | 0.000 | 0.000 | (s_all +0.01) | | | |
+| exact | 0.3 | 0.000 | +0.05 (3.6) | +0.10e (4.8) | +0.06 (0.7) | +0.10e (7.2) | +0.10e (1.2) | -0.09 (0.4) | -0.10e (2.7) |
+| exact (E028 stage A) | 0.5 | +0.01 | +0.10e (12) | +0.09 | +0.07 | (s_all +0.08) | | | |
+| cs | 0.1 | **-0.020 (24.5; 8 curvature sd)** | +0.09 (21) | +0.10e (18) | +0.10e (8.5) | **+0.10e (31)** | +0.10e (6.6) | +0.10e (3.2) | +0.02 (0.05) |
+| cs | 0.3 | 0.000 | +0.04 (2.5) | +0.10e (8.2) | +0.10e (4.6) | +0.10e (11) | +0.10e (4.0) | +0.10e (1.4) | -0.10e (0.7) |
+| cs | 0.5 | 0.000 | +0.06 (4.2) | +0.10e (5.9) | +0.10e (2.1) | +0.10e (14) | +0.10e (4.6) | +0.10e (1.2) | -0.10e (1.4) |
+
+Profiled scatters s_q at the reference: exact sd 0.3 dust [0.025, 0.057, 0.108, 0.146], cs sd 0.3
+dust [0.067, 0.060, 0.108, 0.144], cs sd 0.1 dust [0.071, 0.146, 0.201, 0.177] and sync [0.077,
+0.239, 0.283, 0.409] (the misspecified tight prior pushes the template error into the scatters).
+
+Reading of pass 1 against the predictions (superseded: CMB prior sd 100). (3) appeared confirmed in the strongest form: with the cs
+template and sd 0.1 the data-dominated dust quartile is biased by -0.020 (8 curvature sd, 24.5
+nats; the only cell in E025 to E030 that moves d_Q1 off zero with the true T), the faint dust
+quartiles are pushed +0.09 and beyond, and the bright sync quartile is pushed beyond +0.1 (31
+nats). (2) holds for the bright dust quartile (0.000 at sd 0.3 with either template) and the
+faint quartiles are within 0.02 of the exact cell where both are inside the scan range (d_Q2
++0.04 against +0.05); the faint quartiles hit the edge. (1): the exact template at sd 0.3 carries
+an Occam push of +0.05 to +0.10 in the faint dust quartiles, between sd 0.1 (zero) and sd 0.5
+(+0.07 to +0.10), and the sync quartiles move by 0.1 or more in both directions, which the
+whole-sky s_all of E028 (+0.01 at sd 0.1, +0.08 at sd 0.5) did not show. Several optima lie
+beyond the scan range, so a second pass over [-0.3, 0.3] with the stage A scan set and the
+per-quartile sync scans at every width (both templates) was launched at the time stamped in
+the log (`run_e030_scans2.sh`) before any conclusion is drawn.
 
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
