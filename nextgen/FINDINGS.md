@@ -1,6 +1,6 @@
 # Findings so far
 
-F1 to F11 date from the exploratory session of 2026-10-25. F12 to F43 were added as experiments
+F1 to F11 date from the exploratory session of 2026-10-25. F12 to F44 were added as experiments
 closed, through 2026-11-09. Experiment IDs refer to `experiments/registry.md`. Numbers are from
 simulations unless stated.
 
@@ -65,6 +65,7 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F39, F40 | B | One sky; Fisher at the truth |
 | F41 | A for the floor, B for the order | Real maps and one simulated CMB |
 | F42, F43 | A | Code facts |
+| F44 | A for the flat-prior shift and the calibration of the profile at real depth, B for the rest | Exact grids, 100 noise realizations per cell, one sky |
 
 ## 1. Sampler correctness
 
@@ -1051,3 +1052,39 @@ records attribute its value of 50 to 100 to the alm representation alone, which 
 the residual passed to a group when an index-field component is held fixed, the `conditional`
 likelihood, and the sky handed to the TOD side. No recorded result uses any of the four. The fix
 is queued behind the E032 chains.
+
+**F44. For signed Q/U amplitudes at real WMAP/LFI depth the profile likelihood and a zero-mean
+amplitude prior with one free scale per index region give calibrated region indices without any
+template, while the flat-prior marginal is shifted by ln(nu_ref / nu_pivot) times the index
+variance of a single amplitude, 0.06 to 0.9 with a sign and size set by the reference frequency
+and by the CMB prior** (E036: exact grid posteriors for one index per region, no sampler; truth
+amplitudes from the DR1 polarized synchrotron map at 5 deg and nside 16, one index over the sky,
+real Q/U white noise of WMAP K, Ka, Q and LFI 30, 44; 100 noise realizations per cell; predictions
+written before each stage). At real depth with synchrotron only (median S/N per element 4.45) the
+profile and the zero-mean prior have mean z within 0.11, sd of z 0.97 to 1.10 and 68 percent
+coverage 0.64 to 0.72, for 48 regions of 128 amplitudes and for 192 regions of 32, down to region
+index errors of 0.4. The flat-prior marginal sits at -0.061 (reference 23 GHz), +0.062 (30 GHz)
+and +0.34 (60 GHz) for an index error of 0.06, and at -0.40 and +0.34 for 0.16; the formula gives
+0.118 for the difference between 23 and 30 GHz against the measured 0.122, and the shift does not
+average down with the number of amplitudes that share the index. Noise ladder: at twice and four
+times the noise (S/N 2.2 and 1.1) the profile stays calibrated (sd of z 1.00 to 1.09) except in
+the faintest class of the 30 degree regions (1.27 and 1.40, coverage 0.60 and 0.58), and the
+free-scale prior shows mean z -0.30 in one class at four times the noise, which a scale map
+removes even when it carries a 30 percent error. With a free CMB and a free dust amplitude per
+element under flat priors the index error grows by 1.63, the profile and the zero-mean prior stay
+calibrated (mean z within 0.08, sd of z 0.91 to 1.08), and the pivot of the flat-prior shift
+moves to the lowest band: +0.006 at 23 GHz and +0.17 at 30 GHz for an index error of 0.064, +0.86
+for 0.13. With a Gaussian CMB prior of 0.2 uK the index error returns to the synchrotron-only
+value (0.059 against 0.060) and the pivot to 26.4 GHz. With the truth moved off the grid centre
+(-2.8, -3.4) nothing changes below a region index error of 0.25; above it the posterior mean
+reverts 13 percent toward the centre. Three of my predictions failed, all in the same direction:
+I expected the profile to under-cover at real depth, at twice and at four times the noise, and it
+did so only in one class. Consequences: the flat-prior marginal, which is what a Gibbs sampler
+with flat amplitude priors targets (F15), is not a usable target for a polarized index at any
+reference except by accident of the pivot; E022's +0.27 in the Spur at a 30 GHz reference with a
+free CMB amplitude is this effect on real data; the amplitude prior of the polarized track is
+the profile with a sandwich width or the per-region zero-mean prior, with a CMB prior the size of
+the signal (D029); no template is needed, so the template-error findings F21 to F38 do not arise
+there. Scope: white noise, one index over the sky, a truth amplitude field that is a posterior
+mean of real data, no dense covariance; the sandwich factor was not verified region by region;
+the shared-scale arm is in the E036 record.

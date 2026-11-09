@@ -1,0 +1,1 @@
+# global-scale arms: information pivot 26.03 GHz; scale maps: true local rms (10 deg), and the same times 1.3 at |b| > 30 deg

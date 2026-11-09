@@ -324,7 +324,28 @@ uK_RJ at 353 GHz).
 - The profile and the zero-mean prior stay calibrated: mean z within 0.16, sd of z 0.96 to 1.10,
   coverage 0.65 to 0.71 in every class.
 
-**The third stage.** Pending.
+**Third stage (a), off-centre truths** (`E036/coverage_truth_m28.txt`, `coverage_truth_m34.txt`,
+finished 00:21 and 00:26; synchrotron only, real depth, 100 realizations each).
+
+| regions | class | profile shift at truth -2.8 / -3.1 / -3.4 | zero-mean, free scale | profile sd of z |
+|---|---|---|---|---|
+| nside 2 | 0.03 to 0.1 | -0.002 / -0.002 / -0.003 | +0.001 / -0.002 / -0.006 | 0.97 / 0.97 / 0.97 |
+| nside 2 | 0.1 to 0.25 | -0.021 / -0.019 / -0.018 | -0.014 / +0.002 / -0.020 | 1.07 / 1.05 / 1.05 |
+| nside 4 | 0.03 to 0.1 | -0.002 / -0.002 / -0.002 | -0.002 / -0.002 / -0.003 | 0.99 / 0.99 / 0.99 |
+| nside 4 | 0.1 to 0.25 | -0.012 / -0.012 / -0.011 | -0.013 / -0.013 / -0.013 | 1.01 / 1.01 / 1.01 |
+| nside 4 | above 0.25 | -0.089 / -0.051 / -0.010 | -0.101 / -0.053 / -0.001 | 1.08 / 1.08 / 1.07 |
+
+- **H1 pass.** In the classes below 0.25 nothing moves with the truth: shifts agree to 0.003 for
+  the profile, and the one value outside +-0.02 (-0.021) is the same at all three truths.
+- **H2 pass.** In the class above 0.25 the shift follows the distance of the truth from the grid
+  centre, -0.089, -0.051, -0.010, a reversion of about 13 percent on top of a skew of -0.05. So
+  the calibration of the data-dominated classes does not come from the truth sitting at the
+  centre, and the numbers of the faintest class are prior-dependent, as the challenge said.
+- The flat-prior marginal behaves the same at all three truths. For the 24 high-latitude regions
+  at nside 2 with Fisher sd below 0.25 it is -0.22 / +0.15 at references of 23 / 30 GHz for a
+  truth of -2.8 and -0.18 / +0.19 for -3.4, against -0.011 and -0.010 for the profile.
+
+**Third stage (b), the shared-scale arm.** Pending.
 
 ## Negative control
 
