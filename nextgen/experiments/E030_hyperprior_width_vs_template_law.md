@@ -512,6 +512,35 @@ below +0.2 (from beyond +0.3), because the intermediate regions, which produce t
 gain multiplier constraint from the 23 GHz data; dust optima within 0.02 of the old ones in
 Q1 and Q2 and otherwise unchanged.
 
+**Chain 3 (queued 2026-11-09 13:14 behind the pass 6 rerun; `gmrf16_cs_mumap_nc_Tmap_mu03_ref23`;
+driver, log and check set `run_e030_chain3*.sh` in the data dir, outputs `E030/chain3_*.txt`):**
+chain 1's parameter file with the amplitude and template reference moved to the leading band
+(`nu_ref` 23 GHz for sync, 353 GHz for dust) and the cs templates moved with the true per-pixel
+SEDs through Commander4's own `get_sed` (`template_sync_cs_23GHz.fits`,
+`template_dust_cs_353GHz.fits`; the per-pixel log error a / g is unchanged to 3e-16, the
+realized exp(-f) region means to 0.002 sync and 0.006 dust from the template weighting). Matched
+width 0.3, oracle T map, otherwise identical to chain 1, so the only change is where the
+template pins the amplitude. The check set is chain 2's with the conditional check at the new
+reference (`--nu-ref-sync 23 --nu-ref-dust 353`, new options) and the multiplier comparison
+against a / g at the template frequency; the S/N quartiles and Fisher weights stay those of the
+30 and 545 GHz reference (`refs_nside16.npz`) so that the quartile numbers are comparable
+across chains. Pre-registered before it is read, from pass 7 and the F38 mechanism: (i) D025
+passes. (ii) The discriminating prediction: if the F38 field-mean displacement is the template's
+through the lever arm, the sync field mean returns to within 0.10 of -3.00 (chain 1 -2.70,
+stage A' exact -2.967), the faint sync quartiles sit within +-0.10 of the region reference
+(chain 1 +0.31 to +0.37), sigma_s falls below 0.25 (chain 1 0.51, exact 0.07) and the sync pixel
+RMSE below 0.20 (chain 1 0.43); if the displacement is the GMRF-hyperprior interplay independent
+of the reference, the field mean stays within 0.1 of -2.70 and sigma_s near 0.5. (iii) The
+data-dominated sync: the hundred brightest regions by Fisher weight within +-0.05 of the
+reference (chain 1 +0.09; pass 7 Q1 -0.04). (iv) Dust unchanged within 0.03 per quartile from
+chain 1 (+0.004, +0.032, +0.059, +0.023), field mean 1.57 +- 0.02, sigma_d 0.17 +- 0.05, dust RMSE
+0.12 +- 0.02, because the dust lever arm hardly moved (pass 7). (v) The sync multiplier maps
+track the realized error beyond the bright quartile: Q2 correlation above 0.6 (chain 1 +0.37)
+and rms against exp(-f) below 0.20 (chain 1 0.277), since the 23 GHz data pin the multipliers
+once the index cannot tilt the residual away; dust multiplier maps unchanged (Q1 +0.86, Q2
++0.44). (vi) GLS CMB residual at the posterior-mean fields below 94.0 uK (chain 1 96.4, stage
+A' 93.1; chain 1's attribution put the excess in the sync field).
+
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
 sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the control for

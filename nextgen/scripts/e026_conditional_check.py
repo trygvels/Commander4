@@ -25,6 +25,8 @@ ap.add_argument("--t-map", default=None, help="fixed per-region dust T map (FITS
 ap.add_argument("--sample-t", action="store_true", help="the chain sampled one scalar log T (E028 stage B): read ThermalDust/T from the draws and scan the log T conditional too")
 ap.add_argument("--t-prior", type=float, nargs=2, default=[2.995732, 0.2], help="mean and rms of the Gaussian prior on log T (K) of the sampled scalar T")
 ap.add_argument("--t-half-width", type=float, default=0.02, help="scan half-width in log T for the sampled scalar T")
+ap.add_argument("--nu-ref-sync", type=float, default=30.0, help="reference frequency (GHz) of the sync amplitudes and template, as in the chain's parameter file (E030 chain 3: 23)")
+ap.add_argument("--nu-ref-dust", type=float, default=545.0, help="reference frequency (GHz) of the dust amplitudes and template (E030 chain 3: 353)")
 a = ap.parse_args(); sys.argv = [sys.argv[0]]
 import numpy as np, healpy as hp, h5py
 from scipy.stats import kstest
@@ -102,8 +104,9 @@ def comp(cls, name, short, beta0, **sed):
     return cls(p, Bunch(nside=NSIDE, double_precision=True), allocate_empty_alms=True, eval_pol="I", comp_name=name)
 
 cmb = comp(CMB, "CMB", "cmb", 0.0, nu_ref=1e-3); cmb.comp_params.sample_spectral_index = False
-sync = comp(Synchrotron, "Synchrotron", "sync", -3.1, nu_ref=30.0)
-dust = comp(ThermalDust, "ThermalDust", "dust", 1.6, T=T_fixed, nu_ref=545.0)
+sync = comp(Synchrotron, "Synchrotron", "sync", -3.1, nu_ref=a.nu_ref_sync)
+dust = comp(ThermalDust, "ThermalDust", "dust", 1.6, T=T_fixed, nu_ref=a.nu_ref_dust)
+print(f"reference frequencies: sync {a.nu_ref_sync:g} GHz, dust {a.nu_ref_dust:g} GHz")
 if a.t_map:
     tm = hp.read_map(a.t_map, field=0); dust.set_T_map(tm, hp.npix2nside(tm.size)); print(f"fixed T map {a.t_map}: mean {tm.mean():.3f} K")
 if a.sample_t:

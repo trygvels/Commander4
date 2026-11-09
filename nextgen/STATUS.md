@@ -26,9 +26,19 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   faint-half fix is the law (Q18 (b), (d), (e), (f)), not the width.
 
 **Running**
-- E030 pass 6 (log-normal multiplier law, Q18 (d)): gaussian-law quadrature check against pass
-  3, then the ten log-normal scans; pre-registered in the record. Pass 7 (template reference at
-  the leading band, Q18 (f)) queued behind it.
+- E030 pass 7 read (13:07): with the template reference at the leading band (sync 23 GHz) a
+  uniform 30 percent error shifts sync Q1 by -0.02 instead of +0.27 and leaves the faint sync
+  flat instead of beyond +0.3; the realized field's faint sync push disappears (-0.18 to -0.30
+  at 1 to 1.5 nats, from beyond +0.3 at 5.5 to 6.6). Dust unchanged (lever arm 2.3 to 2.1; Q2
+  +0.25 under a uniform error at either reference). Q18 candidate (f) is the fix for sync at
+  the scan level; in Commander4 it is a parameter choice, no code change.
+- E030 chain 3 queued (13:14) behind the pass 6 rerun: chain 1 with the reference and the cs
+  templates at 23 and 353 GHz; pre-registered (sync field mean back within 0.10 of -3.00 if the
+  F38 displacement is the template's through the lever arm; dust unchanged). About 7 h.
+- E030 pass 6 rerunning (13:08) after a wiring bug: the first run never reached the quadrature
+  (the law flags were assigned without a `global` statement; it reproduced the gaussian pass 3
+  to 0.0000 nats in identical time, which was the signal) and is retracted. The check and the
+  log-normal scans run in parallel, about 1.5 h.
 
 **Next**
 - Read passes 6 and 7 against their pre-registrations; close E030 with the final F37/F38
