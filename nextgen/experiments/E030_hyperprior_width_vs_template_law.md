@@ -1,6 +1,6 @@
 # E030: multiplier hyperprior width against the template-error law on component-separation-quality templates
 
-- **Date started / finished:** 2026-11-08 20:31 / scans read 21:55; chain running
+- **Date started / finished:** 2026-11-08 20:31 / scans read 21:55; chains 1 to 3 read by 2026-11-09 21:40; closed 2026-11-09 23:00
 - **Branch and commit:** `nextgen`, 8566e0a (plus the uncommitted Gibbs-check and Paper A edits of the same evening)
 - **Open question addressed:** Q16 (robustness of the hierarchical amplitude prior to the template law); feeds the real-data default of D017/E029
 - **Validation level:** L1 (exact-target scans of the implemented likelihood, no chain)
@@ -566,6 +566,41 @@ once the index cannot tilt the residual away; dust multiplier maps unchanged (Q1
 +0.44). (vi) GLS CMB residual at the posterior-mean fields below 94.0 uK (chain 1 96.4, stage
 A' 93.1; chain 1's attribution put the excess in the sync field).
 
+**Chain 3 result (ran 2026-11-09 14:00:40 to 20:57:15, 1200 iterations, 700 post-burn, 31.0
+gradients per iteration, 0 divergences; outputs `E030/chain3_*.txt` written 20:58 to 21:00; verdict
+written 2026-11-09 23:00).** Hyperparameter ESS: sync field mean 111, log sigma 47, range 224; dust 79, 32,
+21. One chain; its twin (F42) was not written.
+
+| Item | Pre-registered | Chain 3 | Verdict |
+|---|---|---|---|
+| (i) D025 | passes | KS p 0.72 (sync), 0.43 (dust) | pass |
+| (ii) sync field mean | within 0.10 of -3.00 | -3.164 +- 0.049 | fail |
+| (ii) faint sync quartiles against the region reference | within +-0.10 | -0.15 to -0.18 against `bs_trueT` (-0.18 to -0.19 against `bs_fixT`) | fail |
+| (ii) sigma_s | below 0.25 | 0.121 | pass |
+| (ii) sync pixel RMSE | below 0.20 | 0.177 | pass, without weight: a constant field at -3.164 has 0.176 |
+| (ii) alternative (mean within 0.1 of -2.70, sigma_s near 0.5) | | | also false |
+| (iii) hundred brightest sync regions | within +-0.05 | -0.126 (ten brightest -0.093, thirty -0.052, three hundred -0.191) | fail |
+| (iv) dust quartiles against chain 1 | within 0.03 | +0.023, +0.033, +0.016, +0.016 | fail in Q2 by 0.003 |
+| (iv) dust field mean, sigma_d, RMSE | 1.57 +- 0.02, 0.17 +- 0.05, 0.12 +- 0.02 | 1.591, 0.110, 0.084 | fail, fail, fail |
+| (v) sync multiplier maps | Q2 correlation above 0.6, rms below 0.20 | 0.453, 0.270 | fail |
+| (vi) GLS CMB residual | below 94.0 uK | 90.9 | pass, without weight: the total is the noise term (E033) |
+
+Per quartile against the true-T region fit, sync: -0.161, -0.154, -0.165, -0.177; all sky -0.164
+against the independent-region shrinkage prediction -0.162, rms 0.024. Dust: +0.027, +0.065,
++0.075, +0.040. Region calibration, sync: abs(z) below 1 for 27, 26, 33 and 31 percent of the
+regions per quartile. Amplitude scatters 0.056 +- 0.010 (sync) and 0.063 +- 0.002 (dust). Sync
+multiplier map correlation with the realized error 0.72, 0.45, 0.32, 0.25 per quartile.
+
+**The pass 7 reading above was wrong, and the chain 3 pre-registration was built on it.** The
+realized-field scan of pass 7 gave faint-quartile optima of -0.18, -0.24 and -0.30 (the last at
+the scan edge) with gains of 1.0 to 1.5 nats each. The reading called these "flat" and said the
+faint push "is gone". It had changed sign. Summing the four quartile parabolas gives -0.06 for
+the level, as the scan's own s_all does, and -0.23 +- 0.09 for the faint three quartiles
+together: three scans of about one nat each add up to a constraint, which the per-scan reading
+"under a nat and a half, so flat" missed. The chain went where the scan pointed. The lesson for
+every later scan reading: gains are summed over the regions a hyperparameter pools before they
+are called flat, and a pre-registration states the pooled optimum with its error.
+
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
 sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the control for
@@ -617,9 +652,26 @@ displacement F38 goes with it. Pass 6 (log-normal multiplier law, candidate (d))
 faint push grows under it (sync 8 to 11 nats beyond +0.3 against 5.5 to 6.6; dust +0.05 to
 +0.15), and the law's mean multiplier above 1 costs about a nat against an exact template.
 
+Chain 3 (reference at the leading band, read 2026-11-09 evening): the remedy fails. The
+synchrotron field mean moves from -2.70 to -3.16 against a truth of -3.00, the field collapses to
+a near-constant at that mean (sigma_s 0.12), region coverage falls to 27 to 33 percent inside one
+sd, and the hundred brightest regions move from +0.09 to -0.13. The statement of the previous
+paragraph, that pass 7 "removes the template effect in the exact target" and that "the realized
+field's faint push disappears", is withdrawn: the push changed sign and the reading missed it.
+What E030 establishes at noise scale 1 with a 30 percent region-scale template error: no
+hyperprior width (0.1, 0.3, 0.5) and neither reference (30 and 545 GHz, 23 and 353 GHz) gives a
+calibrated field mean; the mean follows the prior-dominated majority and the GMRF carries it into
+every region, to rms 0.024 of an independent-region shrinkage prediction; the sign and size of
+the displacement depend on where the template pins the amplitude. What it does not establish: the
+cause. The lever-arm reading predicted the sign change in the uniform-error scan and failed for
+the chain's size, and the Occam slope of the multipliers is second order at either reference
+(+0.06 and -0.01). Noise scale 1 is 24 to 90 times real intensity noise (E031), so the practical
+weight of all of this rests on E032. FINDINGS: F38 amended, F28 withdrawn at scale 1. The outline
+of Paper A must drop "the remedy is the template reference at the leading band".
+
 ## Follow-ups
+- Done: chain 3 read 2026-11-09 evening (remedy fails; see Conclusion).
 - Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09 04:35; chain 2 (cs, sd 0.5, oracle T) read 12:20; pass 7 read 13:07; pass 6 read 14:06 (candidate (d) dead).
-- Chain 3: cs templates and reference at 23 and 353 GHz (Q18 (f) at the chain level), pre-registration below once the templates exist.
 - Q18: a field-mean hyperprior informed by the data-dominated regions only, or a spatially
   correlated (GMRF) multiplier prior that lets the bright neighbours inform a faint region's
   template error (the cs error field has a 10 deg correlation length the iid N(1, sd^2) ignores).
