@@ -32,7 +32,7 @@ link as `https://arxiv.org/abs/<id>`.
 | 2205.13968 | de Belsunce+ 2022: Gaussian-kernel beta prior with fixed 5 deg correlation; strongly prior dominated |
 | 1811.00479 | Errard & Stompor 2019: ignoring spatial variability biases r by O(0.01) |
 | 0804.2645 | Stompor+ 2009: spectral (profile) likelihood |
-| 0709.1058 | Eriksen+ 2008: Jeffreys prior removes >4 sigma prior-volume bias |
+| 0709.1058 | Eriksen+ 2008: Jeffreys prior; the >4 sigma example (Sect. IV.2) is a bias of the global offset driven by a uniform index prior, not of the index (corrected 2026-11-09 from the novelty check) |
 
 ## Moments and foreground models
 | arXiv | Takeaway |
@@ -97,3 +97,35 @@ link as `https://arxiv.org/abs/<id>`.
 | 2312.09001, 2506.22217 | LiteBIRD sidelobe and bandpass requirements |
 
 Full-read report with section references for the four BeyondPlanck papers above: `research/2026-10-27_beyondplanck_chain_lengths_and_index_sampling.md` (BP I Sects. 9.2 to 11 not reached: no accessible full text; BP XVI not yet read).
+
+## Corrections and additions flagged on 2026-11-09 (verify in the PDF before citing)
+
+From `research/2026-11-09_science_landscape_and_data.md` (Sect. 5) and
+`research/2026-11-09_novelty_check_methods.md`. Both reports are agent summaries. The lines above
+are left as written, with the correction recorded here, because neither version has been checked
+against the papers by a person.
+
+| Entry above | Correction |
+|---|---|
+| 2011.05609 (BeyondPlanck I), "~30% larger errors" | BP XII Fig. 6: 46 percent over white noise, 32 percent over astrophysical-only. Say which |
+| 2011.08503 (BP XV), "widening the prior biases tau" | One qualitative sentence in the paper, no number |
+| 2303.08095 (DR1) | DR1 I states the polarized beta_s prior as N(-3.30, 0.1^2); DR1 III and the released parameter file give N(-3.15, 0.05) with the index drawn from the prior |
+| 2310.13740, "-3.07 +- 0.07 from T-T plots" | That is the K/30 all-sky weighted mean only; the chain's polarized index is a prior draw |
+| 2203.11445 (Weiland 2022) | Q/U correlation fit in nside-8 superpixels, with a documented K against 30 GHz systematic |
+| 2510.17761 (QUIJOTE XIX), "-3.13 (high latitude)" | NPS dominated; Table 1 gives -3.02 +- 0.02 for regions 1 to 14 |
+| 2404.17567 (CLASS 40 GHz), "PTE < 0.001" | Shi et al. 2024; holds for one map pair only (0.01 for the other); the two index maps correlate at r = 0.04. Eimer 2024 is 2309.00675 |
+| 2511.14572 (MFI2 forecast), "~10x" | The maximum; the typical per-pixel gain is 2 to 4 |
+| 2605.23489 (C-BASS + S-PASS) | Pre-publication C-BASS data, no beta_s measured |
+| 2504.16932 (DESI + CMB tau) | Now PRL 136, 081002 (2026). In naive quadrature the WMAP plus LFI values are 1.3 to 1.4 sigma from 0.090; the tension is carried by HFI |
+| 2007.04997 (NPIPE) | Add the low-multipole transfer-function caveat at 44 and 70 GHz |
+
+Must-cite for Paper A that are missing above (novelty check): 0811.4280 (Dunkley+ 2009, WMAP
+polarization Gibbs with 48 index pixels and a volume-correcting prior), 1608.00551 (Alonso+ 2017,
+BFoRe, volume prior), 1502.01588 (Planck 2015 X), 0903.4311, 1203.0152, 1907.11426, 1907.11642,
+1203.0025, Neyman and Scott 1948, Andrieu and Roberts 2009 (pseudo-marginal samplers, for E035).
+
+Missing for Paper B and the tau by-product (landscape report): 2610.31469 (QUIJOTE XII), 2510.12860,
+2403.18123, 2301.05117, 2301.05113, 1909.05923, 1802.01145, 1903.09420, 2309.00675, 2110.12803,
+1103.2554, 1801.01226 (Weiland 2018), 1801.04945, 2005.05600, 1908.09856, 2103.14378, 2010.01139,
+1907.12875, 2205.10104 (BP XII), 2602.06115, 1801.01481.
+

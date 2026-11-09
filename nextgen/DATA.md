@@ -403,3 +403,18 @@ because the DR1 per-band monopoles (chain component `md`, 7.0 to 10.4 K for Hasl
 scatter for the Planck bands) are not removed in the released maps. The Haslam map sits 9.2 K
 above the DR1 sky at |b| > 30. Use pass 4 for any new run (D011); pass 2 and 3 inputs are kept
 for the method comparisons already recorded.
+
+## Flags from the 2026-11-09 landscape report (not yet acted on)
+
+- Lines 31 to 37 above still say "verify" although the later sections verify them.
+- The CMB-S4 Globus mirror statement (404) conflicts with the later section that lists direct
+  links; the links were still on the CMB-S4 pages on 2026-11-09 and were not tested.
+- BeyondPlanck chain size: the release page says 1.6 TB per chain (one line above says 1.8 TB).
+- Missing entries, all needed by the polarized low-resolution track: the WMAP nine-year K-band
+  res 4 Q/U map and N^-1 with its loss-imbalance modes (LAMBDA, about 150 MB; Ka, Q and V are in
+  `~/data/wmap9_lowres/`), the Planck PR4 low-resolution maps and dense covariances (about 650 MiB
+  each), the LFI 2018 low-resolution noise covariance matrices, SRoll2 maps and simulations, and
+  the BeyondPlanck likelihood tarball.
+- Real maps read through Commander4 at `eval_nside` below the native nside carry the ingest
+  errors of F41 until the reader is fixed.
+
