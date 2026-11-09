@@ -2,7 +2,7 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
-## 2026-11-09 (Mac mini, 12:25): E030 chain 2 read (the hyperprior width sets the index field's roughness, not the template-driven displacement; no width gives a calibrated map under a 30 percent template); passes 6 and 7 running
+## 2026-11-09 (Mac mini, 12:22): E030 chain 2 read (the hyperprior width sets the index field's roughness, not the template-driven displacement; no width gives a calibrated map under a 30 percent template); passes 6 and 7 running
 
 **Learned**
 - E030 chain 2 (`gmrf16_cs_mumap_nc_Tmap_mu05`: cs templates, hyperprior sd 0.5, oracle T map;
