@@ -2,7 +2,7 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
-## 2026-11-09 (Mac mini, 04:45): E030 chain 1 read (F38: with a 30 percent template the field mean is set by the faint half and the GMRF spreads it; only the data-dominated regions and the Fisher-weighted level hold); chain 2 at sd 0.5 running
+## 2026-11-09 (Mac mini, 04:40): E030 chain 1 read (F38: with a 30 percent template the field mean is set by the faint half and the GMRF spreads it; only the data-dominated regions and the Fisher-weighted level hold); chain 2 at sd 0.5 running
 
 **Learned**
 - E030 chain 1 (`gmrf16_cs_mumap_nc_Tmap_mu03`: cs templates, matched hyperprior sd 0.3, oracle
@@ -25,6 +25,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   script is now in the repo and reproduces the stage A' table to four decimals.
 
 **Running**
+- E030 pass 4 scans (niced beside the chain, from 04:57): the cs error field with its sign
+  flipped, a second seed, and a near-flat multiplier prior (sd 3); pre-registered in the record.
+  The pass 3 files show the faint-half push is in the chi2 term alone (logdet and trace cancel),
+  a misfit effect of the template error, which is why no width removes it.
 - E030 chain 2, `gmrf16_cs_mumap_nc_Tmap_mu05` (cs, sd 0.5, oracle T; differs from chain 1 only
   by the width and from E026's cs chain only by the T map), from 04:36, about 6.7 h; check set
   armed in the data dir (`run_e030_chain2_checks.sh`, outputs `E030/chain2_*.txt`).
