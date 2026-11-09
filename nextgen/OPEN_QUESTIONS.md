@@ -394,6 +394,15 @@ original numbering.
   hyperprior width that widens where the data say nothing, so the template cannot set the index
   there (the index then falls back on the GMRF alone, as with a flat amplitude prior); (3) the
   reporting rule meanwhile: Fisher-weighted level and data-dominated regions only (D027).
+  Code: the multiplier hyperprior is isolated in `AmpPrior.log_hyperprior`,
+  `log_hyperprior_grad` and the `1 / s_mu^2` term of the NUTS metric in
+  `RegionIndexLikelihood` (`src/commander4/compsep/index_field.py`), so candidate (b) is a
+  correlated quadratic form on the mu map with one or two hyperparameters (sigma_mu, rho_mu)
+  reusing the index field's graph Laplacian, plus a correlated-prior integration in the exact
+  scan (`e023_exact_scan.py`, per-region marginalization becomes one sparse 3072 x 3072 solve
+  per evaluation). Stats review before merging (principle 6). Mechanism evidence so far: the
+  pass 3 scan files put the faint-half push in the chi2 term alone (logdet and trace cancel),
+  a misfit effect of the template error; pass 4 (sign flip, second seed, sd 3) is running.
 - **Decides:** the hier prior's law on real data and the Paper A statement about what a
   template-informed index field can report.
 - **Status (2026-11-09, 04:40):** opened from E030 chain 1 (F38); chain 2 (sd 0.5) pending for
