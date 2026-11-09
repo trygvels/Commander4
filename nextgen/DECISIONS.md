@@ -463,3 +463,44 @@ sufficient: E030 chain 3 passes it with a field mean 3.4 posterior sd from the t
 out as stand-ins for the marginal. Its conclusion that the multiplier field makes a
 component-separation-quality template admissible is withdrawn at noise scale 1 (F28, F38) and
 open at real depth (E032).
+
+## D029 (2026-11-09, PROPOSED, pending Trygve): Paper A1 narrowed to the legacy move and the incidental-parameter problem with a polarization section; a K band against 30 GHz null test before any polarized field code; intensity template work frozen after E032
+
+**Proposed decision.**
+1. Paper A1 is scoped as in `reviews/2026-11-09_program_review.md` Sect. 7: the legacy move as
+   Monte Carlo within Metropolis with its temperature law and exact alternatives; the flat-prior
+   volume term in its reference-frequency form, the profile likelihood with its sandwich width,
+   and proper amplitude priors, with coverage against S/N; the limits of priors tied to a
+   template; a polarization section at real depth (E036) and on real WMAP and LFI data in regions
+   with dense covariance. The GMRF index field moves to Paper B. The template-multiplier sequence
+   (F26 to F38) becomes one paragraph. The real-intensity section is cut unless Trygve wants it.
+2. The first polarized step is a K band against 30 GHz null test on exact grids with the released
+   WMAP covariances, on the gates of `reviews/2026-11-09_way_forward_challenge.md` Sect. F. Paper
+   B is planned only after its outcome.
+3. E032 is the last intensity template-law experiment, pass or fail. The dust temperature field
+   (E028 stage C), Q18 and sampler-efficiency work are frozen. Two follow-ups on a failed
+   pre-registration are the limit before a design review.
+4. The polarized analysis runs in a standalone low-resolution module with dense algebra in this
+   repository, not in Commander4, which has no Q/U covariance.
+5. Amplitude priors from now on: the profile likelihood with a sandwich error, or a zero-mean
+   Gaussian prior with one free scale per index region; a C(l)-sized Gaussian prior for the CMB;
+   never the flat-prior marginal, and never one scale shared across index regions on a template.
+
+**Why.** E031 showed that the regime of F26 to F38 has no real intensity counterpart. E036 showed
+that at real polarization depth the profile and the per-region zero-mean prior are calibrated
+without a template, while the flat-prior marginal is biased by 0.06 to 0.4 with a sign that
+depends on the reference frequency. The independent challenge rejected the first version of the
+plan as two half-papers, showed that a global scale on a template reproduces the F38 pattern, and
+pointed out that K band and 30 GHz carry 91 percent of the index information and are known to
+disagree, so a field analysis built before that is understood would rest on an unexamined choice.
+
+**Alternatives considered.** Keeping the GMRF field in Paper A1 with F24 and E032: possible as an
+outlook section; it keeps the paper open on experiments in a regime chosen for convenience.
+Continuing the template-law work until a calibrated configuration is found: rejected, the sound
+estimators need no template. Building the polarized field sampler first and treating K against
+30 GHz as a nuisance model inside it: rejected, the nuisance is degenerate with the measurand and
+must be sized on grids first. Implementing Q/U covariance in Commander4 first: weeks of
+engineering before the first number.
+
+**Not decided here (Trygve):** items 2 to 5 of the review's Sect. 8 (where the GMRF goes, what
+is sent upstream, the standalone module, the real-intensity section).

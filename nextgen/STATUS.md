@@ -2,6 +2,71 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-09 (Mac mini, 23:42): program review done; Paper A narrowed to what is A or B grade; three new results (legacy-move law, reference-frequency form of the flat-prior shift, profile and per-region zero-mean prior calibrated for Q/U at real depth); two ingest bugs confirmed on real maps; plan proposed as D029
+
+Read `reviews/2026-11-09_program_review.md` first. It has the verdict, the plan and the decisions
+that need Trygve.
+
+**Learned**
+- **Noise regime (E031, F39).** Ladder scale 1 is 24 to 90 times real WMAP/LFI intensity noise.
+  F26 to F38 are a stress test with no real intensity counterpart. Scale 0.03 is 0.7 to 2.7 times
+  real WMAP/LFI depth.
+- **CMB metric (E033, F40).** The total GLS CMB residual used to rank models since E026 is the
+  noise term (90.5 to 96.0 of 90.9 to 96.4 uK). At abs(b) > 20 no cs-template chain beats a
+  constant index (bias 1.56 to 3.34 against 0.95 uK).
+- **E030 chain 3.** The leading-band reference fails as a remedy: sync field mean -3.164 +- 0.049
+  against -3.000 (chain 1 -2.70), coverage 27 to 33 percent. The scan it was built on was misread.
+  E030 is closed. No width and neither reference gives a calibrated field mean at scale 1.
+- **Legacy move (E035, F1).** It is Monte Carlo within Metropolis. With one index step per
+  amplitude draw the chain converges to the ridge posterior at temperature sqrt(pi k / 8) + 1/2,
+  width 0.79 k^(1/4). Derived twice independently, toy to 0.7 percent. The real-map width (16.4
+  to 17.0) is explained by the alm storage of per-pixel amplitudes, which multiplies the
+  acceptance noise by 2.44 (measured from the E014 log) and also predicts the +3 sd dust shift
+  (F7 amended). The temperature law itself is in print (Ball, Fink and Bowler 2003).
+- **Flat amplitude priors depend on the reference frequency (E036).** At real WMAP/LFI Q/U depth
+  on a realistic amplitude field the flat-prior marginal shifts a region index by -0.06 (ref 23
+  GHz) or +0.06 (ref 30 GHz) at an index error of 0.06, and by -0.40 or +0.34 at 0.16. Formula:
+  ln(nu_ref / nu_pivot) times the single-amplitude index variance. The profile likelihood and a
+  zero-mean prior with one free scale per region are both calibrated there (mean z within 0.1,
+  68 percent coverage 0.64 to 0.72) and need no template. They hold at twice the noise as well.
+- **Ingest bugs (E034, F41).** The model-error floor reaches the likelihood 27.6 times below
+  nominal, and degrading before smoothing leaves 0.6 to 1.7 uK of band-dependent CMB aliasing.
+  The E014 chains had the HFI bands at 0.37 to 0.83 uK_RJ, the tightest bands. Every E014 number
+  in posterior sd is withdrawn.
+- **Code facts.** Every run computed a second chain and discarded it (F42). `get_sky` evaluates
+  an index-field component at the mean index (F43). A null C(l) prior is N(0, 1) per alm in
+  units that depend on the reference frequency (read, size not computed).
+- **Independent challenge of the plan.** The first version was rejected as two half-papers. The
+  reduced plan is adopted: Paper A1 without the GMRF field and the real-intensity section, a K
+  band against 30 GHz null test before any polarized field code. It also showed that one scale
+  shared across index regions on a template is biased by +-0.12 with a reference-dependent sign,
+  the F38 pattern.
+
+**Running**
+- E032: the E030 chain 1 model at noise scale 0.03, run A (seed 7) since 22:34 with both in-flight
+  chains written, run B (seed 8, dispersed start) after it. About 7 hours each. Waiter armed on
+  run A's last file. Analysis script `nextgen/scripts/e032_analyze.py`.
+- E036 remaining cells on one thread: regression check of the extended script, noise times 4,
+  free CMB and dust amplitudes with a flat and with a 0.2 uK CMB prior.
+- E037 queued behind them: the validation harness over 40 seeds (is the F8 offset the smoothed
+  noise or a bug), with a white-noise control.
+
+**Next**
+- Read E032 run A when it ends, then run B; write Result and Conclusion. No follow-ups (D029).
+- E036: off-centre truths (-2.8, -3.4) and the global-scale arm at three references.
+- After E032: reader fix behind a switch, `get_sky` with an index field, the legacy lookup, a
+  per-pixel run with amplitudes stored as maps (Q6, Q23), audit tests 4 to 8 and 10.
+- Fetch the WMAP K-band res 4 map and inverse covariance; Gate 0 of the polarized track.
+
+**Needs Trygve**
+- D029 (proposed): the plan of the program review Sect. 7.
+- Where the GMRF index field goes (Paper A1 outlook or Paper B).
+- Upstream: the pull request for the index-sampler fix; reports of the ingest bugs, the alm
+  storage, the null-prior behaviour, the unwritten chain and `get_sky`; the DR1 dust reference
+  frequency; the Commander3 code facts. Nothing has been sent to anyone.
+- The polarized analysis as a standalone low-resolution module outside Commander4.
+- Keep or cut the real-intensity section of the paper.
+
 ## 2026-11-09 (Mac mini, 12:22): E030 chain 2 read (the hyperprior width sets the index field's roughness, not the template-driven displacement; no width gives a calibrated map under a 30 percent template); passes 6 and 7 running
 
 **Learned**

@@ -3,6 +3,26 @@
 Phases overlap. Each milestone has acceptance criteria; a milestone is done only when its criteria
 are met and logged in `experiments/registry.md`. Revisit this file when findings change the plan.
 
+## Proposed revision after the 2026-11-09 review (D029, pending Trygve)
+
+The phases below are the plan of 2026-11-02 and are kept as written. The review
+(`reviews/2026-11-09_program_review.md`) proposes this order instead:
+
+| Step | Weeks | Acceptance |
+|---|---|---|
+| R1. E032 read; no follow-ups | 0 to 1 | Pre-registered items of the E032 record, four chains |
+| R2. E036 completed (noise ladder, off-centre truths, free CMB and dust, a CMB prior, the global-scale arm) | 0 to 1 | Predictions in the E036 record |
+| R3. Gate 0 for polarization: WMAP K-band res 4 map and inverse covariance fetched and checked; an LFI 30 GHz low-resolution covariance that passes a half-split null test; one window for WMAP and LFI | 1 | Challenge report Sect. F, Gate 0 |
+| R4. K band against 30 GHz null test: region indices from {K, Ka}, {K, 30}, {30, 44, Ka}, profile with sandwich error, dense covariances; WMAP9 with PR3, PR4 and DR1 30 GHz | 1 to 3 | The three pairs agree within 2 combined sd, or a model with at most five named modes brings the residual to a PTE above 0.01, or the disagreement is reported as the result |
+| R5. Paper A1 draft: legacy move, incidental parameters, limits, polarization section | 1 to 6 | Every claim A or B grade; exact grids; the 20-seed F8 test; SBC of the Commander4 ridge and marginal modes |
+| R6. Commander4 fixes after E032 (reader order and floor behind a switch, `get_sky` with an index field, maps instead of alms for per-pixel amplitudes) and the upstream reports | when cores are free; reports need Trygve | Tests green; E014 grid rerun if the real-intensity section is kept |
+| R7. Paper B, planned on the outcome of R4: an index field at nside 8 data and nside 2 field on Gates 1 to 6, or a systematics paper | after R4 | Challenge report Sect. F |
+
+**Paper A1 (methods):** spectral indices and incidental amplitudes in pixel-based Bayesian
+component separation. **Paper B (science):** the polarized synchrotron index at the resolution
+the public data determine, positioned against Dunkley et al. 2009. **tau:** a paired difference
+between index models on the same WMAP and LFI data, as a by-product of Paper B.
+
 ## Phase 0: groundwork (done, 2026-10-25)
 
 - Correctness fix for spectral-index MCMC with exact likelihood options and a ridge default.
