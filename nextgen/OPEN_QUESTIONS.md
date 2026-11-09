@@ -417,3 +417,13 @@ original numbering.
   linear-Gaussian law absorbs it asymmetrically; testable in the scan by Gauss-Hermite
   quadrature per region. Pass 5 (uniform +-0.3 errors) separates variance-driven from
   response-driven even parts.
+- **Status (2026-11-09, 05:50, E030 pass 5):** the per-region response to a uniform 30 percent
+  template error is odd and large: sync Q1 +0.27 / -0.28 (46 to 48 nats), faint sync beyond
+  +-0.3, dust Q2 +0.26 / -0.17, even part at most +0.04. Mechanism: the hyperprior's pull on the
+  multiplier leaves a residual amplitude error that the index compensates along the leading
+  band's lever arm (3.8 per unit log error for sync via 23 GHz); only regions with index Fisher
+  sd below about 0.3 keep their index. So the realized fields' even push is variance-driven
+  (candidate (d) stays alive, pass 6), the odd part is a template-quality limit that no law
+  removes, and a template calibration error is an index bias of 3.8 c for sync: candidate (e),
+  a sampled global calibration factor per component (the hyperprior mean), is cheap insurance
+  for real templates and should be added to the list.

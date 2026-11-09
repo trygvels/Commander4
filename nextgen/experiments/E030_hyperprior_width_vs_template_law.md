@@ -326,6 +326,41 @@ absorption under the hyperprior N(1, 0.3^2): mu 1.35 costs 0.68 nats, 0.74 costs
 prior width s g scales with the template). Data-dominated quartiles: shifts of opposite sign
 for the two errors, sync Q1 of order 0.1, dust Q1 of order 0.01.
 
+**Pass 5 result (read 2026-11-09 05:50; `scan5_sd03_const{neg,pos}.txt`).** The response to a
+uniform multiplicative template error at the matched width is predominantly odd, i.e. linear
+in the log error, and large: template too high by e^0.3 (a/g 0.74): sync Q1 +0.27 (48 nats,
+10 curvature sd), Q2 to Q4 beyond +0.3 (35, 24, 19 nats), s_all beyond +0.3 (125 nats); dust
+Q1 +0.02 (10 nats), Q2 +0.26 (75 nats), Q3 +0.20, Q4 +0.15, d_all +0.03. Template too low by
+e^-0.3 (a/g 1.35): sync Q1 -0.28 (46 nats), Q2 to Q4 beyond -0.3 (18, 11, 9 nats), s_all
+beyond -0.3; dust Q1 -0.01, Q2 -0.17 (29 nats), Q3 -0.14, Q4 -0.10, d_all -0.01. Odd part
+(half the difference): sync Q1 0.27, dust Q2 to Q4 0.22, 0.17, 0.12; even part (half the
+sum): dust +0.04, +0.03, +0.03, sync Q1 -0.005, sync faint unmeasured (both at the edge; the
+edge gains 19 against 9 nats say the too-high side is steeper). So the pre-registration's
+first alternative holds: the even push of the realized fields (pass 4: sync +0.2 to +0.3, dust
++0.03 to +0.14) comes from the field's variance, not from the per-region response, whose even
+part is +0.03 to +0.04 at most; a random field's odd parts cancel across a quartile and its
+even part accumulates.
+
+Mechanism, now quantitative. The hyperprior's pull of each multiplier toward 1 leaves a
+residual amplitude error at the reference frequency, which the index compensates along the
+leading band's lever arm: for sync the 23 GHz band, slope 1 / ln(30 / 23) = 3.8 per unit log
+error, sign positive for a too-high template (a flatter index lowers the 23 GHz prediction);
+for dust the 353 to 143 GHz bands below the 545 GHz reference, sign positive for a too-high
+template as well (a larger beta_d lowers the prediction below 545 GHz). Both signs match. The
+size says how much residual is left: sync Q1 +0.27 for a 0.3 log error means the multipliers
+of the median Q1 region absorb only about a tenth of a uniform error (its index Fisher sd is
+1.0, so the index is the cheaper coordinate; only the hundred brightest regions, Fisher sd
+below 0.3, hold their index), while the truly data-dominated dust Q1 (Fisher sd 0.06) absorbs
+it in the multiplier and moves +0.02. In the faint half the multiplier is unconstrained, the
+pinned amplitude is the template itself, and the compensation is the full log error times the
+lever arm, beyond the scan range. Consequence for the hier prior with a real template: a
+template calibration or zero-level error of e^c shifts every region fainter than the
+hyperprior-set threshold by about 3.8 c (sync) and the dust quartiles by 0.5 to 0.9 c; the
+multipliers' hyperprior protects only the brightest regions. For a region-scale error field of
+zero mean in log the odd shifts average out over a quartile (pass 4: +0.07, -0.06, +0.01) and
+the variance-driven even part remains (the Jensen gap between the linear-Gaussian law and the
+log-normal error), which pass 6 tests with the log-normal law.
+
 **Pass 6 (queued 2026-11-09 05:36 behind chain 2, which the niced scans slow threefold through its
 MPI barriers; driver `run_e030_scans6.sh`; outputs `scan6_sd03_gaussquad_check.txt`,
 `scan6_sd03_lognormal.txt`):** the log-normal multiplier law (Q18 candidate (d)): the

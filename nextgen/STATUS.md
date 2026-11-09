@@ -25,8 +25,14 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   script is now in the repo and reproduces the stage A' table to four decimals.
 
 **Running**
-- E030 pass 5 scans (niced, from 05:26): uniform template errors of -0.3 and +0.3 in log at
-  the matched width, to separate a variance-driven from a response-driven even push.
+- Pass 5 read (05:50): a uniform 30 percent template error shifts the sync Q1 quartile by
+  +0.27 (too high) or -0.28 (too low), the faint sync beyond +-0.3 and dust Q2 by +0.26 / -0.17;
+  the response is odd with an even part of at most +0.04, so the realized fields' even push is
+  variance-driven (the law, pass 6) and the odd part is a template-quality limit. Mechanism:
+  the hyperprior's pull on the multiplier leaves a residual the index compensates (3.8 per unit
+  log error for sync via 23 GHz); only the hundred brightest sync regions hold their index. A
+  template calibration error is therefore an index bias; a sampled global calibration factor
+  per component is proposed (Q18 (e)).
 - E030 pass 6 queued behind chain 2 (the scans slow the 12-rank chain threefold through its
   MPI barriers even at nice 19, so no more scans beside it): the log-normal multiplier law
   (Q18 (d)) in the exact scan, by adaptive Gauss-Hermite validated against the analytic
