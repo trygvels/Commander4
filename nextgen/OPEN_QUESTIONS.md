@@ -426,4 +426,8 @@ original numbering.
   (candidate (d) stays alive, pass 6), the odd part is a template-quality limit that no law
   removes, and a template calibration error is an index bias of 3.8 c for sync: candidate (e),
   a sampled global calibration factor per component (the hyperprior mean), is cheap insurance
-  for real templates and should be added to the list.
+  for real templates and should be added to the list. Candidate (f), from the same
+  mechanism: define the template and amplitude at the leading band (sync 23 GHz, dust 353 GHz
+  here), where a residual template error cannot be tilted away by the index and the data push
+  the multiplier instead; pass 7 tests it in the scan (queued behind pass 6). In Commander4 this
+  is the component's reference frequency plus a template at that frequency, no code change.

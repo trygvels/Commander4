@@ -62,14 +62,19 @@ def cmb_mixing(nu):
     return x**2 * np.exp(x) / np.expm1(x)**2          # uK_RJ per uK_CMB
 
 
-def sync_sed(bs):
-    return (FREQS[None, :] / 30.0) ** bs[:, None]
+NU_REF = {"sync": 30.0, "dust": 545.0}   # reference frequencies of the amplitudes and templates (GHz)
 
 
-def dust_sed(bd, T):
-    x = H_K * FREQS[None, :] * 1e9 / T[:, None]
-    xr = H_K * 545e9 / T[:, None]
-    return (FREQS[None, :] / 545.0) ** (bd[:, None] + 1.0) * np.expm1(xr) / np.expm1(x)
+def sync_sed(bs, nu=None):
+    nu = FREQS if nu is None else np.atleast_1d(np.asarray(nu, float))
+    return (nu[None, :] / NU_REF["sync"]) ** bs[:, None]
+
+
+def dust_sed(bd, T, nu=None):
+    nu = FREQS if nu is None else np.atleast_1d(np.asarray(nu, float))
+    x = H_K * nu[None, :] * 1e9 / T[:, None]
+    xr = H_K * NU_REF["dust"] * 1e9 / T[:, None]
+    return (nu[None, :] / NU_REF["dust"]) ** (bd[:, None] + 1.0) * np.expm1(xr) / np.expm1(x)
 
 
 class Hyper:
@@ -387,7 +392,7 @@ def region_fit(sky, rms, T, cm, reg, nreg, bs0, bd0, bounds=((-4.0, -2.0), (1.1,
 def fisher_sd_regions(c, a, beta, rms, T, reg, nreg):
     """Region Fisher sd of the index with the amplitude a known (as e020_analyze.index_fisher_weight),
     1/sqrt(sum over the region's pixels)."""
-    nu_ref = 30.0 if c == "sync" else 545.0
+    nu_ref = NU_REF[c]
     sed = sync_sed(beta) if c == "sync" else dust_sed(beta, T)
     wpix = np.sum((a[:, None] * sed * np.log(FREQS / nu_ref)[None, :] / rms) ** 2, axis=1)
     return 1.0 / np.sqrt(np.maximum(np.bincount(reg, wpix, nreg), 1e-300))
@@ -420,6 +425,10 @@ def main():
                     help="rms of the log error field of the 'cs' (component-separation-quality) template")
     ap.add_argument("--cs-fwhm", type=float, default=10.0, help="correlation FWHM in degrees of that field")
     ap.add_argument("--cs-seed", type=int, default=11)
+    ap.add_argument("--nu-ref-sync", type=float, default=30.0,
+                    help="reference frequency (GHz) at which the sync amplitude and template are defined (default 30)")
+    ap.add_argument("--nu-ref-dust", type=float, default=545.0,
+                    help="reference frequency (GHz) of the dust amplitude and template (default 545)")
     ap.add_argument("--cs-const", type=float, default=None,
                     help="replace the cs log error field by this constant (uniform multiplicative error)")
     ap.add_argument("--T-grid-fields", default=None,
@@ -461,6 +470,17 @@ def main():
     g_data = {"sync": np.maximum(hp.read_map(f"{D}/template_sync_30GHz.fits", field=0), 1e-3),
               "dust": np.maximum(hp.read_map(f"{D}/template_dust_545GHz.fits", field=0), 1e-3)}
     a_true = {"sync": np.asarray(t["a_sync"], float), "dust": np.asarray(t["a_dust"], float)}
+    # truth amplitudes are stored at 30 and 545 GHz; move them to the requested reference frequencies
+    # with the true per-pixel SEDs (the data are unchanged; only where the template pins the
+    # amplitude changes)
+    if a.nu_ref_sync != 30.0:
+        NU_REF["sync"] = 30.0
+        a_true["sync"] = a_true["sync"] * sync_sed(np.asarray(t["beta_s"], float), a.nu_ref_sync)[:, 0]
+        NU_REF["sync"] = float(a.nu_ref_sync)
+    if a.nu_ref_dust != 545.0:
+        NU_REF["dust"] = 545.0
+        a_true["dust"] = a_true["dust"] * dust_sed(np.asarray(t["beta_d"], float), np.asarray(t["T_d"], float), a.nu_ref_dust)[:, 0]
+        NU_REF["dust"] = float(a.nu_ref_dust)
     g_exact = {k: np.maximum(v, 1e-3 * np.mean(np.abs(v))) for k, v in a_true.items()}
     # "cs" template: the true amplitude times exp(f), f a Gaussian random field with rms
     # cs_scatter and a Gaussian correlation of FWHM cs_fwhm (a smooth multiplicative error with
@@ -507,6 +527,7 @@ def main():
         say(f"  data template {name}: g/true at |b|>20 16/50/84 pct {np.percentile(r,16):.3f}/"
             f"{np.percentile(r,50):.3f}/{np.percentile(r,84):.3f}")
     # realized a/g per quartile for the two template levels
+    say(f"  reference frequencies: sync {NU_REF['sync']:g} GHz, dust {NU_REF['dust']:g} GHz")
     say(f"  multiplier law {MU_LAW}" + (f", Gauss-Hermite {MU_QUAD[0]} x {MU_QUAD[1]} per dimension" if MU_LAW == "lognormal" or MU_FORCE_QUAD else " (analytic)"))
     say(f"  cs template: log error field rms {a.cs_scatter}, FWHM {a.cs_fwhm} deg, seed {a.cs_seed}"
         + (f", replaced by the constant {a.cs_const}" if a.cs_const is not None else "") + "; realized "

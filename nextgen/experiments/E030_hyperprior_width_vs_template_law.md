@@ -386,6 +386,26 @@ dust from +0.03, +0.08, +0.13 to within 0.05, with the data-dominated quartiles 
 the law is not the cause and candidate (d) is dead as well, leaving the correlated prior (b)
 and the reporting rule.
 
+**Pass 7 (queued 2026-11-09 05:58 behind pass 6; driver `run_e030_scans7.sh`;
+`scan7_ref23_353_sd03.txt`, `scan7_ref23_353_sd03_constpos.txt`):** Q18 candidate (f), the
+template reference frequency at the leading band. The pass 5 mechanism says the index
+compensates the residual template error with the lever arm 1 / ln(nu_ref / nu_lead), because a
+misfit at the leading band can be removed by tilting the SED about the reference. With the
+amplitude pinned at the leading band itself (sync 23 GHz, dust 353 GHz in this 12-band
+simulation; new options `--nu-ref-sync`, `--nu-ref-dust`, the truth amplitudes moved with the
+true per-pixel SEDs, the data unchanged, checked to 1e-15), a residual at that band cannot be
+removed by the index, so the data push the multiplier instead of the index wherever they
+constrain the amplitude. Pre-registered, matched width 0.3, oracle T map, seed 11: (i) the
+exact cell stays within 0.05 of pass 3's exact optima (the law and the true multiplier are
+unchanged); (ii) the uniform +0.3 error: sync Q1 from +0.27 to below +0.10 and dust Q2 from
++0.26 to below +0.10; the faint sync stays beyond +0.3 (the remaining lever arm through 44 GHz
+is 1 / ln(44 / 23) = 1.5, giving about +0.45 for an unconstrained multiplier) and the faint
+dust changes little (the next lever arm, 1 / ln(353 / 217) = 2.1, is close to the old one);
+(iii) the realized cs field: sync Q1 within +-0.03 (from +0.07), the faint sync even push
+below +0.2 (from beyond +0.3), because the intermediate regions, which produce the even part,
+gain multiplier constraint from the 23 GHz data; dust optima within 0.02 of the old ones in
+Q1 and Q2 and otherwise unchanged.
+
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
 sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the control for
