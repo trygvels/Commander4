@@ -1,0 +1,25 @@
+
+== gmrf16_cs_mumap_nc_Tmap_mu05: 1200 files, 700 post-burn
+   gradients per iteration (post-burn mean) 62.3
+   sync: region ESS min 131 5pct 254 median 662; max |mean - ref| 0.830
+      Q1: rmse vs ref 0.2146 (vs region-mean truth 0.2269); z vs ref median +0.69 MAD 0.48 |z|<1 0.68 |z|<2 0.97; sd median 0.2146; z vs truth median +0.85
+      Q2: rmse vs ref 0.3270 (vs region-mean truth 0.3385); z vs ref median +0.98 MAD 0.44 |z|<1 0.51 |z|<2 0.90; sd median 0.2604; z vs truth median +1.05
+      Q3: rmse vs ref 0.3778 (vs region-mean truth 0.3831); z vs ref median +1.12 MAD 0.44 |z|<1 0.41 |z|<2 0.89; sd median 0.2817; z vs truth median +1.15
+      Q4: rmse vs ref 0.3316 (vs region-mean truth 0.3359); z vs ref median +1.06 MAD 0.26 |z|<1 0.44 |z|<2 0.97; sd median 0.2940; z vs truth median +1.08
+      s: mean 0.0564 sd 0.0096 ESS 606
+      mu map (3072): ESS min 222 median 1236; mean 0.9687; against the realized exp(-f) region means: correlation 0.410, rms diff 0.2981, z median -0.05 MAD 0.53
+         Q1: corr 0.697 rms diff 0.2129 sd median 0.2413
+         Q2: corr 0.409 rms diff 0.3111 sd median 0.3824
+         Q3: corr 0.274 rms diff 0.3080 sd median 0.4335
+         Q4: corr 0.230 rms diff 0.3443 sd median 0.4632
+   dust: region ESS min 64 5pct 206 median 483; max |mean - ref| 0.315
+      Q1: rmse vs ref 0.1076 (vs region-mean truth 0.1007); z vs ref median +1.83 MAD 0.68 |z|<1 0.19 |z|<2 0.55; sd median 0.0517; z vs truth median +1.72
+      Q2: rmse vs ref 0.1220 (vs region-mean truth 0.1181); z vs ref median +1.62 MAD 0.54 |z|<1 0.22 |z|<2 0.70; sd median 0.0685; z vs truth median +1.55
+      Q3: rmse vs ref 0.1123 (vs region-mean truth 0.1065); z vs ref median +1.26 MAD 0.51 |z|<1 0.38 |z|<2 0.85; sd median 0.0766; z vs truth median +1.21
+      Q4: rmse vs ref 0.0502 (vs region-mean truth 0.0466); z vs ref median +0.30 MAD 0.30 |z|<1 0.91 |z|<2 1.00; sd median 0.0818; z vs truth median +0.26
+      s: mean 0.0676 sd 0.0021 ESS 895
+      mu map (3072): ESS min 124 median 1180; mean 1.0268; against the realized exp(-f) region means: correlation 0.471, rms diff 0.2852, z median +0.01 MAD 0.51
+         Q1: corr 0.897 rms diff 0.1291 sd median 0.1039
+         Q2: corr 0.477 rms diff 0.2878 sd median 0.3401
+         Q3: corr 0.271 rms diff 0.3190 sd median 0.4478
+         Q4: corr 0.145 rms diff 0.3522 sd median 0.4912

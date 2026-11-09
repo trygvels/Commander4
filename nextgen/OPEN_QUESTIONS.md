@@ -431,3 +431,12 @@ original numbering.
   here), where a residual template error cannot be tilted away by the index and the data push
   the multiplier instead; pass 7 tests it in the scan (queued behind pass 6). In Commander4 this
   is the component's reference frequency plus a template at that frequency, no code change.
+- **Status (2026-11-09, 12:20, E030 chain 2):** the width is not the lever. At sd 0.5 the sync
+  field mean (-2.722) and the faint half (+0.26 to +0.34) are where sd 0.3 put them; the width
+  sets the field's roughness (sigma_s 0.32 against 0.51, RMSE 0.33 and 0.09 against 0.43 and
+  0.12) and trades coverage for it (z median against the reference +1.0 in both components,
+  |z| < 1 for 47 to 49 percent of the regions, against +0.65 and +0.28 and 65 to 69 percent at
+  sd 0.3; bright dust shrunk to +0.036). The multiplier maps absorb the same share of the error
+  at either width (rms against exp(-f) 0.28 to 0.30). So the F38 displacement is the law's, and
+  the candidates stand as listed: (b), (d) (pass 6 running), (e), (f) (pass 7 queued). For a
+  real-data default the matched width stays the rule (F37), with the report restricted by D027.

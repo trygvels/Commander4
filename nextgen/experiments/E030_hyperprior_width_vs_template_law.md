@@ -254,6 +254,57 @@ cause, chain 2 lands at chain 1's 0.43 and 0.12 with sigma_s about 0.5, and E026
 is then read as an unconverged chain's; (vi) the faint dust quartiles between the shrinkage
 prediction and the sd-0.5 scan optima (+0.10, +0.13, +0.19).
 
+**Chain 2 result (read 2026-11-09 12:20; `chain2_*.txt`; 1200 iterations in 7 h 22 min with
+about 40 min lost to scans beside it, 0 tracebacks, 20 divergences, 62.3 gradients per iteration
+against chain 1's 31.0; hyperparameter ESS 39 to 887, region ESS min 64 dust, 131 sync).**
+(i) D025 passes: KS p 0.78 sync, 0.72 dust; conditional optimum minus draw +0.0008 and +0.0001
+in index units. (ii) Fails: bright dust against `bd_trueT` +0.036, z median +0.73 (chain 1
++0.004, +0.17). The shrinkage prediction for Q1 is +0.018 (data weight 0.64 against 0.89 in
+chain 1, because sigma_d fell from 0.17 to 0.081 while the field mean rose to 1.612, +0.042
+above the Q1 reference mean), so half of the bright dust shift is shrinkage toward a field
+mean the faint half sets, and the remaining +0.018 is at the scan optimum +0.01 within the Q1
+scatter (rms chain minus prediction 0.045). The criterion was posed as if the bright dust
+quartile were data-dominated at every width; at sd 0.5 it is not. (iii) Passes for the
+Fisher-weighted regions: the ten, thirty and hundred brightest sync regions at +0.02, +0.06,
++0.06 (chain 1 -0.01, +0.06, +0.09), the Fisher-weighted level of the posterior-mean field
+-2.921 (truth -2.988, reference -3.009). The Q1 average +0.169 is 0.055 below the shrinkage
+prediction +0.224 (chain 1: 0.012 below): with the field sd 0.32 against the median Q1 Fisher
+sd 1.0, the GMRF lets the bright neighbours pull the intermediate Q1 regions, which the
+independent-region formula ignores. (iv) Passes: sync field mean -2.722 +- 0.051. (v) The
+first branch: sigma_s 0.32 +- 0.08 (predicted about 0.35; chain 1 0.51), sigma_d 0.081 (chain 1
+0.174, E026 0.118); pixel RMSE 0.3265 sync, 0.0908 dust against E026's 0.3346, 0.0888 and chain
+1's 0.4256, 0.1167 (paired against stage A': +0.261 +- 0.012 and +0.041 +- 0.003, against chain
+1's +0.360, +0.064); GLS CMB residual at the draws 94.45 uK (E026 95.25, chain 1 97.66, floor
+93.18), at the posterior-mean fields 94.04 against chain 1's 96.42, of which swapping in chain
+1's dust costs 1.5 uK and its sync 0.7 uK. So the width drives the roughness and the RMSE, the
+T map changes the RMSE by under 0.01 at this template quality, and E026's cs RMSE is a
+converged chain's number (its hyperparameter ESS of 4 to 13 does not recur here). The
+sub-prediction that the multiplier maps absorb more of the error fails: rms against exp(-f)
+0.298 sync, 0.285 dust (chain 1 0.277, 0.278; E026 0.297, 0.284). The rms is dominated by the
+faint half, where the posterior mean sits at 1 at either width and the rms is the error field's
+own 0.31 to 0.35; the width only sets the multipliers' posterior sd there (0.46 to 0.49 against
+0.29). In Q1 the wider width tracks the dust error better (rms 0.129 against 0.158, corr +0.90
+against +0.85) and the sync error slightly worse (0.213 against 0.205). (vi) Passes: the faint
+dust quartiles +0.089, +0.101, +0.066 against the shrinkage predictions +0.082, +0.095, +0.064
+and the sd-0.5 scan optima +0.10, +0.13, +0.19; they sit at the shrinkage prediction, because
+the GMRF with sigma_d 0.08 holds the faint regions at the field mean and the per-quartile scan
+optimum (every other region at the reference) is not reached.
+
+Not pre-registered, read afterwards: the width trades coverage for RMSE. Against the region
+reference the z median is +1.03 (sync) and +1.00 (dust) at sd 0.5 against +0.65 and +0.28 at
+sd 0.3, the fraction of regions with |z| < 1 is 0.47 and 0.49 against 0.69 and 0.65 (|z| < 2:
+0.93, 0.90 against 0.94, 0.93), the dust field mean is +0.073 above the `bd_trueT` mean against
++0.030, and the per-region posterior sd is halved (dust 0.052 to 0.082 against 0.071 to 0.151,
+sync 0.21 to 0.29 against 0.33 to 0.46). The lower RMSE and CMB residual at sd 0.5 come from a
+smoother field whose roughness at either width is the template error's, not the sky's (truth
+region sd 0.05 to 0.08; exact templates give sigma_s 0.07, sigma_d 0.05): sd 0.5 reports a map
+that is one posterior sd high almost everywhere, sd 0.3 a map twice as rough with z closer to
+zero. Neither width gives a calibrated region map under a 30 percent template, and the faint
+sync half sits at +0.26 to +0.34 at both. What survives at both widths is the hundred brightest
+sync regions (+0.06 at sd 0.5, +0.09 at sd 0.3; scan +0.07) and the Fisher-weighted level
+(+0.07 to +0.09 against truth), as D027 reports. Cost: the wider width doubled the leapfrog
+steps and produced 20 divergences (chain 1: 0; E026 cs: 1).
+
 **Mechanism of the faint-half push, from the pass 3 scan files (read 2026-11-09 04:42):** along
 every faint sync scan the expected target's logdet and trace terms cancel to within 0.05 nats
 at every offset for both templates (for example cs s_Q4 at +0.3: logdet +3.25, trace -3.22;
@@ -412,7 +463,7 @@ sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the
 the template effect.
 
 ## Conclusion
-(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 pending) The hyperprior width of the per-region template
+(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 read 12:20; passes 6 and 7 pending) The hyperprior width of the per-region template
 multipliers must be at least the template error's scale: with a 30 percent template the tight
 sd 0.1 biases the data-dominated indices (sync +0.21, dust -0.02, tens of nats) and is not
 admissible; the matched sd 0.3 leaves the bright dust index unbiased and the bright sync index
@@ -433,8 +484,21 @@ chain 2 separates. With a real-data-quality template the reportable quantities a
 data-dominated regions and the Fisher-weighted level, not the field mean or the region map as a
 whole (Q18).
 
+Chain 2 (cs, sd 0.5, oracle T; D025 passes) settles the confound: the width drives the index
+field's roughness and the pixel RMSE (sigma_s 0.32 against 0.51, RMSE 0.33 and 0.09 against
+0.43 and 0.12), the T map changes the RMSE by under 0.01, and E026's cs numbers stand. The width
+is a bias-variance knob with no calibrated setting under a 30 percent template: sd 0.5 gives the
+lower RMSE and CMB residual (94.5 against 97.7 uK) by smoothing toward a field mean the faint
+half sets, with the region map one posterior sd high almost everywhere (z median +1.0 in both
+components, |z| < 1 for 47 to 49 percent of the regions) and the bright dust quartile shrunk to
++0.036; sd 0.3 gives z median +0.65 and +0.28 but a field twice as rough. At both widths the
+hundred brightest sync regions sit at +0.06 to +0.09 and the faint sync half at +0.26 to +0.34.
+The multiplier maps absorb the same share of the error at either width (rms against exp(-f)
+0.28 to 0.30, the faint half's own error rms), so the width is not the lever for the faint
+half; that remains the law (Q18 (b), (d), (e), (f)), with passes 6 and 7 pending.
+
 ## Follow-ups
-- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09; chain 2 (cs, sd 0.5, oracle T) running.
+- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09 04:35; chain 2 (cs, sd 0.5, oracle T) read 12:20.
 - Q18: a field-mean hyperprior informed by the data-dominated regions only, or a spatially
   correlated (GMRF) multiplier prior that lets the bright neighbours inform a faint region's
   template error (the cs error field has a 10 deg correlation length the iid N(1, sd^2) ignores).

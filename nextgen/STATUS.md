@@ -2,6 +2,46 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-09 (Mac mini, 12:25): E030 chain 2 read (the hyperprior width sets the index field's roughness, not the template-driven displacement; no width gives a calibrated map under a 30 percent template); passes 6 and 7 running
+
+**Learned**
+- E030 chain 2 (`gmrf16_cs_mumap_nc_Tmap_mu05`: cs templates, hyperprior sd 0.5, oracle T map;
+  7 h 22 min, 20 divergences, twice chain 1's leapfrog steps; D025 passes, KS p 0.78 sync,
+  0.72 dust) settles the E026 confound: the width drives the roughness and the pixel RMSE
+  (sigma_s 0.32 against 0.51 at sd 0.3; RMSE 0.33 / 0.09 against 0.43 / 0.12; CMB residual
+  94.5 against 97.7 uK), the T map changes the RMSE by under 0.01, and E026's cs numbers were a
+  converged chain's.
+- The F38 displacement does not depend on the width: sync field mean -2.72 at both, the faint
+  sync half +0.26 to +0.34 at both, the hundred brightest sync regions +0.06 (sd 0.5) and +0.09
+  (sd 0.3) against the scan's +0.07. The multiplier maps absorb the same share of the error at
+  either width (rms against exp(-f) 0.28 to 0.30, the faint half's own error rms).
+- The width trades coverage for RMSE: at sd 0.5 the region map is one posterior sd high almost
+  everywhere (z median against the reference +1.0 in both components, |z| < 1 for 47 to 49
+  percent of regions against 65 to 69 at sd 0.3), the dust field mean sits +0.073 above the
+  reference mean (sd 0.3: +0.030) and the bright dust quartile at +0.036, half of it shrinkage
+  toward that mean. Pre-registration (ii) failed for that reason; (i), (iii), (iv), (vi) and
+  the discriminating (v) passed, except the sub-prediction that the multipliers absorb more
+  error at the wider width.
+- Consequence: the matched width stays the rule (F37) and D027's reporting rule stands; the
+  faint-half fix is the law (Q18 (b), (d), (e), (f)), not the width.
+
+**Running**
+- E030 pass 6 (log-normal multiplier law, Q18 (d)): gaussian-law quadrature check against pass
+  3, then the ten log-normal scans; pre-registered in the record. Pass 7 (template reference at
+  the leading band, Q18 (f)) queued behind it.
+
+**Next**
+- Read passes 6 and 7 against their pre-registrations; close E030 with the final F37/F38
+  wording; choose the Q18 path; stats review before any chain-code change to the prior.
+
+**Needs Trygve**
+- The real-data hyperprior default (D017 territory): the width follows the template quality
+  (F37), and E030 chains 1 and 2 show that no width gives a calibrated region map under a 30
+  percent template; proposal: matched width plus the D027 report (data-dominated regions and
+  the Fisher-weighted level), pending passes 6 and 7.
+- Earlier items unchanged (template reference frequency; the 14-band simulation for E028
+  stage C; the Paper A reporting rule).
+
 ## 2026-11-09 (Mac mini, 04:40): E030 chain 1 read (F38: with a 30 percent template the field mean is set by the faint half and the GMRF spreads it; only the data-dominated regions and the Fisher-weighted level hold); chain 2 at sd 0.5 running
 
 **Learned**

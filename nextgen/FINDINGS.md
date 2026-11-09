@@ -755,7 +755,11 @@ at the matched width a data-dominated sync index carries a template-induced shif
 +0.07 for a 30 percent template (the chain `gmrf16_cs_mumap_nc_Tmap_mu03` confirms it with the
 field prior: the hundred brightest regions at -0.01 to +0.09, the Fisher-weighted level +0.08
 to +0.10; the region map as a whole follows the displaced field mean, F38). Pass 4 scans
-(2026-11-09): over three realizations of the 30 percent error (seed 11, its negative, seed 12)
+(2026-11-09; chain 2 at sd 0.5 read 12:20: the bright dust quartile is +0.036 there, of which
++0.018 is shrinkage toward the field mean through the smoother field, sigma_d 0.08, so "leaves
+bright dust at zero" holds at the matched width and not above it; the hundred brightest sync
+regions sit at +0.06 at sd 0.5 against +0.09 at sd 0.3, both at the scan's +0.07 within the
+region scatter): over three realizations of the 30 percent error (seed 11, its negative, seed 12)
 the data-dominated sync shift at the matched width is +0.07, -0.06, +0.01, a random shift with
 scale 0.06 and mean near zero, so the "+0.07" is one draw and not a bias; the faint push stays
 positive in all three (sync +0.2 to +0.3, dust +0.03 to +0.14; even in the error field's sign);
@@ -800,3 +804,22 @@ data-dominated regions and the Fisher-weighted level, not the field mean or the 
 whole; the field-mean hyperprior, or the multiplier prior's law, must be changed so that the
 template-dominated regions do not set the field mean (Q18). Scope: one sky, one template-error
 realization, the oracle T; the sd 0.5 chain is pending.
+
+**Amended (2026-11-09 12:20, E030 chain 2, `gmrf16_cs_mumap_nc_Tmap_mu05`: cs, sd 0.5, oracle T;
+D025 passes, KS p 0.78 and 0.72; 20 divergences):** the width drives the roughness. sigma_s 0.32
+against 0.51 at sd 0.3, sigma_d 0.081 against 0.174; pixel RMSE 0.327 sync, 0.091 dust against
+0.426, 0.117 at sd 0.3 and E026's 0.335, 0.089, so the T map changes the RMSE by under 0.01 and
+E026's cs numbers are a converged chain's. GLS CMB residual 94.45 uK at the draws against 97.66
+(floor 93.18). The sync field mean is -2.722 +- 0.051 at sd 0.5 as at sd 0.3, the faint sync
+half +0.26 to +0.34 at both, the hundred brightest sync regions +0.06 against +0.09 (scan
++0.07), so the F38 displacement does not depend on the width. The width trades coverage for
+RMSE: at sd 0.5 the region map is one posterior sd high almost everywhere (z median against
+the reference +1.03 sync, +1.00 dust; |z| < 1 for 47 and 49 percent of the regions against 69
+and 65 at sd 0.3), the dust field mean +0.073 above the `bd_trueT` mean against +0.030, and the
+bright dust quartile +0.036 (z +0.73) against +0.004, of which +0.018 is shrinkage toward the
+field mean (data weight 0.64 at sigma_d 0.08 against 0.89 at 0.17). The multiplier maps absorb
+the same share of the error at either width (rms against exp(-f) 0.28 to 0.30, the faint
+half's own error rms; the width sets only their posterior sd there, 0.46 to 0.49 against 0.29).
+Neither width gives a calibrated region map under a 30 percent template; what holds at both is
+the data-dominated regions and the Fisher-weighted level (+0.07 to +0.09 against truth), D027.
+Scope unchanged: one sky, one error realization, the oracle T.

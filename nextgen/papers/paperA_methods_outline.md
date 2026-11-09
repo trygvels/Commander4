@@ -189,9 +189,16 @@ model component rather than a preprocessing choice.
   variance-driven even push of +0.2 to +0.3 (sync) remains in the prior-dominated half. A
   wider hyperprior does not help (sd 3 collapses every prior-dominated quartile by the Occam
   push). Candidates under test: the log-normal multiplier law (pass 6) and the template
-  reference at the leading band (pass 7). Table candidate: Table 3 rows E030 chain 1 and E026
-  cs, plus a table of the uniform-error response per quartile; Figure candidate: posterior-mean
-  sync minus reference against region Fisher sd with the shrinkage curve.
+  reference at the leading band (pass 7). The width itself is a bias-variance knob with no
+  calibrated setting under such a template (E030 chains 1 and 2): sd 0.5 halves the field's
+  roughness and the pixel RMSE relative to sd 0.3 (0.33 and 0.09 against 0.43 and 0.12) and
+  lowers the CMB residual (94.5 against 97.7 uK) by shrinking toward a field mean the faint half
+  sets, leaving the region map one posterior sd high almost everywhere (|z| < 1 for 47 to 49
+  percent of regions against 65 to 69); the faint half (+0.26 to +0.34) and the field mean
+  (-2.72) are the same at both widths, and the hundred brightest regions hold at both (+0.06 to
+  +0.09). Table candidate: Table 3 rows E030 chains 1 and 2 and E026 cs, plus a table of the
+  uniform-error response per quartile; Figure candidate: posterior-mean sync minus reference
+  against region Fisher sd with the shrinkage curve at both widths.
 - The dust temperature model at realistic noise (E028 stages A, A', B with E029; F33 to F36):
   with a fixed T the hier target has no unbiased configuration. Under sd 0.5 the T misfit is
   hidden in the multipliers (mu_d map 1.029) and the faint dust index sits +0.06 above beta_d;

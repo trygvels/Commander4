@@ -1,0 +1,16 @@
+gmrf16_cs_mumap_nc_Tmap_mu05 ThermalDust: 700 post-burn draws; mu +1.6122, sigma 0.0811; bd_trueT mean +1.5392; per-quartile bd_trueT means +1.5699 +1.5226 +1.5159 +1.5481
+quartile  chain-ref  pred-ref  mu-ref  median w  median fs  median post sd  rms(chain-pred)
+  Q1    +0.0361   +0.0179  +0.0423   0.64     0.060     0.052        0.045
+  Q2    +0.0893   +0.0816  +0.0896   0.08     0.274     0.068        0.046
+  Q3    +0.1010   +0.0947  +0.0963   0.02     0.657     0.077        0.038
+  Q4    +0.0657   +0.0639  +0.0640   0.00     2.118     0.082        0.023
+all sky  chain-ref +0.0730  pred-ref +0.0645  rms(chain-pred) 0.039
+
+gmrf16_cs_mumap_nc_Tmap_mu05 Synchrotron: 700 post-burn draws; mu -2.7221, sigma 0.3208; bs_trueT mean -2.9995; per-quartile bs_trueT means -2.9896 -3.0066 -3.0046 -2.9973
+quartile  chain-ref  pred-ref  mu-ref  median w  median fs  median post sd  rms(chain-pred)
+  Q1    +0.1687   +0.2235  +0.2676   0.09     1.001     0.215        0.161
+  Q2    +0.2897   +0.2779  +0.2846   0.02     2.150     0.260        0.177
+  Q3    +0.3406   +0.2796  +0.2825   0.01     3.174     0.282        0.178
+  Q4    +0.3109   +0.2739  +0.2752   0.00     4.580     0.294        0.108
+all sky  chain-ref +0.2775  pred-ref +0.2637  rms(chain-pred) 0.159
+

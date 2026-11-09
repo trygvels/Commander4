@@ -69,6 +69,7 @@ Sources: `E028/stageA_dust_vs_refs.txt`, `stageAprime_dust_vs_refs.txt`, `stageB
 | E028 B `..._Tscalar` | 0.1 | sampled scalar (19.19 +- 0.54 K) | -0.004 / +0.029 / +0.024 / -0.002 | 1.002 | -2.977 | 0.062 / 0.046 | 93.42 |
 | E026 `gmrf16_cs_mumap_nc`, cs | 0.5 | fixed 20.93 K | -0.008 / +0.060 / +0.080 / +0.050 | 1.030 | -2.723 | 0.335 / 0.089 | 95.25 (at draws) |
 | E030 chain 1 `..._cs_mumap_nc_Tmap_mu03`, cs | 0.3 | oracle map | +0.004 / +0.032 / +0.059 / +0.023 | 1.009 | -2.701 | 0.426 / 0.117 | 96.42 |
+| E030 chain 2 `..._cs_mumap_nc_Tmap_mu05`, cs | 0.5 | oracle map | +0.036 / +0.089 / +0.101 / +0.066 | 1.027 | -2.722 | 0.327 / 0.091 | 94.45 (at draws) |
 | exact marginal | 0.5 | fixed | +0.02 / +0.10 / +0.09 / +0.08 | | | | |
 | exact marginal | 0.5 | oracle map | +0.01 / +0.10 / +0.09 / +0.07 | | | | |
 | exact marginal | 0.1 | fixed | -0.01 / -0.03 / -0.01 / +0.01 | | | | |
