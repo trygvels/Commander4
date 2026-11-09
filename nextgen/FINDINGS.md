@@ -1,7 +1,70 @@
 # Findings so far
 
-Established on 2026-10-25 in a single exploratory session. Experiment IDs refer to
-`experiments/registry.md`. Numbers are from simulations unless stated.
+F1 to F11 date from the exploratory session of 2026-10-25. F12 to F43 were added as experiments
+closed, through 2026-11-09. Experiment IDs refer to `experiments/registry.md`. Numbers are from
+simulations unless stated.
+
+## 0. Reading guide after the 2026-11-09 review
+
+The review is `reviews/2026-11-09_program_review.md`, with the referee report and the pipeline
+audit beside it. Five things apply to everything below.
+
+- **Noise regime.** "Realistic noise", "Planck-like depth" and "noise scale 1" in F26 to F38 mean
+  scale 1 of the PySM ladder, which is 24 to 90 times real WMAP/LFI intensity white noise (F39).
+  Scale 0.03 (F21, F23, F24) is 0.7 to 2.7 times the real depth. Only F22 concerns polarization.
+- **Baselines.** On the PySM d1s1 sky a constant index at the truth mean has pixel RMSE 0.0629
+  (sync) and 0.0374 (dust); the truth's own nside-16 region means have 0.0130 and 0.0187. An
+  index-field RMSE means something only against these. Every scale 1 synchrotron field with the
+  sd 0.5 or cs-template configurations is worse than the constant.
+- **The CMB residual.** The total flat-prior GLS CMB residual quoted in F32 to F38 is the noise
+  term at scale 1 and ranks nothing (F40).
+- **One realization, one chain.** F26 to F38 rest on one sky, one noise realization and single
+  chains. Each run computed a second chain that was never written (F42).
+- **Real maps.** Every E014 number expressed in posterior sd is the width of a fit whose
+  high-latitude reduced chi-square was of order 13 to 60 in the chain's own noise model (F41).
+
+Grades: A, established against an exact or independent reference with replication. B, supported
+on one sky, seed or configuration. C, suggestive. D, possibly an artefact. W, withdrawn. They
+follow the referee report except where a later experiment changed them (F1, F38).
+
+| Finding | Grade | Status after the review |
+|---|---|---|
+| F1 | A for the mechanism and the law, B for the real-map size | Restated (E035): a pseudo-marginal kernel for the ridge posterior broken by the amplitude draw; width 0.79 k^(1/4) derived |
+| F2 | A | Stands |
+| F3 | B | Mechanism stands and is in the literature (0709.1058, 0811.4280, 1608.00551); "54 ridge sd" dropped (F41) |
+| F4 | C | "Principled default" is a convention, not a result; literature sentence corrected |
+| F5, F6 | C | One seed per cell; the qualitative result is known |
+| F7 | B | Stands |
+| F8 | C | One realization; the audit estimates up to 3.3 in width (item D2); Q7 open |
+| F9 | C | Code reading, confirmed by a second reading (audit G1); no experiment |
+| F10, F11 | B for the code facts, C for their impact | Commander3 was never run |
+| F12, F15, F18 | A on simulations | Stand |
+| F13 | B | Stands |
+| F14 | B for the ratio, C for iterations per sample | One configuration |
+| F16 | B | Calibrated on data drawn from its own hyperprior; says nothing about misspecified skies |
+| F17 | B | A statement about means; the like-for-like shift is +0.035 (beta_s) and -0.016 (beta_d); "0.4" compares two band sets; "hundreds of sd" dropped |
+| F19 | B | One replicate; no SBC of the Commander4 implementation |
+| F20, F25 | B minus, C | Efficiency on one seed |
+| F21 | B plus | The most important negative result: a runaway at real depth with a data-built template |
+| F22 | B for (a) and (b), D for (c) | (c) is an inference, not a measurement |
+| F23 | A for the mechanism, B for the size | Stands |
+| F24 | B plus | The one place an index field beats a scalar; needs the same comparison on PySM at scale 0.03 with longer chains |
+| F26 | A | Algebra |
+| F27 | B to C | Scale 1 |
+| F28 | W at scale 1 | Contradicted by F37, F38 and chain 3; the scale 0.03 part awaits E032 |
+| F29 | B to C | Wording of the slope corrected; sizes from 6 to 8 realizations in a review note |
+| F30 | W | Withdrawn in 2026-11-03 |
+| F31 | A | Stands |
+| F32 | B for the numbers, W for the rule | All three rungs lose to a constant index for synchrotron at scale 1 |
+| F33 | C | One chain with exact templates; not a rule (F37) |
+| F34 | C | One chain |
+| F35 | C | "Validated" withdrawn: the reference was refined after pre-registration, 22 divergences |
+| F36 | C | Holds for one sky with exact templates, the oracle T map and a width chosen knowing the template is exact |
+| F37 | B minus for the scans, C for the rule | Scale 1 |
+| F38 | B for the description, W for the cause and the remedy | Chain 3 amendment below |
+| F39, F40 | B | One sky; Fisher at the truth |
+| F41 | A for the floor, B for the order | Real maps and one simulated CMB |
+| F42, F43 | A | Code facts |
 
 ## 1. Sampler correctness
 
@@ -20,13 +83,28 @@ amplitude degrees of freedom, and drops the -1/2 ln det A term.
 | Commander4 unit test, 150 / 600 pixels (E005) | 3.2x / 4.4x | +0.50 / +0.83 sd |
 | Real maps, nside 64, 38165 masked pixels, 17 bands, 5 components (E014) | 16.5x (beta_d) / 17.1x (beta_s) | +3.0 +- 0.5 sd (beta_d), -2.7 +- 2.0 sd (beta_s) |
 
-The inflation grows roughly as k^(1/4), with k the number of amplitude degrees of freedom, so at
-full resolution (k ~ 10^7) it would be far larger. The shifted means match the profile ("ridge")
-posterior. Commander4's `perpix_betasamp` example config uses exactly this setup at nside 512. An
-independent subagent reading the upstream code reached the same conclusion. Real-data impact
-(E014, Q1): on public maps at nside 64 the legacy posterior is 16 to 17x too wide against the exact
-ridge target computed on the same data, consistent with the k^(1/4) scaling (predicted 18.5x), and
-the dust index is shifted by 3 ridge sd. At nside 512 to 1024 the scaling predicts factors above 50.
+**Restated 2026-11-09 (E035).** Taken alone the move is a valid pseudo-marginal
+Metropolis-Hastings kernel, but for an extended target whose index marginal is the profile (ridge)
+posterior and whose amplitudes have half their posterior covariance. The amplitude step of the
+Gibbs sweep redraws the amplitudes with their full covariance, which is not that target's
+conditional, so the composite chain leaves neither target invariant. With one index step per
+amplitude draw it converges to the ridge posterior tempered by T = sqrt(2 pi k) / 4, with k the
+number of amplitude degrees of freedom re-solved per proposal: the ridge mean, and a width of
+0.7916 k^(1/4) times the ridge width. The law is derived in the E035 record and holds in toy
+chains to 0.7 percent for k from 1000 to 190825; without the amplitude refresh, or with the
+refresh drawn from the extended target's conditional, the same toy returns the ridge posterior
+exactly. More index steps per amplitude draw lower the coefficient (0.64 at five, 0.54 at
+twenty). The simulated rows of the table agree with the toy at their own settings to 5 percent
+(E002: 4.0 to 4.1 and 5.7; E005: 3.0 and 4.3). The real-map row does not: the toy at E014's
+settings gives 13.1 to 13.6 against the measured 16.5 and 17.1 (8 percent error each), so the
+real-map width is 22 to 31 percent above the toy and unexplained (candidates in E035). At
+k = 1e7 the one-step law gives 45 and the twenty-step coefficient 30. Commander4's
+`perpix_betasamp` example config uses this move at nside 512, and an independent subagent
+reading the upstream code reached the same conclusion about it. On the real maps of E014 the
+dust index is also shifted by 3 ridge sd. Scope: flat amplitude priors and the per-pixel
+amplitude path. In the CG path the re-solve is a truncated solve (audit A1) and nothing is
+established. Superseded wording, kept for the record: "not a valid MCMC step", an empirical
+k^(1/4) fit with a predicted 18.5 for E014, and "factors above 50" at nside 512 to 1024.
 
 **F2. Fixed** on branch `fix/mcmc-marginal-acceptance` (E005, E006). Options `marginal`, `ridge`,
 `conditional` are exact for their stated targets; `resolve_chisq` keeps the old behaviour with a
@@ -49,6 +127,10 @@ On real nside-64 maps (E014, dust referenced at 70 GHz, 17 bands, 38165 pixels) 
 shifts the exact beta_s target by +0.019 (54 ridge sd) and beta_d by +0.0002 (5 sd) with the same
 widths; two exact chains (`ridge`, `marginal`) reproduce both targets within 0.2 sd, and the
 reduced chi-square differs by 0.07 percent, so the data do not pick the prior.
+**Caveat (2026-11-09, F41):** the "54 ridge sd" and "5 sd" are widths of a fit that does not hold
+at high latitude in the chain's own noise model, and are dropped. The absolute shift of +0.019
+belongs to that error model. The mechanism is published (Eriksen et al. 2008, Dunkley et al. 2009,
+Alonso et al. 2017); what is not published is a coverage curve against S/N (novelty check).
 
 **F4. Ridge is the principled default.** Ridge is the profile ("spectral") likelihood of parametric
 component separation (Stompor et al. 2009). As an MH target it equals the flat-prior marginal times
@@ -56,8 +138,11 @@ det(A)^(1/2), i.e. the marginal under the Jeffreys prior of the amplitude block 
 p(a | beta) proportional to det A(beta)^(1/2), with a flat prior on beta. (Corrected 2026-10-25 after
 the E012 review: it is NOT the full joint Jeffreys prior sqrt(det I(a, beta)), which carries an
 a-dependent factor and gives a different beta posterior; quadrature check in
-`experiments/E009_c3_nonlin_review/check_a_e.py`.) Eriksen et al. 2008 and Planck 2015 X used
-Jeffreys priors to remove prior-volume bias of more than 4 sigma. `auto` now resolves to ridge where available. Conditional Gibbs (Commander3
+`experiments/E009_c3_nonlin_review/check_a_e.py`.) Eriksen et al. 2008 used a Jeffreys prior to
+remove a bias of more than 4 sigma in the global offset driven by a uniform index prior (their
+Sect. IV.2), and Alonso et al. 2017 (1608.00551, Fig. 11) report index biases of more than 4 sigma
+from the volume factor and apply a volume prior that makes their target the ridge likelihood
+(corrected 2026-11-09 from the novelty check; verify both in the PDFs before citing). `auto` now resolves to ridge where available. Conditional Gibbs (Commander3
 'chisq' default) targets the flat-prior posterior and therefore carries the same volume pull, only
 hidden by slow mixing. This needs a proper coverage study (Q2).
 
@@ -219,6 +304,9 @@ steps per Gibbs iteration at fixed amplitudes (lag-n correlation below 0.1) and 
 Gibbs correlation length of 30 to 50 over about 500 samples (2011.08503 Sect. 5.3.2), so its
 within-conditional mixing was handled and the amplitude-index Gibbs coupling was measured, not
 ignored; the open question is only whether 30 to 50 is the full coupling length.
+**Caveat (2026-11-09, F41):** both widths belong to an error model with the HFI bands at 235 to
+760 times their intended weight. The ratio of the two is the finding; neither width is an
+uncertainty of the sky's index.
 
 **F15. The joint posterior with flat amplitude priors has the collapsed flat-prior marginal (w1, with
 -1/2 ln det A) as its exact spectral-parameter marginal; a Gibbs sampler that draws amplitudes with
@@ -267,6 +355,12 @@ index on these maps is irrelevant next to the convention. Commander4 has no mono
 per-band zero level with a prior is part of the model (Q15), spectral indices from maps-only runs on
 real data are convention-dependent and are not science results. The method results of E014 (chain
 against exact grid on identical inputs) are unaffected.
+**Corrected (2026-11-09, referee Sect. 2.5 and F41):** the like-for-like effect of the zero-level
+convention, with the same 20 bands, is +0.035 in beta_s (-2.9103 to -2.8755) and -0.016 in beta_d,
+plus +0.011 from the Haslam dipole. The "0.4" of the headline compares two band sets (17 against
+20 bands) and is not a zero-level effect. "Hundreds of posterior sd" is dropped: the sd is that of
+a fit with a high-latitude reduced chi-square of tens. The ingest errors of F41 act on the same
+maps and were not separated from the zero levels.
 
 **F18. For one full-sky spectral index on template data the flat-prior marginal is biased or
 collapsed at every S/N, the profile is unbiased but up to two times too narrow below full-sky S/N
@@ -524,6 +618,10 @@ sync Q1 (where the data decide), but +0.06 to +0.11 in dust Q3 and Q4 and beyond
 faint sync quartiles at every hyperprior width 0.1 to 0.5: in the prior-dominated half of the
 sky a 30 percent template error is not removed by the multiplier field, and the GMRF index
 prior sets those regions in a chain.
+**Withdrawn at noise scale 1 (2026-11-09 review):** four chains with the multiplier field and a 30
+percent template put the synchrotron field mean at -2.72, -2.70, -2.72 and -3.16 against -3.00
+(F38). The scale 0.03 statement rests on exact-target scans (E032 scan: every quartile within
+0.02) and awaits the E032 chains.
 
 **F29. At realistic noise the nside-16 GMRF synchrotron index field is prior-dominated over
 three quarters of the sky, and there the hierarchical amplitude prior's per-region multipliers
@@ -537,9 +635,11 @@ holds 90 percent of the sync Fisher weight and agrees with the noise-free region
 -2.978 against -2.988 for the truth. The unweighted field mean is -2.868 +- 0.042, +0.13 above
 the sky mean, because the 2300 regions with region Fisher sd 2.5 to 3.7 sit at +0.12 to +0.14.
 Cause (exact marginal with the multipliers integrated analytically): the volume term -1/2
-sum_r log(-Q_r) of the 3072 marginalized multipliers rises with a steeper index (slope +130
+sum_r log(-Q_r) of the 3072 marginalized multipliers rises with a flatter index (slope +130
 nats per unit beta over the faint regions; 66 percent of the sync amplitude information is at
-23 GHz, so a steeper index gives each multiplier more leverage), which puts the faint level
+23 GHz, so with the reference at 30 GHz a steeper index gives each multiplier more leverage,
+which the volume term penalizes; wording corrected 2026-11-09, the text said "rises with a
+steeper index" against its own slope sign), which puts the faint level
 +0.15 +- 0.05 above the truth over simulated noise realizations (+0.19 on this one); the chain's
 +0.13 is that bias held back by the field prior. The bias scales with the hyperprior variance:
 sd 0.2 gives +0.06, sd 0.1 zero within noise (E029 tests this in a chain). It is not a property
@@ -793,12 +893,13 @@ sit at -0.01, +0.06, +0.09 and the Fisher-weighted level of the field at +0.08 (
 is at the reference (+0.004, z median +0.17); dust Q2 to Q4 +0.032, +0.059, +0.023 against the
 prediction +0.033, +0.049, +0.021. The multiplier maps track the realized template error in the
 bright quartile (corr +0.86 dust, +0.66 sync) and not beyond (Q2 +0.44, +0.37), their mean
-1.009 and 0.982 against exp(-f)'s 1.046. Pixel RMSE 0.426 sync, 0.117 dust against stage A's
-0.066, 0.038 with exact templates (paired +0.360 +- 0.021, +0.064 +- 0.005) and against E026's
+1.009 and 0.982 against exp(-f)'s 1.046. Pixel RMSE 0.426 sync, 0.117 dust against stage A' 's
+0.066, 0.038 (exact templates and sd 0.1, so template and width differ at once; label corrected
+2026-11-09, the text said stage A; paired +0.360 +- 0.021, +0.064 +- 0.005) and against E026's
 cs chain 0.335, 0.089; the field is rougher (sigma_s 0.51 against 0.35, sigma_d 0.17 against
 0.12), and the E026 comparison is confounded by the T map, the width and E026's hyperparameter
 ESS of 4 to 13 (chain 2, cs at sd 0.5 with the oracle T, separates them). GLS CMB residual at
-the posterior-mean fields 96.4 uK against stage A's 93.1, the excess from the sync field.
+the posterior-mean fields 96.4 uK against stage A' 's 93.1 (the difference is the noise term, F40).
 Consequence: with a real-data-quality template the reportable index quantities are the
 data-dominated regions and the Fisher-weighted level, not the field mean or the region map as a
 whole; the field-mean hyperprior, or the multiplier prior's law, must be changed so that the
@@ -823,3 +924,103 @@ half's own error rms; the width sets only their posterior sd there, 0.46 to 0.49
 Neither width gives a calibrated region map under a 30 percent template; what holds at both is
 the data-dominated regions and the Fisher-weighted level (+0.07 to +0.09 against truth), D027.
 Scope unchanged: one sky, one error realization, the oracle T.
+**Amended (2026-11-09 evening, E030 chain 3, `gmrf16_cs_mumap_nc_Tmap_mu03_ref23`: chain 1 with
+the amplitude and template reference at the leading band, 23 and 353 GHz; 1200 iterations, 0
+divergences; D025 passes, KS p 0.72 and 0.43):** the displacement changes sign and the remedy
+fails. Sync field mean -3.164 +- 0.049 against the truth -3.000 (3.4 posterior sd low;
+pre-registered within 0.10), sigma_s 0.121. The field is a near-constant at the displaced mean:
+every quartile sits 0.15 to 0.18 below the true-T region fit (all sky -0.164 against the
+independent-region shrinkage prediction -0.162, rms 0.024), with |z| < 1 for 27 to 33 percent of
+the regions. The hundred brightest regions by Fisher weight sit at -0.126, where chains 1 and 2
+had +0.09 and +0.06, so "the data-dominated regions and the Fisher-weighted level stay where the
+exact target puts them" does not hold across reference frequencies and is withdrawn as a general
+statement. The sync pixel RMSE of 0.177 equals that of a constant at -3.164 (0.176) and carries
+no information. Dust: field mean 1.591, sigma_d 0.110, RMSE 0.084. The pre-registration rested on
+a misreading of the pass 7 scan, whose faint-quartile optima were -0.18 to -0.30 and not flat;
+the four quartile parabolas sum to -0.06 for the level and -0.23 +- 0.09 for the faint three.
+What stands of F38 is the description: the field mean follows the prior-dominated majority, the
+GMRF carries it into every region, and the regions follow the shrinkage prediction to rms 0.024.
+What does not stand is the causal reading through the lever arm and the remedy of referencing the
+template at the leading band. Four chains with a 30 percent template put the sync field mean at
+-2.72, -2.70, -2.72 and -3.16 against -3.00. At noise scale 1 the hier prior with a
+component-separation-quality template has no configuration with a calibrated field mean. Whether
+that matters at real intensity depth is E032.
+
+## 8. Findings of the 2026-11-09 review
+
+**F39. Noise scale 1 of the PySM ladder is 24 to 90 times real WMAP/LFI intensity white noise (88
+to 1090 times HFI, 17 to 64 times WMAP/LFI Q/U), and scale 0.03 is 0.7 to 2.7 times the real
+WMAP/LFI depth. Real intensity synchrotron is limited by the component model and the 408 MHz
+anchor, not by noise; real polarized synchrotron is where the weak-data machinery applies**
+(E031: per-pixel white noise of the ladder against the real maps at nside 64; Fisher sd of region
+indices at the truth with the amplitudes profiled). Median synchrotron index sd per nside-16
+region: ladder scale 1 5.99, scale 0.03 0.180, real three-component intensity 0.078, real
+five-component intensity 1.36, with 408 MHz 0.10; real dust 0.012. Polarized synchrotron per
+nside-16 region and Stokes parameter: 2.18 with the BP XV band set, 0.77 with K band added (0.37,
+0.18, 0.087, 0.035 at nside 8, 4, 2, 1), 0.17 with an 11 GHz channel at an assumed depth. The
+truth's index sd on this sky is 0.063 (sync) and 0.037 (dust). The median synchrotron S/N per
+nside-64 pixel at 23 GHz is 0.31 at scale 1 and 16 at real depth. Consequences: the label
+"realistic noise" for scale 1 is withdrawn in every record; F26 to F38 describe a weak-data
+regime whose real counterpart is polarization, where none of them was obtained; at real
+intensity depth the binding terms are the component model (free-free, spinning dust), the zero
+levels (F17) and the ingest path (F41). Scope: Fisher numbers at the truth with white noise; real
+low-multipole polarization noise is correlated and worse.
+
+**F40. The total flat-prior GLS CMB residual at noise scale 1 is the noise term and ranks no
+model. Its bias part is a Galactic-plane number, and at high latitude no chain with a
+component-separation-quality template beats a constant index** (E033: the residual of the GLS CMB
+estimate at assumed SEDs split analytically into bias, w^T sky minus cmb, and noise; the weights
+reproduce `gls_cmb` to 4e-12 uK). The total is 90.9 to 96.4 uK for every model against a noise
+term of 90.5 to 96.0. Bias over the sky and at abs(b) > 20, in uK: the truth's nside-16 region
+means 5.95 and 0.42; a constant at the truth means 16.3 and 0.95; the exact-template chain (stage
+A') 5.60 and 0.84; the cs-template chains 6.7 to 9.8 and 1.56 to 3.34. Every chain beats the
+constant over the full sky by 30 to 60 percent, through dust and the plane. At abs(b) > 20 the
+constant is matched by the exact-template chain and beaten by no cs-template chain, and at l = 2
+to 10 chain 1 has six times the constant's bias amplitude (1.92 against 0.32 uK). Withdrawn with
+this: every ranking of models by the total residual in E026 to E030 and Paper A Table 3, "chain 3
+improves the CMB residual", and the E029 attribution. Consequence: in intensity the stake of the
+index model for the CMB is 0.3 to 0.5 uK per low-multipole band-power bin against a signal near
+30 uK, so index fields in intensity are a foreground-science gain first. The same bias in
+polarization would be compared with a signal of 0.1 to 1 uK and has not been measured. Scope: one
+sky, pseudo-C_l over f_sky, band powers exploratory.
+
+**F41. Two steps of the map ingest make the real-map error model wrong: the model-error floor
+reaches the likelihood 27.6 times below its nominal value, and maps are degraded before they are
+smoothed, which leaves band-dependent CMB aliasing of 0.6 to 1.7 uK per nside-64 pixel** (E034;
+raised by the pipeline audit as B14 and B1, expectations written before the runs).
+`add_signal_fraction_to_rms` adds a white term per native pixel, which the degradation (8 times)
+and the smoothing (3.45 times) average down, so the E014 chains had 100, 353 and 857 GHz at 0.37,
+0.49 and 0.83 uK_RJ per pixel, the tightest bands, where the E014 table lists 5.1, 13.4 and 23.
+That table's rms column is the degraded rms with the nominal floor and without the smoothing
+reduction; it reproduces to 2 percent. In the chain's own noise model the high-latitude reduced
+chi-squares are of order 13 to 60 in every band, where the table shows 0.0 to 6.4. For a CMB-only
+simulated sky the code path (`ud_grade`, then smoothing to 120 arcmin) leaves differences between
+bands of 0.79 uK_CMB (13 against 32 arcmin native beams), 1.5 (13 against 60) and 0.64 (32
+against 53), and the other order leaves 0.0000. Against the per-pixel noise that reaches the
+likelihood these are 0.65 to 3 times the noise for the CMB-dominated bands. What stands of E014:
+the chains agree with the exact targets of the model as implemented (F2), the ratio of F14, and
+the mean shifts of F17. What does not: any number in posterior sd, the reading of which bands
+carry the fit, and the dust index as a measurement. Upstream is affected by both items. The
+reader fix is queued behind the E032 chains. Scope: the aliasing test is CMB only and is a lower
+bound; the effect on the indices needs the chains rerun.
+
+**F42. Commander4 computes two chains in every run and writes one. Every chain of E020 to E030
+had an unwritten twin, and no between-chain diagnostic has been computed for any result** (code
+reading 2026-11-09, audit G9 and G7: `gibbs_schedule` in `cli.py` walks `chain in (1, 2)` inside
+every iteration, the random stream is keyed on seed, chain, iteration and rank, the NUTS state is
+kept per chain and group in `compsep/index_field_sampler.py`, and `file_io/chain_writer.py`
+writes only the chains in `output.chains.write`, `[1,]` in every parameter file used so far). The
+two chains share their start and differ in random stream. Half of the compute of every run was
+discarded, and wall times per written iteration cover both chains. From E032 on both are written.
+Consequence: split R-hat over at least four chains from two starts becomes a standard check
+(VALIDATION.md), at no extra compute.
+
+**F43. `get_sky` evaluates a component that carries an index field at the field's mean index**
+(code reading 2026-11-09, audit B3: `sky/diffuse_components.py`, `get_sky` multiplies the
+amplitude map by the scalar `get_sed(nu)` at the mean that `set_beta_map` stores). The
+index-field sampler and both amplitude solvers use the per-pixel SED, so sampled posteriors are
+not affected. Affected: Commander4's own chi-square in every index-field run (the E020 and E021
+records attribute its value of 50 to 100 to the alm representation alone, which is incomplete),
+the residual passed to a group when an index-field component is held fixed, the `conditional`
+likelihood, and the sky handed to the TOD side. No recorded result uses any of the four. The fix
+is queued behind the E032 chains.
