@@ -179,9 +179,19 @@ model component rather than a preprocessing choice.
   Fisher-weighted level hold (-0.01 to +0.09, +0.08). Statement for the paper: with a
   component-separation-quality template the index field reports its data-dominated regions and
   its Fisher-weighted level; the field mean and the region map as a whole are prior statements
-  unless the multiplier law is changed (Q18). Table candidate: Table 3 rows E030 chain 1 and
-  E026 cs; Figure candidate: posterior-mean sync minus reference against region Fisher sd with
-  the shrinkage curve.
+  unless the multiplier law is changed (Q18). Mechanism (E030 passes 4 and 5): the hyperprior's
+  pull of a region's multiplier toward 1 leaves a residual amplitude error at the reference
+  frequency, which the index removes by tilting the SED about the reference along the leading
+  band's lever arm, 1 / ln(nu_ref / nu_lead) = 3.8 for sync through 23 GHz; a uniform 30
+  percent template error shifts the sync Q1 quartile by 0.27 and dust Q2 by 0.2, and only
+  regions with index Fisher sd below about 0.3 hold their index. For a zero-mean error field
+  the odd shifts average out over a quartile (three realizations: +0.07, -0.06, +0.01) and a
+  variance-driven even push of +0.2 to +0.3 (sync) remains in the prior-dominated half. A
+  wider hyperprior does not help (sd 3 collapses every prior-dominated quartile by the Occam
+  push). Candidates under test: the log-normal multiplier law (pass 6) and the template
+  reference at the leading band (pass 7). Table candidate: Table 3 rows E030 chain 1 and E026
+  cs, plus a table of the uniform-error response per quartile; Figure candidate: posterior-mean
+  sync minus reference against region Fisher sd with the shrinkage curve.
 - The dust temperature model at realistic noise (E028 stages A, A', B with E029; F33 to F36):
   with a fixed T the hier target has no unbiased configuration. Under sd 0.5 the T misfit is
   hidden in the multipliers (mu_d map 1.029) and the faint dust index sits +0.06 above beta_d;
