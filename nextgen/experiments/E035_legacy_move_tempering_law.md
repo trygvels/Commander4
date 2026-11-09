@@ -99,7 +99,9 @@ k = 100 as stated; the O(k^(-1/2)) correction is visible there and at k = 10 (12
 **P2 and P3, the exact controls: pass.** Without any refresh the chain returns the ridge posterior
 (sd 1.000, 0.999, 1.001 at k = 4, 8, 16) with mean X of 2.000, 3.999, 8.001, which is k/2. With
 the refresh drawn from the extended target's own conditional, Gamma(k/2, 1), it returns sd 1.000,
-1.000, 1.001. Acceptance falls from 0.28 to 0.10 between k = 4 and 16, as exp(-k/4) predicts.
+1.000, 1.001. Acceptance falls from 0.28 to 0.10 between k = 4 and 16. (Corrected after the
+stats review: I had written "as exp(-k/4) predicts", which these numbers contradict. The rate with
+the index frozen is 2 I_(1/3)(k/2, k/2), which decays as exp(-0.059 k).)
 
 **P4, more steps per refresh and wider proposals.** Ratio of the toy sd to the one-step law:
 
@@ -151,7 +153,8 @@ else in the toy.
    0.7 percent for k from 1000 to 190825. More index steps per amplitude draw lower the
    coefficient (0.64 at five, 0.54 at twenty) and leave the k^(1/4) scaling.
 3. The correct-looking repair of drawing the refresh from N(a_hat, (2A)^-1) is exact and useless:
-   acceptance falls as exp(-k/4). The marginal or ridge acceptance of F2 is the fix.
+   acceptance falls as exp(-0.059 k) (corrected, see the stats review below), 6e-4 at k = 100. The
+   marginal or ridge acceptance of F2 is the fix.
 4. **The real-map width is not explained by the toy.** E014 measured 16.5 and 17.1 where the toy
    at its settings gives 13.1 to 13.6. Candidates, none tested: the legacy chi-square is evaluated
    on the alm-represented amplitudes (F7), which adds acceptance noise the toy does not have and
@@ -166,20 +169,70 @@ amplitude path, where the re-solve is a truncated solve (audit A1), or for other
 Changes: F1 rewritten around items 1 and 2 with the old empirical fit kept as history; the
 novelty report's sentence that the move "has no stated target" is corrected in the program review.
 
+## Independent stats review and what it changes (added 2026-11-09 23:38)
+
+`../reviews/2026-11-09_stats_review_legacy_move.md`: a stats-reviewer agent derived the answer
+without seeing this record, checked it with its own toy and an exact-kernel grid, and then
+compared. Its scripts are kept in `E035/stats_review_scripts/`.
+
+**Agreement.** The extended target, the profile marginal, the half-covariance conditional, the
+leading law sqrt(2 pi k)/4 and the useless exact repair are derived identically. Its exact-kernel
+reference reproduces every row of the P1 table within 1.4 standard errors.
+
+**It goes further.**
+1. The small-step law is exact at every k: T = 1/2 + 1/(4 c_k), with c_k = 2^-(k+1) C(k, k/2), so
+   T = sqrt(pi k / 8) + 1/2 + O(k^(-1/2)). The +1/2 is the excess of the toy at k = 10 and 100.
+   P1 did not fail at k = 100; my 3 percent band was too tight for a leading-order law. The
+   challenge report found the same term independently.
+2. For n index steps per amplitude draw the accepted moves are the lower records of the fresh
+   chi-square values, which gives the ratio T_n / T_1 = 0.833, 0.647, 0.543, 0.467, 0.357 at n = 2,
+   5, 10, 20, 100, confirmed to 1 percent at k of 1e4 and above. My measured coefficients 0.64 and
+   0.54 are 0.7916 sqrt(R_5) and 0.7916 sqrt(R_20).
+3. The law in terms of the acceptance noise, which is what matters when the stored amplitudes
+   are not the drawn ones: T is 1/2 + 0.443 times the sd of the chi-square at a fresh draw.
+
+**Errors it found in this record.**
+1. "exp(-k/4)" for the acceptance of the exact chain was wrong (corrected above).
+2. I misread the error of the real-map width. ESS 74 belongs to beta_s. beta_d has ESS 1184 and a
+   second chain in the log, with widths 16.40 and 16.59 ridge sd at 2 percent each, so the excess
+   over the toy's 13.55 is above 8 sigma and cannot be a width error.
+3. The toy's acceptance of 0.067 against the chains' 0.0735 and 0.0765 is a deficit of 9 to 13
+   percent, not a match.
+4. The outputs `toy_at_earlier_settings.txt` and `toy_e014_recorded_proposals.txt` came from
+   scripts that were not committed. They are now `nextgen/scripts/e035_toy_at_earlier_settings.py`
+   and `e035_toy_recorded_proposals.py`. The Setup paragraph gives the P4 chain lengths; P1 used
+   300 burn-in and 600 kept iterations, P2 400 and 1200 with 20 steps.
+
+**The open item is closed at the level of analysis** (item 4 of the Conclusion; Q23).
+1. The E014 log records the log acceptance ratio of every proposal. At the first step of an
+   iteration both amplitude sets are fresh, and the residual scatter of those 3200 values is 682
+   +- 9 where exact draws give sqrt(k) = 437. The chi-square at a fresh draw therefore has (2.44
+   +- 0.06) times the variance 2k of an exact draw.
+2. The toy with that one factor gives widths of 15.95 and 16.57 and an acceptance of 0.0751,
+   against the chains' 17.0 and 16.4 (beta_s), 16.40 and 16.59 (beta_d), 0.0735 and 0.0765.
+3. The cause is the storage of per-pixel amplitudes as alms (F7). Computed directly on the E014
+   inputs, the chi-square that `global_loglike` sees has 2.69 +- 0.18 times the exact variance.
+   The lost fluctuation variance would lower the noise to 0.74. The increase is a cross term with
+   the round-trip residual of the mean amplitude maps, which are not band-limited at lmax = 3
+   nside - 1: that residual costs 1.90 k in chi-square inside the mask, 9.5 per kept pixel.
+4. The same offset explains the legacy mean shift. Its gradient predicts +3.1 ridge sd in beta_d
+   and -0.1 in beta_s, against the measured +3.0 +- 0.5 and -2.7 +- 2.0. The "6 sigma" dust shift
+   of F1 is the gradient of the storage residual, not a property of the move.
+5. That the measured widths sat at the one-step law (16.5) was a coincidence of 0.82 from the
+   twenty steps and 2.44^(1/4) = 1.25 from the storage noise.
+
+Limits: routes 3 and 4 re-implement the draw and the round trip with the same library calls and
+do not execute Commander4. The end-to-end run below now has a predicted outcome: with amplitudes
+kept as maps the legacy widths fall to 13.1 and 13.6 ridge sd at these settings and the beta_d
+shift vanishes.
+
+Changes: F1 and F7 amended, Q23 answered at the level of analysis, Q6 raised in priority. The
+extrapolation "45 at k = 1e7" assumes exact stored draws and is dropped: with alm storage the
+factor depends on the round-trip residual, hence on lmax, beam and S/N.
+
 ## Follow-ups
 
 - The legacy mode in Commander4 at small nside with 1 and 20 steps per refresh, with and without
   the alm storage of the per-pixel amplitudes, to test the first candidate of item 4. Needs cores,
   so after E032.
 - The O(k^(-1/2)) correction, if Paper A wants the law below k = 1000.
-
-## Negative control
-
-P2 and P3 are the controls: the same code with the refresh removed or corrected must return the
-ridge posterior exactly.
-
-## Conclusion
-
-Pending.
-
-## Follow-ups

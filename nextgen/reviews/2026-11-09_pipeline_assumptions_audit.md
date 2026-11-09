@@ -1609,7 +1609,8 @@ The audit ran nothing. Items checked since, by the main session:
 | G9 / G7, two chains computed, one written, shared start | Confirmed by reading `cli.py`, `chain_writer.py` and `index_field_sampler.py`; E032 now writes both | F42 |
 | B3 / S4, `get_sky` at the mean index | Confirmed by reading `sky/diffuse_components.py`; no recorded result depends on it | F43 |
 | B8 / G2, latent default to the legacy move | Confirmed by reading `compsep/processing.py`; the comment there states the fallback on purpose. Not exercised by any run | none |
-| B2, B4, B5, B6, B7, B15, B16, A1 | Not yet checked. Tests 4 to 8 and 10 of section 11 are queued behind the E032 chains | none |
+| B5 / A2 and B6, the null C(l) prior | Confirmed by reading `sky/diffuse_components.py` (`P_Cl_prior` returns ones before the apodization) and `compsep/cg_solver.py` (the identity term and the prior fluctuation are always present): a null prior is N(0, 1) per alm in (uK_RJ at nu_ref)^2. Its size against the data, including the 408 MHz case, is not yet computed | Q22 |
+| B2, B4, B7, B15, B16, A1 | Not yet checked. Tests 5 to 8 and 10 of section 11 are queued behind the E032 chains | none |
 
 The sizes quoted for B14 in section 7 were hand estimates; the measured ones are in E034.
 

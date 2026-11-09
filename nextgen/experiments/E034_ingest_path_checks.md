@@ -187,14 +187,3 @@ not contacted without Trygve's decision.
   and re-read F3 and F17 in a model that fits at high latitude.
 - The same order test with a PySM foreground sky and point sources.
 - Audit test 9 (pixel covariance of smoothed noise against the stored diagonal, Q7).
-
-## Negative control
-
-The smooth-then-degrade column of the order check is the control: it must agree with the
-reference to well below the code path's difference.
-
-## Conclusion
-
-Pending.
-
-## Follow-ups

@@ -29,12 +29,12 @@ follow the referee report except where a later experiment changed them (F1, F38)
 
 | Finding | Grade | Status after the review |
 |---|---|---|
-| F1 | A for the mechanism and the law, B for the real-map size | Restated (E035): a pseudo-marginal kernel for the ridge posterior broken by the amplitude draw; width 0.79 k^(1/4) derived |
+| F1 | A for the mechanism and the law (derived twice independently), B for the real-map size | Restated (E035): Monte Carlo within Metropolis; temperature 1/2 + 0.443 times the sd of the chi-square at a fresh draw, sqrt(pi k / 8) + 1/2 for exact stored draws; the real-map width and mean shift explained by the alm storage (F7) |
 | F2 | A | Stands |
 | F3 | B | Mechanism stands and is in the literature (0709.1058, 0811.4280, 1608.00551); "54 ridge sd" dropped (F41) |
 | F4 | C | "Principled default" is a convention, not a result; literature sentence corrected |
 | F5, F6 | C | One seed per cell; the qualitative result is known |
-| F7 | B | Stands |
+| F7 | B | Amended: the stored mean maps are not band-limited either; 1.9 k of chi-square inside the E014 mask; stored amplitude samples under-dispersed; maps instead of alms (Q6) is now a correctness item |
 | F8 | C | One realization; the audit estimates up to 3.3 in width (item D2); Q7 open |
 | F9 | C | Code reading, confirmed by a second reading (audit G1); no experiment |
 | F10, F11 | B for the code facts, C for their impact | Commander3 was never run |
@@ -95,13 +95,23 @@ chains to 0.7 percent for k from 1000 to 190825; without the amplitude refresh, 
 refresh drawn from the extended target's conditional, the same toy returns the ridge posterior
 exactly. More index steps per amplitude draw lower the coefficient (0.64 at five, 0.54 at
 twenty). The simulated rows of the table agree with the toy at their own settings to 5 percent
-(E002: 4.0 to 4.1 and 5.7; E005: 3.0 and 4.3). The real-map row does not: the toy at E014's
-settings gives 13.1 to 13.6 against the measured 16.5 and 17.1 (8 percent error each), so the
-real-map width is 22 to 31 percent above the toy and unexplained (candidates in E035). At
-k = 1e7 the one-step law gives 45 and the twenty-step coefficient 30. Commander4's
+(E002: 4.0 to 4.1 and 5.7; E005: 3.0 and 4.3). The real-map row sits 22 to 31 percent above the
+toy at E014's settings (13.1 to 13.6 against 16.4 to 17.0 in two chains, beta_d known to 2
+percent), and the independent stats review traced that to the alm storage of the per-pixel
+amplitudes (F7): the chi-square the move sees at a fresh draw has 2.44 +- 0.06 times the exact
+variance (measured from the chain's own log; 2.69 +- 0.18 computed directly on the inputs), and
+the toy with that factor gives 15.95 and 16.57 with the chain's acceptance. In general the
+temperature is 1/2 + 0.443 times the sd of the chi-square at a fresh draw, which equals
+sqrt(pi k / 8) + 1/2 when the stored amplitudes are the drawn ones. The exact small-step law at
+every k is T = 1/2 + 1/(4 c_k), c_k = 2^-(k+1) C(k, k/2). The temperature law for a noisy
+acceptance is in print for the sign rule (Ball, Fink and Bowler 2003; unverified in the PDF by
+the main session), and the scheme is the "Monte Carlo within Metropolis" of Andrieu and Roberts
+2009; new here are the identification of the move, the chi-square form and the k^(1/4)
+consequence. Commander4's
 `perpix_betasamp` example config uses this move at nside 512, and an independent subagent
 reading the upstream code reached the same conclusion about it. On the real maps of E014 the
-dust index is also shifted by 3 ridge sd. Scope: flat amplitude priors and the per-pixel
+dust index is also shifted by 3 ridge sd, which is not a property of the move: the gradient of
+the storage residual predicts +3.1 (F7). Scope: flat amplitude priors and the per-pixel
 amplitude path. In the CG path the re-solve is a truncated solve (audit A1) and nothing is
 established. Superseded wording, kept for the record: "not a valid MCMC step", an empirical
 k^(1/4) fit with a predicted 18.5 for E014, and "factors above 50" at nside 512 to 1024.
@@ -170,10 +180,27 @@ Python plus C++ (nanobind) design is adequate; algorithmic gains dominate.
 
 ## 4. Commander4 implementation issues found
 
-**F7. Per-pixel amplitudes are stored as alms with lmax = 3 nside - 1** (E007). For unsmoothed maps
+**F7. Per-pixel amplitudes are stored as alms with lmax = 3 nside - 1** (E007; amended
+2026-11-09, see the end of this entry). For unsmoothed maps
 the round trip alone raises reduced chi^2 from 0.57 to ~794 (matching Commander4's own logged value);
 raising lmax makes it unstable. With common-resolution smoothing the mean is fine, but the white
 per-pixel fluctuation draws still lose variance above lmax. Not changed yet.
+**Amended (2026-11-09, stats review of the legacy move, `reviews/2026-11-09_stats_review_legacy_move.md`
+Sect. 7d):** "with common-resolution smoothing the mean is fine" does not hold at the chi-square
+level. Computed on the E014 inputs (nside 64, 120 arcmin, lmax 191, 38165 masked pixels, five
+components), the stored amplitudes are P(a_hat + delta) with P the alm round trip, and the
+chi-square at stored amplitudes exceeds the minimum by a deterministic 1.90 k (9.5 per kept pixel,
+k = 190825), from the round-trip residual of the mean amplitude maps, which are not band-limited
+at lmax = 3 nside - 1 (residual 0.5 to 1.6 marginal sd per component; not an iteration artefact
+and not confined to the mask edge). The fluctuation keeps 0.74 of its chi-square variance, so
+every stored amplitude sample is under-dispersed. Consequences: any acceptance evaluated through
+`global_loglike` sees chi2_min plus this offset. For the legacy move that multiplies the
+acceptance noise by 2.44 and shifts beta_d by +3 ridge sd through the offset's gradient (F1).
+The `conditional` mode accepts through the same function and is probably affected; unchecked.
+`ridge`, `marginal` and `hier` accept on the pixel-space kernel and are not affected, so no
+index result of F12 to F38 changes. The amplitudes written to the chain files are affected in
+every per-pixel run. This re-implements the draw and the round trip with Commander4's library
+calls and has not been confirmed by a Commander4 run with map storage (Q6, Q23).
 
 **F8. The per-pixel model treats smoothed noise as white** (E006). After smoothing to a common beam
 the noise is correlated; the per-pixel likelihood ignores that, and in the validation simulation

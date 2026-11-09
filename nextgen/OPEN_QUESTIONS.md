@@ -154,6 +154,13 @@ original numbering.
 - **Decides:** whether the method extends to full-resolution polarization analyses.
 
 ## Q6. Should per-pixel amplitudes be stored as maps instead of alms?
+
+**Raised in priority (2026-11-09, F7 amended).** The storage round trip costs 1.9 k in chi-square
+inside the E014 mask, makes every stored amplitude sample under-dispersed (0.74 in chi-square
+variance), and biases any acceptance evaluated through `global_loglike` (the legacy move, and
+probably `conditional`). This is now a correctness item for the per-pixel path, and a candidate
+upstream report. Test: one per-pixel run with the amplitudes kept as maps, legacy mode, against
+the predictions in Q23.
 - **Why:** F7. The alm round trip at lmax = 3 nside - 1 loses pixel-scale content and inflates chi^2.
 - **How:** measure variance loss and chi^2 bias at realistic settings (nside 512, 60 arcmin); prototype
   map-space storage for per-pixel groups.
@@ -519,7 +526,14 @@ How to answer: audit tests 4 and 5 (a dense solve at nside 8 to 16 against the t
 per multipole and component; the null prior at two reference frequencies). Minutes each, numpy.
 What it decides: the scope sentence of Paper A ("the per-pixel path") and two upstream reports.
 
-## Q23. Why is the real-map legacy width above the E035 law? (new 2026-11-09)
+## Q23. Why is the real-map legacy width above the E035 law? (new 2026-11-09; ANSWERED at the level of analysis the same day)
+
+Answer (stats review of the legacy move, Sect. 7d; E035 record): the alm storage of per-pixel
+amplitudes multiplies the variance of the chi-square the move sees by 2.44 +- 0.06 (from the
+chain's own log) or 2.69 +- 0.18 (computed on the inputs), and the toy with that factor gives the
+measured widths and acceptance. The same storage residual predicts the +3 sd shift of beta_d.
+Remaining: the end-to-end confirmation in Commander4 with amplitudes kept as maps, predicted to
+give 13.1 and 13.6 ridge sd and no shift. The original entry follows.
 
 E035 derives the stationary law of the legacy move and confirms it on five simulated measurements
 to 5 percent, but the E014 real-map widths (16.5 and 17.1) are 22 to 31 percent above the toy at
