@@ -406,7 +406,7 @@ def quartiles(f):
 
 
 def main():
-    global CMB_SD, MU_PRIOR
+    global CMB_SD, MU_PRIOR, MU_LAW, MU_QUAD, MU_FORCE_QUAD
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", required=True)
     ap.add_argument("--out", required=True)

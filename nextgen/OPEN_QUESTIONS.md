@@ -440,3 +440,18 @@ original numbering.
   at either width (rms against exp(-f) 0.28 to 0.30). So the F38 displacement is the law's, and
   the candidates stand as listed: (b), (d) (pass 6 running), (e), (f) (pass 7 queued). For a
   real-data default the matched width stays the rule (F37), with the report restricted by D027.
+- **Status (2026-11-09, 13:07, E030 pass 7):** candidate (f) works for synchrotron in the exact
+  target. With the amplitude and template reference at 23 GHz (the leading band) instead of 30,
+  a uniform 30 percent error shifts sync Q1 by -0.02 (0.3 nats) instead of +0.27 (48 nats) and
+  leaves the faint half flat (+0.03 to +0.16, under half a nat) instead of beyond +0.3 (19 to 35
+  nats); the realized error field's faint push goes from beyond +0.3 (5.5 to 6.6 nats) to -0.18
+  to -0.30 at 1 to 1.5 nats (flat) and sync Q1 from +0.07 to -0.04. A residual at the reference
+  cannot be tilted away by the index, so the 23 GHz data push the multiplier against the
+  hyperprior instead. Dust does not respond (reference 545 to 353 GHz changes the lever arm
+  from 2.3 to 2.1; uniform-error Q2 +0.25 at 25 nats from +0.26 at 75), but its realized-field
+  shifts were under 2 nats at either reference. In Commander4 this is a parameter choice (the
+  component's reference frequency and a template at it), no code change; the natural real-data
+  choice for sync is the K band or 30 GHz template. Next: chain 3 (cs templates at 23 and 353
+  GHz, sd 0.3, oracle T) for the field-mean displacement F38, which the scan cannot test. Pass
+  6 (candidate (d)) is rerunning: its first run never reached the quadrature (a missing
+  `global` statement) and was retracted.

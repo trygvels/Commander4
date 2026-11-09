@@ -437,11 +437,60 @@ dust from +0.03, +0.08, +0.13 to within 0.05, with the data-dominated quartiles 
 the law is not the cause and candidate (d) is dead as well, leaving the correlated prior (b)
 and the reporting rule.
 
-**Pass 6 in-situ check (read 2026-11-09 12:31; `scan6_sd03_gaussquad_check.txt`, run 12:26 to
-12:29):** the quadrature path with the gaussian law reproduces `scan3_sd03.txt` for the cs
-s_Q4 and d_Q2 scans at every offset to the printed 0.01 nats in the chi2, logdet, trace and
-total columns (differences 0.0000 at all 14 offsets; profiled hyperparameters identical). The
-log-normal run started 12:29.
+**Pass 6 first run retracted (13:07).** The in-situ check (12:26 to 12:29) reproduced
+`scan3_sd03.txt` to 0.0000 nats at all 14 offsets, and the log-normal run (12:29 to 12:39)
+then reproduced the gaussian-law pass 3 optima, gains, profiled hyperparameters and cell totals
+(hyperprior term -3.61 included) to the printed precision in all 20 scans, in a tenth of the
+expected time. Both are the analytic gaussian law: `main()` assigned `MU_LAW`, `MU_QUAD` and
+`MU_FORCE_QUAD` without declaring them global (the `global` line named only `CMB_SD` and
+`MU_PRIOR`), so the header printed the requested law while `Sky._marginal_terms` saw the module
+defaults. The unit validation of the quadrature (05:33) set the module attributes directly and
+stands; the command-line wiring did not. Fixed (the three names added to the `global`
+statement) and both runs relaunched in parallel at 13:08 (`run_e030_scans6b.sh`, nothing else
+running); the check must now take about 30 min for the profile (459 evaluations at 4 s) and the
+agreement with pass 3 is the criterion as before. An identical result in identical time was the
+signal; the "pass" recorded at 12:31 is withdrawn. `NU_REF` is mutated in place, so pass 7 is
+unaffected (its header and profiled hyperparameters differ from pass 3).
+
+**Pass 7 result (read 2026-11-09 13:07; `scan7_ref23_353_sd03.txt`, `scan7_ref23_353_sd03_constpos.txt`,
+run 12:42 to 12:57).** With the amplitude and template reference at the leading band (sync 23
+GHz, dust 353 GHz), matched width 0.3, oracle T, expected target: (i) exact cell: dust and sync
+Q1 within 0.05 of pass 3 (dust +0.00, +0.06, +0.04, +0.03, d_all +0.01; s_Q1 -0.02, s_all -0.02),
+the faint sync argmaxima move by 0.06 to 0.09 (+0.03 to +0.05 become -0.03 to -0.04) with gains of
+0.0 nats and curvature sd 0.13 to 0.18, so the criterion fails as posed on scans that are flat
+to the printed precision; it should have been stated in nats. (ii) Uniform +0.3 error: sync Q1
+from +0.27 (48 nats) to -0.02 (0.3 nats), s_all from beyond +0.3 (125 nats) to -0.01 (0.1 nats):
+pass. The faint sync did not stay beyond +0.3: +0.03, +0.11, +0.16 with 0.0, 0.3, 0.5 nats
+(flat), against 19 to 35 nats before; the prediction of +0.45 through the 44 GHz lever arm
+assumed an unconstrained multiplier, and the 23 GHz data pin the faint multipliers well enough
+once the residual there can no longer be tilted away. Dust: Q1 from +0.02 (10 nats) to 0.00
+(0.0 nats), but Q2 +0.25 (25 nats, from +0.26 and 75 nats), Q3 +0.20 (4.9 nats, from 16), Q4
++0.10 (0.6, from 4.4), d_all +0.01 (1.1, from 28): the prediction that Q2 falls below +0.10
+fails; the dust lever arm hardly changed (1 / ln(545 / 353) = 2.3 to 1 / ln(353 / 217) = 2.1)
+and the per-pixel 353 GHz amplitudes of the Q2 regions do not pin the multiplier (its chain
+posterior sd in Q2 is 0.25 to 0.34 at either width), so the mechanism's own lever-arm reading,
+not the pre-registered one, describes dust; the gains fell threefold. (iii) Realized cs field:
+sync Q1 -0.04 (0.9 nats, 1.3 curvature sd; from +0.07 and 3.0 nats), outside the +-0.03 asked by
+0.01 and within the realization scale 0.06 of pass 4; the faint sync even push is gone: -0.18,
+-0.24, -0.30 with 1.0, 1.2, 1.5 nats (flat, curvature sd 0.13 to 0.16) from beyond +0.3 with 5.5
+to 6.6 nats; s_all -0.06 (2.4 nats) from +0.12 (12 nats); dust Q1 0.00 and Q2 +0.03 (0.2 nats)
+within 0.02 of before: pass; dust Q3 +0.09 (0.7 nats), Q4 +0.19 (1.7 nats, curvature sd 0.10)
+from +0.08 and +0.13, within the scan noise.
+
+Reading. For synchrotron the template reference at the leading band removes the template
+effect in the exact target: the data-dominated shift under a uniform 30 percent error goes from
++0.27 to -0.02, the faint-half push from beyond +0.3 to flat (under a nat), and the realized
+field's faint push from +0.3 to a weak negative tilt of about a nat. The reason is the one the
+pass 5 mechanism gives: a residual template error at 23 GHz cannot be removed by tilting the SED
+about 23 GHz, so the data there push the multiplier against the hyperprior instead of the index;
+the remaining lever arms through 30 and 44 GHz carry small residuals. For dust the bands are
+too close in log frequency for the reference to matter (lever arm 2.3 to 2.1), the faint
+multipliers stay prior-set, and the uniform-error push remains (+0.25 in Q2); the realized
+field's dust shifts were small at either reference (+0.03 to +0.19, under 2 nats). Q18
+candidate (f) is therefore the fix for sync and not for dust, at the scan level; a chain with
+the reference at 23 and 353 GHz on the cs templates (chain 3) is the test of the field-mean
+displacement F38, which the scan cannot address (it profiles at the reference field).
+
 
 **Pass 7 (queued 2026-11-09 05:52 behind pass 6; driver `run_e030_scans7.sh`;
 `scan7_ref23_353_sd03.txt`, `scan7_ref23_353_sd03_constpos.txt`):** Q18 candidate (f), the
@@ -469,7 +518,7 @@ sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the
 the template effect.
 
 ## Conclusion
-(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 read 12:20; passes 6 and 7 pending) The hyperprior width of the per-region template
+(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 read 12:20; pass 7 read 13:07; pass 6 rerunning after a wiring bug) The hyperprior width of the per-region template
 multipliers must be at least the template error's scale: with a 30 percent template the tight
 sd 0.1 biases the data-dominated indices (sync +0.21, dust -0.02, tens of nats) and is not
 admissible; the matched sd 0.3 leaves the bright dust index unbiased and the bright sync index
@@ -501,10 +550,20 @@ components, |z| < 1 for 47 to 49 percent of the regions) and the bright dust qua
 hundred brightest sync regions sit at +0.06 to +0.09 and the faint sync half at +0.26 to +0.34.
 The multiplier maps absorb the same share of the error at either width (rms against exp(-f)
 0.28 to 0.30, the faint half's own error rms), so the width is not the lever for the faint
-half; that remains the law (Q18 (b), (d), (e), (f)), with passes 6 and 7 pending.
+half; that remains the law (Q18 (b), (d), (e), (f)).
+
+Pass 7 (reference at the leading band) is the first candidate that removes the template effect
+in the exact target, for synchrotron: with the amplitude pinned at 23 GHz a uniform 30 percent
+error shifts the data-dominated sync quartile by -0.02 instead of +0.27 and the faint half not
+at all (flat to half a nat instead of beyond +0.3 with 19 to 35 nats), and the realized field's
+faint push disappears. Dust does not respond (lever arm 2.3 to 2.1, Q2 +0.25 under a uniform
+error at either reference), but its realized-field shifts were small anyway. Chain 3 (cs
+templates at 23 and 353 GHz, matched width, oracle T) tests whether the field-mean
+displacement F38 goes with it. Pass 6 (log-normal law) is rerunning after a wiring bug.
 
 ## Follow-ups
-- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09 04:35; chain 2 (cs, sd 0.5, oracle T) read 12:20.
+- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09 04:35; chain 2 (cs, sd 0.5, oracle T) read 12:20; pass 7 read 13:07; pass 6 rerunning (first run invalid, wiring bug).
+- Chain 3: cs templates and reference at 23 and 353 GHz (Q18 (f) at the chain level), pre-registration below once the templates exist.
 - Q18: a field-mean hyperprior informed by the data-dominated regions only, or a spatially
   correlated (GMRF) multiplier prior that lets the bright neighbours inform a faint region's
   template error (the cs error field has a 10 deg correlation length the iid N(1, sd^2) ignores).
