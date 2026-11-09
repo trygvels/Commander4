@@ -254,7 +254,7 @@ cause, chain 2 lands at chain 1's 0.43 and 0.12 with sigma_s about 0.5, and E026
 is then read as an unconverged chain's; (vi) the faint dust quartiles between the shrinkage
 prediction and the sd-0.5 scan optima (+0.10, +0.13, +0.19).
 
-**Mechanism of the faint-half push, from the pass 3 scan files (read 2026-11-09 04:55):** along
+**Mechanism of the faint-half push, from the pass 3 scan files (read 2026-11-09 04:42):** along
 every faint sync scan the expected target's logdet and trace terms cancel to within 0.05 nats
 at every offset for both templates (for example cs s_Q4 at +0.3: logdet +3.25, trace -3.22;
 exact: +2.08, -2.07), so the push is in the chi2 term alone, the expected data misfit of the
@@ -270,7 +270,7 @@ and the amplitude prior width s g is tighter where the template is low), so the 
 too-low template leave the larger residual; with the sync index information dominated by the
 bands above the 30 GHz reference, an under-predicted amplitude is relieved by a flatter index.
 
-**Pass 4 (launched 2026-11-09 04:5x, niced beside chain 2; driver `run_e030_scans4.sh` in the data
+**Pass 4 (launched 2026-11-09 04:43, niced beside chain 2; driver `run_e030_scans4.sh` in the data
 dir; outputs `E030/scan4_*.txt`):** three scans at the matched width with the expected target,
 oracle T map, CMB sd 1e4, all ten per-quartile scans. Pre-registered before they are read:
 (1) `scan4_sd03_csneg`: the cs error field with its sign flipped (`--cs-scatter -0.3`). If the

@@ -25,7 +25,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   script is now in the repo and reproduces the stage A' table to four decimals.
 
 **Running**
-- E030 pass 4 scans (niced beside the chain, from 04:57): the cs error field with its sign
+- E030 pass 4 scans (niced beside the chain, from 04:43): the cs error field with its sign
   flipped, a second seed, and a near-flat multiplier prior (sd 3); pre-registered in the record.
   The pass 3 files show the faint-half push is in the chi2 term alone (logdet and trace cancel),
   a misfit effect of the template error, which is why no width removes it.
