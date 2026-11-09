@@ -27,8 +27,18 @@ that need Trygve.
   on a realistic amplitude field the flat-prior marginal shifts a region index by -0.06 (ref 23
   GHz) or +0.06 (ref 30 GHz) at an index error of 0.06, and by -0.40 or +0.34 at 0.16. Formula:
   ln(nu_ref / nu_pivot) times the single-amplitude index variance. The profile likelihood and a
-  zero-mean prior with one free scale per region are both calibrated there (mean z within 0.1,
-  68 percent coverage 0.64 to 0.72) and need no template. They hold at twice the noise as well.
+  zero-mean prior with one free scale per region are both calibrated there (mean z within 0.11,
+  68 percent coverage 0.64 to 0.72) and need no template. They hold with free CMB and dust
+  amplitudes, with the truth off the grid centre, and to four times the noise except in the
+  faintest 30 degree regions. A flat CMB prior costs 1.63 in the index error and moves the pivot
+  to the lowest band (+0.17 to +0.86 at a 30 GHz reference); a 0.2 uK CMB prior restores both.
+  A shared scale on a map 30 percent high at high latitude moves the index there by -0.026 /
+  0.000 / +0.029 at 23 GHz / pivot / 30 GHz. E036 is closed (F44). E022's recorded real-data
+  numbers obey the formula to 0.2 percent and put BeyondPlanck's 30 GHz reference at the pivot of
+  its band set when the CMB carries a prior, a candidate answer to Q17.
+- **Polarized inputs (E038).** WMAP K band fetched. The K and Ka inverse covariances are
+  symmetric and positive definite, the pixel rms is as estimated (2.0 uK_RJ), and a few modes at
+  multipoles 2 to 6 carry 20 to 90 times the median mode variance.
 - **Ingest bugs (E034, F41).** The model-error floor reaches the likelihood 27.6 times below
   nominal, and degrading before smoothing leaves 0.6 to 1.7 uK of band-dependent CMB aliasing.
   The E014 chains had the HFI bands at 0.37 to 0.83 uK_RJ, the tightest bands. Every E014 number
@@ -46,14 +56,13 @@ that need Trygve.
 - E032: the E030 chain 1 model at noise scale 0.03, run A (seed 7) since 22:34 with both in-flight
   chains written, run B (seed 8, dispersed start) after it. About 7 hours each. Waiter armed on
   run A's last file. Analysis script `nextgen/scripts/e032_analyze.py`.
-- E036 remaining cells on one thread: regression check of the extended script, noise times 4,
-  free CMB and dust amplitudes with a flat and with a 0.2 uK CMB prior.
-- E037 queued behind them: the validation harness over 40 seeds (is the F8 offset the smoothed
-  noise or a bug), with a white-noise control.
+- E037 on one thread: the validation harness over 40 seeds (is the F8 offset the smoothed noise
+  or a bug), with a white-noise control.
 
 **Next**
 - Read E032 run A when it ends, then run B; write Result and Conclusion. No follow-ups (D029).
-- E036: off-centre truths (-2.8, -3.4) and the global-scale arm at three references.
+- E038: Q and V through the covariance check, E022's conditional with dense matrices, an LFI
+  covariance with a null test, one window for WMAP and LFI.
 - After E032: reader fix behind a switch, `get_sky` with an index field, the legacy lookup, a
   per-pixel run with amplitudes stored as maps (Q6, Q23), audit tests 4 to 8 and 10.
 - Fetch the WMAP K-band res 4 map and inverse covariance; Gate 0 of the polarized track.
