@@ -463,3 +463,68 @@ original numbering.
   likelihood response itself is asymmetric. Remaining candidates: (f) the reference at the
   leading band (works for sync in the scan; chain 3 running), (b) a correlated multiplier prior,
   (e) a sampled global calibration factor; the gaussian law on mu stays.
+## Q19. What do real-map indices become with a corrected ingest and an error model that fits? (new 2026-11-09, F41)
+
+Why it matters: E034 showed that the model-error floor reaches the likelihood 27.6 times below
+nominal and that degrading before smoothing leaves band-dependent CMB aliasing of 0.6 to 1.7 uK
+per pixel. In the chain's own noise model the E014 fit has high-latitude reduced chi-squares of
+13 to 60, so no E014 width is an uncertainty and the dust index was set by HFI bands at 235 to
+760 times their intended weight. The audit adds four untested ingest items on the same path: the
+smoothed noise treated as independent (D2, up to 3.3 in width by its estimate), the
+position-dependent effective beam of the noise-weighted smoothing (D3), no calibration factor
+per band (D10) and delta bandpasses (D7).
+How to answer: (1) reader fix behind a switch: smooth at native resolution, then degrade; the
+floor added after both as a fraction of the smoothed signal; the reader prints the rms it hands
+to the likelihood. (2) Rerun the E014 ridge chain and grid. Acceptance: high-latitude reduced
+chi-square below 2 in every band, or a named model term for each band that fails. (3) Audit test
+9 (pixel covariance of smoothed noise against the stored diagonal) to size D2.
+What it decides: whether any maps-only real-data index can be quoted (with Q15), and what goes
+upstream. Priority: after E032, before any new real-map run. Not a science result by itself.
+
+## Q20. Which amplitude prior gives calibrated index posteriors for signed Q/U amplitudes at real depth? (new 2026-11-09, E036 running)
+
+Why it matters: every amplitude-prior result so far is for intensity with a prior mean tied to a
+positive template, and E031 showed that the weak-data regime those results describe exists on
+real data only in polarization, where amplitudes are signed and no template mean applies. The
+template-error failures F21 to F38 all enter through the prior mean.
+How to answer: E036, exact grid posteriors for one index per region on a realistic polarized
+amplitude field at real WMAP/LFI Q/U depth, with the flat-prior marginal, the profile, and a
+zero-mean Gaussian prior with a free scale per region (with and without a scale map). Then the
+same with CMB and dust in the model and with the real WMAP noise covariance.
+What it decides: the amplitude prior of the polarized track, and whether a template is needed at
+all there.
+
+## Q21. Can a low-resolution polarized analysis with dense noise covariance be made exact end to end, and which covariances can be trusted? (new 2026-11-09)
+
+Why it matters: the audit ranks the missing Q/U covariance and correlated-noise modes first for
+large-scale polarization (items D1, T6), and at nside 8 to 16 the whole posterior (amplitudes
+collapsed, dense algebra of order 5000 to 18000) is exact and cheap on one machine, so
+calibration can be checked at the configuration that is reported. E022 already holds a surrogate
+with the WMAP Ka, Q, V nine-year covariances.
+How to answer: fetch the WMAP K-band res 4 map and N^-1 (150 MB), build the simulation at real
+depth with the real WMAP covariances, run SBC, then add LFI 30 with its low-resolution covariance
+and an explicit K against 30 GHz consistency term. Go or no-go numbers are in the program review.
+What it decides: whether Paper B (the polarized synchrotron index field with calibrated
+uncertainties) is feasible from public data on this machine, and what the tau by-product is worth.
+
+## Q22. Are the amplitude draws of the CG path samples? (new 2026-11-09, audit A1, A2, B5)
+
+Why it matters: every full-resolution Commander4 run takes its amplitudes from a CG solve stopped
+at a fixed 100 iterations from a zero start, and a null C(l) prior is a unit-variance Gaussian
+prior per alm in (uK_RJ at nu_ref)^2, so the CG path never has the flat prior that F3, F12 and
+F15 analyse and its posterior depends on the reference frequency. Nothing in `nextgen/` tested
+either. None of our results uses the CG path, so this is about what can be claimed for
+Commander4 as a whole and what is reported upstream.
+How to answer: audit tests 4 and 5 (a dense solve at nside 8 to 16 against the truncated solve,
+per multipole and component; the null prior at two reference frequencies). Minutes each, numpy.
+What it decides: the scope sentence of Paper A ("the per-pixel path") and two upstream reports.
+
+## Q23. Why is the real-map legacy width above the E035 law? (new 2026-11-09)
+
+E035 derives the stationary law of the legacy move and confirms it on five simulated measurements
+to 5 percent, but the E014 real-map widths (16.5 and 17.1) are 22 to 31 percent above the toy at
+the same settings (13.1 to 13.6). Candidates: the legacy chi-square is evaluated on alm-stored
+per-pixel amplitudes (F7), which adds acceptance noise; a width from a chain with ESS 74.
+How to answer: the legacy mode in Commander4 at nside 16 with 1 and 20 steps per amplitude draw,
+with the amplitudes kept as maps and as alms. Needs cores, so after E032. Low priority: it changes
+one sentence of Paper A.

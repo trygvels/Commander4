@@ -5,6 +5,55 @@ or a finding (`FINDINGS.md`); items marked (pending) have no result yet and name
 that will supply it. Target journal A&A (methods section of the Cosmoglobe series) or JCAP.
 Writing preference: no em-dashes.
 
+## Revision after the 2026-11-09 review (proposed; the scope is Trygve's decision, D029)
+
+The review (`../reviews/2026-11-09_program_review.md`) changes what this paper can claim. The
+sections below are the 2026-10-27 to 2026-11-08 text and are not yet rewritten. Until they are,
+this block overrides them.
+
+**Proposed thesis.** In pixel-based Bayesian component separation the spectral indices share the
+data with per-pixel amplitudes, which are incidental parameters. (1) A natural joint move,
+"propose the index, re-solve the amplitudes, accept on chi-square", is a pseudo-marginal kernel
+for the profile posterior that the Gibbs amplitude draw breaks; with one index step per amplitude
+draw the chain converges to the profile posterior tempered by sqrt(2 pi k)/4, k the number of
+amplitudes, and we give exact alternatives (E035, F1, F2). (2) With flat amplitude priors the
+index posterior carries a volume term that is not invariant to the reference frequency: the
+index shifts by ln(nu_ref / nu_pivot) times the single-amplitude index variance, a shift that
+does not average down over pixels; at real WMAP/LFI polarization depth it is 0.06 to 0.4 with a
+sign that flips between a 23 and a 30 GHz reference (E036; F3, F12, F15 in intensity). The
+profile likelihood and proper amplitude priors do not have it, and we map where each is
+calibrated against S/N (E012, E016, E017, E036). (3) Spatially varying indices are modelled as a
+Gaussian Markov random field with inferred amplitude and correlation length, sampled with NUTS on
+the collapsed likelihood, validated by simulation-based calibration and at real depth with four
+chains (F16, F24, E032 pending). (4) Limits: an amplitude prior whose mean is tied to a template
+is exact only for its own template-error law, and a 30 percent template error displaces the
+field mean (F21, F23, F38). (5) On real maps the samplers reproduce their exact targets, while
+the answers are set by zero levels and by the map error model (F17, F41).
+
+**Section changes.**
+- Sect. 3: rewritten around E035. "Not exact" becomes the pseudo-marginal statement and the
+  tempering law, with the toy, the five simulated measurements and the real-map number as an
+  open 25 percent excess. The Commander3 material moves to an appendix or a note (Trygve's call).
+- Sect. 4: add the reference-frequency formula and the polarized real-depth table of E036. Drop
+  every "sd" unit taken from E014 (F41). Cite Eriksen et al. 2008, Dunkley et al. 2009, Alonso et
+  al. 2017 for the mechanism; the new parts are the formula, the coverage curves and the SBC.
+- Sect. 5: cut from 150 lines to about 40. Keep the model, the SBC, F24 and one "limits under
+  template error" subsection (F21, F23, F37, F38 with the chain 3 result). Everything at noise
+  scale 1 is labelled as a stress test at 24 to 90 times real intensity noise (F39).
+- Sect. 6: add the four-chain criterion and an SBC of the Commander4 implementation.
+- Sect. 7: the like-for-like zero-level shifts (0.035 and 0.016) and F41. No sd units.
+- Table 3: the CMB column becomes the bias term at high latitude and its low-multipole band
+  power (E033). Every row gets the constant-index and region-mean baselines.
+
+**Withdrawn sentences in the text below.** "The remedy is the template reference at the leading
+band" and "Statement for the paper: pin the amplitude of a template-informed component at the
+band that carries its index information" (Sect. 5; chain 3 failed). "The hierarchical prior the
+calibrated choice for spatially varying indices" (Sect. 8; calibrated inside its model class
+only). "Depending only on the input zero levels" and "260 sd, 460 sd, 80 sd" (Sect. 7). "+56 sd,
++16 sd, +23 sd" (Sect. 4). "16 to 17 times too wide ... consistent with the k^(1/4) scaling
+(predicted 18.5)" (Sect. 3; replaced by E035). "Realistic noise" and "Planck-like depth" wherever
+they mean ladder scale 1.
+
 ## Working title
 Exact sampling of spectral parameters in pixel-based Bayesian component separation: the
 prior-volume problem, collapsed likelihoods, and hierarchical index fields with inferred smoothness.

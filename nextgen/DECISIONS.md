@@ -431,3 +431,35 @@ checks were lost for five days because the scratchpad under /private/tmp was cle
 recorded as a miss with the mechanism. Running stage C now on the 7-band simulation: rejected
 by D026 (unidentifiable). Starting the 14-band simulation on my own: it is a plan change with
 real cost and a new reference construction, so it waits for Trygve.
+
+## D028 (2026-11-09): eight validation rules from the program review; both in-flight chains are written from E032 on; code fixes wait for the E032 chains
+
+**Decision.** The rules added to `VALIDATION.md` on 2026-11-09 are in force from E032 on: the
+regime gate, trivial baselines, four chains with split R-hat, replication before a number is
+called a property of a method, calibration at the reported configuration, pooled scan readings,
+pre-registration with a falsifying number and a file time, and no real-map number in posterior sd
+without a fit. Every production run sets `output.chains.write: [1, 2]`. The source tree is the
+installed code, so no file under `src/` is changed while the E032 pair is running; the queued
+fixes (reader order and floor behind a switch, `get_sky` with an index field, the legacy lookup
+raising on a missing key) go in afterwards on a short-lived branch with tests.
+
+**Why.** The review found one cause behind most of what had to be withdrawn: a number was read
+without the anchor that gives it meaning. "Realistic noise" was never compared with a map (F39).
+The CMB residual was never compared with its own noise term or with a constant index (F40). A
+set of one-nat scans was called flat without summing them (E030 chain 3). Thirteen findings rest
+on single chains while a second chain was computed and discarded in every run (F42). The E014
+widths were quoted without checking the fit in the noise model the chain used (F41). Each rule
+closes one of these.
+
+**Alternatives considered.** Leaving the rules implicit in the review document: rejected, the
+validation ladder is what every experiment record is written against. Fixing the reader and
+`get_sky` at once: rejected, run B of E032 would then execute different code from run A.
+
+**Addendum to D025 (append only).** The "Why" paragraph of D025 cites a roughness coupling that
+the E026 stats review refuted (F29). The check itself stands. It is necessary and not
+sufficient: E030 chain 3 passes it with a field mean 3.4 posterior sd from the truth.
+
+**Addendum to D023 (append only).** D023 rested on profiled per-region scans, which F31 ruled
+out as stand-ins for the marginal. Its conclusion that the multiplier field makes a
+component-separation-quality template admissible is withdrawn at noise scale 1 (F28, F38) and
+open at real depth (E032).
