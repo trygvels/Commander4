@@ -1,0 +1,4 @@
+# E014 settings with the recorded proposal widths: 0.002 in beta_s (ridge sd 0.00036) and 0.004 in beta_d (ridge sd 0.000043),
+# i.e. 5.6 and 93 ridge sd; k = 190825, 20 steps per refresh; law (one step per refresh) 16.545; measured 17.1 (beta_s), 16.5 (beta_d), acceptance 0.073
+toy sd beta_s 13.089 (halves 13.078, 13.099), beta_d 13.564 (halves 13.565, 13.562), acceptance 0.0669
+second seed: beta_s 13.083, beta_d 13.565, acceptance 0.0669
