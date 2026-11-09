@@ -407,7 +407,7 @@ checked region by region. The truth amplitudes are a posterior mean of real data
 
 Changes: F44 added; Q20 answered for white noise; D029 item 5; Paper A outline thesis item 2.
 
-**Check against the real-data numbers of E022** (added 2026-11-10 00:45; arithmetic on that
+**Check against the real-data numbers of E022** (added 2026-11-10 00:41; arithmetic on that
 record's table, no new run). The formula says the flat-prior marginal minus the profile equals
 ln(nu_ref / nu_pivot) times the number of amplitudes times the squared profile sd. E022 has both
 targets for the BP XV regions on real WMAP, LFI and 353 GHz Q/U maps at a 30 GHz reference, for
