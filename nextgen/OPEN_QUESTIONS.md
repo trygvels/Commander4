@@ -455,3 +455,11 @@ original numbering.
   GHz, sd 0.3, oracle T) for the field-mean displacement F38, which the scan cannot test. Pass
   6 (candidate (d)) is rerunning: its first run never reached the quadrature (a missing
   `global` statement) and was retracted.
+- **Status (2026-11-09, 14:06, E030 pass 6 rerun):** candidate (d), the log-normal multiplier
+  law, is dead. With the hyperprior on log mu (sd 0.3) the faint sync push grows (beyond +0.3
+  with 8 to 11 nats against 5.5 to 6.6), sync Q1 moves to +0.10 from +0.07, faint dust to +0.05
+  to +0.15 from +0.03 to +0.13, and against an exact template the law's mean multiplier e^0.045
+  pushes the faint sync +0.14 at about a nat. The even push is not a law mismatch; the
+  likelihood response itself is asymmetric. Remaining candidates: (f) the reference at the
+  leading band (works for sync in the scan; chain 3 running), (b) a correlated multiplier prior,
+  (e) a sampled global calibration factor; the gaussian law on mu stays.

@@ -188,7 +188,8 @@ model component rather than a preprocessing choice.
   the odd shifts average out over a quartile (three realizations: +0.07, -0.06, +0.01) and a
   variance-driven even push of +0.2 to +0.3 (sync) remains in the prior-dominated half. A
   wider hyperprior does not help (sd 3 collapses every prior-dominated quartile by the Occam
-  push). Candidates under test: the log-normal multiplier law (pass 6) and the template
+  push), and neither does a log-normal multiplier law (pass 6: the faint push grows and the
+  law's mean multiplier above 1 costs a nat against an exact template). The remedy is the template
   reference at the leading band (pass 7). The width itself is a bias-variance knob with no
   calibrated setting under such a template (E030 chains 1 and 2): sd 0.5 halves the field's
   roughness and the pixel RMSE relative to sd 0.3 (0.33 and 0.09 against 0.43 and 0.12) and

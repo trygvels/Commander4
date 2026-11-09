@@ -452,6 +452,31 @@ agreement with pass 3 is the criterion as before. An identical result in identic
 signal; the "pass" recorded at 12:31 is withdrawn. `NU_REF` is mutated in place, so pass 7 is
 unaffected (its header and profiled hyperparameters differ from pass 3).
 
+**Pass 6 result (rerun 13:08 to 13:59; read 2026-11-09 14:06; `scan6_sd03_gaussquad_check.txt`,
+`scan6_sd03_lognormal.txt`).** The quadrature path ran this time: the check cell's profile took
+308 s against 138 s analytic, and the log-normal cells have their own profiled hyperparameters and
+totals (cs: s_s 0.061, 0.161, 0.188, 0.225 against 0.060, 0.147, 0.175, 0.207; hyperprior term
+-3.41 against -3.61). In-situ check: the gaussian law through the quadrature reproduces
+`scan3_sd03.txt` for cs s_Q4 and d_Q2 at all 14 offsets to the printed precision (totals agree
+to 0.00, single columns differ by at most 0.01 from rounding). Log-normal law at sd 0.3 (on log
+mu), seed 11: (i) exact cell: dust within 0.01 to 0.02 of the gaussian optima (0.00, +0.05, +0.04,
++0.03; d_all +0.01), sync Q1 +0.01 and s_all +0.04 within 0.02; the faint sync argmaxima move to
++0.14 in all three quartiles (from +0.03 to +0.05) with 0.7 to 1.3 nats and curvature sd 0.09 to
+0.12, so the criterion fails as posed there, on nearly flat scans: the log-normal prior with sd
+0.3 has mean multiplier e^0.045 = 1.046, a 4.6 percent push against an exact template, which the
+faint half answers with a flatter index of about a nat; the gaussian law has no such term. (ii)
+cs cell: the faint sync optima stay beyond +0.3 and the gains grow, 11.0, 9.8, 8.3 nats against
+6.6, 6.5, 5.5; sync Q1 +0.10 (6.3 nats) against +0.07 (3.0); s_all +0.17 (22.9 nats) against +0.12
+(12.1); faint dust +0.05, +0.10, +0.15 (2.1, 3.1, 3.8 nats) against +0.03, +0.08, +0.13; dust Q1
+and d_all 0.00. The second pre-registered alternative holds: the law is not the cause, and
+candidate (d) is dead. The even faint push is therefore not the Jensen gap between a linear
+law and a log-normal error (the log-normal law would have closed it and instead widened it);
+what remains of the pass 4 and 5 reading is the asymmetry of the likelihood response itself,
+steeper for a too-high template (edge gains 19 against 9 nats in pass 5) and nonlinear beyond
+the scan range, which a symmetric error field turns into a net positive push, plus the
+log-normal prior mean above 1. Pass 7 removes the push for sync by changing the geometry
+instead of the law, and is the line to follow.
+
 **Pass 7 result (read 2026-11-09 13:07; `scan7_ref23_353_sd03.txt`, `scan7_ref23_353_sd03_constpos.txt`,
 run 12:42 to 12:57).** With the amplitude and template reference at the leading band (sync 23
 GHz, dust 353 GHz), matched width 0.3, oracle T, expected target: (i) exact cell: dust and sync
@@ -547,7 +572,7 @@ sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the
 the template effect.
 
 ## Conclusion
-(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 read 12:20; pass 7 read 13:07; pass 6 rerunning after a wiring bug) The hyperprior width of the per-region template
+(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 read 12:20; pass 7 read 13:07; pass 6 read 14:06) The hyperprior width of the per-region template
 multipliers must be at least the template error's scale: with a 30 percent template the tight
 sd 0.1 biases the data-dominated indices (sync +0.21, dust -0.02, tens of nats) and is not
 admissible; the matched sd 0.3 leaves the bright dust index unbiased and the bright sync index
@@ -588,10 +613,12 @@ at all (flat to half a nat instead of beyond +0.3 with 19 to 35 nats), and the r
 faint push disappears. Dust does not respond (lever arm 2.3 to 2.1, Q2 +0.25 under a uniform
 error at either reference), but its realized-field shifts were small anyway. Chain 3 (cs
 templates at 23 and 353 GHz, matched width, oracle T) tests whether the field-mean
-displacement F38 goes with it. Pass 6 (log-normal law) is rerunning after a wiring bug.
+displacement F38 goes with it. Pass 6 (log-normal multiplier law, candidate (d)) is dead: the
+faint push grows under it (sync 8 to 11 nats beyond +0.3 against 5.5 to 6.6; dust +0.05 to
++0.15), and the law's mean multiplier above 1 costs about a nat against an exact template.
 
 ## Follow-ups
-- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09 04:35; chain 2 (cs, sd 0.5, oracle T) read 12:20; pass 7 read 13:07; pass 6 rerunning (first run invalid, wiring bug).
+- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09 04:35; chain 2 (cs, sd 0.5, oracle T) read 12:20; pass 7 read 13:07; pass 6 read 14:06 (candidate (d) dead).
 - Chain 3: cs templates and reference at 23 and 353 GHz (Q18 (f) at the chain level), pre-registration below once the templates exist.
 - Q18: a field-mean hyperprior informed by the data-dominated regions only, or a spatially
   correlated (GMRF) multiplier prior that lets the bright neighbours inform a faint region's

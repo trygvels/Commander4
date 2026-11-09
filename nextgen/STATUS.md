@@ -32,13 +32,15 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   at 1 to 1.5 nats, from beyond +0.3 at 5.5 to 6.6). Dust unchanged (lever arm 2.3 to 2.1; Q2
   +0.25 under a uniform error at either reference). Q18 candidate (f) is the fix for sync at
   the scan level; in Commander4 it is a parameter choice, no code change.
-- E030 chain 3 queued (13:14) behind the pass 6 rerun: chain 1 with the reference and the cs
+- E030 chain 3 running (started 13:59 after the pass 6 rerun): chain 1 with the reference and the cs
   templates at 23 and 353 GHz; pre-registered (sync field mean back within 0.10 of -3.00 if the
   F38 displacement is the template's through the lever arm; dust unchanged). About 7 h.
-- E030 pass 6 rerunning (13:08) after a wiring bug: the first run never reached the quadrature
-  (the law flags were assigned without a `global` statement; it reproduced the gaussian pass 3
-  to 0.0000 nats in identical time, which was the signal) and is retracted. The check and the
-  log-normal scans run in parallel, about 1.5 h.
+- E030 pass 6 rerun read (14:06): the first run never reached the quadrature (the law flags
+  were assigned without a `global` statement; it reproduced the gaussian pass 3 to 0.0000 nats
+  in identical time, which was the signal) and is retracted. The rerun's gaussian check
+  reproduces pass 3 to 0.01 nats, and the log-normal law makes the faint push larger (sync
+  beyond +0.3 with 8 to 11 nats against 5.5 to 6.6; dust +0.05 to +0.15) and costs about a nat
+  against an exact template: Q18 candidate (d) is dead; the gaussian law on mu stays.
 
 **Next**
 - Read passes 6 and 7 against their pre-registrations; close E030 with the final F37/F38
