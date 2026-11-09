@@ -386,7 +386,7 @@ dust from +0.03, +0.08, +0.13 to within 0.05, with the data-dominated quartiles 
 the law is not the cause and candidate (d) is dead as well, leaving the correlated prior (b)
 and the reporting rule.
 
-**Pass 7 (queued 2026-11-09 05:58 behind pass 6; driver `run_e030_scans7.sh`;
+**Pass 7 (queued 2026-11-09 05:52 behind pass 6; driver `run_e030_scans7.sh`;
 `scan7_ref23_353_sd03.txt`, `scan7_ref23_353_sd03_constpos.txt`):** Q18 candidate (f), the
 template reference frequency at the leading band. The pass 5 mechanism says the index
 compensates the residual template error with the lever arm 1 / ln(nu_ref / nu_lead), because a
