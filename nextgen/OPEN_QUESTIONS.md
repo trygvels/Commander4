@@ -488,7 +488,11 @@ chi-square below 2 in every band, or a named model term for each band that fails
 What it decides: whether any maps-only real-data index can be quoted (with Q15), and what goes
 upstream. Priority: after E032, before any new real-map run. Not a science result by itself.
 
-## Q20. Which amplitude prior gives calibrated index posteriors for signed Q/U amplitudes at real depth? (new 2026-11-09, E036 running)
+## Q20. Which amplitude prior gives calibrated index posteriors for signed Q/U amplitudes at real depth? (new 2026-11-09; ANSWERED for white noise, E036, F44)
+
+Answer: the profile likelihood, or a zero-mean prior with one free scale per index region; a
+CMB prior the size of the signal; never the flat-prior marginal; no template needed. Open: the
+same with dense covariances and on real data (Q21), and the sandwich width at low S/N.
 
 Why it matters: every amplitude-prior result so far is for intensity with a prior mean tied to a
 positive template, and E031 showed that the weak-data regime those results describe exists on

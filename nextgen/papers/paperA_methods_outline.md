@@ -14,15 +14,19 @@ this block overrides them.
 **Proposed thesis.** In pixel-based Bayesian component separation the spectral indices share the
 data with per-pixel amplitudes, which are incidental parameters. (1) A natural joint move,
 "propose the index, re-solve the amplitudes, accept on chi-square", is a pseudo-marginal kernel
-for the profile posterior that the Gibbs amplitude draw breaks; with one index step per amplitude
-draw the chain converges to the profile posterior tempered by sqrt(2 pi k)/4, k the number of
-amplitudes, and we give exact alternatives (E035, F1, F2). (2) With flat amplitude priors the
-index posterior carries a volume term that is not invariant to the reference frequency: the
-index shifts by ln(nu_ref / nu_pivot) times the single-amplitude index variance, a shift that
-does not average down over pixels; at real WMAP/LFI polarization depth it is 0.06 to 0.4 with a
-sign that flips between a 23 and a 30 GHz reference (E036; F3, F12, F15 in intensity). The
-profile likelihood and proper amplitude priors do not have it, and we map where each is
-calibrated against S/N (E012, E016, E017, E036). (3) Spatially varying indices are modelled as a
+for the profile posterior that the Gibbs amplitude draw turns into Monte Carlo within Metropolis
+(Andrieu and Roberts 2009); with one index step per amplitude draw the chain converges to the
+profile posterior at temperature sqrt(pi k / 8) + 1/2, k the number of amplitudes, in general 1/2
++ 0.443 times the sd of the chi-square at a fresh draw (the temperature law for the sign rule is
+Ball, Fink and Bowler 2003), and we give exact alternatives (E035 and its independent review, F1,
+F2). (2) With flat amplitude priors the index posterior carries a volume term that is not
+invariant to the reference frequency: the index shifts by ln(nu_ref / nu_pivot) times the
+single-amplitude index variance, a shift that does not average down over pixels and whose pivot
+depends on the bands and on the CMB prior; at real WMAP/LFI polarization depth it is 0.06 to 0.9
+with a sign that can flip between a 23 and a 30 GHz reference (E036, F44; F3, F12, F15 in
+intensity). The profile likelihood, with a sandwich width at low S/N, and a zero-mean prior with
+one free scale per index region do not have it and need no template, and we map where each is
+calibrated against S/N (E012, E016, E017, E036). (3) [In Paper B if D029 is adopted] Spatially varying indices are modelled as a
 Gaussian Markov random field with inferred amplitude and correlation length, sampled with NUTS on
 the collapsed likelihood, validated by simulation-based calibration and at real depth with four
 chains (F16, F24, E032 pending). (4) Limits: an amplitude prior whose mean is tied to a template

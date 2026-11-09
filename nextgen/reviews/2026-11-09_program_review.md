@@ -206,9 +206,11 @@ factor for a mean amplitude S/N near 1; the factor was not computed region by re
 The free-scale prior shows a bias of 0.3 posterior sd in one class there, which a scale map
 removes. The same analysis says what is unsound: a scale shared across index
 regions and tied to a template. A scale map 30 percent high in the faint sky moves the faint
-index by +0.12 or -0.12 depending on the reference (challenge check 1). That is the pattern of
-F38 and of chain 3, the displaced faint sky with a sign that flips with the reference, and it is
-a candidate mechanism for them, not an established one.
+index by +0.12 or -0.12 depending on the reference in the challenge's two-zone toy. E036 then
+tested it on the realistic field: the sign structure and the null at the pivot hold, and the
+size is 0.03 for the regions the data inform at real depth. That is the pattern of F38 and of
+chain 3, the displaced faint sky with a sign that flips with the reference, and it is a
+candidate mechanism for them, not an established one.
 
 The consequence for the program: the thirteen findings on template multipliers (F26 to F38)
 were refinements of a prior whose mean is tied to a template. The sound estimators need no
@@ -248,10 +250,9 @@ proper priors; (6) implementation and validation in Commander4. Not in it: the G
 main claim, the real-intensity section, the template-multiplier sequence beyond one paragraph.
 
 Remaining work for it, all exact grids unless stated:
-1. E036 completed. Done: the noise ladder to four times real noise, free CMB and dust, a CMB
-   prior. Running: off-centre truths (-2.8 and -3.4; the challenge points out that a truth at the
-   grid centre hides reversion to the prior) and the unsound arm (one global scale times a scale
-   map at three references) as the control.
+1. E036 is complete (F44): the noise ladder to four times real noise, free CMB and dust, a CMB
+   prior, off-centre truths, and the shared-scale arm at three references. Left for the paper:
+   the sandwich factor per region, a truth with a latitude step, a data-built scale map.
 2. The sandwich factor overlaid on the E012 and E017 coverage tables, and E017 at three
    reference frequencies.
 3. The dense-covariance upgrade of E022 with K band on the four BP XV regions and on nside-2
@@ -312,13 +313,13 @@ they gate anything.
 |---|---|---|---|
 | The profile likelihood and the per-region zero-mean prior are calibrated for Q/U at real depth | Tested for synchrotron only, white noise | E036 | Pass at real depth; harder cells below |
 | They stay calibrated with free CMB and dust amplitudes | Tested | E036 second stage | Pass (E036 second stage): mean z within 0.08, sd of z 0.91 to 1.08, coverage 0.62 to 0.74; the region index error grows by 1.63 |
-| Their calibration does not come from the truth sitting at the grid centre | Untested | E036 with truths -2.8 and -3.4 | Queued |
-| A scale shared across regions on a template is biased with a reference-dependent sign | Shown in a two-zone toy by the challenge | E036 with a global-scale arm at 23, 26, 30 GHz | Queued |
+| Their calibration does not come from the truth sitting at the grid centre | Tested | E036 with truths -2.8 and -3.4 | Pass: nothing moves below a region index error of 0.25; above it the posterior mean reverts 13 percent toward the grid centre |
+| A scale shared across regions on a template is biased with a reference-dependent sign | Shown in a two-zone toy by the challenge; tested | E036 with a shared-scale arm at 23 GHz, the pivot and 30 GHz | Sign and null confirmed, size small: a scale map 30 percent high at high latitude moves the high-latitude index by -0.026, 0.000 and +0.029 |
 | The CMB prior is the prior that matters in polarization | Shown on the E022 surrogate with diagonal noise | E036 with and without a CMB prior; the dense upgrade of E022 | Pass at real depth (E036): with a 0.2 uK CMB prior the region index error equals the synchrotron-only value (0.059 against 0.060); with a flat CMB prior it is 1.63 times larger and the pivot of the flat-prior shift moves to the lowest band. The dense upgrade of E022 is still to do |
 | The WMAP K, Ka, Q, V inverse covariances are usable as released | K and Ka checked (E038): symmetric, positive definite, pixel rms as estimated; a few modes at multipoles 2 to 6 carry 20 to 90 times the median variance | Q and V through the same check; E022's conditional with dense matrices | Week 1 |
 | A trustworthy LFI 30 GHz low-resolution covariance exists publicly | Unverified | Gate 0 half-split null test | Week 1 |
 | K band and 30 GHz can be told apart from the index | Doubtful: they carry 91 percent of the index information and only Ka separates a relative gain from the index | The null test; Fisher with a gain and large-scale modes added | Weeks 1 to 3 |
-| The data determine an index field, not only a mean and a latitude trend | Doubtful at nside 2 (per-region error 0.09 against a sky scatter near 0.06, white noise) | The exact posterior of the field amplitude and range for a field seen with those errors | With the null test |
+| The data determine an index field, not only a mean and a latitude trend | Marginal. Hand estimate from the E036 region errors with white noise: the variance of the field is detectable at 2 to 3.5 sigma for a sky scatter of 0.06 and at 3.5 to 6 sigma for 0.10 to 0.15, with 48 or 192 regions. A correlation length is hardly constrained. Real large-scale noise is worse (E038) | The exact posterior of the field amplitude and range for a field seen with those errors and the real covariances | With the null test |
 | Dense NUTS is affordable | Supported at nside 8 (1 s per factorization), not at nside 16 (a minute) | Gate 5 | Timed by the challenge |
 | The legacy-move law describes Commander4 | Supported on simulations and, with the storage noise measured from the chain's log, on real maps to 3 percent | A Commander4 run with amplitudes kept as maps (Q6, Q23); predicted widths 13.1 and 13.6, no dust shift | After E032 |
 | The validation harness has no bug behind F8 | Untested | E037: 40 seeds, exact grids, a white-noise control | Queued behind E036 |

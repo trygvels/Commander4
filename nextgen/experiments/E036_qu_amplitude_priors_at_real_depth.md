@@ -1,6 +1,6 @@
 # E036: amplitude priors for signed Q/U amplitudes at real WMAP/LFI depth, coverage of a region index
 
-- **Date started / finished:** 2026-11-09 23:07 / running
+- **Date started / finished:** 2026-11-09 23:07 / 2026-11-10 00:39
 - **Branch and commit:** `nextgen` at 1eaac33
 - **Open question addressed:** Q2 (calibrated priors) in the regime E031 identified as the one that
   matters, Q3; the design assumption of the proposed polarized track
@@ -345,15 +345,73 @@ finished 00:21 and 00:26; synchrotron only, real depth, 100 realizations each).
   at nside 2 with Fisher sd below 0.25 it is -0.22 / +0.15 at references of 23 / 30 GHz for a
   truth of -2.8 and -0.18 / +0.19 for -3.4, against -0.011 and -0.010 for the profile.
 
-**Third stage (b), the shared-scale arm.** Pending.
+**Third stage (b), the shared-scale arm** (`E036/coverage_global_scale.txt`, finished 00:38; 50
+realizations, real depth, truth -3.1; information pivot 26.03 GHz). Mean shift of the regions
+with Fisher sd below 0.25, by latitude zone; errors over realizations are 0.002 to 0.003.
+
+| regions, zone | profile | free scale per region | shared scale, true map: ref 23 / pivot / 30 | shared scale, map 30 percent high at abs(b) > 30: ref 23 / pivot / 30 |
+|---|---|---|---|---|
+| nside 2, abs(b) > 30 (24) | -0.010 | +0.002 | -0.004 / -0.009 / -0.013 | -0.030 / -0.009 / +0.017 |
+| nside 2, abs(b) <= 30 (24) | -0.001 | -0.003 | -0.006 / -0.002 / +0.002 | +0.006 / -0.003 / -0.012 |
+| nside 4, abs(b) > 30 (78) | -0.007 | -0.007 | -0.001 / -0.007 / -0.013 | -0.013 / -0.007 / +0.001 |
+| nside 4, abs(b) <= 30 (75) | -0.007 | -0.009 | -0.013 / -0.009 / -0.002 | -0.001 / -0.009 / -0.018 |
+
+- **H3 pass.** With the true scale map the shared-scale prior stays within 0.013 of the truth at
+  every reference.
+- **H4: the sign and the null hold, the size is below what I predicted.** With the map 30 percent
+  high at high latitude, the high-latitude zone moves by -0.026 at a 23 GHz reference and by
+  +0.029 at 30 GHz relative to the true-map arm, and by 0.000 at the pivot (nside 2). At nside 4
+  the same differences are -0.012, 0.000 and +0.014. I predicted 0.03 to 0.3, so three of the
+  four sizes miss the range from below. The challenge report's formula gives about 0.045 for a
+  prior-to-noise variance ratio of 30, which is where these data-informative regions sit; the
+  larger shifts it quotes are for fainter regions, which this zone table excludes.
+- **H5 pass.** The low-latitude zone moves the other way by less than 0.02.
+- The effect is coherent over a zone: each zone mean is 8 standard errors from its true-map
+  value. For a latitude trend of the index it is a bias of the order of the pooled error.
 
 ## Negative control
 
-(a) and (b) are the controls: the flat-prior marginal is known to be biased (F12) and must show
-it here.
+The flat-prior marginal is the control and fails as it must. At real depth its mean z at
+references of 23 and 30 GHz is 0.9 to 2.5 for the 30 degree regions above a Fisher sd of 0.03 and
+0.3 to 1.9 for the 15 degree regions, and at a 60 GHz reference it is 6 to 34.
 
 ## Conclusion
 
-Pending.
+1. **The amplitude prior is not the problem of the polarized track, provided it is not flat.**
+   At real WMAP/LFI Q/U white-noise depth, on a realistic amplitude field, the profile likelihood
+   and a zero-mean Gaussian prior with one free scale per index region both give calibrated
+   region indices: mean z within 0.11, 68 percent coverage 0.64 to 0.72, down to region index
+   errors of 0.4. Neither needs a template. This holds with free CMB and dust amplitudes, with
+   the truth moved off the grid centre, and down to four times the real noise except in the
+   faintest 30 degree regions.
+2. **The flat-prior marginal is shifted by ln(nu_ref / nu_pivot) times the index variance of a
+   single amplitude.** The shift does not average down with the number of amplitudes sharing the
+   index, flips sign between references on either side of the pivot, and the pivot depends on
+   the bands and on the CMB prior: 26.4 GHz with a CMB prior or no CMB, the lowest band with a
+   flat CMB prior. Sizes at real depth: 0.06 to 0.4 for synchrotron only, +0.17 to +0.86 at a 30
+   GHz reference with a flat CMB prior.
+3. **The CMB prior matters, the synchrotron prior hardly.** A free CMB amplitude under a flat
+   prior costs a factor 1.63 in the index error; with a prior the size of the signal it costs
+   nothing.
+4. **A scale shared across index regions on a scale map is biased by a wrong map with a
+   reference-dependent sign**, as the challenge report derived, by 0.01 to 0.03 here for a 30
+   percent error. It is the polarized relative of the template prior of F21 to F38, and it is
+   small at this depth for regions the data inform.
+5. Five of my predictions failed. Four of them underestimated the profile likelihood (P3, F1,
+   F2) or overestimated an effect (H4), and one assumed a pivot that moved (G4). None of the
+   failures favours the prior I set out to justify over the simpler profile.
+
+What this does not establish: anything with correlated noise or a dense covariance, a spatially
+varying truth index, or real data. The sandwich factor for the profile's width at low S/N was not
+checked region by region. The truth amplitudes are a posterior mean of real data.
+
+Changes: F44 added; Q20 answered for white noise; D029 item 5; Paper A outline thesis item 2.
 
 ## Follow-ups
+
+- The same grid machinery on the E022 surrogate with dense WMAP covariances and K band, at
+  references of 23 and 30 GHz, with and without a CMB prior. It would test whether the pivot
+  explains why the BeyondPlanck chains show no flat-prior pull (Q17): for the BP XV band set
+  without K band the pivot is near 30 GHz, the reference BeyondPlanck used.
+- The sandwich factor computed per region and overlaid on these tables and on E012 and E017.
+- A truth with a latitude step in the index, and a data-built scale map.

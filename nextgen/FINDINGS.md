@@ -1086,5 +1086,8 @@ free CMB amplitude is this effect on real data; the amplitude prior of the polar
 the profile with a sandwich width or the per-region zero-mean prior, with a CMB prior the size of
 the signal (D029); no template is needed, so the template-error findings F21 to F38 do not arise
 there. Scope: white noise, one index over the sky, a truth amplitude field that is a posterior
-mean of real data, no dense covariance; the sandwich factor was not verified region by region;
-the shared-scale arm is in the E036 record.
+mean of real data, no dense covariance; the sandwich factor was not verified region by region.
+A zero-mean prior with one scale shared by all regions on a scale map that is 30 percent high at
+high latitude moves the high-latitude index by -0.026 at a 23 GHz reference, 0.000 at the pivot
+and +0.029 at 30 GHz (30 degree regions; half that for 15 degree regions): the sign structure the
+independent challenge derived, small at this depth for regions the data inform.
