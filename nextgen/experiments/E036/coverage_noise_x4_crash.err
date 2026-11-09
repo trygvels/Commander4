@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/Users/trygvels/code/Commander4/nextgen/scripts/e036_qu_amplitude_priors.py", line 194, in <module>
+    main()
+    ~~~~^^
+  File "/Users/trygvels/code/Commander4/nextgen/scripts/e036_qu_amplitude_priors.py", line 119, in main
+    A0 = np.einsum("b,pbc,c->p", ft, P, ft)
+  File "/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/_core/einsumfunc.py", line 1608, in einsum
+    return c_einsum(*operands, **kwargs)
+ValueError: einstein sum subscripts string contains too many subscripts for operand 1
