@@ -72,3 +72,37 @@ be traced to a cause (method, prior, model, data) before it is claimed.
   check (`e026_roughness_check.py`) is kept as a diagnostic only: its block-shift optimum is
   linear in the coefficient scale and measures the pull of the data-pinned regions, not a
   roughness effect (E026 review).
+
+## Rules added after the 2026-11-09 review (D028)
+
+Each rule answers a failure that the review found in the record. They apply to every experiment
+from E032 on.
+
+- **Regime gate (F39).** Before an experiment runs, its record states which real data it stands
+  for: the noise per pixel relative to the real maps of that band, and the per-pixel S/N in the
+  leading band. Words such as "realistic" or "Planck-like" are not used without those numbers.
+  A simulation with no real counterpart is labelled as a stress test.
+- **Trivial baselines (F40, referee objection 7).** Every index-field result is reported next to
+  a constant index at the truth mean and next to the truth's own region means, for the index
+  error and for the CMB. CMB comparisons use the bias term of the E033 split at high latitude
+  and its low-multipole band power, never the total residual.
+- **Four chains (F42).** A production configuration is run with both in-flight chains written
+  (`output.chains.write: [1, 2]`) and at least two runs with different seeds and dispersed
+  starts. Split R-hat over the eight half-chains must be below 1.05 for every quantity a claim
+  rests on, and the effective sample size is reported per chain. The D025 check stays necessary
+  and is not sufficient. A single-chain result is graded B at best.
+- **Replication.** A number enters a paper as a property of a method only after it has been
+  reproduced on at least three noise seeds, five for a coverage statement. Otherwise it is
+  labelled as one realization.
+- **Calibration at the configuration reported.** Simulation-based calibration is run for the
+  Commander4 implementation at the configuration a paper reports, at reduced resolution if
+  needed, not only for the prototype.
+- **Reading exact-target scans (E030 chain 3).** A set of scans is summarized by the optimum
+  pooled over the regions a hyperparameter pools, with its error. "Flat" is not a reading for
+  scans whose gains add. A pre-registration built on a scan states the pooled number.
+- **Pre-registration.** Predictions state the number that would falsify them and the trivial
+  baseline they must beat. The time is the record file's modification time, and it must precede
+  the first output file.
+- **Real maps (F41).** No real-map number is quoted in units of posterior sd unless the
+  high-latitude reduced chi-square of the fit, in the noise model the chain used, is below 2.
+  The rms that reached the likelihood is printed by the reader, not reconstructed.
