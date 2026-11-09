@@ -1,0 +1,102 @@
+E031 report. nside 64, pixel side 0.9161 deg. All noise values are white-noise rms per nside-64 pixel in uK_RJ.
+
+Table 1. Real white noise (median over the sky) against the ladder, intensity and Q/U.
+band               real I   real QU   ladder x1   ratio I   ladder x0.03  ratio I   x1 / real QU
+WMAP K               5.470    7.852     280.0       51.2        8.40      1.54       35.7
+LFI 30               3.246    4.587     240.0       73.9        7.20      2.22       52.3
+WMAP Ka              5.565    7.941     240.0       43.1        7.20      1.29       30.2
+WMAP Q               5.177    7.419     220.0       42.5        6.60      1.27       29.7
+LFI 44               3.796    5.607     240.0       63.2        7.20      1.90       42.8
+WMAP V               6.673    9.519     240.0       36.0        7.20      1.08       25.2
+LFI 70               3.096    4.380     280.0       90.4        8.40      2.71       63.9
+WMAP W               6.764    9.648     160.0       23.7        4.80      0.71       16.6
+HFI 100              1.090    1.659      96.0       88.1        2.88      2.64       57.9
+HFI 353 (NPIPE A)    0.294    0.748     320.0     1090.0        9.60     32.70      427.7
+HFI check against Planck 2018 I Table 4 (uK_CMB deg, temperature): 100 GHz local 1.284 against 1.29; 353 GHz local (NPIPE A split) 3.471 against 2.56 (full mission; 3.6 if the split has 1.4 times its noise)
+143 and 217 GHz from the table: used (spatial pattern of the 100 GHz rms map)
+HFI 143 (table)      0.363      n/a      64.0      176.3        1.92      5.29
+HFI 217 (table)      0.285      n/a      96.0      337.3        2.88     10.12
+
+Check: stored truth.npz Fisher sd at noise scale 1 reproduced, max relative difference: sync known 4.4e-16, sync profiled 2.8e-15, dust known 4.4e-16, dust profiled 8.0e-15
+
+PySM free-free (f1): median amplitude at 30 GHz 16.88 uK_RJ (sync 39.65); pixels with zero emission at 30 GHz 0; median SED at 0.408 GHz relative to 30 GHz 9.87e+03
+PySM AME (a1, two populations summed): median amplitude at 30 GHz 30.77 uK_RJ (sync 39.65); pixels with zero emission at 30 GHz 18; median SED at 0.408 GHz relative to 30 GHz 0.0147
+Model I5 has 5 amplitude columns per pixel (cmb, sync, dust, free-free, AME), free-free and AME SEDs known per pixel
+Haslam 408 MHz: effective rms per nside-64 pixel median 1.053 K; synchrotron truth extrapolated to 408 MHz median 16.39 K; median S/N 15.6
+
+Table 2. Intensity: Fisher sd of the region indices at nside_beta 16 (3072 regions). Quartile medians, Q1 the regions with the smallest scale 1 amplitude-known sd of that index. The real+408 rows are post hoc (models I3H and I5H).
+noise     model index  kind      Q1       Q2       Q3       Q4      median   frac<0.1 frac<truth sd
+x1        I3    sync   known      1.0005   2.1505   3.1739   4.5800   2.6830    0.002    0.000
+x1        I3    sync   profiled   2.2250   4.8265   7.1199  10.2384   5.9938    0.000    0.000
+x1        I3    dust   known      0.0650   0.2791   0.6543   2.0360   0.4471    0.186    0.066
+x1        I3    dust   profiled   0.5363   2.4057   5.7121  17.0518   3.8785    0.021    0.005
+x1        I5    sync   profiled  59.4736 108.7115 134.1217 202.2954 125.0998    0.000    0.000
+x1        I5    dust   profiled   0.8390   3.5973   8.2271  23.9264   5.6524    0.009    0.001
+x0.03     I3    sync   known      0.0300   0.0645   0.0952   0.1374   0.0805    0.663    0.366
+x0.03     I3    sync   profiled   0.0667   0.1448   0.2136   0.3072   0.1798    0.226    0.110
+x0.03     I3    dust   known      0.0020   0.0084   0.0196   0.0611   0.0134    0.981    0.778
+x0.03     I3    dust   profiled   0.0161   0.0722   0.1714   0.5116   0.1164    0.454    0.244
+x0.03     I5    sync   profiled   1.7842   3.2613   4.0237   6.0689   3.7530    0.000    0.000
+x0.03     I5    dust   profiled   0.0252   0.1079   0.2468   0.7178   0.1696    0.355    0.187
+real      I3    sync   known      0.0174   0.0390   0.0564   0.0768   0.0476    0.972    0.727
+real      I3    sync   profiled   0.0291   0.0650   0.0925   0.1262   0.0780    0.702    0.370
+real      I3    dust   known      0.0002   0.0010   0.0025   0.0069   0.0017    1.000    1.000
+real      I3    dust   profiled   0.0016   0.0072   0.0175   0.0481   0.0117    0.998    0.818
+real      I5    sync   profiled   0.6249   1.2291   1.4954   2.1947   1.3590    0.002    0.001
+real      I5    dust   profiled   0.0028   0.0113   0.0263   0.0692   0.0181    0.961    0.736
+real+408  I3    sync   known      0.0019   0.0031   0.0044   0.0062   0.0037    1.000    1.000
+real+408  I3    sync   profiled   0.0023   0.0042   0.0059   0.0082   0.0051    1.000    1.000
+real+408  I3    dust   known      0.0002   0.0010   0.0025   0.0069   0.0017    1.000    1.000
+real+408  I3    dust   profiled   0.0015   0.0065   0.0156   0.0430   0.0105    1.000    0.843
+real+408  I5    sync   profiled   0.0493   0.0939   0.1291   0.1634   0.1008    0.494    0.246
+real+408  I5    dust   profiled   0.0018   0.0079   0.0194   0.0558   0.0130    0.990    0.796
+truth sd of the PySM index maps: sync 0.0629, dust 0.0374
+
+Table 2b. Intensity, profiled sd of beta_s, median over regions against region size.
+noise     model  nside_beta:  whole sky      1        2        4        8       16
+x1        I3                  0.03390  0.23809  0.60630  1.37823  2.88875  5.99378
+x1        I5                  0.92180  5.19772 13.45121 28.42164 60.00027 125.09977
+x0.03     I3                  0.00102  0.00714  0.01819  0.04135  0.08666  0.17981
+x0.03     I5                  0.02765  0.15593  0.40354  0.85265  1.80001  3.75299
+real      I3                  0.00049  0.00297  0.00824  0.01813  0.03831  0.07802
+real      I5                  0.01030  0.05415  0.13625  0.30655  0.63851  1.35901
+real+408  I3                  0.00006  0.00026  0.00059  0.00123  0.00255  0.00511
+real+408  I5                  0.00057  0.00489  0.01015  0.02283  0.04759  0.10084
+
+Table 2c (post hoc). Real noise, profiled sd of beta_s per nside-16 region, median, by model:
+  I3 (cmb, sync, dust)   without 408 MHz   0.0780   with 408 MHz   0.0051
+  I3 + free-free         without 408 MHz   0.6967   with 408 MHz   0.0280
+  I3 + AME               without 408 MHz   0.1209   with 408 MHz   0.0202
+  I5 (both)              without 408 MHz   1.3590   with 408 MHz   0.1008
+
+Median synchrotron S/N per nside-64 pixel, intensity: 23 GHz ladder x1 0.31, real 16.0; 30 GHz ladder x1 0.17, real 12.6
+
+Polarization truth (PySM s1, d1): P_sync at 30 GHz median 7.89 uK_RJ (|b| > 30: 6.20), at 23 GHz median 17.57; P_dust at 353 GHz median 4.04
+Cross-check, DR1 synch P over PySM s1 P at 30 GHz, both smoothed to 5 deg: median 0.91 (16/84 pct 0.68/1.17); |b| > 30: 0.90
+
+Table 3. Polarization: Fisher sd of beta_s per nside-16 region (Q and U share the index; sync and dust amplitudes profiled, dust SED known; CMB column with a flat prior unless stated). Quartiles by the set B profiled sd.
+set                         kind      Q1       Q2       Q3       Q4      median   frac<0.1 frac<0.3  whole sky
+A  BP XV set (no K)         profiled   0.7855   1.7207   2.7835   5.9635   2.1840    0.000    0.011   0.01808
+A  BP XV set (no K)         known      0.2959   0.6528   1.0692   2.2385   0.8390    0.008    0.129   0.00680
+B  A + K band               profiled   0.2745   0.6138   0.9943   2.1188   0.7737    0.011    0.145   0.00631
+B  A + K band               known      0.1202   0.2820   0.4630   0.9732   0.3606    0.078    0.402   0.00276
+C  B + 11 GHz at 45         profiled   0.0598   0.1348   0.2192   0.4661   0.1706    0.258    0.748   0.00136
+C  B + 11 GHz at 45         known      0.0224   0.0503   0.0832   0.1785   0.0652    0.695    0.963   0.00048
+B  no CMB column            profiled   0.1505   0.3385   0.5513   1.1629   0.4334    0.048    0.319   0.00343
+B  no CMB column            known      0.1202   0.2820   0.4630   0.9732   0.3606    0.078    0.402   0.00276
+B  LFI variance x 2.65      profiled   0.3575   0.8067   1.3055   2.7851   1.0158    0.007    0.079   0.00829
+B  LFI variance x 2.65      known      0.1242   0.2935   0.4820   1.0168   0.3767    0.072    0.384   0.00284
+A  LFI variance x 2.65      profiled   1.0720   2.3672   3.8099   8.1402   2.9841    0.000    0.007   0.02459
+A  LFI variance x 2.65      known      0.3779   0.8373   1.3894   2.8786   1.0884    0.006    0.071   0.00861
+B  A + K band               profiled, regions fully at dec > -30 deg (0.74 of the sky): median 0.7949, frac<0.1 0.004, frac<0.3 0.141
+C  B + 11 GHz at 45         profiled, regions fully at dec > -30 deg (0.74 of the sky): median 0.1730, frac<0.1 0.248, frac<0.3 0.730
+
+Table 3b. Polarization, profiled sd of beta_s against region size: median over regions and the fraction of regions below 0.1.
+set                         nside_beta:      1              2              4              8             16
+A  BP XV set (no K)                      0.0996 (0.50)  0.2344 (0.17)  0.5175 (0.03)  1.0436 (0.00)  2.1840 (0.00)
+B  A + K band                            0.0349 (0.92)  0.0866 (0.65)  0.1839 (0.24)  0.3727 (0.06)  0.7737 (0.01)
+C  B + 11 GHz at 45                      0.0076 (1.00)  0.0190 (1.00)  0.0412 (0.87)  0.0828 (0.61)  0.1706 (0.26)
+B  LFI variance x 2.65                   0.0457 (0.83)  0.1142 (0.44)  0.2424 (0.16)  0.4906 (0.03)  1.0158 (0.01)
+
+Median polarized synchrotron S/N per nside-64 pixel (P over the Q/U rms): 23 GHz 2.25, 30 GHz 1.86; at |b| > 30: 23 GHz 1.76, 30 GHz 1.46
+Prediction 6: ladder x1 sync median sd, known 2.683, profiled 5.994; polarization set B profiled median 0.774; real-noise intensity I3 profiled median 0.0780
