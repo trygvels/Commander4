@@ -196,7 +196,16 @@ model component rather than a preprocessing choice.
   sets, leaving the region map one posterior sd high almost everywhere (|z| < 1 for 47 to 49
   percent of regions against 65 to 69); the faint half (+0.26 to +0.34) and the field mean
   (-2.72) are the same at both widths, and the hundred brightest regions hold at both (+0.06 to
-  +0.09). Table candidate: Table 3 rows E030 chains 1 and 2 and E026 cs, plus a table of the
+  +0.09). The lever-arm mechanism predicts its own remedy, and the exact target confirms it for
+  synchrotron (E030 pass 7): with the amplitude and template reference at the leading band (23
+  GHz instead of 30), a residual template error cannot be tilted away by the index, the data
+  there push the multiplier instead, and a uniform 30 percent error shifts the data-dominated
+  sync quartile by -0.02 instead of +0.27 while the faint half stays flat instead of running
+  beyond +0.3; the realized error field's faint push disappears. Dust does not respond (lever
+  arm 2.3 to 2.1 between the 545 and 353 GHz references). Statement for the paper: pin the
+  amplitude of a template-informed component at the band that carries its index information;
+  this is a parameter choice, not a model change. Chain-level confirmation (field mean, RMSE,
+  multiplier maps) pending (E030 chain 3). Table candidate: Table 3 rows E030 chains 1 and 2 and E026 cs, plus a table of the
   uniform-error response per quartile; Figure candidate: posterior-mean sync minus reference
   against region Fisher sd with the shrinkage curve at both widths.
 - The dust temperature model at realistic noise (E028 stages A, A', B with E029; F33 to F36):
