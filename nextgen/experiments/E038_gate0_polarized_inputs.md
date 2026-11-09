@@ -72,6 +72,14 @@ multipoles 2 to 6 carry 20 to 90 times the variance of the median mode. A white-
 estimate of anything that lives at those multipoles, such as a latitude trend of the index or
 the reionization signal, is optimistic by that order.
 
+**(a.1), Q and V, 2026-11-10 00:42 to 00:44.** Q (40.6 GHz): symmetry 8.8e-10, positive definite,
+condition 649, pixel rms 2.01 uK_RJ (white diagonal 1.81), worst mode 164 times the median, then
+82, 43 (fifth), 17 (tenth); worst ten modes 6.3 percent of the variance; map chi-square 4.3e4. V
+(60.8 GHz): symmetry 1.4e-10, positive definite, condition 450, pixel rms 2.24 uK_RJ (2.06), worst
+mode 101 times the median, then 54, 29, 21; worst ten modes 4.5 percent; map chi-square 1.3e4.
+The pixel rms is within 8 percent of the E031 estimates (1.85 and 2.38). The three worst modes of
+every band sit at mean multipoles 2 to 6.
+
 (a.2), (b), (c): not started.
 
 ## Negative control
@@ -80,10 +88,10 @@ None for a.1.
 
 ## Conclusion
 
-Partial. The WMAP K and Ka inverse covariances are usable as released for a dense analysis. The
+Partial. The WMAP K, Ka, Q and V inverse covariances are usable as released for a dense analysis. The
 E031 white-noise numbers for the index per region hold at the pixel scale and are optimistic for
 the largest scales.
 
 ## Follow-ups
 
-- Q and V through the same check; a.2, b and c.
+- a.2, b and c.

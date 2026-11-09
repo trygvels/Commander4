@@ -1,0 +1,3 @@
+usage: gate0_wmap_ninv_check.py [-h] --ninv NINV --map MAP --nu NU
+                                [--label LABEL]
+gate0_wmap_ninv_check.py: error: argument --nu: expected one argument
