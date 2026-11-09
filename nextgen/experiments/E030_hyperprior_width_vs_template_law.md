@@ -437,7 +437,7 @@ dust from +0.03, +0.08, +0.13 to within 0.05, with the data-dominated quartiles 
 the law is not the cause and candidate (d) is dead as well, leaving the correlated prior (b)
 and the reporting rule.
 
-**Pass 6 in-situ check (read 2026-11-09 12:32; `scan6_sd03_gaussquad_check.txt`, run 12:26 to
+**Pass 6 in-situ check (read 2026-11-09 12:31; `scan6_sd03_gaussquad_check.txt`, run 12:26 to
 12:29):** the quadrature path with the gaussian law reproduces `scan3_sd03.txt` for the cs
 s_Q4 and d_Q2 scans at every offset to the printed 0.01 nats in the chi2, logdet, trace and
 total columns (differences 0.0000 at all 14 offsets; profiled hyperparameters identical). The
