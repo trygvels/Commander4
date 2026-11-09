@@ -32,11 +32,10 @@ None. Deterministic checks.
 
 ## Reference
 
-Expectations written before a.1 was run on K band (the Ka run served as the functional test):
-symmetric to 1e-9 relative, no negative eigenvalues, pixel rms within 15 percent of the E031
-white-noise estimate (1.96 uK_RJ per nside-16 pixel for K), and a small number of large-scale
-modes with a variance tens of times the median, as the WMAP papers describe for the poorly
-constrained modes.
+I wrote no expectations down before a.1 was run. The only prior statement is the challenge
+report's Gate 0 text: N^-1 symmetric to 1e-10 and positive semi-definite, with the processing
+mask as its null space. The E031 white-noise estimate of the pixel rms (1.96 uK_RJ per nside-16
+pixel for K, 1.99 for Ka) is the other number fixed in advance.
 
 ## Command
 
@@ -65,9 +64,9 @@ for b in "K 22.8 ~/data/wmap9_lowres_K" "Ka 33.0 ~/data/wmap9_lowres"; do set --
 | Mean multipole of the three worst modes (Q part) | 2.9, 6.2, 3.9 | 2.3, 3.9, 4.2 |
 | Map chi-square for 6144 elements | 1.16e6 | 1.40e5 |
 
-Both matrices are symmetric at the level of their storage precision and positive definite. There
-is no null space: the processing mask is not projected out in these files, unlike what the
-challenge report's Gate 0 text assumed. The pixel rms agrees with the E031 white-noise estimate
+Against the Gate 0 text: symmetry holds to 1e-10 for Ka and to 4e-10 for K, which is the storage
+precision. Both matrices are positive definite. There is no null space: the processing mask is
+not projected out in these files, unlike what the Gate 0 text assumed. The pixel rms agrees with the E031 white-noise estimate
 (1.96 and 1.99) to 3 percent. The noise is far from white on large scales: a few modes at
 multipoles 2 to 6 carry 20 to 90 times the variance of the median mode. A white-noise Fisher
 estimate of anything that lives at those multipoles, such as a latitude trend of the index or
