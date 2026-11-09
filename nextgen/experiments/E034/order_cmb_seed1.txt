@@ -1,0 +1,21 @@
+# CMB-only, nside 512 -> 64, target beam 120.0 arcmin, seed 1; uK_CMB
+# rms of the reference map (b): 62.682
+# per band: rms of code path minus reference (b: no pixel window, c: with the nside-64 pixel window), and of smooth-then-degrade minus the same references
+  fwhm    code-b    code-c  s.t.d.-b  s.t.d.-c   unsmoothed alias rms
+   5.0    2.7663    2.0892    1.8739    0.5157                25.1827
+  13.2    2.6262    1.8994    1.8739    0.5157                23.5292
+  32.3    2.1979    1.2406    1.8739    0.5157                16.4194
+  52.8    1.9700    0.7667    1.8739    0.5157                 8.5553
+  60.0    1.9393    0.6834    1.8739    0.5157                 6.4415
+# between-band differences (the part no common CMB amplitude absorbs): rms of band_i - band_j
+          pair      code    s.t.d.
+   5.0-13.2      0.2416    0.0000
+   5.0-32.3      1.0211    0.0000
+   5.0-52.8      1.6138    0.0000
+   5.0-60.0      1.7351    0.0000
+  13.2-32.3      0.7935    0.0000
+  13.2-52.8      1.4004    0.0000
+  13.2-60.0      1.5254    0.0000
+  32.3-52.8      0.6357    0.0000
+  32.3-60.0      0.7711    0.0000
+  52.8-60.0      0.1407    0.0000

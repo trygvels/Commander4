@@ -1,0 +1,25 @@
+# parameter file nextgen/params/q1/param_q1_n64_ridge_npipetuned.yml; common_res_fwhm 120.0 arcmin; rms in uK_RJ at |b| > 30 deg
+# cols: band, freq, fwhm, native nside, floor fraction, nominal floor (frac * mean|map|), then the median over |b|>30 of:
+#   A  rms the likelihood gets (reader as configured)
+#   B  the same without add_signal_fraction_to_rms
+#   C  degraded rms before smoothing (no floor), i.e. native white noise per coarse pixel
+#   D  sqrt(C^2 + nominal floor^2): degraded rms with the nominal floor, no smoothing reduction
+#   A/D and the effective floor that reaches the likelihood, sqrt(A^2 - B^2)
+band                             GHz   fwhm nside  frac    nominal          A          B          C          D    A/D  eff floor
+Haslam408MHz                   0.408   60.0   512  0.00          0  4.159e+04  4.159e+04  1.264e+05  1.264e+05  0.329          0
+WMAPK                         22.800   52.8   512  0.00          0      1.789      1.789      5.614      5.614  0.319          0
+WMAPKa                        33.000   39.6   512  0.00          0      1.745      1.745      5.721      5.721  0.305          0
+WMAPQ1                        40.600   30.6   512  0.00          0      2.328      2.328      7.802      7.802  0.298          0
+WMAPQ2                        40.600   30.6   512  0.00          0       2.14       2.14       7.17       7.17  0.299          0
+WMAPV1                        60.800   21.0   512  0.00          0      2.975      2.975      10.13      10.13  0.294          0
+WMAPV2                        60.800   21.0   512  0.00          0      2.711      2.711       9.23       9.23  0.294          0
+WMAPW1                        93.500   13.2   512  0.00          0      3.732      3.732      12.81      12.81  0.291          0
+WMAPW2                        93.500   13.2   512  0.00          0      3.968      3.968      13.62      13.62  0.291          0
+WMAPW3                        93.500   13.2   512  0.00          0      4.373      4.373      15.01      15.01  0.291          0
+WMAPW4                        93.500   13.2   512  0.00          0      4.127      4.127      14.17      14.17  0.291          0
+Planck30GHz                   28.400   32.3   512  0.00          0     0.9753     0.9753      3.254      3.254  0.300          0
+Planck44GHz                   44.100   27.0   512  0.00          0      1.132      1.132      3.817      3.817  0.297          0
+Planck70GHz                   70.100   13.2  1024  0.00          0     0.9048     0.9048      3.107      3.107  0.291          0
+Planck353GHz                 353.000    4.9   512  0.05      13.44     0.4938      0.083     0.2873      13.44  0.037     0.4867
+Planck857GHz                 857.000    4.6   512  0.05      23.03     0.8343     0.0167    0.05771      23.03  0.036     0.8342
+Planck100GHz                 100.000    9.7   512  0.05       5.65     0.3747     0.3134      1.081      5.753  0.065     0.2053
