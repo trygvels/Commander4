@@ -1,0 +1,11 @@
+# Ka N^-1 (6144, 6144), ordering NESTED; map columns ['Q_POLARISATION', 'U_POLARISATION'] units ['mK,thermodynamic', 'mK,thermodynamic']; nside 16
+symmetry: max |N - N^T| / max |N| = 1.03e-10
+eigenvalues: min 4.156e+03 max 1.240e+06; below 1e-10 max: 0; negative: 0; condition (positive part) 2.984e+02
+all-zero rows (masked elements): 0
+pixel rms from diag(C), uK_RJ: median 2.043, 16/84 pct 1.707/2.453
+white-noise rms 1/sqrt(diag N^-1), uK_RJ: median 1.899; ratio median diag(C)^1/2 over it 1.076
+mode variances relative to the median mode: worst 65.3, 2nd 38.5, 5th 23.6, 10th 15.8, 50th 4.6, 100th 3.42; fraction of total variance in the worst 10 modes 0.037, worst 100 0.101
+  worst mode 1: mean multipole of its Q part 2.3
+  worst mode 2: mean multipole of its Q part 3.9
+  worst mode 3: mean multipole of its Q part 4.2
+map chi-square d^T N^-1 d = 139572.2 for 6144 modes (signal plus noise; above the mode count when the sky is detected)
