@@ -402,8 +402,18 @@ original numbering.
   scan (`e023_exact_scan.py`, per-region marginalization becomes one sparse 3072 x 3072 solve
   per evaluation). Stats review before merging (principle 6). Mechanism evidence so far: the
   pass 3 scan files put the faint-half push in the chi2 term alone (logdet and trace cancel),
-  a misfit effect of the template error; pass 4 (sign flip, second seed, sd 3) is running.
+  though the sd-3 scan shows the F29 Occam push lands in the same term, so the split does not
+  separate the two effects; pass 4 read 05:25 (status below).
 - **Decides:** the hier prior's law on real data and the Paper A statement about what a
   template-informed index field can report.
 - **Status (2026-11-09, 04:40):** opened from E030 chain 1 (F38); chain 2 (sd 0.5) pending for
   the width's share of the roughness.
+- **Status (2026-11-09, 05:30, E030 pass 4):** candidate (c) is dead: at sd 3 every
+  prior-dominated quartile runs beyond +0.3 with 40 to 136 nats, exact or cs template (the
+  F29 Occam push). The faint push is even in the error field's sign (+0.2 to +0.3 sync, +0.03
+  to +0.14 dust for +f, -f and a second seed), while the data-dominated shift is odd (+0.07,
+  -0.06, +0.01), so the faint half's problem is the law, not the realization. New candidate (d):
+  a log-normal multiplier law (hyperprior on log mu), since the error is multiplicative and the
+  linear-Gaussian law absorbs it asymmetrically; testable in the scan by Gauss-Hermite
+  quadrature per region. Pass 5 (uniform +-0.3 errors) separates variance-driven from
+  response-driven even parts.

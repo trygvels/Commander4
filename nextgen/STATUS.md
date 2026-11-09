@@ -25,10 +25,14 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   script is now in the repo and reproduces the stage A' table to four decimals.
 
 **Running**
-- E030 pass 4 scans (niced beside the chain, from 04:43): the cs error field with its sign
-  flipped, a second seed, and a near-flat multiplier prior (sd 3); pre-registered in the record.
-  The pass 3 files show the faint-half push is in the chi2 term alone (logdet and trace cancel),
-  a misfit effect of the template error, which is why no width removes it.
+- E030 pass 5 scans (niced, from 05:26): uniform template errors of -0.3 and +0.3 in log at
+  the matched width, to separate a variance-driven from a response-driven even push.
+- Pass 4 read (05:25): the data-dominated sync shift over three error realizations is +0.07,
+  -0.06, +0.01 (a random shift of scale 0.06, not a bias); the faint push is positive for every
+  realization and sign (+0.2 to +0.3 sync, +0.03 to +0.14 dust); a near-flat multiplier prior
+  (sd 3) pushes every prior-dominated quartile beyond +0.3 with 40 to 136 nats, exact or cs:
+  the width must be matched, not wider (Q18 candidate (c) dead). Next candidate: a log-normal
+  multiplier law (Q18 (d)).
 - E030 chain 2, `gmrf16_cs_mumap_nc_Tmap_mu05` (cs, sd 0.5, oracle T; differs from chain 1 only
   by the width and from E026's cs chain only by the T map), from 04:36, about 6.7 h; check set
   armed in the data dir (`run_e030_chain2_checks.sh`, outputs `E030/chain2_*.txt`).

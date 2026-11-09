@@ -1,0 +1,16 @@
+E023 exact-target scans (v2) on /Users/trygvels/data/e023_pysm_n1: nside 64, noise scale 1.0, CMB prior sd 10000, T_fixed 20.929 K; truth sd beta_s 0.0629, beta_eff3 0.0516, beta_d 0.0374
+  sync quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 1.0021 2.5343 3.2427 3.6588; block sd (quartile, amplitudes known) 0.01801 0.07830 0.10093 0.11643
+  dust quartiles (template Fisher sd): median true-amplitude region Fisher sd per quartile 0.0599 0.2895 0.7586 1.4540; block sd (quartile, amplitudes known) 0.00065 0.00887 0.01966 0.03014
+  data template sync: g/true at |b|>20 16/50/84 pct 0.199/0.991/1.793
+  data template dust: g/true at |b|>20 16/50/84 pct 0.023/1.078/2.614
+  cs template: log error field rms 0.3, FWHM 10.0 deg, seed 11, replaced by the constant -0.3; realized exp(-f) mean/sd sync 1.350/0.000, dust 1.350/0.000
+  realized a/g (data template, sync) mean/sd per quartile: 0.865/0.278 0.796/0.359 2.264/21.793 140.607/212.228
+  realized a/g (data template, dust) mean/sd per quartile: 0.879/0.346 0.876/5.851 5.914/29.806 48.258/63.291
+  realized a/g (exact template, sync) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (exact template, dust) mean/sd per quartile: 1.000/0.000 1.000/0.000 1.000/0.000 1.000/0.000
+  realized a/g (cs template, sync) mean/sd per quartile: 1.350/0.000 1.350/0.000 1.350/0.000 1.350/0.000
+  realized a/g (cs template, dust) mean/sd per quartile: 1.350/0.000 1.350/0.000 1.350/0.000 1.350/0.000
+  reference (fixT): region fit in 13 s; fit minus region mean: sync rms 0.0564 max 0.4537, dust rms 0.0117 max 0.1224; at the bounds: 0 sync, 0 dust
+  reference (trueT): region fit in 13 s; fit minus region mean: sync rms 0.0209 max 0.4886, dust rms 0.0094 max 0.1184; at the bounds: 0 sync, 0 dust
+  reference (mapT): region fit in 13 s; fit minus region mean: sync rms 0.0156 max 0.2470, dust rms 0.0114 max 0.1180; at the bounds: 0 sync, 0 dust
+  mapT minus trueT reference: sync mean +0.0023 rms 0.0204; dust mean -0.0034 rms 0.0077; per dust quartile mean -0.0015 -0.0040 -0.0038 -0.0044

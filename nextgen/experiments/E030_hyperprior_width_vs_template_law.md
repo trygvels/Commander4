@@ -262,9 +262,12 @@ collapsed model. With the exact template chi2 is nearly flat (within 4 nats over
 every faint quartile, mildly favouring flatter indices: -2.3 to -3.9 nats at +0.3 at sd 0.3);
 with the cs template it rises monotonically toward flatter indices, +5.4, +6.5, +6.6 nats at
 +0.3 in Q4, Q3, Q2 at sd 0.3 and +8.2, +10.0, +12.8 at sd 0.1, i.e. the tighter the multiplier
-prior, the larger the misfit a flatter index relieves. So the template error's effect is a
-misfit effect, not a volume effect, which is why it survives every hyperprior width (F37). A
-candidate reading: with a linear-Gaussian multiplier prior a multiplicative error is absorbed
+prior, the larger the misfit a flatter index relieves. Qualification (05:25, from the sd-3
+scan of pass 4): the Occam push of the integrated multipliers (F29) lands in the same quadratic
+term (exact d_Q2 at sd 3: "chi2" +135 nats, logdet +13 at +0.3), because the analytic
+integration over mu puts the prior-pulled residual into the data term; so this decomposition
+does not separate the template effect from the Occam effect, and "survives every width" rests
+on the pass 3 optima, not on the split. A candidate reading: with a linear-Gaussian multiplier prior a multiplicative error is absorbed
 asymmetrically (a too-low template needs mu 1.35 for f = -0.3, a too-high one 0.74 for +0.3,
 and the amplitude prior width s g is tighter where the template is low), so the regions with a
 too-low template leave the larger residual; with the sync index information dominated by the
@@ -285,6 +288,43 @@ template the faint sync optima move beyond the sd-0.5 values (+0.15 to +0.20; th
 grows with the width, F29), with the cs template they stay beyond +0.3; i.e. a wide multiplier
 prior does not rescue the faint half, and Q18 needs the GMRF on the multipliers or a different
 law, not a wider width.
+
+**Pass 4 result (read 2026-11-09 05:25; `scan4_*.txt`).** (1) Sign flip (`scan4_sd03_csneg`):
+the faint sync optima do not flip: +0.12, +0.13, +0.22 (Q2 to Q4; 0.9, 0.7, 1.5 nats, within
+1.5 block sd) against beyond +0.3 (5.5 to 6.6 nats) for +f, so the push has an even part of
+about +0.2 and an odd part of about +0.1 (edge-limited). The data-dominated sync quartile
+flips: Q1 +0.07 (+f) to -0.06 (-f; 2 nats, 2 curvature sd), s_all +0.12 to -0.02. Dust: Q1
++0.01 (3 nats), Q2 +0.10 (10.7 nats, 4.5 curvature sd) against +0.03 for +f, Q3 +0.14 against
++0.08, Q4 +0.10 against +0.13: positive for both signs, so even in f, and the Q2 shift under
+-f is the largest template effect seen on a partly data-dominated dust quartile (data weight
+0.29 in the chain). Neither pre-registered alternative in pure form: the faint push is mostly
+even (not linear in f), and smaller than for +f. (2) Second seed (`scan4_sd03_seed12`,
+realized exp(-f) mean 1.034 sync, 1.053 dust): every prediction holds: sync Q1 +0.01 (0.1
+nats), faint sync +0.20, +0.30, +0.30 (2.5, 4.3, 5.1 nats), dust Q1 0.000, faint dust +0.06,
++0.08, +0.11 (3.7, 1.8, 1.7 nats), s_all +0.06 (2.9 nats), d_all +0.01. Across the three
+realizations of a 30 percent error (seed 11, its negative, seed 12) the data-dominated sync
+shift is +0.07, -0.06, +0.01: a realization-dependent random shift with scale 0.06 and mean
+near zero, not a bias; F37's "+0.07" is one draw of it. The faint sync push is +0.3, +0.2,
++0.3 and the faint dust push +0.03 to +0.14, positive in all three. (3) Near-flat multiplier
+prior (`scan4_sd30`, sd 3): the exact and cs cells agree to 0.01 everywhere; the faint
+quartiles of both components run beyond +0.3 with 38 to 41 nats (sync) and 69 to 136 nats
+(dust), sync Q1 +0.14 (10 nats), s_all beyond +0.3 (115 nats), d_all +0.03 (29 nats). The
+Occam push of free multipliers (F29) at full strength, template quality irrelevant: Q18
+candidate (c) (a wide width where the data say nothing) is dead, and the width must be
+matched, not wider. The push sits in the quadratic term here too (see the qualification
+above).
+
+**Pass 5 (launched 2026-11-09 05:26, niced; `run_e030_scans5.sh`; `scan5_sd03_const{neg,pos}.txt`):**
+the cs error field replaced by a uniform log error of -0.3 (template too low everywhere,
+a/g = 1.35) and +0.3 (too high, a/g = 0.74), matched width 0.3, via the new `--cs-const`
+option of the scan script. Pre-registered: if the two uniform errors give faint pushes of
+equal size and opposite sign, the even push of the realized fields comes from the field's
+variance (the linear-Gaussian multiplier law against a log-normal error, Q18 candidate (d), a
+log-normal law), and the constant-error scans give the odd (linear) response directly; if both
+give a positive push, the even part is in the per-region response itself (asymmetric
+absorption under the hyperprior N(1, 0.3^2): mu 1.35 costs 0.68 nats, 0.74 costs 0.38; the
+prior width s g scales with the template). Data-dominated quartiles: shifts of opposite sign
+for the two errors, sync Q1 of order 0.1, dust Q1 of order 0.01.
 
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template

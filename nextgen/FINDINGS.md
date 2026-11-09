@@ -754,7 +754,14 @@ template quality (sd 0.1 only for a template good to about 10 percent at the reg
 at the matched width a data-dominated sync index carries a template-induced shift of order
 +0.07 for a 30 percent template (the chain `gmrf16_cs_mumap_nc_Tmap_mu03` confirms it with the
 field prior: the hundred brightest regions at -0.01 to +0.09, the Fisher-weighted level +0.08
-to +0.10; the region map as a whole follows the displaced field mean, F38). Also
+to +0.10; the region map as a whole follows the displaced field mean, F38). Pass 4 scans
+(2026-11-09): over three realizations of the 30 percent error (seed 11, its negative, seed 12)
+the data-dominated sync shift at the matched width is +0.07, -0.06, +0.01, a random shift with
+scale 0.06 and mean near zero, so the "+0.07" is one draw and not a bias; the faint push stays
+positive in all three (sync +0.2 to +0.3, dust +0.03 to +0.14; even in the error field's sign);
+and a near-flat multiplier prior (sd 3) pushes every prior-dominated quartile beyond +0.3 with
+40 to 136 nats for exact and cs templates alike (the F29 Occam push at full strength), so the
+width must be matched and not wider. Also
 recorded: two earlier passes ran with the scan script's default per-pixel CMB prior sd 100 and
 showed +0.04 to +0.12 in the faint dust quartiles with exact templates and the true T, the F26
 leakage at realistic noise; invalid as readings of the target, kept as the F26 illustration.

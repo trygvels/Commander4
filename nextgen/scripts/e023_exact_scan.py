@@ -329,6 +329,8 @@ def main():
                     help="rms of the log error field of the 'cs' (component-separation-quality) template")
     ap.add_argument("--cs-fwhm", type=float, default=10.0, help="correlation FWHM in degrees of that field")
     ap.add_argument("--cs-seed", type=int, default=11)
+    ap.add_argument("--cs-const", type=float, default=None,
+                    help="replace the cs log error field by this constant (uniform multiplicative error)")
     ap.add_argument("--T-grid-fields", default=None,
                     help="npz with bs, bd (nside-16 region fields) held fixed along --T-grid instead of the per-T "
                          "region fit (E028 stage B: the chain's posterior means)")
@@ -374,6 +376,8 @@ def main():
     for k in ("sync", "dust"):
         f = hp.synfast(cl, nside, lmax=lmax_cs, new=True)
         cs_fields[k] = f / f.std() * a.cs_scatter
+        if a.cs_const is not None:
+            cs_fields[k] = np.full_like(f, a.cs_const)
         g_cs[k] = np.maximum(a_true[k] * np.exp(cs_fields[k]), 1e-3 * np.mean(np.abs(a_true[k])))
     T_fixed = float(t["T_fixed"]); T_true = np.asarray(t["T_d"], float)
     nreg = hp.nside2npix(16)
@@ -404,7 +408,8 @@ def main():
         say(f"  data template {name}: g/true at |b|>20 16/50/84 pct {np.percentile(r,16):.3f}/"
             f"{np.percentile(r,50):.3f}/{np.percentile(r,84):.3f}")
     # realized a/g per quartile for the two template levels
-    say(f"  cs template: log error field rms {a.cs_scatter}, FWHM {a.cs_fwhm} deg, seed {a.cs_seed}; realized "
+    say(f"  cs template: log error field rms {a.cs_scatter}, FWHM {a.cs_fwhm} deg, seed {a.cs_seed}"
+        + (f", replaced by the constant {a.cs_const}" if a.cs_const is not None else "") + "; realized "
         f"exp(-f) mean/sd sync {np.exp(-cs_fields['sync']).mean():.3f}/{np.exp(-cs_fields['sync']).std():.3f}, "
         f"dust {np.exp(-cs_fields['dust']).mean():.3f}/{np.exp(-cs_fields['dust']).std():.3f}")
     realized = {}
