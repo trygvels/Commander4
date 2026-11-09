@@ -32,7 +32,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   at 1 to 1.5 nats, from beyond +0.3 at 5.5 to 6.6). Dust unchanged (lever arm 2.3 to 2.1; Q2
   +0.25 under a uniform error at either reference). Q18 candidate (f) is the fix for sync at
   the scan level; in Commander4 it is a parameter choice, no code change.
-- E030 chain 3 running (started 13:59 after the pass 6 rerun): chain 1 with the reference and the cs
+- E030 chain 3 running (started 14:00 after the pass 6 rerun): chain 1 with the reference and the cs
   templates at 23 and 353 GHz; pre-registered (sync field mean back within 0.10 of -3.00 if the
   F38 displacement is the template's through the lever arm; dust unchanged). About 7 h.
 - E030 pass 6 rerun read (14:06): the first run never reached the quadrature (the law flags
