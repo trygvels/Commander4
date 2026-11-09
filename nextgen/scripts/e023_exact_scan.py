@@ -52,6 +52,7 @@ H_K = 4.799243073366221e-11   # h/k in K s, astropy value as in commander4.sky.d
 T_CMB = 2.7255
 FREQS = np.array([23., 30., 33., 41., 44., 61., 70., 94., 100., 143., 217., 353.])
 MU_PRIOR, LOGS_PRIOR, LOGS_MIN = (1.0, 0.5), (float(np.log(0.3)), 1.0), -8.0
+MU_LAW, MU_QUAD, MU_FORCE_QUAD = "gaussian", (12, 6), False   # multiplier law; (inner, outer) Gauss-Hermite orders
 CMB_SD = 100.0
 PRIOR_MEAN = {"sync": -3.10, "dust": 1.60}
 
@@ -214,18 +215,108 @@ class Sky:
         c_r = np.bincount(reg, c_p, nreg)
         b_r = np.stack([np.bincount(reg, b_p[:, k], nreg) for k in range(2)], -1) + MU_PRIOR[0] / sd2
         Q = np.stack([np.bincount(reg, A_p[:, j, k], nreg) for j in range(2) for k in range(2)], -1).reshape(nreg, 2, 2)
+        A_r = Q.copy()                                                        # data part only
         Q[:, 0, 0] += 1.0 / sd2; Q[:, 1, 1] += 1.0 / sd2
         Qinv = np.linalg.inv(Q)
-        chi = float(c_r.sum() + 0.5 * np.einsum("ri,rij,rj->", b_r, Qinv, b_r)
-                    - 0.5 * np.linalg.slogdet(Q)[1].sum() - nreg * (MU_PRIOR[0]**2 / sd2 + np.log(sd2)))
-        tr = 0.0
+        Cov_r = None
         if expected:
             Cov_p = np.einsum("ni,nij,nik->njk", self.rms2, CiG, CiG)        # (n, 2, 2)
             Cov_r = np.stack([np.bincount(reg, Cov_p[:, j, k], nreg) for j in range(2) for k in range(2)], -1).reshape(nreg, 2, 2)
-            chi += 0.5 * float(np.einsum("rij,rji->", Qinv, Cov_r))
+        if MU_LAW == "lognormal" or MU_FORCE_QUAD:
+            chi = float(c_r.sum() + self._quad_logZ(b_r - MU_PRIOR[0] / sd2, A_r, Cov_r).sum())
+        else:
+            chi = float(c_r.sum() + 0.5 * np.einsum("ri,rij,rj->", b_r, Qinv, b_r)
+                        - 0.5 * np.linalg.slogdet(Q)[1].sum() - nreg * (MU_PRIOR[0]**2 / sd2 + np.log(sd2)))
+            if expected:
+                chi += 0.5 * float(np.einsum("rij,rji->", Qinv, Cov_r))
+        tr = 0.0
+        if expected:
             Cinv_diag = np.einsum("nij,nij->ni", np.linalg.inv(L).transpose(0, 2, 1), np.linalg.inv(L).transpose(0, 2, 1))
             tr = -0.5 * float(np.einsum("ni,ni->", self.rms2, Cinv_diag))
         return chi, tr, None
+
+    def _quad_logZ(self, bd, A, Cov):
+        """Per region, E over the noise of log int exp(bd . m - 1/2 m^T A m) p(mu) dmu, the two
+        multipliers m = (mu_s, mu_d) integrated under the law MU_LAW: gaussian, p(mu) = N(mu0, sd^2)
+        per entry, integrated in mu; lognormal, p(log mu) = N(log mu0, sd^2) per entry, integrated in
+        eta = log mu. Adaptive 2-D Gauss-Hermite (MU_QUAD[0] nodes per dimension) centred on the
+        Laplace mode of the integrand with its curvature (damped Newton, the negative Hessian
+        floored at the prior precision), and an outer 2-D Gauss-Hermite (MU_QUAD[1]) over the
+        N(0, Cov) noise scatter of bd (Cov None: evaluated at bd). For the gaussian law both
+        quadratures are exact, so this reproduces the analytic integral (the validation path).
+        bd (nreg, 2) the data part of the region statistic, A (nreg, 2, 2), Cov (nreg, 2, 2) or
+        None; returns (nreg,)."""
+        from numpy.polynomial.hermite import hermgauss
+        from scipy.special import logsumexp
+        ln = MU_LAW == "lognormal"
+        sd2 = MU_PRIOR[1]**2
+        eta0 = np.log(MU_PRIOR[0]) if ln else MU_PRIOR[0]
+        R = bd.shape[0]; eye = np.eye(2)
+        ni, no = MU_QUAD
+        xi, wi = hermgauss(ni)
+        Xi = np.array(np.meshgrid(xi, xi, indexing="ij")).reshape(2, -1).T                # (N, 2)
+        lwi = np.log(np.outer(wi, wi).ravel()) + np.sum(Xi**2, 1)                         # log w_n + |x_n|^2
+        if Cov is None:
+            Xo, wo = np.zeros((1, 2)), np.ones(1)
+        else:
+            xo, wo1 = hermgauss(no)
+            Xo = np.array(np.meshgrid(xo, xo, indexing="ij")).reshape(2, -1).T            # (K, 2)
+            wo = np.outer(wo1, wo1).ravel() / np.pi
+            wc, Vc = np.linalg.eigh(Cov)                                               # symmetric square root (Cov may be singular)
+            Lc = np.einsum("rij,rj,rkj->rik", Vc, np.sqrt(np.maximum(wc, 0.0)), Vc)
+        Qg = A + eye / sd2
+
+        def h(eta, b):          # eta, b: (..., 2); A broadcast (R, ..., 2, 2)
+            m = np.exp(eta) if ln else eta
+            Am = np.einsum("r...ij,r...j->r...i", A.reshape((R,) + (1,) * (eta.ndim - 2) + (2, 2)), m)
+            return (np.sum(b * m, -1) - 0.5 * np.sum(m * Am, -1)
+                    - 0.5 * np.sum((eta - eta0)**2, -1) / sd2)
+
+        def grad_hess(eta, b):  # (R, 2) -> (R, 2), (R, 2, 2)
+            m = np.exp(eta) if ln else eta
+            Am = np.einsum("rij,rj->ri", A, m)
+            if ln:
+                g = m * (b - Am) - (eta - eta0) / sd2
+                H = (np.einsum("ri,ij->rij", m * (b - Am), eye)
+                     - m[:, :, None] * A * m[:, None, :] - eye / sd2)
+            else:
+                g = b - Am - (eta - eta0) / sd2
+                H = -(A + eye / sd2)
+            return g, H
+
+        def floor_neg_hess(H):  # -H with eigenvalues floored at 1/sd2, (R, 2, 2)
+            w, V = np.linalg.eigh(-H)
+            w = np.maximum(w, 1.0 / sd2)
+            return np.einsum("rij,rj,rkj->rik", V, w, V)
+
+        out = np.zeros(R)
+        for k in range(Xo.shape[0]):
+            b = bd if Cov is None else bd + np.sqrt(2.0) * np.einsum("rij,j->ri", Lc, Xo[k])
+            mu_hat = np.linalg.solve(Qg, (b + MU_PRIOR[0] / sd2)[..., None])[..., 0]       # gaussian-law mode (exact for that law)
+            eta = np.log(np.clip(mu_hat, 0.05, 20.0)) if ln else mu_hat
+            hv = h(eta, b)
+            for _ in range(0 if not ln else 15):
+                g, H = grad_hess(eta, b)
+                P = floor_neg_hess(H)
+                step = np.linalg.solve(P, g[..., None])[..., 0]
+                acc = np.zeros(R, bool); alpha = np.ones(R)
+                for _j in range(6):
+                    cand = eta + alpha[:, None] * step
+                    hc = h(cand, b)
+                    better = (hc > hv) & ~acc
+                    eta = np.where(better[:, None], cand, eta); hv = np.where(better, hc, hv)
+                    acc |= better; alpha = np.where(acc, alpha, 0.5 * alpha)
+                if np.max(np.abs(step), initial=0.0) < 1e-7:        # in eta units, scale-free
+                    break
+            g, H = grad_hess(eta, b)
+            P = floor_neg_hess(H)
+            Ls = np.linalg.cholesky(np.linalg.inv(P))                                      # (R, 2, 2)
+            nodes = eta[:, None, :] + np.sqrt(2.0) * np.einsum("rij,nj->rni", Ls, Xi)      # (R, N, 2)
+            hn = h(nodes, b[:, None, :])
+            logdetL = np.log(Ls[:, 0, 0] * Ls[:, 1, 1])
+            logZ = np.log(2.0) + logdetL + logsumexp(hn + lwi[None, :], axis=1) - np.log(2.0 * np.pi * sd2)
+            out += wo[k] * logZ
+        return out
 
     def objective(self, Ms, Md, hyper, expected):
         if getattr(hyper, "marg", False):
@@ -340,6 +431,13 @@ def main():
                          "in --cells (fixT cells only); prints the total per T, whose argmax is the pseudo-true "
                          "scalar T of the pinned-amplitude model. Then exits.")
     ap.add_argument("--mu-sd", type=float, default=None, help="hyperprior sd of the template multipliers (default 0.5)")
+    ap.add_argument("--mu-law", default="gaussian", choices=["gaussian", "lognormal"],
+                    help="law of the per-region template multipliers in perregmarg cells: N(mu0, sd^2) on mu "
+                         "(integrated analytically) or N(log mu0, sd^2) on log mu (adaptive Gauss-Hermite)")
+    ap.add_argument("--mu-quad", type=int, nargs=2, default=[12, 6],
+                    help="Gauss-Hermite orders per dimension: inner (over the multipliers) and outer (over the noise scatter of the region statistic)")
+    ap.add_argument("--mu-force-quad", action="store_true",
+                    help="use the quadrature path for the gaussian law too (validation against the analytic integral)")
     ap.add_argument("--marg-fixed-s", type=int, default=1,
                     help="perregmarg cells: hold the scatters at their delta-0 profile along a scan (1) or re-profile (0)")
     ap.add_argument("--dust-ref", default="fixT", choices=["fixT", "trueT"],
@@ -351,6 +449,7 @@ def main():
     CMB_SD = a.cmb_sd
     if a.mu_sd is not None:
         MU_PRIOR = (MU_PRIOR[0], float(a.mu_sd))
+    MU_LAW, MU_QUAD, MU_FORCE_QUAD = a.mu_law, tuple(a.mu_quad), bool(a.mu_force_quad)
     D = a.dir
     t = np.load(f"{D}/truth.npz")
     nside = int(t["nside"]); npix = hp.nside2npix(nside)
@@ -408,6 +507,7 @@ def main():
         say(f"  data template {name}: g/true at |b|>20 16/50/84 pct {np.percentile(r,16):.3f}/"
             f"{np.percentile(r,50):.3f}/{np.percentile(r,84):.3f}")
     # realized a/g per quartile for the two template levels
+    say(f"  multiplier law {MU_LAW}" + (f", Gauss-Hermite {MU_QUAD[0]} x {MU_QUAD[1]} per dimension" if MU_LAW == "lognormal" or MU_FORCE_QUAD else " (analytic)"))
     say(f"  cs template: log error field rms {a.cs_scatter}, FWHM {a.cs_fwhm} deg, seed {a.cs_seed}"
         + (f", replaced by the constant {a.cs_const}" if a.cs_const is not None else "") + "; realized "
         f"exp(-f) mean/sd sync {np.exp(-cs_fields['sync']).mean():.3f}/{np.exp(-cs_fields['sync']).std():.3f}, "

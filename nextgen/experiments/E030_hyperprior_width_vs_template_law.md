@@ -326,6 +326,31 @@ absorption under the hyperprior N(1, 0.3^2): mu 1.35 costs 0.68 nats, 0.74 costs
 prior width s g scales with the template). Data-dominated quartiles: shifts of opposite sign
 for the two errors, sync Q1 of order 0.1, dust Q1 of order 0.01.
 
+**Pass 6 (queued 2026-11-09 05:36 behind chain 2, which the niced scans slow threefold through its
+MPI barriers; driver `run_e030_scans6.sh`; outputs `scan6_sd03_gaussquad_check.txt`,
+`scan6_sd03_lognormal.txt`):** the log-normal multiplier law (Q18 candidate (d)): the
+hyperprior N(log mu0, sd^2) on log mu instead of N(mu0, sd^2) on mu, integrated per region by
+adaptive two-dimensional Gauss-Hermite (12 nodes per dimension) centred on the Laplace mode,
+with an outer Gauss-Hermite (6 per dimension) over the noise scatter of the region statistic
+in the expected mode (`--mu-law lognormal`, `--mu-quad`, `--mu-force-quad` in
+`e023_exact_scan.py`). Validation of the quadrature before any reading (05:33, unit check on
+500 synthetic regions with data scales 1e-2 to 1e4): with the gaussian law the quadrature
+reproduces the analytic integral to 1e-10 (plain) and 1e-9 (expected, i.e. including the
+trace term) at sd 0.1, 0.3, 0.5; with the log-normal law it matches brute-force 1601^2 grid
+integrals to 1e-7 nats except where the grid does not resolve the posterior (two regions with
+scale above 500 at sd 0.5, where the grid step exceeds half the posterior width); 4 s per
+evaluation of 3072 regions. The first pass 6 run repeats two pass 3 scans (cs, s_Q4 and d_Q2,
+step 0.1) through the quadrature path with the gaussian law as the in-situ check: it must
+reproduce `scan3_sd03.txt` to 0.01 nats per offset. Pre-registered for the log-normal law at
+sd 0.3, seed 11: (i) exact template: optima within 0.05 of the gaussian law's (+0.01, +0.04,
++0.02, +0.02; sync +0.03, +0.03), the law mattering little when the true multiplier is 1;
+(ii) cs template: if the even faint push is the law mismatch (a linear-Gaussian prior on a
+log-normal error), the faint sync optima move from beyond +0.3 to within +0.15 and the faint
+dust from +0.03, +0.08, +0.13 to within 0.05, with the data-dominated quartiles unchanged
+(sync Q1 +0.07 +- 0.03 is the odd, realization part; dust Q1 0.00); if they stay beyond +0.3
+the law is not the cause and candidate (d) is dead as well, leaving the correlated prior (b)
+and the reporting rule.
+
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
 sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the control for

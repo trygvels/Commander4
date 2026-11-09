@@ -27,6 +27,10 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
 **Running**
 - E030 pass 5 scans (niced, from 05:26): uniform template errors of -0.3 and +0.3 in log at
   the matched width, to separate a variance-driven from a response-driven even push.
+- E030 pass 6 queued behind chain 2 (the scans slow the 12-rank chain threefold through its
+  MPI barriers even at nice 19, so no more scans beside it): the log-normal multiplier law
+  (Q18 (d)) in the exact scan, by adaptive Gauss-Hermite validated against the analytic
+  integral (1e-9) and brute force (1e-7); pre-registered in the record.
 - Pass 4 read (05:25): the data-dominated sync shift over three error realizations is +0.07,
   -0.06, +0.01 (a random shift of scale 0.06, not a bias); the faint push is positive for every
   realization and sign (+0.2 to +0.3 sync, +0.03 to +0.14 dust); a near-flat multiplier prior
