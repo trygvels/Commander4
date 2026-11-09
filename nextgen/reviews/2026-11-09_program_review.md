@@ -187,7 +187,10 @@ depth, on a realistic amplitude field, it is -0.06 at a 23 GHz reference and +0.
 of 0.16. With a free CMB and a free dust amplitude in every pixel the pivot moves down to the
 lowest band, so a flat prior stated at 23 GHz is nearly unbiased and one stated at 30 GHz is
 biased flat by +0.17 at an index error of 0.064 and by +0.86 at 0.13. E022 saw the same sign and
-size on real data at a 30 GHz reference (+0.27 in the Spur). Published high-latitude values of
+size on real data at a 30 GHz reference (+0.27 in the Spur), and its recorded numbers obey the
+formula: two noise models give the same pivot to 0.2 percent. With a CMB prior the pivot of the
+BeyondPlanck band set is 29.5 to 30.2 GHz, which is the reference BeyondPlanck used. That is a
+candidate explanation of why its chains show no flat-prior pull, the open point of F22. Published high-latitude values of
 the polarized synchrotron index differ by 0.2 to 0.3 between analyses. This experiment does not
 show that the reference frequency explains that spread, and no published analysis was checked
 for it. It does show an effect of that size in the estimator that a Gibbs sampler with flat

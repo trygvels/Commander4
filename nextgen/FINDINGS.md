@@ -1082,7 +1082,11 @@ I expected the profile to under-cover at real depth, at twice and at four times 
 did so only in one class. Consequences: the flat-prior marginal, which is what a Gibbs sampler
 with flat amplitude priors targets (F15), is not a usable target for a polarized index at any
 reference except by accident of the pivot; E022's +0.27 in the Spur at a 30 GHz reference with a
-free CMB amplitude is this effect on real data; the amplitude prior of the polarized track is
+free CMB amplitude is this effect on real data, and its recorded numbers obey the formula: for
+two noise models the Spur shifts of +0.271 and +0.172 give the same pivot, 26.04 GHz, to 0.2
+percent, while with a 0.19 uK CMB prior the pivot is 29.5 to 30.2 GHz, BeyondPlanck's reference,
+which is a candidate explanation of why its chains show no flat-prior pull (Q17, the open point
+of F22); the amplitude prior of the polarized track is
 the profile with a sandwich width or the per-region zero-mean prior, with a CMB prior the size of
 the signal (D029); no template is needed, so the template-error findings F21 to F38 do not arise
 there. Scope: white noise, one index over the sky, a truth amplitude field that is a posterior

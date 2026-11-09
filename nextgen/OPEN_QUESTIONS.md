@@ -353,6 +353,13 @@ the predictions in Q23.
   prior to polarization and low-S/N intensity.
 
 ## Q17. Is the BeyondPlanck XV polarized beta_s chain stationary, and what is its effective number of free amplitude elements?
+
+**Candidate answer to the missing flat-prior pull (2026-11-10, E036, F44).** The flat-prior shift
+is ln(nu_ref / nu_pivot) times the number of amplitudes times the squared index sd. E022's own
+table gives a pivot of 26.0 GHz under a flat CMB prior and 29.5 to 30.2 GHz under a 0.19 uK CMB
+prior, and BeyondPlanck's reference is 30 GHz. If the CMB amplitude in BeyondPlanck's amplitude
+step is effectively constrained, the shift vanishes by the choice of reference. To test: the
+E022 grids at a second reference frequency. The stationarity part of this question is unchanged.
 - **Why:** E022 / F22. The released chains (four, 1001 samples, one shared start) have 23 to
   114 effective samples per chain and move towards flatter indices; on an nside-16 surrogate
   the flat-prior collapsed target is shifted by +0.27 (Spur) and runs to the prior boundary

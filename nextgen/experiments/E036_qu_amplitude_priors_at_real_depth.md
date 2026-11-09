@@ -407,11 +407,34 @@ checked region by region. The truth amplitudes are a posterior mean of real data
 
 Changes: F44 added; Q20 answered for white noise; D029 item 5; Paper A outline thesis item 2.
 
+**Check against the real-data numbers of E022** (added 2026-11-10 00:45; arithmetic on that
+record's table, no new run). The formula says the flat-prior marginal minus the profile equals
+ln(nu_ref / nu_pivot) times the number of amplitudes times the squared profile sd. E022 has both
+targets for the BP XV regions on real WMAP, LFI and 353 GHz Q/U maps at a 30 GHz reference, for
+two noise models and two CMB priors.
+
+| region, variant | shift | n sd^2 | implied ln(30 / pivot) | pivot (GHz) |
+|---|---|---|---|---|
+| Spur (928 amplitudes), BP rms, flat CMB | +0.271 | 1.913 | +0.1417 | 26.04 |
+| Spur, white rms, flat CMB | +0.172 | 1.216 | +0.1414 | 26.04 |
+| Plane (646), BP rms, flat CMB | +0.126 | 0.968 | +0.130 | 26.3 |
+| Plane, white rms, flat CMB | +0.080 | 0.605 | +0.132 | 26.3 |
+| Spur, BP rms, CMB prior 0.19 uK | -0.004 | 0.526 | -0.008 | 30.2 |
+| Spur, white rms, CMB prior 0.19 uK | +0.005 | 0.301 | +0.017 | 29.5 |
+
+The two noise models give the same pivot to 0.2 percent in the Spur and to 1 percent in the
+Plane, so the shift scales with n sd^2 on real data as the formula requires. With a flat CMB
+prior the pivot is 26.0 to 26.3 GHz, below the lowest band of that set (28.4 GHz). With a CMB
+prior it is 29.5 to 30.2 GHz, where the challenge report computed 29.8 GHz for the band set, and
+that is the reference BeyondPlanck used. This is a candidate answer to Q17 and to the open
+point of F22: the BeyondPlanck chains show no flat-prior pull because, with the CMB constrained
+by a prior, their reference frequency sits at the pivot of their band set. With K band added
+the pivot moves to about 26 GHz and a 30 GHz reference is no longer neutral.
+
 ## Follow-ups
 
 - The same grid machinery on the E022 surrogate with dense WMAP covariances and K band, at
-  references of 23 and 30 GHz, with and without a CMB prior. It would test whether the pivot
-  explains why the BeyondPlanck chains show no flat-prior pull (Q17): for the BP XV band set
-  without K band the pivot is near 30 GHz, the reference BeyondPlanck used.
+  references of 23 and 30 GHz, with and without a CMB prior, to turn the arithmetic above into a
+  direct test.
 - The sandwich factor computed per region and overlaid on these tables and on E012 and E017.
 - A truth with a latitude step in the index, and a data-built scale map.
