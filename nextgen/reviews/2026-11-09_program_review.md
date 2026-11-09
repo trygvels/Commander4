@@ -32,7 +32,8 @@ assumptions it rests on. Sections 2 to 4 are the audit of what exists.
 3. **The most interesting results came out of the review itself** (Sect. 5): the legacy move
    converges to the profile posterior at temperature sqrt(2 pi k)/4 + 1/2; a flat amplitude prior
    shifts the index by ln(nu_ref / nu_pivot) times the single-amplitude index variance, which is
-   0.06 to 0.4 with either sign at real polarization depth; the profile likelihood with a
+   0.06 to 0.9 at real polarization depth with a sign set by the reference frequency and the CMB
+   prior, and which the real-data numbers of E022 obey to 0.2 percent; the profile likelihood with a
    sandwich width, or equivalently a zero-mean prior with one free scale per region, is
    calibrated there and needs no template.
 4. **The pipeline's assumptions are weaker than its samplers.** Two ingest bugs are confirmed on
