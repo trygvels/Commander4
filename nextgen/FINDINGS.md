@@ -752,10 +752,44 @@ error into the profiled scatters (sync 0.09 to 0.35 against 0.04 to 0.21). Conse
 hyperprior width is a property of the template, not of the sky; on real data it follows the
 template quality (sd 0.1 only for a template good to about 10 percent at the region scale), and
 at the matched width a data-dominated sync index carries a template-induced shift of order
-+0.07 for a 30 percent template (a scan statement; the chain `gmrf16_cs_mumap_nc_Tmap_mu03`,
-cs templates at sd 0.3 with the oracle T, is running to read it with the field prior). Also
++0.07 for a 30 percent template (the chain `gmrf16_cs_mumap_nc_Tmap_mu03` confirms it with the
+field prior: the hundred brightest regions at -0.01 to +0.09, the Fisher-weighted level +0.08
+to +0.10; the region map as a whole follows the displaced field mean, F38). Also
 recorded: two earlier passes ran with the scan script's default per-pixel CMB prior sd 100 and
 showed +0.04 to +0.12 in the faint dust quartiles with exact templates and the true T, the F26
 leakage at realistic noise; invalid as readings of the target, kept as the F26 illustration.
 Scope: one sky, one template-error realization (seed 11, 10 degrees, log-normal rms 0.3),
 expected target without the index prior.
+
+**F38. With a 30 percent region-scale template error at realistic noise the index-field mean
+hyperparameter is set by the prior-dominated faint majority of regions, and the GMRF prior
+propagates its displacement into every region fainter than the field's own sd; only the
+data-dominated regions and the Fisher-weighted level stay where the exact target puts them**
+(E030 chain 1, `gmrf16_cs_mumap_nc_Tmap_mu03`: cs templates, the matched hyperprior sd 0.3,
+oracle nside-16 T map, 1200 iterations, 0 divergences; D025 passes with KS p 0.93 sync and 0.40
+dust, so the chain samples its target; `E030/chain_*.txt`). Sync field mean -2.701 +- 0.050
+against the truth -3.000, 6 posterior sd off, where the template-error-dominated faint half
+sits (scan optima beyond +0.3 at every width, F37); E026's cs chain at sd 0.5 with the fixed T
+had -2.723 +- 0.055; with exact templates the means are -2.967 (stage A') and -2.981 (E029).
+Dust field mean 1.569 against the `bd_trueT` mean 1.539, smaller because three dust quartiles
+carry data weights 0.89, 0.29, 0.07. The faint sync quartiles sit +0.31, +0.37, +0.32 above the
+region-fit reference, at the independent-region shrinkage prediction (+0.29, +0.30, +0.29;
+`quartile_shrinkage.py`), and so does the bright quartile's average +0.19 (prediction +0.21: the
+median Q1 region has Fisher sd 1.00 against the learned sigma_s 0.51, data weight 0.21). The
+ten, thirty and hundred brightest regions by Fisher weight (31, 50, 67 percent of the weight)
+sit at -0.01, +0.06, +0.09 and the Fisher-weighted level of the field at +0.08 (truth) to +0.10
+(reference), where the scans put a data-dominated index at this width (+0.07, F37). Bright dust
+is at the reference (+0.004, z median +0.17); dust Q2 to Q4 +0.032, +0.059, +0.023 against the
+prediction +0.033, +0.049, +0.021. The multiplier maps track the realized template error in the
+bright quartile (corr +0.86 dust, +0.66 sync) and not beyond (Q2 +0.44, +0.37), their mean
+1.009 and 0.982 against exp(-f)'s 1.046. Pixel RMSE 0.426 sync, 0.117 dust against stage A's
+0.066, 0.038 with exact templates (paired +0.360 +- 0.021, +0.064 +- 0.005) and against E026's
+cs chain 0.335, 0.089; the field is rougher (sigma_s 0.51 against 0.35, sigma_d 0.17 against
+0.12), and the E026 comparison is confounded by the T map, the width and E026's hyperparameter
+ESS of 4 to 13 (chain 2, cs at sd 0.5 with the oracle T, separates them). GLS CMB residual at
+the posterior-mean fields 96.4 uK against stage A's 93.1, the excess from the sync field.
+Consequence: with a real-data-quality template the reportable index quantities are the
+data-dominated regions and the Fisher-weighted level, not the field mean or the region map as a
+whole; the field-mean hyperprior, or the multiplier prior's law, must be changed so that the
+template-dominated regions do not set the field mean (Q18). Scope: one sky, one template-error
+realization, the oracle T; the sd 0.5 chain is pending.

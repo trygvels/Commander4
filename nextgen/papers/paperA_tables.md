@@ -46,7 +46,8 @@ table's nside-16 rows can be quoted as the mean of the two realizations.
 ## Table 3 (candidate): the dust temperature model and the multiplier hyperprior at realistic noise (E026, E029, E028)
 
 One PySM d1s1c1 sky (`/Users/trygvels/data/e023_pysm_n1`; 12 bands 23 to 353 GHz, nside 64,
-white noise at the E012 levels), exact amplitude templates, GMRF index fields at nside 16,
+white noise at the E012 levels), exact amplitude templates unless marked cs (the 30 percent
+region-scale template error of E025), GMRF index fields at nside 16,
 per-region template multipliers with the hyperprior N(1, sd^2), 1200 Gibbs iterations, 700
 post-burn draws; every chain passes the D025 Gibbs-consistency check. "Dust minus beta_d" is
 the mean over the regions of a dust S/N quartile (Q1 bright to Q4 faint) of the posterior-mean
@@ -66,6 +67,8 @@ Sources: `E028/stageA_dust_vs_refs.txt`, `stageAprime_dust_vs_refs.txt`, `stageB
 | E029 `..._mu01` | 0.1 | fixed 20.93 K | -0.048 / -0.017 / -0.022 / -0.045 | 1.003 | -2.981 | 0.061 / 0.056 | 94.52 |
 | E028 A' `..._Tmap_mu01` | 0.1 | oracle map | +0.010 / +0.033 / +0.031 / +0.003 | 1.002 | -2.967 | 0.066 / 0.038 | 93.08 |
 | E028 B `..._Tscalar` | 0.1 | sampled scalar (19.19 +- 0.54 K) | -0.004 / +0.029 / +0.024 / -0.002 | 1.002 | -2.977 | 0.062 / 0.046 | 93.42 |
+| E026 `gmrf16_cs_mumap_nc`, cs | 0.5 | fixed 20.93 K | -0.008 / +0.060 / +0.080 / +0.050 | 1.030 | -2.723 | 0.335 / 0.089 | 95.25 (at draws) |
+| E030 chain 1 `..._cs_mumap_nc_Tmap_mu03`, cs | 0.3 | oracle map | +0.004 / +0.032 / +0.059 / +0.023 | 1.009 | -2.701 | 0.426 / 0.117 | 96.42 |
 | exact marginal | 0.5 | fixed | +0.02 / +0.10 / +0.09 / +0.08 | | | | |
 | exact marginal | 0.5 | oracle map | +0.01 / +0.10 / +0.09 / +0.07 | | | | |
 | exact marginal | 0.1 | fixed | -0.01 / -0.03 / -0.01 / +0.01 | | | | |

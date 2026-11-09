@@ -3,6 +3,12 @@
 Ranked by how much the answer changes what we build next. Each entry: why it matters, how to answer
 it, and what the answer decides. Mark an entry RESOLVED with the experiment ID when answered.
 
+**Ranking (2026-11-09):** Q16 (a) is answered by E030 (F37, F38) up to chain 2's reading of
+the width's share of the field roughness; the new Q18 (keeping the template-dominated regions
+from setting the field mean) takes its place at the top, because it decides what the hier prior
+can report on real data; then Q16 (b) (the T field with 545 and 857 GHz, needs Trygve), Q15,
+Q4 efficiency, Q8/Q7, Q5, the second half of Q14.
+
 **Ranking (2026-11-08):** Q16 stays first, now two items: (a) the multiplier hyperprior width
 against the template-error law on component-separation-quality templates (E030, exact scans
 first, then one chain if the tight width breaks), which decides the real-data default that F33
@@ -297,6 +303,14 @@ original numbering.
   one. E028 stages A, A', B are closed: the T model is needed on the dust side, the scalar T is
   not a substitute (F35), and the level of prior-dominated regions is a reporting question
   (D025). Stage C (T field with 545 and 857 GHz, 14-band simulation) needs Trygve's go.
+- **Status 2026-11-09, 04:40 (E030 chain 1, F38):** the cs chain at the matched width with the
+  oracle T passes D025 and confirms the scans where the data decide (bright dust +0.004, the
+  hundred brightest sync regions -0.01 to +0.09, Fisher-weighted level +0.08 to +0.10), but the
+  sync field mean is -2.70 (truth -3.00): the template-dominated faint half sets the field-mean
+  hyperparameter and the GMRF propagates it into every region fainter than sigma_s 0.51, so
+  the sync Q1 average (+0.19) and the faint half (+0.31 to +0.37) are the shrinkage
+  prediction. Pixel RMSE 0.43 and 0.12, worse than E026's sd-0.5 cs chain (confounded; chain 2
+  at sd 0.5 with the oracle T running from 04:36). Opened Q18.
 - **Status 2026-11-08, 21:55 (E030 scans, F37):** the multiplier hyperprior width must be at
   least the template error's scale. With a 30 percent cs template the tight sd 0.1 (F33, F36)
   biases the data-dominated sync quartile by +0.21 and the dust quartile by -0.02 (tens of
@@ -358,3 +372,29 @@ original numbering.
   (Spur) and 150 (Plane). Item 1 (the semantics of `none` for the CMB) remains; the
   measurement implies the CMB column is not a free per-pixel amplitude in BP's chain.
 
+## Q18. How is the index field's mean hyperparameter kept from being set by template-error-dominated regions?
+
+- **Why it matters:** F38: with a 30 percent template at realistic noise the sync field mean
+  lands at -2.70 (truth -3.00) because three quarters of the regions are set by the template
+  error (F37), and the GMRF then pulls every region fainter than the field's sd toward that
+  mean, so the region map and the field mean are not reportable; only the hundred brightest
+  regions and the Fisher-weighted level survive. On real data the templates are
+  component-separation products with errors of this order, so this decides what the
+  hierarchical prior can deliver (Paper A Sect. 5, Paper B).
+- **How to answer:** (1) exact-target check of the field-mean posterior: the collapsed target
+  as a function of mu with the faint half pinned at the reference against pinned at the
+  template optima, to confirm that the displacement is the faint regions' and not the
+  likelihood's; (2) candidate models, each tested first by an exact scan and then by one chain
+  on the cs templates with the oracle T, read against stage A' and E030 chain 1: (a) a
+  field-mean hyperprior informed by the data-dominated regions only (weight each region's
+  contribution to mu by its Fisher weight relative to sigma, or estimate mu from regions with
+  Fisher sd below sigma); (b) a spatially correlated multiplier prior (a GMRF on log mu_r
+  instead of iid N(1, sd^2)), since the cs error field has a 10 deg correlation length and the
+  bright neighbours constrain a faint region's template error; (c) a per-quartile or S/N-dependent
+  hyperprior width that widens where the data say nothing, so the template cannot set the index
+  there (the index then falls back on the GMRF alone, as with a flat amplitude prior); (3) the
+  reporting rule meanwhile: Fisher-weighted level and data-dominated regions only (D027).
+- **Decides:** the hier prior's law on real data and the Paper A statement about what a
+  template-informed index field can report.
+- **Status (2026-11-09, 04:40):** opened from E030 chain 1 (F38); chain 2 (sd 0.5) pending for
+  the width's share of the roughness.

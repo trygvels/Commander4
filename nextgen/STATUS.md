@@ -2,6 +2,52 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-09 (Mac mini, 04:45): E030 chain 1 read (F38: with a 30 percent template the field mean is set by the faint half and the GMRF spreads it; only the data-dominated regions and the Fisher-weighted level hold); chain 2 at sd 0.5 running
+
+**Learned**
+- E030 chain 1 (`gmrf16_cs_mumap_nc_Tmap_mu03`: cs templates, matched hyperprior sd 0.3, oracle
+  T map; 6 h 41 min, 0 divergences; D025 passes, KS p 0.93 sync, 0.40 dust) confirms the scans
+  where the data decide: bright dust +0.004 above `bd_trueT` (z +0.17), the ten, thirty and
+  hundred brightest sync regions at -0.01, +0.06, +0.09, the Fisher-weighted sync level +0.08
+  (truth) to +0.10 (reference), against the scan optimum +0.07.
+- F38 (new): the sync field mean is -2.70 +- 0.05 against -3.00. Three quarters of the regions
+  are set by the template error (F37), they set the field-mean hyperparameter, and the GMRF
+  pulls every region with Fisher sd above sigma_s 0.51 toward it: the sync Q1 average +0.19
+  and the faint half +0.31 to +0.37 are the independent-region shrinkage prediction (+0.21,
+  +0.29 to +0.30; new `nextgen/scripts/quartile_shrinkage.py`), not a likelihood bias. Dust is
+  mild (field mean +0.03, Q2 to Q4 +0.03, +0.06, +0.02 at the prediction).
+- Pre-registration (c) failed as written (sync Q1 average outside 0 to +0.09) because the
+  criterion treated sync Q1 as data-dominated; its median region has data weight 0.21.
+  Prediction (e) failed outright: pixel RMSE 0.43 / 0.12 against E026's sd-0.5 cs chain 0.34 /
+  0.09 (the field is rougher, sigma_s 0.51 against 0.35). That comparison is confounded by the
+  T map, the width and E026's hyperparameter ESS of 4 to 13.
+- The scan machinery's CMB-prior default caught by its own warning; the stage A' shrinkage
+  script is now in the repo and reproduces the stage A' table to four decimals.
+
+**Running**
+- E030 chain 2, `gmrf16_cs_mumap_nc_Tmap_mu05` (cs, sd 0.5, oracle T; differs from chain 1 only
+  by the width and from E026's cs chain only by the T map), from 04:36, about 6.7 h; check set
+  armed in the data dir (`run_e030_chain2_checks.sh`, outputs `E030/chain2_*.txt`).
+  Pre-registered in the record: if the width drives the roughness, sigma_s falls to about 0.35
+  and the RMSE to 0.33 / 0.09; if not, chain 2 lands at chain 1's values and E026's cs RMSE is
+  an unconverged chain's.
+
+**Next**
+- Read chain 2 against the pre-registration; close E030 (F37, F38 final), Paper A Sect. 5.
+- Q18 (new, top of the ranking): keep the template-dominated regions from setting the field
+  mean: exact-target check of the mu posterior, then candidate models (Fisher-informed field
+  mean; GMRF on the multipliers, since the template error is correlated over 10 deg; S/N-
+  dependent width). Scans first, one chain each.
+
+**Needs Trygve**
+- Real-data hyperprior default: proposal stands (per-component width from the template's
+  estimated region-scale error, no fixed default); F38 adds that the field mean and the region
+  map as a whole are not reportable with a 30 percent template under the current law, so the
+  Paper A reporting rule (Fisher-weighted level and data-dominated regions) becomes the
+  statement, not a caveat.
+- Earlier items unchanged (14-band simulation for E028 stage C; E022 presentation; COMP_CL_TYPE;
+  hier default; Q15 zero level; D021 CMB prior width).
+
 ## 2026-11-08 (Mac mini, 21:55): E030 scans (F37: the multiplier hyperprior width must match the template error; sd 0.1 is not admissible with a 30 percent template); cs-template chain at the matched width running
 
 **Learned**

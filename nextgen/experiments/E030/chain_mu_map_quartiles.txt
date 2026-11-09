@@ -1,0 +1,12 @@
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/lib/_function_base_impl.py:3037: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/lib/_function_base_impl.py:3038: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+truth.npz keys: ['beta_s', 'beta_d', 'T_d', 'T_fixed', 'beta_eff', 'beta_eff3', 'cmb', 'sky', 'dust_bands', 'rms', 'nu', 'nside', 'noise_scale', 'seed', 'g_sync', 'g_dust', 'a_sync', 'a_dust', 'index_prior_sync', 'index_prior_dust', 'indep_sd', 'cmb_sd', 'sky_mode', 'nside_truth', 'template_scatter', 'template_story', 'fisher_sd_sync_4', 'fisher_sd_sync_4_profiled', 'fisher_sd_dust_4', 'fisher_sd_dust_4_profiled', 'fisher_sd_sync_8', 'fisher_sd_sync_8_profiled', 'fisher_sd_dust_8', 'fisher_sd_dust_8_profiled', 'fisher_sd_sync_16', 'fisher_sd_sync_16_profiled', 'fisher_sd_dust_16', 'fisher_sd_dust_16_profiled']
+posterior-mean template multiplier maps per quartile (Q1 bright to Q4 faint), 700 post-burn draws; correlation with the realized a/g region means where available
+gmrf16_cs_mumap_nc_Tmap_mu03     ThermalDust  all 1.0092  per quartile mean 1.0356 1.0064 0.9944 1.0005  median post sd 0.104 0.247 0.285 0.298  corr(pm, a/g) per quartile +0.86 +0.44 +0.26 +0.15  rms(pm - a/g) 0.275
+gmrf16_cs_mumap_nc_Tmap_mu03     Synchrotron  all 0.9822  per quartile mean 0.9581 0.9862 0.9880 0.9964  median post sd 0.206 0.267 0.282 0.292  corr(pm, a/g) per quartile +0.66 +0.37 +0.25 +0.21  rms(pm - a/g) 0.275
+gmrf16_cs_mumap_nc               ThermalDust  all 1.0299  per quartile mean 1.0914 1.0372 0.9910 0.9998  median post sd 0.107 0.339 0.447 0.491  corr(pm, a/g) per quartile +0.90 +0.47 +0.27 +0.15  rms(pm - a/g) 0.284
+gmrf16_cs_mumap_nc               Synchrotron  all 0.9709  per quartile mean 0.9503 0.9736 0.9708 0.9890  median post sd 0.243 0.384 0.436 0.465  corr(pm, a/g) per quartile +0.70 +0.41 +0.27 +0.22  rms(pm - a/g) 0.297
+gmrf16_exact_mumap_nc_Tmap_mu01  ThermalDust  all 1.0016  per quartile mean 1.0043 1.0018 1.0003 1.0002  median post sd 0.067 0.097 0.099 0.100  corr(pm, a/g) per quartile +nan +nan +nan +nan  rms(pm - a/g) 0.025
+gmrf16_exact_mumap_nc_Tmap_mu01  Synchrotron  all 0.9991  per quartile mean 0.9977 0.9998 0.9992 0.9999  median post sd 0.092 0.098 0.099 0.099  corr(pm, a/g) per quartile +0.00 -0.03 +0.01 -0.05  rms(pm - a/g) 0.021

@@ -173,13 +173,94 @@ error (exp(-f) region means) with a correlation above 0.5 in the bright quartile
 Control: E026 `gmrf16_cs_mumap_nc` (sd 0.5, fixed T; D025 passed) and stage A' (exact, sd 0.1,
 oracle T).
 
+**Chain 1 result (read 2026-11-09 04:35; the chain finished 04:29:57 after 6 h 41 min for 1200
+iterations, 0 divergences, 31 gradients per iteration post-burn; check set in
+`E030/chain_*.txt`; shrinkage prediction in `chain_quartile_shrinkage.txt` from the new
+`nextgen/scripts/quartile_shrinkage.py`, which reproduces the stage A' numbers to four
+decimals).** Against the pre-registration:
+
+(a) passes. D025 with the cs templates, the T map and sd 0.3 read from the parameter file: sync
+KS p 0.93 (CDF mean 0.508), dust p 0.40 (0.527); conditional optimum minus draw -0.01 and -0.10
+conditional sds. The chain samples its target; everything below is a property of the model.
+
+(b) passes. Bright dust against `bd_trueT` +0.004 (z median +0.17, rmse 0.095); the scan
+optimum was 0.000. Dust multiplier map mean 1.009 +- 0.005 (exp(-f) averages 1.046 over the
+sky; the hyperprior shrinks the map toward 1 where the data are weak).
+
+(c) fails as written, and the criterion was wrongly posed. Sync Q1 against `bs_trueT` +0.19
+(against `bs_fixT` +0.16, median +0.15; z median +0.48), outside 0 to +0.09. The region level
+resolves it: the top 10 regions by Fisher weight (31 percent of the weight, Fisher sd median
+0.10) sit at -0.008 (z median 0.00), the top 30 (50 percent) at +0.058, the top 100 (67
+percent) at +0.086, the top 300 (82 percent) at +0.112, and the Fisher-weighted level of the
+posterior-mean field is -2.912 against the reference -3.009 (+0.097; against the truth -2.988,
++0.076): the data-dominated part of the sky lands where the scans put it (+0.07 with its 0.025
+sd; s_all +0.12). The Q1 average is inflated because the median Q1 region has Fisher sd 1.00
+against the learned field sigma 0.51 (median shrinkage weight on the data 0.21): sync Q1 is
+prior-dominated as a quartile, and the independent-region shrinkage prediction gives +0.206
+against the observed +0.194. Stage A' and E029 showed -0.015 and -0.028 there only because their
+exact-template field mean sat near the truth, so the same shrinkage was invisible.
+
+(d) passes. The faint quartiles follow the shrinkage prediction: dust Q2 to Q4 +0.032, +0.059,
++0.023 against +0.033, +0.049, +0.021; sync Q2 to Q4 +0.31, +0.37, +0.32 against +0.29, +0.30,
++0.29 (per-region rms of chain minus prediction 0.09 to 0.12 dust, 0.22 to 0.33 sync; the
+prediction ignores the spatial correlation).
+
+The mechanism behind (c) and (d) is new (F38): the field-mean hyperparameter is set by the faint
+majority of regions. The sync field mean is -2.701 +- 0.050 against the truth -3.000
+(`bs_trueT` mean -2.9995), 6 posterior sd off, exactly where the template-error-dominated faint
+half sits (scan optima beyond +0.3 at every width); E026's cs chain at sd 0.5 with the fixed T
+had -2.723 +- 0.055. Dust: 1.569 against the `bd_trueT` mean 1.539 (+0.030), smaller because
+three dust quartiles have data weights 0.89, 0.29, 0.07 and the faint offsets are +0.02 to
++0.05. With the field mean displaced, the GMRF pulls every region whose Fisher sd exceeds sigma
+toward it, which for sync is the whole sky except the hundred brightest regions. With exact
+templates (stage A') the field means were -2.967 +- 0.029 and 1.558 +- 0.012.
+
+(e) fails, in the opposite direction. Pixel RMSE against the PySM truth: sync 0.426, dust 0.117
+(|b| > 20: 0.459, 0.120) against E026 `cs_mumap_nc` 0.335, 0.089 and stage A' 0.066, 0.038;
+per S/N quartile (low to high) sync 0.40, 0.48, 0.46, 0.35 and dust 0.096, 0.132, 0.135, 0.097
+against E026's 0.34, 0.40, 0.35, 0.23 and 0.068, 0.105, 0.101, 0.076. Paired against stage A'
+by block bootstrap: +0.360 +- 0.021 (sync), +0.064 +- 0.005 (dust). The learned field is
+rougher: sigma_s 0.512 +- 0.077 against E026's 0.346 +- 0.080, sigma_d 0.174 +- 0.028 against
+0.118 +- 0.032, rho 30 and 47 deg against 59 and 57 deg. GLS CMB residual at the posterior-mean
+fields 96.42 uK (|b| > 20: 95.72) against E026's 95.25 and stage A' 93.08; with stage A' dust
+and this chain's sync 96.25, with this chain's dust and stage A' sync 93.13, so the excess is
+the sync field through its +0.3 faint half. The E026 comparison is confounded three ways: the
+T map (oracle here, fixed in E026), the width (0.3 against 0.5), and E026's mixing (its
+hyperparameter ESS was 4 to 13, so its sigma and RMSE come from a chain that had not explored
+the field prior). Chain 2 below breaks the confound.
+
+(f) passes in Q1, as in E026. Multiplier maps against the realized exp(-f) region means: dust
+Q1 corr +0.86 (E026 +0.90), Q2 +0.44 (+0.47), Q3 +0.26, Q4 +0.15; sync Q1 +0.66 (+0.70), Q2
++0.37 (+0.41); rms of map minus a/g 0.275 for both components (E026 0.284, 0.297); posterior sd
+of a multiplier median 0.10 (dust Q1) to 0.30 (faint half), i.e. the hyperprior width where
+the data say nothing.
+
+Mixing: dust region ESS min 38, median 429; sync min 101, median 692; dust hyperparameters ESS
+40 to 659 (`index_field/u` 40, `log_sigma` 55), sync 65 to 395; multiplier maps ESS min 49 and
+107.
+
+**Chain 2 (launched 2026-11-09 04:36:00, `gmrf16_cs_mumap_nc_Tmap_mu05`; driver, log and
+check set `run_e030_chain2*.sh` in the data dir, outputs `E030/chain2_*.txt`):** cs templates,
+`mu_prior: [1.0, 0.5]` on both components, oracle T map, otherwise chain 1's parameter file;
+identical to chain 1 except the width and to E026 `cs_mumap_nc` except the T map. Pre-registered
+before it is read: (i) D025 passes; (ii) bright dust against `bd_trueT` within 0.5 z median
+(scan optimum at sd 0.5 +0.01); (iii) the top-100 Fisher-weight sync regions between +0.04 and
++0.12 (scan +0.07 at sd 0.5), the Q1 average again at the shrinkage prediction; (iv) the sync
+field mean again at -2.70 +- 0.06, since the faint half is set by the template at every width
+(F37); (v) the discriminating prediction: if the width drives the roughness and RMSE difference,
+sigma_s falls to about 0.35, the RMSE to E026's 0.33 and 0.09, and the multiplier maps absorb
+more of the error (rms against exp(-f) below 0.275); if the T map or E026's unmixed chain is the
+cause, chain 2 lands at chain 1's 0.43 and 0.12 with sigma_s about 0.5, and E026's cs_mumap RMSE
+is then read as an unconverged chain's; (vi) the faint dust quartiles between the shrinkage
+prediction and the sd-0.5 scan optima (+0.10, +0.13, +0.19).
+
 ## Negative control
 Not needed for the scan machinery (validated in F31 and E028 stage A, where the exact-template
 sd 0.1 cell reproduces zero in every quartile); the exact-template cells are the control for
 the template effect.
 
 ## Conclusion
-(from the scans, 21:55; the chain is pending) The hyperprior width of the per-region template
+(scans read 2026-11-08 21:55; chain 1 read 2026-11-09 04:35; chain 2 pending) The hyperprior width of the per-region template
 multipliers must be at least the template error's scale: with a 30 percent template the tight
 sd 0.1 biases the data-dominated indices (sync +0.21, dust -0.02, tens of nats) and is not
 admissible; the matched sd 0.3 leaves the bright dust index unbiased and the bright sync index
@@ -188,6 +269,20 @@ both fields is set by the template error and the GMRF prior at every width (qual
 FINDINGS: F37, F28 qualified. OPEN_QUESTIONS: Q16 status. The real-data default is a choice
 for Trygve (D017 territory): the width follows the template quality.
 
+Chain 1 (cs, sd 0.3, oracle T; D025 passes) confirms the scan reading where the data decide:
+bright dust at the reference (+0.004), the Fisher-weighted sync level +0.08 to +0.10 and the
+hundred brightest regions at -0.01 to +0.09. It adds F38: the index-field mean hyperparameter is
+set by the template-dominated faint majority (-2.70 +- 0.05 against -3.00 for sync), and the
+GMRF propagates the displacement into every region fainter than the field's sd, so the sync Q1
+average (+0.19) and the whole faint half (+0.31 to +0.37) are the shrinkage prediction, not a
+likelihood bias. Pixel RMSE (0.43, 0.12) is worse than E026's sd-0.5 chain (0.34, 0.09), against
+prediction (e); the comparison is confounded by the T map, the width and E026's mixing, which
+chain 2 separates. With a real-data-quality template the reportable quantities are the
+data-dominated regions and the Fisher-weighted level, not the field mean or the region map as a
+whole (Q18).
+
 ## Follow-ups
-- If (3) breaks: one chain with cs templates at the matched width (sd 0.3) and the oracle T
-  map, read against the scan optima and E026's cs_mumap chain (sd 0.5).
+- Done: chain 1 (cs, sd 0.3, oracle T) read 2026-11-09; chain 2 (cs, sd 0.5, oracle T) running.
+- Q18: a field-mean hyperprior informed by the data-dominated regions only, or a spatially
+  correlated (GMRF) multiplier prior that lets the bright neighbours inform a faint region's
+  template error (the cs error field has a 10 deg correlation length the iid N(1, sd^2) ignores).

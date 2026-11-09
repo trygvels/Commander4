@@ -169,6 +169,19 @@ model component rather than a preprocessing choice.
   (+0.48 / +0.24). Figure candidate: the Occam slope of the marginalized multipliers against the
   hyperprior width (E026 review `occam.py`, `musd.py`) with the E029 chain; Table candidate:
   exact / cs_mumap / cs_scalar per quartile.
+- The hyperprior width against the template error (E030; F37, F38): the width of the per-region
+  multiplier hyperprior must be at least the template error's scale (a 30 percent template with
+  sd 0.1 biases the data-dominated sync index +0.21 and dust -0.02 in the exact target; the
+  matched sd 0.3 leaves bright dust at zero and bright sync +0.07; with an exact template the
+  matched width costs under 0.05). In the chain the template-dominated three quarters of the
+  sky set the field-mean hyperparameter (sync -2.70 against -3.00) and the GMRF spreads it into
+  every region fainter than the field's sd; the hundred brightest regions and the
+  Fisher-weighted level hold (-0.01 to +0.09, +0.08). Statement for the paper: with a
+  component-separation-quality template the index field reports its data-dominated regions and
+  its Fisher-weighted level; the field mean and the region map as a whole are prior statements
+  unless the multiplier law is changed (Q18). Table candidate: Table 3 rows E030 chain 1 and
+  E026 cs; Figure candidate: posterior-mean sync minus reference against region Fisher sd with
+  the shrinkage curve.
 - The dust temperature model at realistic noise (E028 stages A, A', B with E029; F33 to F36):
   with a fixed T the hier target has no unbiased configuration. Under sd 0.5 the T misfit is
   hidden in the multipliers (mu_d map 1.029) and the faint dust index sits +0.06 above beta_d;

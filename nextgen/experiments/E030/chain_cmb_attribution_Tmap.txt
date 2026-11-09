@@ -1,0 +1,20 @@
+GLS dust temperature: per-region map /Users/trygvels/data/e023_pysm_n1/truth_Td_nside16.fits (mean 20.929 K)
+GLS CMB residual (uK) at posterior-mean index fields; A = gmrf16_cs_mumap_nc_Tmap_mu03, B = gmrf16_exact_mumap_nc_Tmap_mu01
+A sync, A dust                                               rms all  96.418  |b|>20  95.717
+B sync, B dust                                               rms all  93.077  |b|>20  92.368
+A sync, B dust                                               rms all  96.252  |b|>20  96.085
+B sync, A dust                                               rms all  93.129  |b|>20  91.957
+A sync, dust = bd_fixT everywhere                            rms all  97.747  |b|>20  96.416
+A sync, A dust with Q1 replaced by bd_fixT                   rms all  97.212  |b|>20  95.744
+A sync, A dust with Q2 replaced by bd_fixT                   rms all  96.737  |b|>20  96.046
+A sync, A dust with Q3 replaced by bd_fixT                   rms all  96.780  |b|>20  96.275
+A sync, A dust with Q4 replaced by bd_fixT                   rms all  96.277  |b|>20  95.501
+A sync, A dust with faint half replaced by bd_fixT           rms all  96.639  |b|>20  96.061
+A sync, dust = bd_trueT everywhere                           rms all  96.805  |b|>20  96.697
+A sync, A dust with Q1 replaced by bd_trueT                  rms all  96.152  |b|>20  95.707
+A sync, A dust with Q2 replaced by bd_trueT                  rms all  96.576  |b|>20  95.944
+A sync, A dust with Q3 replaced by bd_trueT                  rms all  96.804  |b|>20  96.317
+A sync, A dust with Q4 replaced by bd_trueT                  rms all  96.527  |b|>20  95.881
+A sync, A dust with faint half replaced by bd_trueT          rms all  96.912  |b|>20  96.481
+sync = bs_fixT, A dust                                       rms all  93.071  |b|>20  91.781
+sync = bs_fixT, dust = bd_fixT                               rms all  94.508  |b|>20  92.488
