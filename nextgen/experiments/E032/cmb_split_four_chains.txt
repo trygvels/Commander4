@@ -1,0 +1,99 @@
+E033 split of the GLS CMB residual, /Users/trygvels/data/e020_d1s1, noise scale 0.03, rms in uK_CMB
+columns: bias = w^T sky - cmb (all sky, |b|>20, then per sync S/N quartile Q1 bright to Q4 faint); noise = analytic sqrt(mean var), realized rms of w^T n, analytic at |b|>20; total = bias + noise (all sky, |b|>20); closure = total - sqrt(bias^2 + realized noise^2); mean bias
+fields                                                        bias    b>20       Q1      Q2      Q3      Q4     n_an  n_real n_an>20    total  tot>20   clos    mean
+   [check] max |weights estimate - gls_cmb| = 4.04e-12 uK
+true per-pixel beta_s and true dust band column (control)     0.00    0.00     0.00    0.00    0.00    0.00     2.79    2.80    2.79     2.80    2.78  -0.00   +0.00
+true per-pixel beta_s, beta_d, T_d (parametric control)       0.00    0.00     0.00    0.00    0.00    0.00     2.79    2.80    2.79     2.80    2.78  -0.00   -0.00
+true per-pixel indices, region-mean T map                     1.73    0.22     3.32    0.88    0.35    0.28     2.79    2.80    2.79     3.29    2.79  -0.00   -0.02
+truth nside-16 region means, T map                            5.95    0.42    11.83    0.97    0.73    0.47     2.79    2.79    2.79     6.57    2.81  +0.00   -0.12
+constant at truth means, T map                               16.31    0.95    32.34    3.69    1.72    1.05     2.79    2.79    2.78    16.54    2.93  -0.01   -1.70
+constant at truth means, T fixed                             19.48    0.83    38.74    3.49    1.81    1.04     2.79    2.79    2.79    19.67    2.90  -0.01   -0.75
+constant at prior means (-3.1, 1.6), T map                   10.50    1.65    20.45    3.74    2.31    1.79     2.72    2.72    2.71    10.84    3.17  -0.00   +2.34
+truth region means, sync shifted -0.300, T map                5.84    1.44    11.40    1.86    1.39    1.13     2.73    2.73    2.72     6.46    3.08  +0.01   +1.95
+truth region means, sync shifted -0.164, T map                5.61    0.89    11.07    1.33    0.99    0.75     2.76    2.76    2.75     6.25    2.88  +0.00   +1.05
+truth region means, sync shifted +0.100, T map                6.53    0.65    12.97    1.15    0.86    0.60     2.82    2.82    2.82     7.11    2.88  -0.00   -0.89
+truth region means, sync shifted +0.300, T map                8.47    1.68    16.68    2.15    1.61    1.29     2.88    2.88    2.88     8.94    3.32  -0.01   -2.60
+region-fit references bs_trueT, bd_trueT, T map               4.43    0.45     8.75    1.13    0.77    0.51     2.79    2.80    2.79     5.26    2.82  +0.02   +0.13
+region-fit references bs_fixT, bd_fixT, T fixed               7.04    0.55    13.65    2.92    1.60    0.77     2.81    2.81    2.79     7.59    2.83  +0.01   -0.81
+-- gmrf16_cs_mumap_nc_Tmap_mu03_s7 (T map): field means -3.0160 +1.5449
+   chain sync, chain dust                                     4.55    0.78     8.91    1.26    1.05    0.81     2.79    2.79    2.78     5.35    2.88  +0.01   +0.49
+   chain sync, true dust column                               0.59    0.24     1.10    0.28    0.24    0.20     2.79    2.79    2.79     2.85    2.78  -0.00   +0.11
+   true sync, chain dust                                      4.37    0.66     8.58    1.16    0.94    0.72     2.79    2.79    2.79     5.20    2.86  +0.01   +0.39
+   constant at the chain's field means                       15.46    0.96    30.65    3.57    1.68    1.07     2.78    2.79    2.77    15.70    2.92  -0.01   -1.28
+-- gmrf16_cs_mumap_nc_Tmap_mu03_s7_c2 (T map): field means -3.0167 +1.5455
+   chain sync, chain dust                                     4.55    0.76     8.91    1.25    1.04    0.81     2.79    2.79    2.78     5.35    2.88  +0.01   +0.50
+   chain sync, true dust column                               0.59    0.24     1.10    0.28    0.24    0.20     2.79    2.79    2.79     2.85    2.78  -0.00   +0.11
+   true sync, chain dust                                      4.37    0.65     8.58    1.15    0.93    0.72     2.79    2.79    2.79     5.20    2.86  +0.01   +0.40
+   constant at the chain's field means                       15.38    0.96    30.49    3.56    1.68    1.07     2.78    2.78    2.77    15.62    2.92  -0.01   -1.25
+-- gmrf16_cs_mumap_nc_Tmap_mu03_s8 (T map): field means -3.0184 +1.5489
+   chain sync, chain dust                                     4.55    0.79     8.90    1.26    1.06    0.83     2.78    2.78    2.78     5.35    2.88  +0.01   +0.51
+   chain sync, true dust column                               0.59    0.24     1.10    0.28    0.25    0.21     2.79    2.79    2.79     2.85    2.78  -0.00   +0.11
+   true sync, chain dust                                      4.37    0.67     8.58    1.16    0.95    0.73     2.79    2.79    2.78     5.20    2.85  +0.01   +0.41
+   constant at the chain's field means                       14.93    0.96    29.58    3.50    1.66    1.08     2.78    2.78    2.77    15.18    2.92  -0.01   -1.04
+-- gmrf16_cs_mumap_nc_Tmap_mu03_s8_c2 (T map): field means -3.0169 +1.5462
+   chain sync, chain dust                                     4.55    0.77     8.91    1.25    1.04    0.82     2.79    2.79    2.78     5.35    2.88  +0.01   +0.50
+   chain sync, true dust column                               0.59    0.24     1.10    0.28    0.24    0.21     2.79    2.79    2.79     2.85    2.78  -0.00   +0.11
+   true sync, chain dust                                      4.37    0.66     8.58    1.15    0.94    0.72     2.79    2.79    2.79     5.20    2.86  +0.01   +0.40
+   constant at the chain's field means                       15.29    0.96    30.30    3.55    1.67    1.07     2.78    2.78    2.77    15.53    2.92  -0.01   -1.21
+
+band powers sqrt(mean D_l) [uK] in l = 2-10, 11-30, 31-100, 101-191: bias, then bias/noise power ratio at this noise scale, then the same ratio at 0.03 times this noise
+-- full sky
+true per-pixel beta_s and true dust band column (control)    0.000   0.000   0.000   0.000    5.53e-10  5.09e-11  9.77e-12  4.98e-12    6.14e-07  5.66e-08  1.09e-08  5.53e-09
+true per-pixel beta_s, beta_d, T_d (parametric control)      0.000   0.000   0.000   0.000    3.25e-09  3.29e-10  2.76e-11  6.83e-12    3.61e-06  3.66e-07  3.06e-08  7.59e-09
+true per-pixel indices, region-mean T map                    0.177   0.453   1.206   1.282    2.23e+00  1.43e+00  9.46e-01  2.37e-01    2.48e+03  1.59e+03  1.05e+03  2.63e+02
+truth nside-16 region means, T map                           0.692   1.589   4.446   3.918    3.40e+01  1.76e+01  1.29e+01  2.21e+00    3.78e+04  1.96e+04  1.43e+04  2.46e+03
+constant at truth means, T map                               5.092   7.402   9.719   8.249    1.85e+03  3.83e+02  6.15e+01  9.82e+00    2.06e+06  4.26e+05  6.83e+04  1.09e+04
+constant at truth means, T fixed                             5.998   9.200  11.507   9.619    2.58e+03  5.93e+02  8.64e+01  1.34e+01    2.87e+06  6.59e+05  9.60e+04  1.49e+04
+constant at prior means (-3.1, 1.6), T map                   2.923   4.318   6.369   5.638    6.49e+02  1.37e+02  2.79e+01  4.84e+00    7.21e+05  1.53e+05  3.09e+04  5.37e+03
+truth region means, sync shifted -0.300, T map               1.166   1.293   3.910   3.683    1.03e+02  1.22e+01  1.04e+01  2.05e+00    1.15e+05  1.36e+04  1.16e+04  2.28e+03
+truth region means, sync shifted -0.164, T map               0.613   1.200   4.119   3.777    2.77e+01  1.03e+01  1.13e+01  2.11e+00    3.08e+04  1.15e+04  1.26e+04  2.35e+03
+truth region means, sync shifted +0.100, T map               1.190   2.027   4.688   4.021    9.81e+01  2.82e+01  1.40e+01  2.29e+00    1.09e+05  3.13e+04  1.56e+04  2.54e+03
+truth region means, sync shifted +0.300, T map               2.435   3.173   5.283   4.273    3.88e+02  6.63e+01  1.71e+01  2.48e+00    4.31e+05  7.37e+04  1.90e+04  2.75e+03
+region-fit references bs_trueT, bd_trueT, T map              0.795   1.219   3.259   3.021    4.50e+01  1.04e+01  6.91e+00  1.32e+00    5.00e+04  1.15e+04  7.67e+03  1.46e+03
+region-fit references bs_fixT, bd_fixT, T fixed              2.833   3.640   3.574   2.928    5.63e+02  9.17e+01  8.24e+00  1.22e+00    6.26e+05  1.02e+05  9.15e+03  1.36e+03
+   chain sync, chain dust                                    1.117   1.676   3.078   2.844    8.94e+01  1.96e+01  6.19e+00  1.17e+00    9.93e+04  2.18e+04  6.88e+03  1.30e+03
+   chain sync, true dust column                              0.213   0.341   0.305   0.216    3.24e+00  8.13e-01  6.07e-02  6.77e-03    3.60e+03  9.04e+02  6.75e+01  7.52e+00
+   true sync, chain dust                                     0.949   1.409   3.076   2.847    6.42e+01  1.38e+01  6.17e+00  1.17e+00    7.13e+04  1.54e+04  6.86e+03  1.30e+03
+   constant at the chain's field means                       4.678   6.953   9.335   7.982    1.58e+03  3.40e+02  5.71e+01  9.25e+00    1.75e+06  3.78e+05  6.34e+04  1.03e+04
+   chain sync, chain dust                                    1.112   1.675   3.079   2.844    8.87e+01  1.96e+01  6.20e+00  1.17e+00    9.85e+04  2.18e+04  6.89e+03  1.30e+03
+   chain sync, true dust column                              0.212   0.342   0.305   0.217    3.23e+00  8.16e-01  6.07e-02  6.78e-03    3.58e+03  9.07e+02  6.75e+01  7.53e+00
+   true sync, chain dust                                     0.945   1.407   3.076   2.847    6.37e+01  1.38e+01  6.17e+00  1.17e+00    7.08e+04  1.54e+04  6.86e+03  1.30e+03
+   constant at the chain's field means                       4.641   6.911   9.298   7.955    1.55e+03  3.36e+02  5.67e+01  9.19e+00    1.72e+06  3.74e+05  6.30e+04  1.02e+04
+   chain sync, chain dust                                    1.117   1.675   3.079   2.844    8.96e+01  1.97e+01  6.21e+00  1.18e+00    9.95e+04  2.18e+04  6.90e+03  1.31e+03
+   chain sync, true dust column                              0.213   0.342   0.305   0.216    3.26e+00  8.18e-01  6.06e-02  6.75e-03    3.62e+03  9.08e+02  6.73e+01  7.50e+00
+   true sync, chain dust                                     0.949   1.407   3.077   2.847    6.43e+01  1.38e+01  6.19e+00  1.17e+00    7.14e+04  1.54e+04  6.87e+03  1.31e+03
+   constant at the chain's field means                       4.426   6.674   9.084   7.797    1.42e+03  3.14e+02  5.42e+01  8.85e+00    1.57e+06  3.49e+05  6.02e+04  9.84e+03
+   chain sync, chain dust                                    1.115   1.677   3.078   2.843    8.91e+01  1.97e+01  6.20e+00  1.17e+00    9.90e+04  2.19e+04  6.89e+03  1.30e+03
+   chain sync, true dust column                              0.212   0.342   0.305   0.216    3.23e+00  8.17e-01  6.07e-02  6.76e-03    3.58e+03  9.07e+02  6.74e+01  7.51e+00
+   true sync, chain dust                                     0.947   1.409   3.076   2.847    6.40e+01  1.39e+01  6.17e+00  1.17e+00    7.11e+04  1.54e+04  6.86e+03  1.30e+03
+   constant at the chain's field means                       4.597   6.863   9.254   7.923    1.52e+03  3.32e+02  5.62e+01  9.12e+00    1.69e+06  3.68e+05  6.24e+04  1.01e+04
+-- |b|>20
+true per-pixel beta_s and true dust band column (control)    0.000   0.000   0.000   0.000    5.32e-10  5.73e-11  1.03e-11  5.06e-12    5.91e-07  6.37e-08  1.14e-08  5.63e-09
+true per-pixel beta_s, beta_d, T_d (parametric control)      0.000   0.000   0.000   0.000    5.86e-10  5.92e-11  1.04e-11  5.08e-12    6.51e-07  6.58e-08  1.16e-08  5.64e-09
+true per-pixel indices, region-mean T map                    0.016   0.050   0.151   0.166    1.67e-02  1.88e-02  1.52e-02  4.05e-03    1.86e+01  2.09e+01  1.69e+01  4.50e+00
+truth nside-16 region means, T map                           0.024   0.086   0.319   0.294    3.77e-02  5.46e-02  6.76e-02  1.28e-02    4.18e+01  6.07e+01  7.51e+01  1.42e+01
+constant at truth means, T map                               0.315   0.455   0.527   0.450    6.65e+00  1.55e+00  1.85e-01  2.99e-02    7.39e+03  1.72e+03  2.05e+02  3.33e+01
+constant at truth means, T fixed                             0.291   0.386   0.450   0.375    5.66e+00  1.11e+00  1.34e-01  2.07e-02    6.29e+03  1.23e+03  1.49e+02  2.30e+01
+constant at prior means (-3.1, 1.6), T map                   0.708   0.590   0.509   0.399    3.56e+01  2.74e+00  1.82e-01  2.48e-02    3.95e+04  3.04e+03  2.02e+02  2.76e+01
+truth region means, sync shifted -0.300, T map               0.579   0.388   0.366   0.318    2.33e+01  1.17e+00  9.29e-02  1.56e-02    2.59e+04  1.30e+03  1.03e+02  1.73e+01
+truth region means, sync shifted -0.164, T map               0.331   0.238   0.331   0.300    7.50e+00  4.32e-01  7.47e-02  1.36e-02    8.33e+03  4.80e+02  8.30e+01  1.51e+01
+truth region means, sync shifted +0.100, T map               0.210   0.144   0.334   0.303    2.86e+00  1.51e-01  7.27e-02  1.33e-02    3.18e+03  1.67e+02  8.08e+01  1.48e+01
+truth region means, sync shifted +0.300, T map               0.681   0.423   0.418   0.352    2.89e+01  1.26e+00  1.09e-01  1.72e-02    3.21e+04  1.39e+03  1.21e+02  1.91e+01
+region-fit references bs_trueT, bd_trueT, T map              0.065   0.131   0.325   0.309    2.76e-01  1.28e-01  7.00e-02  1.40e-02    3.07e+02  1.42e+02  7.78e+01  1.55e+01
+region-fit references bs_fixT, bd_fixT, T fixed              0.183   0.219   0.357   0.293    2.22e+00  3.56e-01  8.42e-02  1.26e-02    2.47e+03  3.95e+02  9.35e+01  1.40e+01
+   chain sync, chain dust                                    0.353   0.328   0.375   0.286    8.39e+00  7.98e-01  9.36e-02  1.21e-02    9.32e+03  8.86e+02  1.04e+02  1.34e+01
+   chain sync, true dust column                              0.137   0.113   0.064   0.051    1.26e+00  9.48e-02  2.74e-03  3.80e-04    1.40e+03  1.05e+02  3.05e+00  4.22e-01
+   true sync, chain dust                                     0.270   0.283   0.367   0.282    4.84e+00  5.95e-01  8.92e-02  1.17e-02    5.37e+03  6.61e+02  9.92e+01  1.30e+01
+   constant at the chain's field means                       0.323   0.450   0.516   0.437    7.04e+00  1.52e+00  1.78e-01  2.85e-02    7.82e+03  1.69e+03  1.98e+02  3.17e+01
+   chain sync, chain dust                                    0.342   0.323   0.373   0.285    7.88e+00  7.75e-01  9.27e-02  1.20e-02    8.76e+03  8.61e+02  1.03e+02  1.34e+01
+   chain sync, true dust column                              0.136   0.112   0.064   0.051    1.25e+00  9.35e-02  2.76e-03  3.83e-04    1.38e+03  1.04e+02  3.07e+00  4.25e-01
+   true sync, chain dust                                     0.261   0.280   0.365   0.281    4.52e+00  5.81e-01  8.85e-02  1.17e-02    5.02e+03  6.46e+02  9.83e+01  1.30e+01
+   constant at the chain's field means                       0.324   0.450   0.515   0.436    7.08e+00  1.52e+00  1.77e-01  2.84e-02    7.87e+03  1.69e+03  1.97e+02  3.15e+01
+   chain sync, chain dust                                    0.354   0.328   0.376   0.286    8.43e+00  8.00e-01  9.45e-02  1.22e-02    9.36e+03  8.89e+02  1.05e+02  1.35e+01
+   chain sync, true dust column                              0.138   0.112   0.064   0.051    1.27e+00  9.33e-02  2.76e-03  3.81e-04    1.42e+03  1.04e+02  3.07e+00  4.24e-01
+   true sync, chain dust                                     0.269   0.284   0.368   0.282    4.84e+00  5.99e-01  9.01e-02  1.18e-02    5.37e+03  6.65e+02  1.00e+02  1.31e+01
+   constant at the chain's field means                       0.328   0.447   0.509   0.430    7.30e+00  1.50e+00  1.74e-01  2.76e-02    8.11e+03  1.67e+03  1.93e+02  3.06e+01
+   chain sync, chain dust                                    0.348   0.325   0.375   0.285    8.15e+00  7.86e-01  9.36e-02  1.21e-02    9.05e+03  8.73e+02  1.04e+02  1.34e+01
+   chain sync, true dust column                              0.137   0.112   0.064   0.050    1.25e+00  9.34e-02  2.72e-03  3.76e-04    1.39e+03  1.04e+02  3.03e+00  4.17e-01
+   true sync, chain dust                                     0.265   0.282   0.367   0.281    4.69e+00  5.89e-01  8.93e-02  1.17e-02    5.21e+03  6.55e+02  9.92e+01  1.30e+01
+   constant at the chain's field means                       0.324   0.449   0.513   0.435    7.11e+00  1.52e+00  1.77e-01  2.82e-02    7.90e+03  1.68e+03  1.96e+02  3.13e+01

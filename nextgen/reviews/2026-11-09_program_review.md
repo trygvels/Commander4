@@ -48,12 +48,13 @@ assumptions it rests on. Sections 2 to 4 are the audit of what exists.
 6. **The plan was attacked before it was written down.** An independent reviewer rejected the
    first version ("two half-papers") and proposed the reduced one, which is adopted here with one
    open choice for Trygve.
-7. **E032, first run read on 2026-11-10 (interim).** At WMAP and LFI depth the field-mean
-   displacement is gone, but the index fields do not beat a constant index in pixel error and
-   the dust smoothness parameters do not agree between two chains. That supports freezing the
-   template-prior work and moving the field model to the second paper, where it must beat
-   regions and a constant before it is used.
-8. **Not yet known:** the second run of E032 (running through 2026-11-10), whether a trustworthy LFI
+7. **E032 closed on 2026-11-10 with four chains (F45).** At WMAP and LFI depth the field-mean
+   displacement is gone, but the index fields do not beat a constant index in pixel error, and
+   the field means and the dust smoothness parameters fail the four-chain R-hat criterion while
+   every chain passes its own check. That supports freezing the template-prior work and moving
+   the field model to the second paper, where it must beat regions and a constant and pass the
+   four-chain criterion before it is used.
+8. **Not yet known:** whether a trustworthy LFI
    low-resolution covariance exists publicly, and whether the public data determine a
    high-latitude index at all once K band and 30 GHz are allowed to disagree.
 
@@ -235,7 +236,7 @@ Ordered by expected value per effort. "Evidence" is what says it will work.
 | 1 | Paper A1: the legacy move, the incidental-parameter problem (flat, profile with sandwich, proper priors), limits under template error, a Q/U section | A submittable methods paper from A and B grade evidence only | E035, E036, F2, F12, F15, F16, F18, F21, F23 | Six weeks, exact grids on one thread | A referee wants a positive real-data recommendation; the Q/U section supplies it | Do now |
 | 2 | K band against 30 GHz null test with dense covariances: region indices from {K, Ka}, {K, 30}, {30, 44, Ka} | Decides whether Paper B is about an index field or about systematics; a result by itself | The discrepancy is published (Weiland et al. 2022, unverified extract); E022 infrastructure; the K-band map and covariance are fetched and pass their first checks (E038) | Two weeks, grids only | LFI low-resolution covariance quality; a few WMAP modes at multipoles 2 to 6 carry 20 to 90 times the median noise variance | Do now, before any field code |
 | 3 | Report the two ingest bugs, the alm storage of per-pixel amplitudes, the unwritten chain, `get_sky` and the null-prior behaviour upstream; open the pull request for the index-sampler fix | Useful to every Commander4 user today; an outside check of our reading | E034 (measured), F42, F43 (read), the fix branch (tested) | Hours | None technical | Needs Trygve's yes |
-| 4 | E032 (run A read, run B running): the template-prior model at WMAP/LFI white-noise depth, four chains | Closes the intensity template question, pass or fail | Run A: no displacement of the field mean; the fields do not beat a constant index; dust smoothness parameters unconverged | Already running | None for the plan, which no longer needs the template prior | Finish; no follow-ups |
+| 4 | E032: the template-prior model at WMAP/LFI white-noise depth, four chains | Closed the intensity template question | No displacement of the field mean; the fields do not beat a constant index; field hyperparameters fail the four-chain criterion (F45) | Done | None for the plan, which no longer needs the template prior | Done; no follow-ups |
 | 5 | The many-seed test of F8 (ridge target 1.9 and 3.7 sd from the input on the validation simulation) | Removes a possible bug under the harness that carries F2 | Referee and challenge both asked for it | Done (E037) | None left: no bug; the harness target is four to five times overconfident, half of it from its per-pixel S/N of 0.05 | Done |
 | 6 | Polarized index field (GMRF, NUTS) at nside 8 with an nside-2 field, on the gates of the challenge report Sect. F | Paper B | F24 (B plus), E036; feasibility: one factorization per second at nside 8 | Six to ten weeks after item 2 | The data may not determine a field: per-region error 0.09 at nside 2 against a sky scatter near 0.06 | After item 2, if its gate passes |
 | 7 | tau from WMAP plus LFI as a paired difference between index models on the same data | The first number for how much the index model moves tau there | Dense likelihood exists once item 2 does | Two weeks after item 2 | Low power for the absolute value, which is not the claim | By-product of items 2 and 6 |
@@ -328,7 +329,7 @@ they gate anything.
 | A scale shared across regions on a template is biased with a reference-dependent sign | Shown in a two-zone toy by the challenge; tested | E036 with a shared-scale arm at 23 GHz, the pivot and 30 GHz | Sign and null confirmed, size small: a scale map 30 percent high at high latitude moves the high-latitude index by -0.026, 0.000 and +0.029 |
 | The CMB prior is the prior that matters in polarization | Shown on the E022 surrogate with diagonal noise | E036 with and without a CMB prior; the dense upgrade of E022 | Pass at real depth (E036): with a 0.2 uK CMB prior the region index error equals the synchrotron-only value (0.059 against 0.060); with a flat CMB prior it is 1.63 times larger and the pivot of the flat-prior shift moves to the lowest band. The dense upgrade of E022 is still to do |
 | The WMAP K, Ka, Q, V inverse covariances are usable as released | K and Ka checked (E038): symmetric, positive definite, pixel rms as estimated; a few modes at multipoles 2 to 6 carry 20 to 90 times the median variance | Q and V through the same check; E022's conditional with dense matrices | Week 1 |
-| A trustworthy LFI 30 GHz low-resolution covariance exists publicly | Unverified | Gate 0 half-split null test | Week 1 |
+| A trustworthy LFI 30 GHz low-resolution covariance exists publicly | Checked on 2026-11-10 and not obtainable by the links on record: the PR4 low-resolution set is listed on the CMB-S4 mirror but every link returns 404, and NERSC's public portal does not carry it. No official Planck LFI map is held locally either | Four routes in `DATA.md`; then the Gate 0 half-split null test | Week 1 |
 | K band and 30 GHz can be told apart from the index | Doubtful: they carry 91 percent of the index information and only Ka separates a relative gain from the index | The null test; Fisher with a gain and large-scale modes added | Weeks 1 to 3 |
 | The data determine an index field, not only a mean and a latitude trend | Marginal. Hand estimate from the E036 region errors with white noise: the variance of the field is detectable at 2 to 3.5 sigma for a sky scatter of 0.06 and at 3.5 to 6 sigma for 0.10 to 0.15, with 48 or 192 regions. A correlation length is hardly constrained. Real large-scale noise is worse (E038) | The exact posterior of the field amplitude and range for a field seen with those errors and the real covariances | With the null test |
 | Dense NUTS is affordable | Supported at nside 8 (1 s per factorization), not at nside 16 (a minute) | Gate 5 | Timed by the challenge |
@@ -340,8 +341,7 @@ they gate anything.
 
 1. One session, one machine, with a production chain holding the cores, so every new experiment
    here is a single-thread grid or a toy.
-2. E032's first run is read and its second is running. The interim outcome changes one
-   paragraph of Paper A1 and nothing in the plan.
+2. E032 is closed (F45). Its outcome changes one paragraph of Paper A1 and nothing in the plan.
 3. The referee report is incomplete. The challenge report and this document cover its missing
    sections in part.
 4. No literature statement in this document was checked against a PDF by the main session.

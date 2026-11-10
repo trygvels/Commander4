@@ -1,0 +1,16 @@
+# pre-registered item (ii): split R-hat over four sequences (chain01 of run A and of run B, halves of 350)
+Synchrotron/index_field/mu         R-hat 1.109  A1 - B1 +0.78 sd  ESS 50 55
+Synchrotron/index_field/log_sigma  R-hat 1.015  A1 - B1 -0.26 sd  ESS 45 34
+Synchrotron/index_field/u          R-hat 1.016  A1 - B1 -0.28 sd  ESS 46 34
+Synchrotron/amp_prior/log_s        R-hat 1.000  A1 - B1 +0.08 sd  ESS 762 1077
+Synchrotron regions: fraction with R-hat below 1.05 1.000, 95 pct 1.011, max 1.029
+ThermalDust/index_field/mu         R-hat 1.343  A1 - B1 -1.41 sd  ESS 15 10
+ThermalDust/index_field/log_sigma  R-hat 1.111  A1 - B1 -0.75 sd  ESS 13 15
+ThermalDust/index_field/u          R-hat 1.079  A1 - B1 -0.64 sd  ESS 13 16
+ThermalDust/amp_prior/log_s        R-hat 0.999  A1 - B1 -0.04 sd  ESS 664 684
+ThermalDust regions: fraction with R-hat below 1.05 0.992, 95 pct 1.034, max 1.064
+# cost and divergences per chain
+A1: gradients per iteration all 50.1, warm-up 88.3, post-burn 31.0; divergences all 38, post-burn 0
+A2: gradients per iteration all 45.7, warm-up 75.0, post-burn 31.0; divergences all 23, post-burn 0
+B1: gradients per iteration all 45.7, warm-up 75.1, post-burn 31.0; divergences all 15, post-burn 0
+B2: gradients per iteration all 100.8, warm-up 101.6, post-burn 101.2; divergences all 53, post-burn 13

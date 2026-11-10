@@ -1,6 +1,6 @@
 # Findings so far
 
-F1 to F11 date from the exploratory session of 2026-10-25. F12 to F44 were added as experiments
+F1 to F11 date from the exploratory session of 2026-10-25. F12 to F45 were added as experiments
 closed, through 2026-11-09. Experiment IDs refer to `experiments/registry.md`. Numbers are from
 simulations unless stated.
 
@@ -51,7 +51,7 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F24 | B plus | The one place an index field beats a scalar; needs the same comparison on PySM at scale 0.03 with longer chains |
 | F26 | A | Algebra |
 | F27 | B to C | Scale 1 |
-| F28 | W at scale 1 | Contradicted by F37, F38 and chain 3; the scale 0.03 part awaits E032 |
+| F28 | W at scale 1 | Contradicted by F37, F38 and chain 3. At scale 0.03 the level is unbiased (F45) but the field does not beat a constant index |
 | F29 | B to C | Wording of the slope corrected; sizes from 6 to 8 realizations in a review note |
 | F30 | W | Withdrawn in 2026-11-03 |
 | F31 | A | Stands |
@@ -61,11 +61,12 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F35 | C | "Validated" withdrawn: the reference was refined after pre-registration, 22 divergences |
 | F36 | C | Holds for one sky with exact templates, the oracle T map and a width chosen knowing the template is exact |
 | F37 | B minus for the scans, C for the rule | Scale 1 |
-| F38 | B for the description, W for the cause and the remedy | Chain 3 amendment below |
+| F38 | B for the description, W for the cause and the remedy | Chain 3 amendment below; absent at real depth (F45) |
 | F39, F40 | B | One sky; Fisher at the truth |
 | F41 | A for the floor, B for the order | Real maps and one simulated CMB |
 | F42, F43 | A | Code facts |
 | F44 | A for the flat-prior shift and the calibration of the profile at real depth, B for the rest | Exact grids, 100 noise realizations per cell, one sky |
+| F45 | B | Four chains, one sky; closes the intensity template-prior sequence |
 
 ## 1. Sampler correctness
 
@@ -1110,3 +1111,29 @@ A zero-mean prior with one scale shared by all regions on a scale map that is 30
 high latitude moves the high-latitude index by -0.026 at a 23 GHz reference, 0.000 at the pivot
 and +0.029 at 30 GHz (30 degree regions; half that for 15 degree regions): the sign structure the
 independent challenge derived, small at this depth for regions the data inform.
+
+**F45. At WMAP and LFI white-noise depth the collapsed hier prior with a 30 percent template error
+shows no field-mean displacement, but its index fields do not beat a constant index, and its
+field hyperparameters fail a four-chain convergence criterion that every chain's own check
+passes** (E032: the E030 chain 1 model at noise scale 0.03, two runs with both in-flight chains
+written, seeds 7 and 8 and dispersed starts, 700 post-burn draws per chain; eleven pre-registered
+items plus four for the chain pairs). Sync field mean -3.016 to -3.018 against -3.000 (+0.30 and
+-0.16 at scale 1, F38), dust +0.005 to +0.009 from the truth mean, every quartile within 0.03 of
+the region-fit reference, multiplier maps at correlation 0.91 to 1.00 with the realized template
+error (0.25 to 0.72 at scale 1), CMB bias 4.55 uK over the sky and 0.76 to 0.79 at abs(b) > 20
+against 16.3 and 0.95 for a constant index. Against that: pixel RMSE 0.065 to 0.067 (sync) and
+0.059 to 0.062 (dust) against 0.0629 and 0.0374 for a constant at the truth mean; inferred field
+amplitudes 0.093 to 0.096 and 0.067 to 0.079 against truth scatters of 0.062 and 0.032; dust
+regions inside one posterior sd in 34 to 49 percent of the faint half. Convergence: all four
+chains pass the D025 conditional check (KS p 0.09 to 0.81), yet split R-hat between the first
+chains of the two runs is 1.11 (sync field mean), 1.34 (dust field mean) and 1.11 (dust log
+sigma), and over the eight half-chains 1.05, 1.18, 1.42 and 1.41 (dust range). Chains with the
+same start differ as much as chains with different starts, so this is slow mixing of the
+hyperparameters and their within-chain ESS (10 to 130) is overestimated. Region indices,
+amplitude scatters, multiplier maps and the CMB bias agree across the four chains. Consequences:
+F29 to F38 are weak-data effects of a regime with no real intensity counterpart; the model has no
+advantage over a constant index at real depth on this sky, which answers the referee's objection
+7; every single-chain statement about a field mean, amplitude or range (F29 to F38) carries a
+Monte Carlo error of about one posterior sd; D025 is necessary and not sufficient. Scope: one
+sky, one noise and one template-error realization, oracle T map; for the HFI bands this noise is
+2.6 to 33 times the real one, so the dust numbers do not describe real dust data.

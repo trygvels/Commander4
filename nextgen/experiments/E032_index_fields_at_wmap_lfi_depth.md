@@ -1,6 +1,6 @@
 # E032: index fields with the collapsed hier prior at WMAP/LFI depth (noise scale 0.03), two runs of two chains
 
-- **Date started / finished:** 2026-11-09 21:59 (scan), run A from 22:17:49, restarted 22:34:00 writing both in-flight chains, ended 2026-11-10 05:17:06; run B from 05:17:06 / running
+- **Date started / finished:** 2026-11-09 21:59 (scan), run A from 22:17:49, restarted 22:34:00 writing both in-flight chains, ended 2026-11-10 05:17:06; run B 05:17:06 to 14:12:33 / 2026-11-10 14:17
 - **Branch and commit:** `nextgen` at 52061ad
 - **Open question addressed:** Q16, Q18, Q3, and the multi-chain gap of `VALIDATION.md` (referee
   objections 1, 4 and 7 in `../reviews/2026-11-09_referee_report.md`)
@@ -254,19 +254,97 @@ latitude and by 72 percent over the sky, and what remains is the dust field's.
 5. Noise scale 0.03 is WMAP and LFI white-noise depth; for the HFI bands it is 2.6 to 33 times
    the real noise (E031), so the dust numbers are not a statement about real dust data.
 
-Run B and the four-chain criteria: pending.
+**Run B (seed 8, start at -2.85 and 1.48) and the four chains, read 2026-11-10 14:17.** Run B ran
+2026-11-10 05:17:06 to 14:12:33 (8 h 55 min), rc 0, 1200 iterations per chain. Outputs:
+`E032/chains_n003.txt`, `prereg_two_chain_rhat.txt`, `runB_mu_maps.txt`, `cmb_split_four_chains.txt`
+and the conditional checks. B1 is `chain01` of run B, B2 its twin.
 
-## Negative control
+| Item | Pre-registered | Result | Verdict |
+|---|---|---|---|
+| (i), (i-b) D025 on every chain | passes | KS p, sync and dust: A1 0.66, 0.81; A2 0.09, 0.32; B1 0.51, 0.17; B2 0.19, 0.62 | pass |
+| (ii) field means, A1 against B1 | split R-hat below 1.05, means within 0.5 sd | sync 1.109 and 0.78 sd; dust 1.343 and 1.41 sd | fail |
+| (ii) GMRF log sigma and range, A1 against B1 | below 1.10 | sync 1.015, 1.016; dust 1.111, 1.079 | sync pass; dust log sigma fails by 0.011 |
+| (ii) amplitude scatters and region indices | below 1.05; 95 percent of regions | 1.000 and 0.999; 100 and 99.2 percent | pass |
+| (ii-b) eight half-chains | field means and scatters below 1.05; log sigma and range below 1.10 | sync mean 1.050, dust mean 1.179; dust log sigma 1.418, range 1.410; sync 1.015 and 1.016; regions 100 percent | fail for both field means and for the dust field |
+| (ii-c) every pair of chains | field means within 0.5 sd | largest 0.79 sd (sync), 1.41 sd (dust) | fail |
+| (ii-d) between starts | below 0.35 sd | +0.42 (sync), -0.83 (dust) | fail |
+| (iii) field level, B1 | reference within 0.015; truth within 0.02 and 0.015 | sync -0.021 and -0.018; dust +0.013 and +0.009 | sync against the reference fails, the rest passes |
+| (iv) quartiles, B1 | within 0.03, bright within 0.01 | sync -0.009, -0.028, -0.028, -0.020; dust +0.003, +0.014, +0.030, +0.006 | pass |
+| (v) GMRF sigma | 0.04 to 0.09; 0.02 to 0.05 | sync 0.093 to 0.096 in the four chains; dust 0.067 to 0.079 | fail |
+| (vi) pixel RMSE | below the constant's 0.0629 and 0.0374 | sync 0.0647 to 0.0668; dust 0.0590 to 0.0624 | fail in all four chains |
+| (vii) calibration, B1 | 55 to 80 percent, median z within 0.3 | sync 69, 66, 64, 69 percent, median z -0.19, -0.41, -0.34, -0.28; dust 70, 60, 48, 34 percent | as run A |
+| (viii) multiplier maps | correlation above 0.9, rms below 0.10 | sync 0.987 to 0.997, rms 0.047; dust 0.907 to 0.998, rms 0.086 | pass |
+| (ix) amplitude scatters | -3.1 to -2.6 | -2.710, -2.600 in all four | pass |
+| (x) CMB bias | below 7 and 0.8 uK | 4.55 and 0.76 to 0.79 in all four | pass |
+| (xi) no runaway | none beyond 0.5 | largest 0.33 | pass |
 
-The constant field at the truth mean and the truth's region means, through the same RMSE and CMB
-bias metrics. A scalar-index chain with the same amplitude prior is the non-oracle baseline and is
-queued behind the pair if the pair's timing allows.
+Chain means of the hyperparameters, A1, A2, B1, B2, with ESS: sync field mean -3.0160 (50),
+-3.0167 (101), -3.0184 (55), -3.0169 (129), posterior sd 0.0031; dust field mean 1.5449 (15), 1.5455
+(60), 1.5489 (10), 1.5462 (44), sd 0.0028; dust log sigma -2.601, -2.711, -2.544, -2.596 (ESS 8 to
+15), sd 0.085. Cost: 31.0 gradients per iteration after burn-in in A1, A2 and B1, and 101 in B2,
+which also had 13 divergences after burn-in (none in the others). The two chains of a run adapt
+separately, and B2's adaptation ended at a smaller step.
+
+**Reading of the four chains.**
+
+1. *The disagreement is slow mixing, not the start.* Chains with the same start differ as much as
+   chains with different starts (A1 against A2: 1.4 sd in the dust log sigma). The chain means of
+   the field means scatter by about one posterior sd, where the quoted ESS of 10 to 130 would
+   allow 0.1 to 0.3. So the ESS of the hyperparameters is overestimated within a chain, and the
+   700 draws hold a few independent samples of them at most.
+2. *What disagrees is small in the units that matter.* The four sync field means span 0.0024 and
+   the four dust means 0.0040, against offsets from the truth of 0.017 and 0.007. The region
+   indices, the multiplier maps, the amplitude scatters and the CMB bias agree across the four
+   chains to their last quoted digit. The field means are known to about their posterior sd, not
+   better, and the dust field amplitude and range are known to about two posterior sd.
+3. *D025 passes on all four chains while R-hat fails.* The conditional check is necessary and
+   not sufficient, as D028 states. The four-chain criterion is what found this.
 
 ## Conclusion
 
-Pending.
+Pre-registered outcome, in the terms fixed in advance: no field-level displacement above 0.05,
+so the template prior is not biased at this depth in the sense of F38; (ii) fails, so the
+production sampler is not validated at this configuration for the field hyperparameters; the
+synchrotron RMSE is above 0.0629, so the field does not beat a constant index on this sky at this
+depth.
+
+1. **The field-mean displacement of F29 to F38 is a weak-data effect.** At WMAP and LFI
+   white-noise depth, with the same 30 percent template error, the sync field mean is 0.017 from
+   the truth (0.30 and 0.16 at scale 1), every quartile is within 0.03 of its reference, the
+   multipliers follow the template error, and the CMB bias is 18 percent below a constant
+   index's at high latitude and 72 percent below over the sky.
+2. **The index fields are not better than a constant index.** Pixel RMSE 0.065 to 0.067 against
+   0.063 (sync) and 0.059 to 0.062 against 0.037 (dust), in four chains. The inferred field
+   amplitudes are 1.5 and 2.2 times the truth's scatter. Dust is not calibrated in the faint
+   half of the sky.
+3. **The sampler is not validated for the field hyperparameters at this configuration.** Four
+   chains from two starts fail the split R-hat criterion for both field means and for the dust
+   field's amplitude and range, after 700 draws each, at a cost of 7 to 9 hours per run. Region
+   indices and amplitude scatters pass. Every single-chain statement about a field mean, a field
+   amplitude or a range in F29 to F38 has an unquantified Monte Carlo error of about one
+   posterior sd.
+4. With this the intensity template-prior sequence is closed (D029, proposed): the model has no
+   displacement at real depth and no advantage over a constant index there.
+
+What this does not establish: anything about real dust data (for the HFI bands this noise is 2.6
+to 33 times the real one); whether exact templates or a tighter field prior would beat the
+constant; the cause of the overestimated field amplitudes (the reference-against-pivot lever of
+the dust amplitude at 545 GHz is a candidate, untested). One sky, one noise realization, one
+template-error realization, oracle T map.
+
+Changes: F45 added; F38 and F28 get the real-depth result; the referee's objections 4 and 7 are
+answered for this configuration (not validated; does not beat a constant).
+
+
+## Negative control
+
+The constant index at the truth mean and the truth's own region means are the baselines of items
+(vi) and (x). No deliberately wrong sampler was run.
 
 ## Follow-ups
 
-- The same pair with exact templates (the referee's test for F24 on the PySM maps).
-- The scalar-index baseline chain.
+- Not run under D029 (proposed): the same pair with exact templates, and the scalar-index
+  baseline chain. They would say whether the template error or the field prior is what keeps the
+  field from beating a constant.
+- For Paper B: longer chains or a better update of the field hyperparameters before any field
+  amplitude or range is quoted; the four-chain criterion with an ESS floor.

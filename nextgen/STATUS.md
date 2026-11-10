@@ -2,6 +2,40 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-10 (Mac mini, 14:18): E032 closed with four chains (F45): no displacement at WMAP/LFI depth, no gain over a constant index, field hyperparameters fail R-hat; local holdings checked against official releases; nothing running
+
+**Learned**
+- **E032, four chains (F45).** All four pass D025. No F38 displacement: sync field mean -3.016 to
+  -3.018 against -3.000; quartiles within 0.03; multipliers track the template error; CMB bias
+  below a constant's. But pixel RMSE 0.065 to 0.067 (sync) and 0.059 to 0.062 (dust) against
+  0.063 and 0.037 for a constant index, and field amplitudes 1.5 and 2.2 times the truth scatter.
+- **Convergence.** Split R-hat between the first chains of the two runs: 1.11 (sync field mean),
+  1.34 (dust field mean), 1.11 (dust log sigma); over eight half-chains the dust field amplitude
+  and range are at 1.42 and 1.41. Same-start chains differ as much as different-start chains:
+  slow mixing of the hyperparameters. Region indices, amplitude scatters, maps and CMB bias
+  agree. One chain of four adapted to a step three times smaller and had 13 divergences.
+- **Data holdings (DATA.md, new section).** WMAP low-resolution products are the final official
+  release and complete. No official Planck LFI map of PR3 or PR4 is held, only BeyondPlanck and
+  Cosmoglobe DR1 versions. The PR4 LFI maps answer on the NERSC portal. The PR4 low-resolution
+  maps and dense covariances are listed on the CMB-S4 mirror but every link returns 404.
+- **E036 addendum.** The sandwich factor of the profile, computed from the truth alone, matches
+  the simulated interval widths within 0.05 in 15 of 16 classes.
+
+**Running**
+- Nothing. The cores are free.
+
+**Next** (all pending D029)
+- Fetch the PR4 LFI 30, 44, 70 GHz maps from NERSC and find a usable low-resolution LFI
+  covariance (PR3 on the Planck archive, the low-multipole likelihood package, the BeyondPlanck
+  likelihood package, or one built from the PR4 splits).
+- Commander4 fixes that waited for the chains: reader order and floor behind a switch, `get_sky`
+  with an index field, the legacy lookup, a per-pixel run with amplitudes stored as maps (Q6,
+  Q23), audit tests 4 to 8 and 10.
+- Paper A1 and the K band against 30 GHz test as in the program review.
+
+**Needs Trygve**
+- Unchanged: D029 and the four other decisions of the program review Sect. 8.
+
 ## 2026-11-10 (Mac mini, 05:28): E032 run A read (two chains): the field-mean displacement is gone at WMAP/LFI depth, but the index fields do not beat a constant index and the dust smoothness parameters do not converge; run B running
 
 **Learned** (interim, `experiments/E032_index_fields_at_wmap_lfi_depth.md`; run B and the

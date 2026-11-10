@@ -1,0 +1,51 @@
+# linked 1200 chain02 files of gmrf16_cs_mumap_nc_Tmap_mu03_s7 as chains_gmrf16_cs_mumap_nc_Tmap_mu03_s7_c2
+# linked 1200 chain02 files of gmrf16_cs_mumap_nc_Tmap_mu03_s8 as chains_gmrf16_cs_mumap_nc_Tmap_mu03_s8_c2
+# chain A1: gmrf16_cs_mumap_nc_Tmap_mu03_s7 chain01, 1200 files, 700 post-burn
+# chain A2: gmrf16_cs_mumap_nc_Tmap_mu03_s7 chain02, 1200 files, 700 post-burn
+# chain B1: gmrf16_cs_mumap_nc_Tmap_mu03_s8 chain01, 1200 files, 700 post-burn
+# chain B2: gmrf16_cs_mumap_nc_Tmap_mu03_s8 chain02, 1200 files, 700 post-burn
+
+## 1. Hyperparameters per chain: mean, sd, ESS; then split R-hat over all half-chains, the largest pairwise
+##    difference of chain means and the between-start difference, both in units of the pooled posterior sd
+Synchrotron/index_field/mu             A1 -3.0160 0.0030    50  A2 -3.0167 0.0031   101  B1 -3.0184 0.0032    55  B2 -3.0169 0.0030   129
+                                       split R-hat 1.050  max pairwise 0.79 sd  between starts +0.42 sd  pooled mean -3.0170 sd 0.0031
+Synchrotron/index_field/log_sigma      A1 -2.3699 0.0755    45  A2 -2.3718 0.0702    73  B1 -2.3513 0.0683    34  B2 -2.3780 0.0687    85
+                                       split R-hat 1.015  max pairwise 0.38 sd  between starts -0.09 sd  pooled mean -2.3678 sd 0.0707
+Synchrotron/index_field/u              A1 +0.0687 0.1139    46  A2 +0.0634 0.1046    61  B1 +0.0993 0.1045    34  B2 +0.0595 0.1078    72
+                                       split R-hat 1.016  max pairwise 0.37 sd  between starts -0.12 sd  pooled mean +0.0727 sd 0.1077
+Synchrotron/amp_prior/log_s            A1 -2.7099 0.0064   762  A2 -2.7104 0.0067   688  B1 -2.7104 0.0066  1077  B2 -2.7103 0.0062   998
+                                       split R-hat 1.000  max pairwise 0.09 sd  between starts +0.03 sd  pooled mean -2.7102 sd 0.0065
+ThermalDust/index_field/mu             A1 +1.5449 0.0028    15  A2 +1.5455 0.0026    60  B1 +1.5489 0.0028    10  B2 +1.5462 0.0029    44
+                                       split R-hat 1.179  max pairwise 1.41 sd  between starts -0.83 sd  pooled mean +1.5464 sd 0.0028
+ThermalDust/index_field/log_sigma      A1 -2.6010 0.0798    13  A2 -2.7106 0.0722     8  B1 -2.5435 0.0725    15  B2 -2.5959 0.1108    10
+                                       split R-hat 1.418  max pairwise 1.96 sd  between starts -1.01 sd  pooled mean -2.6127 sd 0.0853
+ThermalDust/index_field/u              A1 +0.4664 0.1058    13  A2 +0.3139 0.0969     6  B1 +0.5295 0.0918    16  B2 +0.4728 0.1477    11
+                                       split R-hat 1.410  max pairwise 1.91 sd  between starts -0.98 sd  pooled mean +0.4456 sd 0.1128
+ThermalDust/amp_prior/log_s            A1 -2.6004 0.0057   664  A2 -2.6002 0.0057   775  B1 -2.6002 0.0054   684  B2 -2.6000 0.0053   792
+                                       split R-hat 0.999  max pairwise 0.07 sd  between starts -0.04 sd  pooled mean -2.6002 sd 0.0055
+
+## 2. Region indices: split R-hat over all half-chains, per component
+Synchrotron  R-hat median 1.001  95 pct 1.005  max 1.014  fraction below 1.05: 1.000  below 1.10: 1.000  (ESS per chain on every 16th region: median 383, min 78)
+ThermalDust  R-hat median 1.005  95 pct 1.021  max 1.044  fraction below 1.05: 1.000  below 1.10: 1.000  (ESS per chain on every 16th region: median 197, min 32)
+
+## 3. Field level, quartiles and calibration against the region-fit reference; pooled over chains, then per chain
+# Synchrotron: truth mean -3.0000, reference (mapT) mean -2.9972; baselines: constant at the truth mean RMSE 0.0629, truth region means 0.0130
+  pooled  field mean -3.0170  minus ref -0.0198  minus truth -0.0170 | quartile offsets Q1..Q4 -0.0092 -0.0265 -0.0255 -0.0181 | |z|<1 0.69 0.65 0.65 0.70 | median z -0.19 -0.38 -0.33 -0.26 | pixel RMSE 0.0654 | max |pm - ref| 0.322
+  A1      field mean -3.0160  minus ref -0.0188  minus truth -0.0160 | quartile offsets Q1..Q4 -0.0092 -0.0257 -0.0242 -0.0162 | |z|<1 0.69 0.66 0.67 0.70 | median z -0.20 -0.36 -0.31 -0.23 | pixel RMSE 0.0653 | max |pm - ref| 0.328
+  A2      field mean -3.0167  minus ref -0.0195  minus truth -0.0167 | quartile offsets Q1..Q4 -0.0094 -0.0258 -0.0245 -0.0183 | |z|<1 0.69 0.66 0.65 0.71 | median z -0.19 -0.36 -0.31 -0.26 | pixel RMSE 0.0647 | max |pm - ref| 0.318
+  B1      field mean -3.0184  minus ref -0.0212  minus truth -0.0184 | quartile offsets Q1..Q4 -0.0090 -0.0280 -0.0280 -0.0200 | |z|<1 0.69 0.66 0.64 0.69 | median z -0.19 -0.41 -0.34 -0.28 | pixel RMSE 0.0668 | max |pm - ref| 0.327
+  B2      field mean -3.0169  minus ref -0.0197  minus truth -0.0169 | quartile offsets Q1..Q4 -0.0091 -0.0265 -0.0253 -0.0180 | |z|<1 0.68 0.66 0.66 0.70 | median z -0.20 -0.38 -0.33 -0.25 | pixel RMSE 0.0651 | max |pm - ref| 0.316
+# ThermalDust: truth mean +1.5397, reference (mapT) mean +1.5358; baselines: constant at the truth mean RMSE 0.0374, truth region means 0.0187
+  pooled  field mean +1.5464  minus ref +0.0106  minus truth +0.0067 | quartile offsets Q1..Q4 +0.0027 +0.0144 +0.0275 -0.0021 | |z|<1 0.69 0.60 0.49 0.36 | median z +0.23 +0.51 +0.76 -0.05 | pixel RMSE 0.0610 | max |pm - ref| 0.254
+  A1      field mean +1.5449  minus ref +0.0092  minus truth +0.0052 | quartile offsets Q1..Q4 +0.0027 +0.0141 +0.0256 -0.0056 | |z|<1 0.68 0.60 0.49 0.36 | median z +0.22 +0.49 +0.72 -0.11 | pixel RMSE 0.0618 | max |pm - ref| 0.257
+  A2      field mean +1.5455  minus ref +0.0097  minus truth +0.0058 | quartile offsets Q1..Q4 +0.0027 +0.0147 +0.0275 -0.0060 | |z|<1 0.67 0.60 0.48 0.36 | median z +0.24 +0.53 +0.78 -0.11 | pixel RMSE 0.0590 | max |pm - ref| 0.243
+  B1      field mean +1.5489  minus ref +0.0131  minus truth +0.0092 | quartile offsets Q1..Q4 +0.0027 +0.0141 +0.0295 +0.0062 | |z|<1 0.70 0.60 0.48 0.34 | median z +0.23 +0.53 +0.81 +0.19 | pixel RMSE 0.0624 | max |pm - ref| 0.267
+  B2      field mean +1.5462  minus ref +0.0104  minus truth +0.0065 | quartile offsets Q1..Q4 +0.0027 +0.0145 +0.0273 -0.0028 | |z|<1 0.69 0.60 0.49 0.36 | median z +0.24 +0.49 +0.75 -0.08 | pixel RMSE 0.0611 | max |pm - ref| 0.254
+
+## 4. Scatters per chain: GMRF sigma = exp(log_sigma), amplitude scatter log s
+Synchrotron  A1 sigma 0.0938+-0.0073 log_s -2.710  A2 sigma 0.0935+-0.0066 log_s -2.710  B1 sigma 0.0955+-0.0065 log_s -2.710  B2 sigma 0.0930+-0.0064 log_s -2.710
+ThermalDust  A1 sigma 0.0744+-0.0061 log_s -2.600  A2 sigma 0.0667+-0.0048 log_s -2.600  B1 sigma 0.0788+-0.0058 log_s -2.600  B2 sigma 0.0750+-0.0084 log_s -2.600
+
+## 5. Template multiplier maps: mean over regions and chains agreement (correlation of posterior means between chains)
+Synchrotron  map means 0.9894 0.9892 0.9885 0.9891  corr with first chain 1.000 1.000 1.000
+ThermalDust  map means 1.0456 1.0462 1.0480 1.0465  corr with first chain 1.000 1.000 1.000
