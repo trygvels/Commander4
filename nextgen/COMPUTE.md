@@ -96,3 +96,11 @@ collapsed likelihood and about 2 s of other work per transition; two such runs a
 to 220 ms per gradient each and 7 s per transition, so two concurrent runs deliver the throughput
 of one. Idle band ranks waiting in MPI collectives use 10 to 30 percent of a core each (MPICH
 polling). Run jobs of this size one at a time (the E021 serializer, D015).
+
+Measured on the dense low-resolution fits (2026-11-10, E039 and E040): numpy and scipy are built on
+Accelerate, and a dense factorization uses about one core whatever `VECLIB_MAXIMUM_THREADS` says
+(a 7000 by 7000 Cholesky plus a matmul: 2.8 to 4.3 s wall, CPU time equal to wall time, at 1 or 4
+threads, niced or not). One nside-16 fit with three components (18432 unknowns) holds about 11 GB.
+Three to four such jobs at once ran 3 to 5 times slower each, filled the 8 GB swap and left one
+job hung with no resident memory. `kill -STOP` had no effect on a job started through the
+harness. Run dense jobs one at a time and plan run times from single-job timings.

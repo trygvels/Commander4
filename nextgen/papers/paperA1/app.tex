@@ -32,10 +32,17 @@ $\hat\beta$ that solves $s(\hat\beta) = 0$ therefore has covariance $\J^{-1}(\J+
 leading order, Eq.~(\ref{eq:sandwich}).
 
 A Gaussian prior on a component whose spectrum does not depend on the index (the CMB with variance
-$\sigma_{\rm c}^2$ per element) fits in by treating the prior as an extra data set: the prior mean
-is a datum with noise covariance $\mathsf{S}$, and the same algebra applies with the enlarged $\M$,
-$\mathsf{N}$ and $d$, provided the true amplitudes of that component are a draw from the prior. If
-they are not, the score is biased by a term proportional to the mismatch.
+$\sigma_{\rm c}^2$ per element) fits in by minimizing over that component first: the result is the
+flat-prior problem for the remaining components with noise covariance
+$\mathsf{N} + \mathsf{C}\,\Lambda^{-1}\mathsf{C}\T$, with $\mathsf{C}$ the columns of the constrained component and
+$\Lambda$ its prior precision. Everything above then holds in expectation over noise and over skies
+of that component drawn from the prior, with its sample variance counted in $\J + \Tm$. It does not
+hold for a prior variance that differs from the true one. If the true variance is $\kappa^2$ times
+the prior variance, the expected score is $(\kappa^2 - 1)\,t$ with
+$t_r = \tr(\Lambda\A^{-1}\M_r\T\mathsf{B}\T)$, $\mathsf{B} = \A^{-1}\M\T\Ni$, and the optimum is biased by
+$-(\kappa^2-1)\,\J^{-1}t$ to first order. Because $t_r$ is a sum over elements of one sign, the bias
+in units of the standard deviation grows as the square root of the number of elements. We print this
+sensitivity with every fit that uses such a prior.
 
 For the fitted amplitudes $\hat a = a + e$ with $\mathrm{Cov}(e) = \A^{-1}$,
 $\E[(\M_r\hat a)\T\Pm(\M_{r'}\hat a)] = \J_{rr'} + \tr(\A^{-1}\M_r\T\Pm\M_{r'}) = \J_{rr'} + \Tm_{rr'}$,

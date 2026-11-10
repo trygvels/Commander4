@@ -5,3 +5,6 @@
 # WMAP_Q: beam 30.6 arcmin, rms of the nside-16 signal 6.13 uK; 38 s
 # WMAP_V: beam 21.0 arcmin, rms of the nside-16 signal 2.92 uK; 45 s
 # Planck_353: beam 4.9 arcmin, rms of the nside-16 signal 202.79 uK; 59 s
+# bands ['K', '30', 'Ka', 'Q', 'V', '353'], regions bpxv, common beam 0.0, small scales False, window matched to 60.0; 7 iterations, chi2_min 53.32; 341 s
+bias per region (fitted index + 3.1): +0.0049 +0.0028 +0.0055 +0.0048
+largest abs bias 0.0055; mean +0.0045

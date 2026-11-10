@@ -1,6 +1,6 @@
 # E038: Gate 0 of the polarized track, are the public low-resolution inputs usable as released?
 
-- **Date started / finished:** 2026-11-09 23:48 / running (items a.1, b and b2 done; a.2 and c open)
+- **Date started / finished:** 2026-11-09 23:48 / running (items a.1, b, b2, c and c2 done; a.2 open)
 - **Branch and commit:** `nextgen` at 0413181
 - **Open question addressed:** Q21; Gate 0 of `../reviews/2026-11-09_way_forward_challenge.md` Sect. F
 - **Validation level:** L0 (input checks, no inference)
@@ -234,6 +234,32 @@ digits); what it cannot touch is structure above multipole 47.
 - D6. If D5 holds, window matching is the baseline of E040 and the unmatched fit an arm; the
   residual bias is quoted as a systematic. If the residual is above 0.005, the cause is found
   first.
+
+**(c2) result, 2026-11-10 21:40 to 22:10** (`E038/window_wmap_nosmall.txt`, `window_wmap_matched.txt`,
+`window_wmap_lfi30_matched.txt`, `window_wmap_lfi30_matched_nosmall.txt`). Bias of the fitted index,
+noise off, in the order High Latitude, Spur, Galactic Center, Plane:
+
+| arm | bias |
+|---|---|
+| true beams, K, Ka, Q, V, 353, no synthetic small scales | +0.0096, +0.0043, +0.0117, +0.0065 |
+| the same with small scales (from above) | +0.0072, +0.0048, +0.0111, +0.0064 |
+| window matched to 60 arcmin, K, Ka, Q, V, 353 | +0.0002, +0.0018, +0.0023, +0.0023 |
+| window matched, adding LFI 30 GHz | +0.0018, +0.0039, +0.0051, +0.0051 |
+| window matched, adding LFI 30 GHz, no small scales | +0.0049, +0.0028, +0.0055, +0.0048 |
+
+- The bias does not come from the synthetic small-scale field: without it the unmatched bias is
+  the same or larger. It comes from structure at multipoles up to about 100 that is in the DR1
+  map itself, so the upper-estimate caveat of the first results does not apply.
+- **D5 holds for the WMAP bands** (residual at most 0.0023) **and fails with 30 GHz included** in three
+  regions (0.0039 to 0.0055 against 0.003), with or without small scales. Window matching removes
+  three quarters of the bias there (from 0.009 to 0.020) and not all of it.
+- **D6.** Window matching is the baseline of E040; the unmatched fit is an arm. Residual window
+  systematic to quote: +0.002 for the WMAP bands and +0.005 with 30 GHz, both toward a flatter
+  index. The rule said that above 0.005 the cause is found first: two regions sit at 0.0051 and
+  0.0055. The cause is what the operator cannot reach by construction, structure above multipole
+  47 inside the nside-16 pixels, which weighs most for the band pair with the shortest lever arm
+  (K and 30 GHz, 0.22 in ln nu). I take that as found and proceed, and say so here because the
+  rule was mine.
 
 ## Negative control
 
