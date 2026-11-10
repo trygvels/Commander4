@@ -261,6 +261,52 @@ large-scale component at intermediate latitudes on the side of the Fan region.
 
 \pend{E042 scale cuts, worst K modes, amplitude factor, angle; the PR3 and DR1 maps.}
 
-\subsection{The band set and reference frequency of BeyondPlanck}
+\subsection{A band set without K band, a free CMB and a 30 GHz reference}
+\label{sec:bpset}
 
-\pend{E040 stage 3.}
+The published end-to-end analyses of these data \citep{svalheim2023,watts2023} sample the polarized
+synchrotron index with a Metropolis step conditional on the amplitudes inside a Gibbs sweep, with the
+synchrotron amplitude defined at 30 GHz. Both report that the high-latitude index, fitted freely,
+goes to ``unreasonably flat'' values, $\beta_{\rm s} \lesssim -2.5$, read this as unmodelled
+systematics or as a degeneracy with the CMB quadrupole, and constrain the index with a prior
+$\mathcal{N}(-3.3, 0.1^2)$ \citep[Sect.~4.4 and Sect.~2.4, respectively]{svalheim2023,watts2023}.
+Section~\ref{sec:flat} suggests a different reading, which can be tested: a conditional index step
+with flat amplitude priors has the flat-prior marginal as its target, and for a band set that starts
+at 30 GHz with an unconstrained CMB amplitude the pivot lies below 30 GHz, so the volume term pulls
+the index flat.
+
+\begin{table}
+\centering
+\caption{The band set 30, 44, 70 GHz (PR4), Ka, Q, V (WMAP) and 353 GHz, without K band, with flat
+priors on the synchrotron, dust and CMB amplitudes, at $N_{\rm side}=16$ in the four regions
+(\exref{E040}). The profile optimum, and the optimum of the flat-prior marginal with the
+synchrotron amplitude defined at 23 and at 30 GHz. The allowed range of the index is $[-4.6, -1.6]$.}
+\label{tab:bpset}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+ & High Latitude & Spur & Galactic Center & Plane \\
+\midrule
+profile likelihood & $-2.70 \pm 0.04$ & $-2.92 \pm 0.05$ & $-2.82 \pm 0.03$ & $-2.78 \pm 0.04$ \\
+flat priors, reference 23 GHz & $-4.04$ & $-3.43$ & $-2.89$ & $-3.00$ \\
+flat priors, reference 30 GHz & $-1.60$ (bound) & $-2.31$ & $-2.75$ & $-2.48$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:bpset} shows the test on the PR4 and WMAP maps. With flat priors on every amplitude
+and a 30 GHz reference, the optimum of the index marginal for the High Latitude region is at the
+upper edge of the allowed range, more than a unit of index flatter than the profile optimum of the
+same likelihood; the Spur sits at $-2.31$ and the Plane at $-2.48$. Defined at 23 GHz the same
+marginal puts the High Latitude region at $-4.04$. Nothing about the data changes between the three
+rows. \pend{With a CMB prior of 0.2 $\muK$: B2.}
+
+We do not claim that this is what happened in the published chains. Their maps, pixelization and
+treatment of the CMB differ from ours, the shift grows with the number of amplitudes and so with the
+resolution at which the index is sampled, and a chain that mixes slowly may not reach its target.
+What the test shows is that the reported behaviour has the sign and more than the size of the volume
+term of a flat amplitude prior in that configuration, without any systematic effect being invoked,
+and that the profile likelihood on the same maps does not show it. The profile optimum for this band
+set is itself flat ($-2.7$ to $-2.9$) and moves by up to 0.3 with the CMB prior, which is the 30 GHz
+problem of the previous subsection seen from another side: these seven maps are not consistent with
+one power law, a modified blackbody and a CMB of the expected size.

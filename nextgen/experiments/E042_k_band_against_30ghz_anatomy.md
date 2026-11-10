@@ -88,6 +88,28 @@ multipole bin against that model, and its map.
 - X9. The same residual for Ka predicted from K, Q, V, 353 (the control) has per-region slopes
   within 0.02 of zero.
 
+**(f) made concrete, 2026-11-11 00:30, before any fit with a PR3 or DR1 map.** Three arms.
+
+- *PR3 with a fitted noise model* (`e042c_pr3_arm.py`): the PR3 30 GHz map through the same steps
+  as PR4, its noise model fitted to the PR3 ring-half difference.
+- *PR3 with the released covariance* (`e042d_pr3_ncvm.py`): the released nside-16 map and
+  `offset_covmat` (IRSA, `LFI_NoiseCovMat_030_0016_R3.20.tgz`, fetched 2026-11-11 00:20). Checked
+  before any fit: the matrix is symmetric, positive definite with a floor at the 0.02 uK
+  regularization, pixel sd 0.85 uK in Q and U; the released map correlates at 0.93 with my
+  noise-weighted downgrade of the PR3 map and its transfer function against it is the cosine
+  window (1.00 to multipole 10, 0.94 at 20, 0.83 at 24, 0.47 at 32) times about 0.97. The 30 GHz
+  information is restricted to multipoles 2 to 24; the PR4 map is cut to the same multipoles for
+  a like-for-like comparison.
+  - Y1. The PR3 ring-half difference through the same steps has a chi-square per mode between
+    0.8 and 1.3 under the released covariance. Outside that, the covariance is rescaled by the
+    measured value for the fits and the fact is reported.
+- *Cosmoglobe DR1* (`e040c_dr1_arm.py`): the DR1 K, Ka and 30 GHz maps with their white-noise
+  weights, which understate the errors.
+- Y2. No prediction for the indices of these arms. What they are for: if the K to 30 GHz index at
+  high latitude is within 0.1 of the K to Ka index for one of these map versions and not for PR4,
+  the gap belongs to the processing of the 30 GHz map (or, for DR1, to the joint reprocessing of
+  both), and the paper says which.
+
 ## Command
 
 Pending.

@@ -12,6 +12,7 @@ mkdir -p $X
 [ -s $X/dr1_K30.txt ] && grep -q "^Plane" $X/dr1_K30.txt || $P nextgen/scripts/e040c_dr1_arm.py --bands K 30 353 --match-window 60 --out $X/dr1_K30.npz > $X/dr1_K30.txt 2> $X/dr1_K30.err
 [ -s $X/dr1_KKa.txt ] && grep -q "^Plane" $X/dr1_KKa.txt || $P nextgen/scripts/e040c_dr1_arm.py --bands K Ka 353 --match-window 60 --out $X/dr1_KKa.npz > $X/dr1_KKa.txt 2> $X/dr1_KKa.err
 [ -s $X/dr1_30Ka.txt ] && grep -q "^Plane" $X/dr1_30Ka.txt || $P nextgen/scripts/e040c_dr1_arm.py --bands 30 Ka 353 --match-window 60 --out $X/dr1_30Ka.npz > $X/dr1_30Ka.txt 2> $X/dr1_30Ka.err
+[ -s $X/pr3_ncvm.txt ] && grep -q "30(PR4, same l) Ka 353" $X/pr3_ncvm.txt || $P nextgen/scripts/e042d_pr3_ncvm.py --lmax 24 --out $X/pr3_ncvm.npz > $X/pr3_ncvm.txt 2> $X/pr3_ncvm.err
 # 1. the band pairs of the K band against 30 GHz comparison
 run bpxv_n16_KKa_wm     --regions bpxv --bands K Ka 353 $W
 run s2_K30_wm           --regions bpxv --bands K 30 353 $W
