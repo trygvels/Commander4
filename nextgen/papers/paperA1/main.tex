@@ -1,0 +1,55 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{caption}
+\usepackage{natbib}
+\captionsetup{font=small,labelfont=bf}
+
+\newcommand{\pend}[1]{\textcolor{red}{[#1]}}
+\newcommand{\exref}[1]{\textsf{\small #1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\T}{^{\mathsf{T}}}
+\newcommand{\Ni}{\mathsf{N}^{-1}}
+\newcommand{\M}{\mathsf{M}}
+\newcommand{\A}{\mathsf{A}}
+\newcommand{\Pm}{\mathsf{P}}
+\newcommand{\J}{\mathsf{J}}
+\newcommand{\Tm}{\mathsf{T}}
+\newcommand{\bs}{\beta_{\mathrm{s}}}
+\newcommand{\nuref}{\nu_{\mathrm{ref}}}
+\newcommand{\nupiv}{\nu_{\mathrm{piv}}}
+\newcommand{\chimin}{\chi^2_{\min}}
+\newcommand{\muK}{\mu\mathrm{K}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\tr}{\mathrm{tr}}
+
+\title{\Large Spectral indices and incidental amplitudes in pixel-based Bayesian component separation:
+tempered samplers, reference-frequency priors, and the polarized synchrotron index of the public
+WMAP and Planck maps}
+\author{T.~L.~Svalheim\\[2pt]
+{\small Draft of \today. Internal, not for distribution. Every number carries the identifier of the
+experiment record it comes from, in the form \exref{E035}; records are in \texttt{nextgen/experiments/}.}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\input{abstract}
+\input{sec_intro}
+\input{sec_model}
+\input{sec_legacy}
+\input{sec_flat}
+\input{sec_profile}
+\input{sec_data}
+\input{sec_limits}
+\input{sec_impl}
+\input{sec_concl}
+\appendix
+\input{app}
+\input{refs}
+\end{document}

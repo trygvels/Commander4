@@ -5,7 +5,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from lowres.fit import fit_profile, sandwich  # noqa: E402
+from lowres.fit import fit_profile, sandwich, sandwich_plugin  # noqa: E402
 from lowres.likelihood import BandData, RegionLikelihood  # noqa: E402
 from lowres.spectra import Band, g_rj, mbb_rj  # noqa: E402
 
@@ -35,10 +35,13 @@ def make(n=64, nreg=4, dense=(0, 2), seed=0, noise=1.0, beta_true=-3.1, amp=8.0,
         d = mean + np.linalg.cholesky(Cv) @ rng.standard_normal(n)
         ninv = np.linalg.inv(Cv) if i in dense else 1.0 / np.diag(Cv)
         bands.append((B, dust, d, ninv, mean))
-    def build(noise_draw=None):
+    def build(noise_draw=None, clean=False):
         out = []
         for k, (B, dust, d, ninv, mean) in enumerate(bands):
-            dd = d if noise_draw is None else mean + np.linalg.cholesky(cov[k]) @ noise_draw.standard_normal(n)
+            if clean:
+                dd = mean
+            else:
+                dd = d if noise_draw is None else mean + np.linalg.cholesky(cov[k]) @ noise_draw.standard_normal(n)
             out.append(BandData(B.name, dd, ninv, lambda b, B=B: B.power_law(b, NU_REF), dust))
         return out
     return build, region, a_s
@@ -116,17 +119,49 @@ def test_sandwich_matches_monte_carlo():
         bh, res = fit_profile(L, np.full(3, -3.1))
         est.append(bh)
     est = np.array(est)
-    # expected information at the truth: use a noiseless data vector so that fitted amplitudes are the truth
-    build0, _, _ = make(n=96, nreg=3, dense=(0, 1, 2), noise=3.0, amp=6.0, seed=3)
-    Ltruth = RegionLikelihood(build0(), region, cmb_prior_sd=0.3)
-    for b in Ltruth.bands:
-        pass
-    Ji, Sw, J, T, _ = sandwich(Ltruth, np.full(3, -3.1))
+    # information at the truth: a noiseless data vector, so that the fitted amplitudes are the truth
+    Ltruth = RegionLikelihood(build(clean=True), region, cmb_prior_sd=0.3)
+    Ji, Sw, J, T, sol = sandwich(Ltruth, np.full(3, -3.1))
+    assert np.allclose(sol["x"][:96], a_s, atol=0.05 * np.abs(a_s).max())
     emp = est.std(axis=0, ddof=1)
-    # one noisy realization's amplitudes stand in for the truth, so allow 15 percent
-    assert np.all(np.abs(emp / np.sqrt(np.diag(Sw)) - 1.0) < 0.15), (emp, np.sqrt(np.diag(Sw)), np.sqrt(np.diag(Ji)))
+    assert np.all(np.abs(emp / np.sqrt(np.diag(Sw)) - 1.0) < 0.12), (emp, np.sqrt(np.diag(Sw)), np.sqrt(np.diag(Ji)))
     assert np.all(np.sqrt(np.diag(Sw)) > np.sqrt(np.diag(Ji)))
     assert np.all(np.abs(est.mean(axis=0) + 3.1) < 4 * emp / np.sqrt(len(est)) + 0.02)
+
+
+def test_plugin_information_is_biased_by_T_and_debiased_sandwich_covers():
+    """On noisy data J(a_hat) averages to J + T, J(a_hat) - T to J, and intervals from the debiased
+    plug-in sandwich cover the truth at the nominal rate where the plain plug-in is too narrow."""
+    kw = dict(n=384, nreg=3, dense=(0, 1, 2), noise=5.0, amp=6.0, seed=3)
+    build, region, a_s = make(**kw)
+    truth = np.full(3, -3.1)
+    _, Sw0, J0, T0, _ = sandwich(RegionLikelihood(build(clean=True), region, cmb_prior_sd=0.3), truth)
+    t = np.diag(T0) / np.diag(J0)
+    assert t.min() > 0.1, t                      # the configuration must make the bias visible
+    rng = np.random.default_rng(12)
+    Jp_sum, est, z_plain, z_deb, nok = np.zeros((3, 3)), [], [], [], 0
+    nrep = 300
+    for _ in range(nrep):
+        L = RegionLikelihood(build(rng), region, cmb_prior_sd=0.3)
+        bh, _ = fit_profile(L, truth)
+        est.append(bh)
+        Jp_sum += L.information(truth)[0]
+        Jh, Th, _ = L.information(bh)
+        Ji = np.linalg.inv(Jh)
+        z_plain.append((bh - truth) / np.sqrt(np.diag(Ji @ (Jh + Th) @ Ji)))
+        _, cs, _, _, _, ok = sandwich_plugin(L, bh)
+        if ok.all():
+            nok += 1
+            z_deb.append((bh - truth) / np.sqrt(np.diag(cs)))
+    Jp_mean = Jp_sum / nrep
+    assert np.allclose(np.diag(Jp_mean), np.diag(J0 + T0), rtol=0.05), (np.diag(Jp_mean), np.diag(J0 + T0), np.diag(J0))
+    est, z_plain, z_deb = np.array(est), np.array(z_plain), np.array(z_deb)
+    emp = est.std(axis=0, ddof=1)
+    assert np.all(np.abs(emp / np.sqrt(np.diag(Sw0)) - 1.0) < 0.12), (emp, np.sqrt(np.diag(Sw0)))
+    assert nok > 0.95 * nrep
+    assert z_plain.std() > 1.08, (z_plain.std(), t)             # too narrow, by about (1 + t)^(3/2) / (1 + 2t)^(1/2)
+    assert abs(z_deb.std() - 1.0) < 0.08, (z_deb.std(), z_plain.std(), t)
+    assert abs(np.mean(np.abs(z_deb) < 1) - 0.683) < 0.05, np.mean(np.abs(z_deb) < 1)
 
 
 def test_reference_frequency_shift_of_flat_marginal():

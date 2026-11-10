@@ -4,7 +4,8 @@ resolution with the released dense WMAP noise covariances; several estimators on
     python -I nextgen/scripts/e040_wmap_region_indices.py --regions bpxv [--nside 16] [--bands K Ka Q V 353]
         [--cmb-prior-sd 0.2] [--delta-bands] [--dust-beta 1.53] [--estimators profile flat zm] [--out FILE.npz]
 
-Prints, per region: profile optimum with naive and sandwich errors; the flat-prior marginal optimum at
+Prints, per region: profile optimum with curvature and sandwich errors (both from the debiased
+information J(a_hat) - T); the flat-prior marginal optimum at
 references of 23 and 30 GHz with the coupled prediction J^-1 (n ln(30/23)) for their difference; the
 zero-mean-prior optimum. Also chi-square at the profile optimum, in total and per band.
 """
@@ -18,10 +19,11 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from lowres import data as D  # noqa: E402
-from lowres.fit import fit_marginal, fit_profile, sandwich  # noqa: E402
+from lowres.fit import fit_marginal, fit_profile, sandwich_plugin  # noqa: E402
 from lowres.likelihood import BandData, RegionLikelihood  # noqa: E402
-from lowres.spectra import WMAP_NOMINAL, Band, wmap_band  # noqa: E402
+from lowres.spectra import WMAP_NOMINAL, Band, hfi_band, lfi_band, wmap_band  # noqa: E402
 
+LFI_NOMINAL = {"30": 28.4, "44": 44.1, "70": 70.4}
 REGION_NAMES = {"bpxv": ["High Latitude", "Spur", "Galactic Center", "Plane"]}
 
 
@@ -33,6 +35,11 @@ def main():
     ap.add_argument("--cmb-prior-sd", type=float, default=0.2, help="uK thermodynamic; 0 means flat")
     ap.add_argument("--delta-bands", action="store_true", help="delta bandpasses at the nominal WMAP frequencies")
     ap.add_argument("--dust-beta", type=float, default=D.DUST_BETA)
+    ap.add_argument("--bp353", default="psb", choices=["psb", "full", "delta"],
+                    help="353 GHz bandpass: polarization-sensitive bolometers, all bolometers, or a delta at 353.0")
+    ap.add_argument("--lfi-split", default="full", help="PR4 LFI map: full, full-ringhalf-1 or full-ringhalf-2")
+    ap.add_argument("--lfi-noise-scale", type=float, default=1.0,
+                    help="factor on the LFI white-noise sd (the map covariance has no correlated-noise term)")
     ap.add_argument("--estimators", nargs="+", default=["profile"], choices=["profile", "flat", "zm"])
     ap.add_argument("--out", default="")
     a = ap.parse_args()
@@ -42,7 +49,13 @@ def main():
     for b in a.bands:
         if b == "353":
             d, ninv = D.load_planck_qu(D.PR4_353, ns)
-            B = Band.delta("Planck_353", 353.0)
+            B = (Band.delta("Planck_353", 353.0) if (a.delta_bands or a.bp353 == "delta")
+                 else hfi_band(353, psb=(a.bp353 == "psb")))
+        elif b in LFI_NOMINAL:
+            d, ninv = D.load_planck_qu(D.PR4_LFI.format(freq=int(b), split=a.lfi_split), ns)
+            if a.lfi_noise_scale != 1.0:
+                ninv = ninv / a.lfi_noise_scale ** 2
+            B = Band.delta(f"Planck_{int(b):03d}", LFI_NOMINAL[b]) if a.delta_bands else lfi_band(int(b))
         else:
             d, ninv = D.load_wmap(b)
             if ns != 16:
@@ -77,21 +90,31 @@ def main():
     kw = dict(cmb_prior_sd=prior, use_dust=has_dust)
     L = RegionLikelihood(bands_for(23.0), region, **kw)
     bh, res = fit_profile(L, np.full(nreg, -3.1))
-    Ji, Sw, J, T, sol = sandwich(L, bh)
+    # errors from this one data set: J(a_hat) - T estimates J, and J(a_hat) the score covariance (fit.sandwich_plugin)
+    Ji, Sw, J, T, sol, okreg = sandwich_plugin(L, bh)
     sdn, sds = np.sqrt(np.diag(Ji)), np.sqrt(np.diag(Sw))
     nper = np.bincount(region, minlength=nreg)
     chi2 = 2.0 * res.fun
     ncomp = L.ncomp
     dof = len(raw) * n - ncomp * n - nreg + (n if prior else 0)
     print(f"# E040 nside {ns}, regions {a.regions} ({nreg}), bands {a.bands}, CMB prior sd {a.cmb_prior_sd}, "
-          f"{'delta bands at nominal frequencies' if a.delta_bands else 'band-averaged spectra'}, dust beta {a.dust_beta}")
+          f"{'delta bands at nominal frequencies' if a.delta_bands else 'band-averaged spectra'}, dust beta {a.dust_beta}, "
+          f"353 bandpass {a.bp353}, LFI split {a.lfi_split}, LFI noise scale {a.lfi_noise_scale}")
+    print("# effective frequencies for index -3.1: " + "  ".join(
+        f"{B.name} {B.effective_frequency(-3.1):.2f}" for B, _, _, _ in raw if B.nu.size > 1 and B.nu.max() < 200))
     print(f"# profile fit: {res.nit} iterations, {res.nfev} evaluations, converged {res.success}; chi2_min {chi2:.1f}; "
           f"nominal dof {dof} (a CMB prior counted as one constraint per element); ratio {chi2 / dof:.4f}; {time.time() - t0:.0f} s")
     rb = L.residuals(sol)
     print("# chi2 per band r^T N^-1 r / n: " + "  ".join(f"{b.name} {float(r @ b.apply(r)) / n:.3f}" for b, r in zip(L.bands, rb)))
+    # chi-square by region: sum over bands of r_R^T (N^-1 r)_R, which adds up to the total without the prior term
+    creg = np.zeros(nreg)
+    for b, r in zip(L.bands, rb):
+        creg += np.bincount(region, weights=r * b.apply(r), minlength=nreg)
+    print("# chi2 by region, sum_b r_R^T (N^-1 r)_R / (n_R n_bands): " + "  ".join(
+        f"{names[k]} {creg[k] / (nper[k] * len(raw)):.3f}" for k in range(nreg)))
     a_s = sol["x"][:n]
     out = {"beta": bh, "sd_naive": sdn, "sd_sand": sds, "J": J, "T": T, "region": region, "a_s": a_s, "chi2": chi2, "dof": dof,
-           "resid": np.array(rb)}
+           "resid": np.array(rb), "ok": okreg, "cov_sand": Sw, "nper": nper}
     full = {}
     if "flat" in a.estimators:
         f23, _, r23 = fit_marginal(L, bh)
@@ -107,7 +130,10 @@ def main():
         full["zm"] = bz
         out.update(zm=bz, zm_tau=np.exp(tz))
         print(f"# zero-mean prior fit: {rz.nit} it; {time.time() - t0:.0f} s")
-    predv = Ji @ (nper * np.log(30.0 / 23.0))
+    Jfin = np.where(np.isfinite(Ji), Ji, 0.0)
+    predv = Jfin @ (nper * okreg * np.log(30.0 / 23.0))
+    print("# T / J_c per region (noise share of the score variance): " + "  ".join(
+        f"{names[k]} {T[k, k] / max(J[k, k] - T[k, k], 1e-30):.4f}" for k in range(nreg)))
     hdr = f"{'region':16s} {'n_el':>6s} {'rms a_s':>8s} {'profile':>9s} {'sd naive':>9s} {'sd sand':>9s}"
     if "flat23" in full:
         hdr += f" {'flat23-p':>9s} {'flat30-p':>9s} {'30-23':>8s} {'pred':>8s}"

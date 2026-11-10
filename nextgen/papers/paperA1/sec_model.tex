@@ -1,0 +1,96 @@
+\section{Model, notation and the index targets in use}
+\label{sec:model}
+
+\subsection{Data model}
+
+The data are maps $d_b$ in bands $b = 1,\dots,n_{\rm b}$, each a vector over elements $p$ (pixels,
+and Stokes parameters in polarization), in thermodynamic units. The parametric model is
+\begin{equation}
+  d_b = \sum_c m_{b,c}(\beta)\, a_c + n_b , \qquad n_b \sim \mathcal{N}(0, \mathsf{N}_b),
+  \label{eq:model}
+\end{equation}
+with one amplitude $a_c(p)$ per component $c$ and element, a mixing coefficient $m_{b,c}$ that is the
+component spectrum averaged over the bandpass of band $b$, and spectral parameters $\beta$ that are
+shared by many elements: one value for the sky, one per region, or a field at lower resolution than
+the amplitudes. Stacking bands and components, $d = \M(\beta)\,a + n$ with $a$ of length $k$. We write
+\begin{equation}
+  \A = \M\T \Ni \M , \qquad \hat a = \A^{-1} \M\T \Ni d , \qquad
+  \Pm = \Ni - \Ni \M \A^{-1} \M\T \Ni ,
+\end{equation}
+all functions of $\beta$, so that
+\begin{equation}
+  \chi^2(\beta, a) = \chimin(\beta) + (a - \hat a)\T \A\, (a - \hat a), \qquad \chimin(\beta) = d\T \Pm d .
+  \label{eq:chisplit}
+\end{equation}
+For the power-law component that carries the index, $m_{b}(\beta)$ is the band average of
+$(\nu/\nuref)^{\beta}$ in brightness temperature, converted to thermodynamic units, so that the
+amplitude is the brightness temperature at the reference frequency $\nuref$. The reference frequency
+is a convention: it changes the meaning of $a$ and not the model.
+
+The amplitudes are what statisticians call incidental parameters \citep{neyman1948}: their number
+grows with the data, and the parameters of interest, the indices, are few. Everything in this paper
+is a consequence of how the incidental parameters are removed.
+
+\subsection{Four ways to remove the amplitudes}
+
+\paragraph{Joint posterior with flat amplitude priors.} With $p(a) \propto 1$ the joint posterior is
+$p(\beta)\exp[-\chi^2(\beta,a)/2]$ and integrating Eq.~(\ref{eq:chisplit}) over $a$ gives the index
+marginal
+\begin{equation}
+  \mathcal{L}_{\rm flat}(\beta) \propto \exp\!\left[-\tfrac12 \chimin(\beta)\right] \det \A(\beta)^{-1/2} .
+  \label{eq:Lflat}
+\end{equation}
+A Gibbs sampler that draws $a \mid \beta$ with its fluctuation and then moves $\beta$ on $\chi^2$ at
+fixed $a$ has exactly this marginal for $\beta$, whether or not it mixes well enough to show it
+(checked numerically and re-derived independently, \exref{E012}). The determinant is the volume
+of amplitude space allowed at a given $\beta$. It is an implicit prior on the index and the subject of
+Sect.~\ref{sec:flat}.
+
+\paragraph{Profile likelihood.} Maximizing over the amplitudes instead of integrating gives
+\begin{equation}
+  \mathcal{L}_{\rm prof}(\beta) \propto \exp\!\left[-\tfrac12 \chimin(\beta)\right],
+  \label{eq:Lprof}
+\end{equation}
+the spectral likelihood of \citet{stompor2009} (their Eq.~9; their Eq.~10 is the marginal form).
+As a Bayesian target it is the marginal under the amplitude prior
+$p(a \mid \beta) \propto \det \A(\beta)^{1/2}$, a Jeffreys prior for the amplitude block conditional on
+the index. It is not the marginal under the joint Jeffreys prior of $(a, \beta)$, which depends on $a$.
+
+\paragraph{Gaussian amplitude prior.} With $a \sim \mathcal{N}(\mu, \mathsf{S})$ the marginal keeps the
+form of Eq.~(\ref{eq:Lflat}) with $\A \to \A + \mathsf{S}^{-1}$ and the prior mean entering $\chimin$.
+We use two cases. A zero-mean prior with one free scale per index region,
+$a_{\rm s}(p) \sim \mathcal{N}(0, \tau_r^2)$ for $p$ in region $r$, with $\tau_r$ maximized or
+marginalized under a prior flat in $\ln\tau_r$. And, for intensity, a prior whose mean and scale are
+tied to a template, with hyperparameters inferred. Under a change of reference frequency $\tau_r$
+rescales by $(\nuref'/\nuref)^{\beta_r}$, and both maximization and a log-flat prior are invariant
+under that rescaling, so the first case does not depend on the reference frequency.
+
+\paragraph{Re-solving the amplitudes inside the index move.} A fourth route is procedural: propose
+$\beta'$, solve for new amplitudes at $\beta'$, and accept on the $\chi^2$ of the new pair. What this
+samples depends on how the new amplitudes are produced, and is the subject of
+Sect.~\ref{sec:legacy}.
+
+\subsection{Information and score}
+
+Let $\M_r = \partial \M/\partial\beta_r$ for index parameter $r$. For data that follow
+Eq.~(\ref{eq:model}) with true amplitudes $a$, the profile score
+$s_r = -\tfrac12\,\partial\chimin/\partial\beta_r$ has zero mean and covariance
+\begin{equation}
+  \mathrm{Cov}(s_r, s_{r'}) = \J_{rr'} + \Tm_{rr'}, \qquad
+  \J_{rr'} = (\M_r a)\T \Pm\, (\M_{r'} a), \qquad
+  \Tm_{rr'} = \tr\!\left(\A^{-1} \M_r\T \Pm\, \M_{r'}\right),
+  \label{eq:JT}
+\end{equation}
+while the expected curvature of $\tfrac12\chimin$ is $\J$ alone (derivation in
+App.~\ref{app:sandwich}). $\J$ is the Fisher information on the indices with the amplitudes
+profiled out. $\Tm$ does not depend on the signal: it is the part of the score variance that the
+noise in the fitted amplitudes contributes. For one power-law component, diagonal noise with weights
+$w_{pb} = 1/\sigma_{pb}^2$ and one region, these reduce to
+\begin{equation}
+  \J = \sum_p u_p V_p, \qquad \Tm = \sum_p V_p, \qquad
+  u_p = a_p^2 \sum_b w_{pb} m_b^2, \qquad
+  V_p = \mathrm{Var}_{w m^2}(\ln \nu)_p ,
+  \label{eq:uV}
+\end{equation}
+with $u_p$ the squared signal-to-noise ratio of amplitude $p$ and $V_p$ the variance of $\ln\nu$ over
+the bands under the weights $w_{pb} m_b^2$: the lever arm.

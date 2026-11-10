@@ -1,0 +1,11 @@
+## LFI 30 GHz, nside 16
+white-noise sd per element, full map: median 1.136 uK_CMB (1.112 uK_RJ); half-difference covariance over full-map covariance, median 0.999
+half difference: chi2 per element 1.7714 (expected 1, sd 0.0180); rms 1.488 uK against white expectation 1.114 uK
+  l  2 to  3: EE ratio  3.347 (white sd 0.417)   BB ratio  6.880 (white sd 0.409)
+  l  4 to  6: EE ratio  3.980 (white sd 0.243)   BB ratio  4.629 (white sd 0.245)
+  l  7 to 10: EE ratio  2.406 (white sd 0.179)   BB ratio  2.734 (white sd 0.168)
+  l 11 to 20: EE ratio  2.419 (white sd 0.084)   BB ratio  2.259 (white sd 0.078)
+  l 21 to 29: EE ratio  1.926 (white sd 0.068)   BB ratio  1.785 (white sd 0.067)
+  l 30 to 47: EE ratio  1.668 (white sd 0.039)   BB ratio  1.658 (white sd 0.043)
+  K band against LFI 30, Q: 1693 elements with abs(K) > 10 uK, correlation 0.985, slope 0.453 (predicted for index -3.1: 0.502; implied index -3.56)
+  K band against LFI 30, U: 1295 elements with abs(K) > 10 uK, correlation 0.970, slope 0.470 (predicted for index -3.1: 0.502; implied index -3.40)

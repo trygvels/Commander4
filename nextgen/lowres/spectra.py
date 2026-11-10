@@ -94,3 +94,42 @@ def wmap_band(band, bandpass_dir):
         resp += r
     resp = np.clip(resp, 0.0, None)
     return Band(f"WMAP_{band}", nus, resp)
+
+
+LFI_RIMO = "/Users/trygvels/data/planck_lfi_rimo/LFI_RIMO_R3.31.fits"
+HFI_RIMO = "/Users/trygvels/data/planck_hfi_rimo/HFI_RIMO_R3.00.fits"
+C_CM_GHZ = 29.9792458           # GHz per cm^-1
+
+
+def lfi_band(freq, rimo=LFI_RIMO):
+    """Planck LFI band-averaged bandpass from the RIMO (`BANDPASS_030` etc.: frequency in GHz and the
+    transmission). The LFI convention is the WMAP one: the calibrated signal of a source with RJ
+    temperature spectrum f is int tau f dnu / int tau g dnu (Planck 2013 results II and V; Commander3
+    `comm_bp_mod`, type `LFI`), so the transmission is the response to antenna temperature. Checked: the
+    ratios C(alpha) / C(-1) of the colour corrections computed from these bandpasses reproduce the
+    published table of the Planck Explanatory Supplement to 3e-4 at 30, 44 and 70 GHz."""
+    from astropy.io import fits
+    with fits.open(rimo) as h:
+        t = h[f"BANDPASS_{int(freq):03d}"].data
+        nu, tau = np.asarray(t["WAVENUMBER"], float), np.asarray(t["TRANSMISSION"], float)
+    return Band(f"Planck_{int(freq):03d}", nu, np.clip(tau, 0.0, None))
+
+
+def hfi_band(freq, rimo=HFI_RIMO, cut=1e-5, psb=False):
+    """Planck HFI band-averaged bandpass from the RIMO (`BANDPASS_F353` etc., or `BANDPASS_PSB353` with
+    psb=True, the polarization-sensitive bolometers only: wavenumber in cm^-1 and the transmission to
+    intensity). The calibrated signal of a source with RJ temperature spectrum f is
+    int tau nu^2 f dnu / int tau nu^2 g dnu (Planck 2013 results IX; Commander3 type `HFI_cmb`), so the
+    response to antenna temperature is tau nu^2. Samples below `cut` of the peak are dropped, which
+    removes the far wings where the measured transmission is noise. Checked against the published unit
+    conversions (243.5, 371.1, 482.4, 288.2 MJy/sr per K_CMB at 100 to 353 GHz against 244.1, 371.7,
+    483.7, 287.5) and the 353 GHz dust colour correction (0.9052 against 0.9036 for 18 K and index 1.6).
+    A modified blackbody (1.53, 19.6 K) seen through the 353 GHz band is 1.137 (all bolometers) or 1.121
+    (PSBs) times its delta-band value at 353.0 GHz, so a delta band misstates the dust amplitude by that
+    factor."""
+    from astropy.io import fits
+    with fits.open(rimo) as h:
+        t = h[f"BANDPASS_{'PSB' if psb else 'F'}{int(freq):03d}"].data
+        nu, tau = np.asarray(t["WAVENUMBER"], float) * C_CM_GHZ, np.asarray(t["TRANSMISSION"], float)
+    ok = (tau > cut * tau.max()) & (nu > 0.5 * freq) & (nu < 2.0 * freq)
+    return Band(f"Planck_{int(freq):03d}", nu[ok], tau[ok] * nu[ok] ** 2)

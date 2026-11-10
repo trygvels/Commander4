@@ -8,12 +8,13 @@ import healpy as hp
 from astropy.io import fits
 
 from .likelihood import BandData
-from .spectra import Band, wmap_band
+from .spectra import Band, wmap_band, lfi_band, hfi_band
 
 WMAP_DIRS = {"K": "/Users/trygvels/data/wmap9_lowres_K", "Ka": "/Users/trygvels/data/wmap9_lowres",
              "Q": "/Users/trygvels/data/wmap9_lowres", "V": "/Users/trygvels/data/wmap9_lowres"}
 WMAP_BANDPASS = "/Users/trygvels/data/wmap9_bandpass/extracted"
 PR4_353 = "/Users/trygvels/data/planck_pr4/HFI_SkyMap_353_2048_R4.00_full.fits"
+PR4_LFI = "/Users/trygvels/data/planck_pr4_lfi/LFI_SkyMap_{freq:03d}_1024_R4.00_{split}.fits"
 DUST_BETA, DUST_T, DUST_REF = 1.53, 19.6, 353.0
 
 
@@ -68,18 +69,31 @@ def degrade(d, ninv, nside_in, nside_out):
     return np.linalg.solve(nc, P.T @ (ninv @ d)), nc
 
 
-def wmap_banddata(band, nu_ref, nside=16):
+def wmap_banddata(band, nu_ref, nside=16, dust_beta=DUST_BETA):
     d, ninv = load_wmap(band)
     if nside != 16:
         d, ninv = degrade(d, ninv, 16, nside)
     B = wmap_band(band, WMAP_BANDPASS)
-    return BandData(f"WMAP_{band}", d, ninv, lambda b, B=B: B.power_law(b, nu_ref), B.mbb(DUST_BETA, DUST_T, DUST_REF))
+    return BandData(f"WMAP_{band}", d, ninv, lambda b, B=B: B.power_law(b, nu_ref), B.mbb(dust_beta, DUST_T, DUST_REF))
 
 
-def planck353_banddata(nu_ref, nside=16, path=PR4_353):
+def planck353_banddata(nu_ref, nside=16, path=PR4_353, bandpass="psb", dust_beta=DUST_BETA):
+    """PR4 353 GHz Q/U. bandpass: "psb" (the polarization-sensitive bolometers, which carry the
+    polarization), "full" (all bolometers) or "delta" (353.0 GHz; misstates the dust response by 12 to
+    14 percent and is kept as a sensitivity arm only)."""
     d, ninv = load_planck_qu(path, nside)
-    B = Band.delta("Planck_353", 353.0)
-    return BandData("Planck_353", d, ninv, lambda b, B=B: B.power_law(b, nu_ref), B.mbb(DUST_BETA, DUST_T, DUST_REF))
+    B = Band.delta("Planck_353", 353.0) if bandpass == "delta" else hfi_band(353, psb=(bandpass == "psb"))
+    return BandData("Planck_353", d, ninv, lambda b, B=B: B.power_law(b, nu_ref), B.mbb(dust_beta, DUST_T, DUST_REF))
+
+
+def planck_lfi_banddata(freq, nu_ref, nside=16, split="full", dust_beta=DUST_BETA):
+    """PR4 LFI Q/U at 30, 44 or 70 GHz with the white-noise covariance of the map file, band-averaged
+    spectra from the RIMO bandpass. The covariance has no correlated-noise term: see the ring-half
+    check before using it at large scales."""
+    d, ninv = load_planck_qu(PR4_LFI.format(freq=int(freq), split=split), nside)
+    B = lfi_band(freq)
+    return BandData(f"Planck_{int(freq):03d}", d, ninv, lambda b, B=B: B.power_law(b, nu_ref),
+                    B.mbb(dust_beta, DUST_T, DUST_REF))
 
 
 def healpix_regions(nside_region, nside=16):

@@ -22,7 +22,7 @@ more than their errors, the model is wrong somewhere and that is what the sectio
 ## Target and priors
 
 As E039: bands K, Ka, Q, V (band-averaged spectra from the WMAP bandpass profiles, dense N^-1 as
-released) and 353 GHz (delta band, PR4 Q/U covariance combined over sub-pixels); synchrotron power
+released) and 353 GHz (PSB bandpass from the HFI RIMO, see the amendment below; PR4 Q/U covariance combined over sub-pixels); synchrotron power
 law at nu_ref = 23 GHz with one index per region, flat on [-4.6, -1.6]; dust modified blackbody
 with index 1.53 and 19.6 K, flat amplitude prior; CMB with N(0, 0.2^2 uK^2) per element.
 
@@ -65,6 +65,29 @@ quoted from agent summaries and are not yet checked in the papers: BeyondPlanck 
 - R8. Nside 8 and nside 16 agree within 2 sd of the nside 8 error per region.
 - R9. A dust index change of 0.05 moves the Plane and Galactic Center indices by less than 0.02
   and the other two by less than 0.005.
+
+**Amendments before any real-data fit, 2026-11-10 21:01.** Two things found while the E039 simulations
+were running, neither from real data.
+
+1. *The 353 GHz band is not a delta band.* Checked against the HFI bandpass (RIMO R3.00; the
+   reader reproduces the published unit conversions to 0.3 percent and the dust colour
+   correction to 0.2 percent), a modified blackbody with index 1.53 and 19.6 K seen through the
+   353 GHz band is 1.137 (all bolometers) or 1.121 (polarization-sensitive bolometers) times its
+   delta-band value at 353.0 GHz. A delta band therefore overstates the dust amplitude at every
+   other frequency by 12 to 14 percent, more than the dust-index variation of R9 (9 percent at V
+   band). The baseline now uses the PSB bandpass; the delta band is a sensitivity arm
+   (`--bp353 delta`), and all bolometers another. E039 is not affected: its simulations are
+   generated and fitted with the same band.
+   - R10. Delta band against PSB bandpass at 353 GHz: Plane and Galactic Center indices move by
+     less than 0.03, the other two by less than 0.01, and the V-band chi-square per element
+     changes by less than 0.02.
+2. *The plug-in information is biased.* J evaluated at the fitted amplitudes has expectation J +
+   T. The errors quoted for real data use J_c = J(a_hat) - T for the curvature and J_c^-1 J(a_hat)
+   J_c^-1 for the sandwich (`fit.sandwich_plugin`; unit test with T / J of 0.1 to 0.5: plain
+   plug-in sd of z above 1.08, debiased within 0.08 of 1). For the four BP XV regions T / J is
+   below 0.02 in the E039 truth, so R1 to R9 do not change; for small faint regions it matters.
+   E039 uses J and T at the truth and tests the theory, not the plug-in; the plug-in is tested in
+   E041.
 
 ## Command
 

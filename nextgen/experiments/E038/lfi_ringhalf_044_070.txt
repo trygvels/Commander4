@@ -1,0 +1,18 @@
+## LFI 44 GHz, nside 16
+white-noise sd per element, full map: median 1.334 uK_CMB (1.269 uK_RJ); half-difference covariance over full-map covariance, median 1.000
+half difference: chi2 per element 1.4013 (expected 1, sd 0.0180); rms 1.591 uK against white expectation 1.346 uK
+  l  2 to  3: EE ratio  3.666 (white sd 0.420)   BB ratio  2.135 (white sd 0.408)
+  l  4 to  6: EE ratio  2.602 (white sd 0.255)   BB ratio  2.290 (white sd 0.258)
+  l  7 to 10: EE ratio  2.244 (white sd 0.184)   BB ratio  1.583 (white sd 0.172)
+  l 11 to 20: EE ratio  1.558 (white sd 0.087)   BB ratio  1.474 (white sd 0.079)
+  l 21 to 29: EE ratio  1.551 (white sd 0.072)   BB ratio  1.328 (white sd 0.069)
+  l 30 to 47: EE ratio  1.369 (white sd 0.041)   BB ratio  1.344 (white sd 0.043)
+## LFI 70 GHz, nside 16
+white-noise sd per element, full map: median 1.173 uK_CMB (1.034 uK_RJ); half-difference covariance over full-map covariance, median 1.000
+half difference: chi2 per element 1.2088 (expected 1, sd 0.0180); rms 1.274 uK against white expectation 1.158 uK
+  l  2 to  3: EE ratio  3.681 (white sd 0.381)   BB ratio  2.937 (white sd 0.418)
+  l  4 to  6: EE ratio  1.224 (white sd 0.260)   BB ratio  2.407 (white sd 0.233)
+  l  7 to 10: EE ratio  1.415 (white sd 0.172)   BB ratio  1.358 (white sd 0.177)
+  l 11 to 20: EE ratio  1.199 (white sd 0.081)   BB ratio  1.143 (white sd 0.090)
+  l 21 to 29: EE ratio  1.415 (white sd 0.066)   BB ratio  1.291 (white sd 0.068)
+  l 30 to 47: EE ratio  1.136 (white sd 0.039)   BB ratio  1.165 (white sd 0.040)

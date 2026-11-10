@@ -1,0 +1,16 @@
+# basis: 4600 modes on 6144 elements; Y^T Y diagonal 0.874 to 1.127, largest off-diagonal 0.119; 2 s
+## LFI 30 GHz: z^T z / n = 1.7714; fit r = 1.464, A(l=10) = 1.161, gamma = 1.265; -2 ln L = 9515.5 against 10883.7 for white; 103 iterations, converged True; 233 s
+   z^T R^-1 z / n = 1.0000; model variance per element over white: median 1.775; multipole 2, 5, 10, 20, 40 variance over white: 10.36, 4.25, 2.62, 1.95, 1.66
+   deviation of the real half difference from model simulations, in sd:
+   zone0 +0.55  zone1 +1.00  zone2 -1.14  zone3 -0.83  zone4 +0.50  zone5 -0.10  HighLat -0.22  Spur -1.19  GC +1.86  Plane +0.81  E2-3 -1.38  B2-3 -0.23  E4-6 +0.32  B4-6 +0.62  E7-10 -1.23  B7-10 -0.38  E11-20 +1.29  B11-20 +1.62  E21-29 +0.69  B21-29 -0.33  E30-47 -0.14  B30-47 -1.73
+   cells beyond 3 sd: 0 of 22; beyond 2 sd: 0; rms deviation 0.98; 249 s
+## LFI 44 GHz: z^T z / n = 1.4013; fit r = 1.280, A(l=10) = 0.448, gamma = 1.246; -2 ln L = 8170.4 against 8609.5 for white; 105 iterations, converged True; 504 s
+   z^T R^-1 z / n = 1.0000; model variance per element over white: median 1.401; multipole 2, 5, 10, 20, 40 variance over white: 4.61, 2.34, 1.73, 1.47, 1.36
+   deviation of the real half difference from model simulations, in sd:
+   zone0 -1.70  zone1 +0.17  zone2 -0.11  zone3 +0.77  zone4 +0.50  zone5 +0.40  HighLat +1.30  Spur -0.47  GC -0.70  Plane -2.33  E2-3 +0.40  B2-3 -1.42  E4-6 +0.99  B4-6 -0.37  E7-10 +1.49  B7-10 -0.91  E11-20 +0.52  B11-20 -0.47  E21-29 +1.23  B21-29 -1.45  E30-47 +0.70  B30-47 -0.70
+   cells beyond 3 sd: 0 of 22; beyond 2 sd: 1; rms deviation 1.03; 524 s
+## LFI 70 GHz: z^T z / n = 1.2088; fit r = 1.169, A(l=10) = 0.164, gamma = 1.692; -2 ln L = 7285.9 against 7426.6 for white; 152 iterations, converged True; 899 s
+   z^T R^-1 z / n = 1.0000; model variance per element over white: median 1.208; multipole 2, 5, 10, 20, 40 variance over white: 3.66, 1.70, 1.33, 1.22, 1.19
+   deviation of the real half difference from model simulations, in sd:
+   zone0 +1.09  zone1 -2.90  zone2 +0.61  zone3 +1.20  zone4 +0.54  zone5 -0.96  HighLat +0.60  Spur -0.99  GC +1.15  Plane -0.89  E2-3 +0.15  B2-3 -0.02  E4-6 -1.10  B4-6 +1.68  E7-10 +0.01  B7-10 -0.49  E11-20 -0.30  B11-20 -0.62  E21-29 +2.68  B21-29 +1.24  E30-47 -1.22  B30-47 -0.89
+   cells beyond 3 sd: 0 of 22; beyond 2 sd: 2; rms deviation 1.20; 917 s

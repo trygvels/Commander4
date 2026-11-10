@@ -65,8 +65,10 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F39, F40 | B | One sky; Fisher at the truth |
 | F41 | A for the floor, B for the order | Real maps and one simulated CMB |
 | F42, F43 | A | Code facts |
-| F44 | A for the flat-prior shift and the calibration of the profile at real depth, B for the rest | Exact grids, 100 noise realizations per cell, one sky |
+| F44 | A for the flat-prior shift and the calibration of the profile at real depth, B for the rest | Exact grids, 100 noise realizations per cell, one sky; the zero-mean prior is qualified by F46 (e) |
 | F45 | B | Four chains, one sky; closes the intensity template-prior sequence |
+| F46 | A for (a) to (d) in one dimension, B for (e) | Exact one-dimensional targets, 400 realizations per cell, pre-registered; the coupled dense case is E039 |
+| F47 | B | Deterministic input checks; the LFI noise model is empirical |
 
 ## 1. Sampler correctness
 
@@ -1137,3 +1139,48 @@ advantage over a constant index at real depth on this sky, which answers the ref
 Monte Carlo error of about one posterior sd; D025 is necessary and not sufficient. Scope: one
 sky, one noise and one template-error realization, oracle T map; for the HFI bands this noise is
 2.6 to 33 times the real one, so the dust numbers do not describe real dust data.
+
+**F46. For a profile-likelihood index the curvature width is too narrow by sqrt(1 + T / J), the
+sandwich evaluated at the fitted amplitudes is narrower still, and the debiased form J(a_hat) - T
+gives nominal coverage from one data set; the zero-mean prior with a free scale is the same
+estimator under a common noise pattern and a biased one otherwise** (E041: one index for 32 to
+8192 heavy-tailed amplitudes, five bands, diagonal noise with a per-amplitude pattern, per-amplitude
+S/N from 9 to 0.07, 400 realizations per cell, six predictions written before the run; unit test
+in `nextgen/lowres/tests`). J = sum u V is the profiled Fisher information and T = sum V the
+noise-noise term of the score variance (general forms in `lowres/likelihood.py`). (a) With the
+curvature width the sd of z is sqrt(1 + T / J) within 0.054 in all 30 measured cells and follows
+it to 2.6 at T / J = 6. (b) J evaluated at the fitted amplitudes has expectation J + T, so the
+sandwich built from it is too narrow by up to a factor 5 in sd of z: worse than no correction.
+(c) With J_c = J(a_hat) - T and variance J(a_hat) / J_c^2 the sd of z is 0.946 to 1.052 and the
+68 percent coverage 0.650 to 0.718 in 29 of 30 measured cells (0.635 in one), for T / J up to
+1.6. (d) The flat-prior shift equals sum_p ln(nu_ref / nu_p) / J within 4 percent at a 23 GHz
+reference and 15 percent at 30 GHz up to shifts of 0.3, and is below 1e-3 at the pivot reference.
+(e) With a noise pattern common to the amplitudes the zero-mean prior with a maximized scale has
+the profile optimum exactly and the debiased sandwich as its curvature variance (algebra,
+confirmed to 0.008 in sd of z). With a pattern that varies between amplitudes it is biased by
+-0.6 to +0.3 posterior sd depending on the amplitude draw, because a Gaussian prior is
+misspecified for heavy-tailed amplitudes and the bright ones carry whatever pattern they happen
+to have. This qualifies F44: its "calibrated within 0.11 except -0.30 in one cell" was this
+effect. The estimator of record is the profile with the debiased sandwich; the zero-mean prior is
+reported beside it. Scope: one region, one component, diagonal noise; the coupled dense case is
+E039.
+
+**F47. Two input facts for the polarized track: the white-noise columns of the PR4 LFI map files
+understate the noise of an nside-16 pixel average at every scale, and the 353 GHz band cannot be
+treated as a delta band** (E038 b and b2; E040 amendment). (a) The ring-half difference of the
+PR4 30, 44 and 70 GHz Q/U maps, averaged to nside 16 with inverse-covariance weights, has a
+chi-square per element of 1.77, 1.40 and 1.21 against the covariance columns, with a ratio of
+1.67, 1.36 and 1.15 at multipoles 30 to 47 and 3 to 7 at multipoles 2 to 6 (two of three
+expectations failed: I expected the pixel scale to be white). A three-parameter model per band,
+white level times r plus a power law in multipole in the whitened frame, fitted to the half
+difference, passes 22 sub-tests per band with none beyond 3 sd; the 70 GHz model is the weakest.
+It is isotropic, fitted to one realization, and blind to errors common to the halves. (b) A
+modified blackbody with index 1.53 and 19.6 K seen through the HFI 353 GHz band is 1.137 (all
+bolometers) or 1.121 (PSBs) times its value for a delta band at 353.0 GHz; the bandpass reader
+reproduces the published unit conversions to 0.3 percent and the LFI colour-correction ratios to
+3e-4. A delta band at 353 GHz therefore overstates the dust amplitude at every lower frequency
+by 12 to 14 percent, more than a dust-index change of 0.05 does at V band. (c) WMAP K band and
+PR4 30 GHz agree in sign and units (correlation 0.985 in Q, 0.970 in U on elements above 10 uK),
+and their unweighted ratio is 0.453 and 0.470 against 0.502 for an index of -3.1 with
+band-averaged spectra. That is not a measurement: an unweighted fit gives the poorly measured
+large-scale modes of the K-band map full weight.
