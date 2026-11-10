@@ -402,8 +402,9 @@ references of 23 and 30 GHz is 0.9 to 2.5 for the 30 degree regions above a Fish
    failures favours the prior I set out to justify over the simpler profile.
 
 What this does not establish: anything with correlated noise or a dense covariance, a spatially
-varying truth index, or real data. The sandwich factor for the profile's width at low S/N was not
-checked region by region. The truth amplitudes are a posterior mean of real data.
+varying truth index, or real data. The sandwich factor is checked for one amplitude per element
+only (addendum below), not with free CMB and dust. The truth amplitudes are a posterior mean of
+real data.
 
 Changes: F44 added; Q20 answered for white noise; D029 item 5; Paper A outline thesis item 2.
 
@@ -431,10 +432,43 @@ point of F22: the BeyondPlanck chains show no flat-prior pull because, with the 
 by a prior, their reference frequency sits at the pivot of their band set. With K band added
 the pivot moves to about 26 GHz and a 30 GHz reference is no longer neutral.
 
+**Addendum, the sandwich factor region by region (prediction written 2026-11-10 05:29, before it was
+computed).** The challenge report derives, for one amplitude per element and known noise, that
+the profile score has curvature u V and variance (u + 1) V per element, with u the true amplitude
+S/N squared and V the weighted variance of ln(nu) over the bands. For a region the profile's
+posterior variance is then 1 / sum(u V) while the estimator's true variance is sum((u + 1) V) /
+sum(u V)^2, so the sd of z should be sqrt(1 + sum(V) / sum(u V)). This needs no simulation: it
+follows from the truth amplitudes and the noise. Prediction: averaged in quadrature over the
+regions of a class, it agrees with the observed sd of z of the profile within 0.05 in the classes
+below a Fisher sd of 0.25 at all three noise levels (synchrotron only), and within 0.15 in the
+classes above 0.25, where the grid edge truncates the posterior means. If it does, "the profile
+with a sandwich width" is a tested recipe in this setting; if not, the recipe is not yet usable.
+
+Result (`E036/sandwich_factor.txt`, `nextgen/scripts/e036_sandwich_factor.py`, computed 05:29 from
+the truth amplitudes and the noise alone). Predicted against observed sd of z of the profile:
+
+| noise | regions | below 0.03 | 0.03 to 0.1 | 0.1 to 0.25 | above 0.25 |
+|---|---|---|---|---|---|
+| real | nside 2 | 1.00 / 1.02 | 1.01 / 0.97 | 1.04 / 1.05 | none |
+| real | nside 4 | 1.00 / 1.00 | 1.00 / 0.99 | 1.01 / 1.01 | 1.10 / 1.08 |
+| times 2 | nside 2 | 1.00 / 1.11 | 1.01 / 0.97 | 1.04 / 1.00 | 1.16 / 1.27 |
+| times 2 | nside 4 | 1.00 / 1.03 | 1.00 / 1.00 | 1.01 / 1.00 | 1.18 / 1.09 |
+| times 4 | nside 2 | none | 1.01 / 1.01 | 1.05 / 1.01 | 1.32 / 1.40 |
+| times 4 | nside 4 | none | 1.00 / 1.01 | 1.01 / 1.02 | 1.43 / 1.08 |
+
+Below a Fisher sd of 0.25 the prediction holds within 0.05 in 15 of 16 cells; the exception is a
+class of two regions whose observed value carries an error of 0.055. Above 0.25 it holds within
+0.15 in four of five cells and accounts for most of the excess (1.16 and 1.32 predicted against
+1.27 and 1.40 observed for the 30 degree regions at two and four times the noise). The failing
+cell is the one where 42 percent of the posteriors touch the grid edge, which truncates the
+observed scatter. So the profile's interval is too narrow by sqrt(1 + sum V / sum u V), a number
+that is computable from the fitted amplitudes, and it is within 5 percent of 1 wherever the region
+index is determined to better than 0.25 at these depths.
+
 ## Follow-ups
 
 - The same grid machinery on the E022 surrogate with dense WMAP covariances and K band, at
   references of 23 and 30 GHz, with and without a CMB prior, to turn the arithmetic above into a
   direct test.
-- The sandwich factor computed per region and overlaid on these tables and on E012 and E017.
+- The sandwich factor with free CMB and dust amplitudes, and overlaid on E012, E017 and E037.
 - A truth with a latitude step in the index, and a data-built scale map.

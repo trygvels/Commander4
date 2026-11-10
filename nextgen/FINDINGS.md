@@ -1101,7 +1101,11 @@ of F22); the amplitude prior of the polarized track is
 the profile with a sandwich width or the per-region zero-mean prior, with a CMB prior the size of
 the signal (D029); no template is needed, so the template-error findings F21 to F38 do not arise
 there. Scope: white noise, one index over the sky, a truth amplitude field that is a posterior
-mean of real data, no dense covariance; the sandwich factor was not verified region by region.
+mean of real data, no dense covariance. The profile's interval is too narrow by the sandwich
+factor sqrt(1 + sum V / sum u V), with u the amplitude S/N squared and V the weighted variance of
+ln(nu) per element; computed from the truth alone it matches the observed sd of z within 0.05 in
+15 of 16 classes below a region index error of 0.25 and gives 1.16 and 1.32 against the observed
+1.27 and 1.40 in the faint 30 degree regions at two and four times the noise.
 A zero-mean prior with one scale shared by all regions on a scale map that is 30 percent high at
 high latitude moves the high-latitude index by -0.026 at a 23 GHz reference, 0.000 at the pivot
 and +0.029 at 30 GHz (30 degree regions; half that for 15 degree regions): the sign structure the

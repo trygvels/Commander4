@@ -210,8 +210,9 @@ index region gives the same answers, needs no template and does not depend on th
 E036 the two agree to 0.02 in the index in every class at real depth, with coverage 0.64 to 0.72
 against a nominal 0.68, and they stay calibrated with free CMB and dust amplitudes. The profile
 holds down to a per-element S/N of 1.1, four times the real noise, except in the faintest 30
-degree regions, where its intervals are 1.4 times too narrow. That is the size of the sandwich
-factor for a mean amplitude S/N near 1; the factor was not computed region by region here.
+degree regions, where its intervals are 1.4 times too narrow. The sandwich factor, computed
+region by region from the truth alone, predicts 1.3 there and matches the observed widths
+within 0.05 in 15 of 16 better-determined classes.
 The free-scale prior shows a bias of 0.3 posterior sd in one class there, which a scale map
 removes. The same analysis says what is unsound: a scale shared across index
 regions and tied to a template. A scale map 30 percent high in the faint sky moves the faint
@@ -344,10 +345,9 @@ they gate anything.
 3. The referee report is incomplete. The challenge report and this document cover its missing
    sections in part.
 4. No literature statement in this document was checked against a PDF by the main session.
-5. The reference-frequency shift is confirmed by one experiment (E036). The temperature law is
-   derived twice and confirmed by two toys and an exact-kernel grid. The sandwich factor and the
-   two-zone bias of a shared scale come from the challenge report's algebra and toy, which no
-   experiment record holds yet. The explanation of the real-map legacy width re-implements the
+5. The reference-frequency shift is confirmed by one experiment (E036) and by arithmetic on
+   E022's real-data numbers. The temperature law is derived twice and confirmed by two toys and
+   an exact-kernel grid. The sandwich factor is checked for one amplitude per element only. The explanation of the real-map legacy width re-implements the
    storage round trip and has not been confirmed by a Commander4 run.
 6. E036 uses white noise, one index for the whole sky, and a truth amplitude field that is a
    posterior mean of real data and therefore carries noise of its own.

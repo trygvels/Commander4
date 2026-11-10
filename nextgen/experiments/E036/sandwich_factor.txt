@@ -1,0 +1,13 @@
+# predicted sd of z of the profile, sqrt(mean over regions of 1 + sum V / sum u V), per Fisher-sd class
+
+## noise scale 1: median u per element 40.50 (S/N 6.36)
+nside 2: < 0.03: 1.001 (9 regions, range 1.00 to 1.00) | 0.03 to 0.1: 1.005 (28 regions, range 1.00 to 1.01) | 0.1 to 0.25: 1.036 (11 regions, range 1.01 to 1.07)
+nside 4: < 0.03: 1.000 (9 regions, range 1.00 to 1.00) | 0.03 to 0.1: 1.002 (62 regions, range 1.00 to 1.00) | 0.1 to 0.25: 1.009 (82 regions, range 1.00 to 1.02) | > 0.25: 1.101 (39 regions, range 1.02 to 1.72)
+
+## noise scale 2: median u per element 10.12 (S/N 3.18)
+nside 2: < 0.03: 1.001 (2 regions, range 1.00 to 1.00) | 0.03 to 0.1: 1.006 (17 regions, range 1.00 to 1.01) | 0.1 to 0.25: 1.035 (21 regions, range 1.02 to 1.08) | > 0.25: 1.162 (8 regions, range 1.11 to 1.25)
+nside 4: < 0.03: 1.000 (2 regions, range 1.00 to 1.00) | 0.03 to 0.1: 1.002 (24 regions, range 1.00 to 1.00) | 0.1 to 0.25: 1.012 (68 regions, range 1.00 to 1.02) | > 0.25: 1.179 (98 regions, range 1.02 to 2.97)
+
+## noise scale 4: median u per element 2.53 (S/N 1.59)
+nside 2: 0.03 to 0.1: 1.007 (8 regions, range 1.00 to 1.01) | 0.1 to 0.25: 1.049 (18 regions, range 1.02 to 1.09) | > 0.25: 1.316 (22 regions, range 1.09 to 1.80)
+nside 4: 0.03 to 0.1: 1.002 (5 regions, range 1.00 to 1.00) | 0.1 to 0.25: 1.013 (35 regions, range 1.00 to 1.02) | > 0.25: 1.431 (152 regions, range 1.02 to 5.69)
