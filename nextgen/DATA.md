@@ -418,3 +418,29 @@ for the method comparisons already recorded.
 - Real maps read through Commander4 at `eval_nside` below the native nside carry the ingest
   errors of F41 until the reader is fixed.
 
+
+## Holdings against the latest official releases (checked 2026-11-10)
+
+Checked by listing `~/data/` and fetching the release pages on 2026-11-10. "Official" means
+released by the instrument team; BeyondPlanck and Cosmoglobe DR1 are reprocessings.
+
+| Bands | Latest official release | Held locally | Gap |
+|---|---|---|---|
+| WMAP K, Ka, Q, V low-resolution Q/U maps and inverse covariances | Nine-year final (DR5, files `_v5`) | All four (`~/data/wmap9_lowres/`, `~/data/wmap9_lowres_K/`) | None |
+| WMAP K to W at full resolution | Nine-year final | Only the Cosmoglobe DR1 reprocessed maps (nside 512) and BeyondPlanck's Ka, Q, V inputs | Official nine-year band maps not held |
+| Planck LFI 30, 44, 70 GHz | PR4 (NPIPE, 2020); PR3 (2018) before it | Only BeyondPlanck v2 and Cosmoglobe DR1 versions | No official LFI map of either release, and no low-resolution map or noise covariance of any release |
+| Planck HFI 100 to 857 GHz | PR4 | PR4 full-mission maps for all six bands; PR3 100 GHz; PR3 143 and 217 GHz truncated and unusable; NPIPE A-split 353 and 857 GHz (UiO copies) | PR4 low-resolution maps and covariances not held |
+| QUIJOTE MFI 11, 13, 17, 19 GHz | DR1 (2023); explanatory supplements 1.1 (2023-12-19) and 1.2 (2025-12-02) add component-separation products, no new sky maps | Nothing | All of it (about 1 GB) |
+| S-PASS 2.3 GHz, CLASS 40 GHz | DR1 each | Nothing | All of it |
+| Haslam 408 MHz | Remazeilles et al. 2014 | Yes (`~/data/haslam/`), plus BeyondPlanck's version | None |
+| Cosmoglobe | DR1 (WMAP and LFI); DR2 is COBE-DIRBE and adds no WMAP or LFI maps | DR1; the DR2 directory is empty | None that matters here |
+
+Access on 2026-11-10: the PR4 LFI maps `LFI_SkyMap_0{30,44,70}_1024_R4.00_full.fits` (with ring-half
+and year splits) answer on the NERSC portal (503 MB each; the link ran at 30 kB/s in October).
+The PR4 low-resolution maps and dense noise covariances (`npipe6v20_*_ns0016*`, 648 MiB per
+matrix) are listed on `data.cmb-s4.org/planck_pr4-lowres.html`, but every Globus link there
+returns 404 (PATH_NOT_FOUND), and the NERSC public portal does not carry them. So a public
+low-resolution LFI covariance is not obtainable today by the links on record. Alternatives to
+check: the PR3 low-resolution products on the Planck Legacy Archive, the Planck low-multipole LFI
+likelihood package, the BeyondPlanck likelihood tarball, or a covariance built from the PR4
+ring-half and year splits.
