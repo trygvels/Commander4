@@ -94,7 +94,47 @@ Pending.
 
 ## Result
 
-Pending.
+**(g) Prediction residual, 2026-11-10 23:37 to 23:43** (`E042/predict30.txt`, `predictKa.txt`; a first run
+crashed after the slopes on a formatting error of mine and is kept as `predict30_first_run_crashed.txt`;
+the numbers it printed are identical).
+
+| | 30 GHz (PR4) predicted from K, Ka, Q, V, 353 | Ka predicted from K, Q, V, 353 (control) |
+|---|---|---|
+| rms of the map, of the prediction, of D (uK) | 16.05, 17.48, 3.74 | 11.54, 11.06, 2.42 |
+| chi-square of D per element, target noise only | 4.29 | 1.23 |
+| slope of D on the predicted synchrotron: High Latitude | -0.114 +- 0.003 | +0.019 +- 0.006 |
+| Spur | -0.024 +- 0.004 | +0.014 +- 0.007 |
+| Galactic Center | -0.077 +- 0.002 | +0.037 +- 0.004 |
+| Plane | -0.024 +- 0.004 | +0.010 +- 0.006 |
+| one slope for the sky | -0.073 +- 0.002 | +0.024 +- 0.003 |
+| chi-square per element after removing four slopes | 3.80 | 1.21 |
+| power of whitened D over white, multipoles 2 to 3, E / B, slopes removed | 33 / 43 | 3.7 / 2.2 |
+| 4 to 6 | 16 / 19 | 3.5 / 2.3 |
+| 7 to 10 | 7.3 / 12 | 1.6 / 1.3 |
+| 11 to 20 | 5.9 / 5.5 | 1.3 / 1.2 |
+| 21 to 29 | 3.9 / 4.1 | 1.1 / 1.1 |
+| 30 to 47 | 2.8 / 3.1 | 1.2 / 1.2 |
+
+The errors on the slopes and the power ratios count the target's noise only; the noise of the
+prediction is not in them, so the ratios are upper limits on the excess and the control column
+is the yardstick.
+
+- **X7: the sign holds in all four regions, the High Latitude size is beyond my range.** PR4 30 GHz
+  is fainter than the WMAP-only prediction by 11.4 percent at high latitude (I allowed 3 to 10),
+  7.7 percent in the Galactic Center and 2.4 percent in the Spur and the Plane.
+- **X8 holds at large scales and fails at small ones as I wrote it.** After the slopes are removed
+  the residual has 16 to 43 times the white expectation at multipoles 2 to 6. Above multipole 20
+  it is at 2.8 to 4.1, not the 0.8 to 1.3 I wrote: I left the noise of the prediction out of the
+  expectation. Against the control (1.1 to 1.2 there) the 30 GHz residual is still 2.5 to 3.5
+  times too large at the pixel scale and 5 to 20 times at multipoles 2 to 10.
+- **X9 holds in three regions**: the Ka control slopes are +0.010 to +0.019, and +0.037 in the
+  Galactic Center. Ka is 1 to 2 percent brighter than K, Q and V predict, the K, Ka against four
+  bands difference of E040 seen from the other side.
+- B-mode power in the 30 GHz residual is as large as E-mode power at every scale. Synchrotron
+  has less B than E; a residual with equal E and B is not sky signal misassigned by a wrong
+  index, it is map-level structure.
+- So the gap is two things at once: a deficit of 30 GHz that depends on the region (2 to 11
+  percent), and large-scale structure in both E and B that no amplitude factor describes.
 
 ## Negative control
 

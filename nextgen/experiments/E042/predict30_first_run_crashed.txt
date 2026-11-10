@@ -1,0 +1,7 @@
+# E042 (g): target 30 predicted from ['K', 'Ka', 'Q', 'V', '353']; indices [-3.094  -3.0965 -3.0867 -2.995 ]; 154 s
+# rms of the target 16.05, of the prediction 17.48, of D 3.74 uK; chi2 of D per element under the target's noise model 4.287
+# slope of D on the predicted synchrotron (a fractional excess of the target), per region, with its error from the target's noise alone:
+#   High Latitude    -0.1143 +- 0.0032   (as an index shift against the lowest fitted band: see record)
+#   Spur             -0.0244 +- 0.0044   (as an index shift against the lowest fitted band: see record)
+#   Galactic Center  -0.0774 +- 0.0019   (as an index shift against the lowest fitted band: see record)
+#   Plane            -0.0236 +- 0.0037   (as an index shift against the lowest fitted band: see record)

@@ -284,6 +284,24 @@ maps agree with it to 0.0006 in every region.
   wrong one by 0.37: this is what a multiplicative or a smooth large-scale difference between the
   maps does, and what a random mismatch does not do. E042 takes it apart.
 
+**Stage 2, the band set without K band** (`E040/s2_noK_lfi_wm.txt`, 22:55 to 22:59; 30, 44, 70, Ka, Q, V,
+353; profile, CMB prior 0.2 uK): High Latitude -2.994 +- 0.019, Spur -3.059 +- 0.024, Galactic
+Center -3.048 +- 0.012, Plane -2.766 +- 0.018. Reduced chi-square 1.28; per element 0.53 (30 GHz),
+1.40 (44), 1.27 (70), 1.12 (Ka), 1.02 (Q), 0.99 (V); by region 0.73, 0.74, 3.25, 1.68. CMB prior
+sensitivity +0.54 sd per unit of variance mismatch at high latitude, four times that of the
+WMAP-only set.
+
+- **S3 holds for the Spur and fails for the Plane.** Against the published -3.17 +- 0.06 and
+  -3.03 +- 0.07: the Spur is 1.7 combined sd away, the Plane 3.7 (0.26 flatter). The published
+  analysis used its own 30 to 70 GHz maps, not PR4, and a prior N(-3.3, 0.1^2).
+- **B3 of stage 3 holds**: the High Latitude profile index on this band set is -2.994, and its
+  error is 1.56 times that of the set with K band.
+- With 30 GHz as the lowest band the Plane is at -2.77; with K band in any combination it is
+  between -2.98 and -3.04. Together with the K, 30 fit this says the PR4 30 GHz map is faint
+  against both neighbours. Note that the PR4 44 and 70 GHz maps are calibrated with a polarized
+  prior built on 30 GHz (NPIPE Sect. 4.3; second citation report, item 4b), so the three LFI
+  bands are not independent witnesses on large scales.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies.

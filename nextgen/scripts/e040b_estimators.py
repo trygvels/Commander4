@@ -135,6 +135,7 @@ def main():
            "resid": np.array(rb), "ok": okreg, "cov_sand": Sw, "nper": nper}
     full = {}
     import gc
+    t_cmb = sol.get("t_cmb")
     sol = None                                      # the solution holds the 2.7 GB inverse at nside 16
     gc.collect()
     if "flat" in a.estimators:
@@ -162,10 +163,10 @@ def main():
         print(f"# zero-mean prior fit: {rz.nit} it; {time.time() - t0:.0f} s")
     if np.any(np.abs(bh + 4.6) < 1e-6) or np.any(np.abs(bh + 1.6) < 1e-6):
         print("# WARNING: a region index sits on a bound of the allowed range")
-    if "t_cmb" in sol:
+    if t_cmb is not None:
         # first-order bias of the optimum per unit of (true CMB variance / prior variance - 1), in sandwich sd
         Jc_ = J - T
-        dbeta = -np.linalg.solve(Jc_, sol["t_cmb"]) if okreg.all() else np.full(nreg, np.nan)
+        dbeta = -np.linalg.solve(Jc_, t_cmb) if okreg.all() else np.full(nreg, np.nan)
         print("# CMB prior: shift of the index per unit of (true CMB variance / prior variance - 1), in index units and in "
               "sandwich sd: " + "  ".join(f"{names[k]} {dbeta[k]:+.4f} ({dbeta[k] / sds[k]:+.2f})" for k in range(nreg)))
         out["cmb_sens"] = dbeta

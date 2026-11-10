@@ -6,6 +6,12 @@ E=nextgen/experiments/E040
 P=".venv/bin/python -I"
 run() { tag=$1; shift; [ -s $E/$tag.txt ] && grep -q "^High Latitude\|^0 \|^region" $E/$tag.txt && return 0; $P $S "$@" --out $E/$tag.npz > $E/$tag.txt 2> $E/$tag.err; }
 W="--match-window 60"
+# 0. E042 (f): the Cosmoglobe DR1 reprocessed maps, white-noise weights
+X=nextgen/experiments/E042
+mkdir -p $X
+[ -s $X/dr1_K30.txt ] && grep -q "^Plane" $X/dr1_K30.txt || $P nextgen/scripts/e040c_dr1_arm.py --bands K 30 353 --match-window 60 --out $X/dr1_K30.npz > $X/dr1_K30.txt 2> $X/dr1_K30.err
+[ -s $X/dr1_KKa.txt ] && grep -q "^Plane" $X/dr1_KKa.txt || $P nextgen/scripts/e040c_dr1_arm.py --bands K Ka 353 --match-window 60 --out $X/dr1_KKa.npz > $X/dr1_KKa.txt 2> $X/dr1_KKa.err
+[ -s $X/dr1_30Ka.txt ] && grep -q "^Plane" $X/dr1_30Ka.txt || $P nextgen/scripts/e040c_dr1_arm.py --bands 30 Ka 353 --match-window 60 --out $X/dr1_30Ka.npz > $X/dr1_30Ka.txt 2> $X/dr1_30Ka.err
 # 1. the band pairs of the K band against 30 GHz comparison
 run bpxv_n16_KKa_wm     --regions bpxv --bands K Ka 353 $W
 run s2_K30_wm           --regions bpxv --bands K 30 353 $W

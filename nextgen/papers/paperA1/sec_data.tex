@@ -116,12 +116,110 @@ each realization: running.}
 
 \subsection{The same maps, five answers}
 
-\pend{E040 baseline.}
+\begin{table}
+\centering
+\caption{The polarized synchrotron index of the WMAP nine-year K, Ka, Q and V maps (with Planck PR4
+353 GHz for dust) in the four regions of \citet{svalheim2023}, at $N_{\rm side}=16$ with the dense
+noise covariances and all bands brought to a common window (\exref{E040}). Top: the profile optimum
+with its debiased sandwich error, and how the answer changes when the same likelihood is instead
+marginalized over flat amplitude priors with the synchrotron amplitude defined at 23 or at 30 GHz, or
+under a zero-mean prior with a free scale. Middle: the difference between the two flat-prior answers
+against Eq.~(\ref{eq:coupled}). Bottom: goodness of fit, as $\chi^2$ per element and band, for which
+three free amplitudes on five bands leave an expectation of 0.6.}
+\label{tab:e040}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+ & High Latitude & Spur & Galactic Center & Plane \\
+\midrule
+elements & 4388 & 928 & 182 & 646 \\
+profile likelihood & $-3.094$ & $-3.097$ & $-3.087$ & $-2.995$ \\
+\quad sandwich error & 0.012 & 0.015 & 0.009 & 0.012 \\
+flat prior at 23 GHz & $-3.102$ & $-3.100$ & $-3.088$ & $-2.997$ \\
+flat prior at 30 GHz & $-2.944$ & $-3.025$ & $-3.062$ & $-2.961$ \\
+\quad minus profile, in units of the error & $+12.4$ & $+4.8$ & $+2.8$ & $+2.9$ \\
+zero-mean prior, free scale & $-3.089$ & $-3.096$ & $-3.078$ & $-2.992$ \\
+\midrule
+flat 30 GHz minus flat 23 GHz & $+0.158$ & $+0.075$ & $+0.025$ & $+0.037$ \\
+\quad Eq.~(\ref{eq:coupled}) & $+0.172$ & $+0.079$ & $+0.027$ & $+0.038$ \\
+\midrule
+$\chi^2$ per element and band & 0.58 & 0.59 & 1.82 & 0.78 \\
+$\Tm/\J_{\rm c}$ & 0.013 & 0.004 & 0.0003 & 0.002 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:e040} is the central result of this section. The four numbers in each column come
+from the same maps, the same regions, the same bands, the same bandpasses and the same noise
+covariances. They differ only in how the amplitudes are removed.
+
+The profile likelihood gives $-3.09$ at high latitude and in the Spur and $-3.00$ in the Plane, with
+statistical errors of 0.012 to 0.015. The fit is good where the sky is simple: the $\chi^2$ per
+element and band is 0.58 and 0.59 in the High Latitude and Spur regions against an expectation of
+0.6. It is 30 percent high in the Plane and three times too high in the Galactic Center, where one
+index for the region is not an adequate model and the quoted error means little.
+
+Under flat amplitude priors the answer depends on where the amplitudes are defined. For this band set
+with the CMB constrained, the pivot lies at 23 GHz, and a flat prior stated there agrees with the
+profile optimum to 0.6 standard deviations. The same flat prior stated at 30 GHz gives a High
+Latitude index of $-2.94$: flatter by 0.15, twelve standard deviations, with no change in the data or
+the model. The Spur moves by 0.07 and the Plane by 0.03. The difference between the two conventions
+is 0.92 to 0.97 of the first-order prediction, Eq.~(\ref{eq:coupled}), in all four regions, so the
+identity of Sect.~\ref{sec:flat} holds on real maps at the predicted size. At $N_{\rm side}=8$, with a
+quarter of the amplitudes, the same change of convention moves the High Latitude index by 0.062:
+the size of the effect is set by the pixelization as much as by the data. For comparison, the indices
+published for these maps and regions span about 0.4.
+
+The zero-mean prior with a free scale agrees with the profile optimum within 0.4 standard deviations
+in the three regions that fit and is 1.0 away in the Galactic Center.
+
+\paragraph{Window.} Without window matching the four indices are flatter by 0.007, 0.003, 0.009 and
+0.004. The noise-free simulation of the beam differences predicted 0.007, 0.003, 0.009 and 0.004
+for the part that matching removes, so the correction is understood to 0.001; the residual that
+matching cannot remove is 0.002 or less for these bands (\exref{E038}).
+
+\paragraph{Resolution.} A cross-check at $N_{\rm side}=8$, with the maps and covariances degraded by
+generalized least squares, failed: the Galactic Center index came out 0.23 flatter and the Plane
+0.07 steeper than at $N_{\rm side}=16$. A noise-free sky of index $-3.1$ put through the same degrade
+returns $+0.22$ in the Galactic Center and $-0.02$ in the Plane. The degrade assumes a signal that is
+constant inside a coarse pixel, its dense weights differ from band to band, and near the Galactic
+Center the signal is far from constant. We discard the $N_{\rm side}=8$ fits of the real maps. The
+same mechanism one level down, sub-pixel weights that differ between bands inside an
+$N_{\rm side}=16$ pixel, cannot be excluded for the released maps themselves, whose processing masks
+differ from band to band \citep{bennett2013}, and is our first suspect for the misfit in the
+Galactic Center.
 
 \subsection{Band subsets, priors and bandpasses}
 
-\pend{E040 arms.}
+\begin{table}
+\centering
+\caption{Profile index and debiased sandwich error by band set, same regions, resolution, window and
+priors as Table~\ref{tab:e040} (\exref{E040}). LFI bands are PR4 with the noise model of
+Sect.~\ref{sec:data}. The last column is the reduced $\chi^2$ of the fit.}
+\label{tab:bands}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+bands (all with 353 GHz) & High Latitude & Spur & Galactic Center & Plane & $\chi^2/{\rm dof}$ \\
+\midrule
+K, Ka, Q, V & $-3.094 \pm 0.012$ & $-3.097 \pm 0.015$ & $-3.087 \pm 0.009$ & $-2.995 \pm 0.012$ & 1.07 \\
+K, Ka & $-3.062 \pm 0.016$ & $-3.074 \pm 0.020$ & $-3.046 \pm 0.011$ & $-2.980 \pm 0.016$ & 1.12 \\
+K, 30 & $-3.428 \pm 0.019$ & $-3.180 \pm 0.023$ & $-3.263 \pm 0.013$ & $-3.035 \pm 0.020$ & 2.64 \\
+30, 44, 70, Ka, Q, V & $-2.994 \pm 0.019$ & $-3.059 \pm 0.024$ & $-3.048 \pm 0.012$ & $-2.766 \pm 0.018$ & 1.28 \\
+\pend{remaining band sets} & & & & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\pend{Text: K, Ka against all four WMAP bands (steeper by 0.015 to 0.041 when Q and V are added; nested
+difference 3.3 sd at high latitude); dust index and CMB prior arms; delta bands; drift.}
 
 \subsection{K band against 30 GHz}
 
-\pend{E040 stage 2.}
+\pend{E040 stage 2 and E042. K with 30 GHz: $-3.43$ at high latitude against $-3.06$ from K with Ka;
+30 GHz as the lowest band: Plane at $-2.77$. Anatomy: prediction residual, scale cuts, amplitude
+factor, angle.}
+
+\subsection{The band set and reference frequency of BeyondPlanck}
+
+\pend{E040 stage 3.}

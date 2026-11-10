@@ -81,9 +81,9 @@ def main():
     for k in range(4):
         print(f"#   {NAMES[k]:16s} {slope[k]:+.4f} +- {sd[k]:.4f}   (as an index shift against the lowest fitted band: see record)")
     # one global slope
-    Xg = psync[:, None]
-    sg = float((Xg.T @ nt @ Dm) / (Xg.T @ nt @ Xg))
-    print(f"#   one slope for the sky {sg:+.4f} +- {1 / np.sqrt(float(Xg.T @ nt @ Xg)):.4f}")
+    den = float(psync @ nt @ psync)
+    sg = float(psync @ nt @ Dm) / den
+    print(f"#   one slope for the sky {sg:+.4f} +- {1 / np.sqrt(den):.4f}")
     D2 = Dm - X @ slope
     print(f"# chi2 per element after removing the four slopes: {D2 @ nt @ D2 / n:.3f}")
     # power by multipole of D whitened with the symmetric square root of N^-1
