@@ -135,6 +135,32 @@ is the yardstick.
   index, it is map-level structure.
 - So the gap is two things at once: a deficit of 30 GHz that depends on the region (2 to 11
   percent), and large-scale structure in both E and B that no amplitude factor describes.
+- Caveat on the slopes: the regressor is the fitted synchrotron, which carries noise, so each
+  slope has an errors-in-variables bias of minus the noise share of the regressor's variance,
+  about -1.5 percent at high latitude and less elsewhere. The control shares it. The joint fits
+  below do not have it.
+
+**Exploratory, not pre-registered, prompted by the residual map** (`E042/leakage_check.txt`,
+`nextgen/papers/paperA1/figures/fig_resid30.pdf`). The map of D shows a band along the inner
+Galactic plane and a blob at the Galactic Center. Regression of D on the PR4 30 GHz intensity at
+nside 16:
+
+| zone | Q: slope on I, correlation | U: slope on I, correlation |
+|---|---|---|
+| abs(b) < 5, inner Galaxy (108 pixels) | -0.13 percent, -0.54 | +0.10 percent, +0.63 |
+| abs(b) < 5, outer Galaxy (212) | +0.12 percent, +0.67 | +0.05 percent, +0.36 |
+| 5 < abs(b) < 20 (768) | +0.03 percent, +0.20 | +0.03 percent, +0.18 |
+| abs(b) > 30 (1600) | +0.01 percent, +0.08 | 0.00 percent, 0.00 |
+
+After the per-region amplitude factors are removed the U residual in the plane keeps its
+correlation with intensity (+0.58) and has none with the predicted synchrotron (+0.03). So in
+the plane the residual follows the intensity at the 0.05 to 0.13 percent level with a sign that
+changes between the inner and outer Galaxy in Q: what a leakage of intensity into polarization
+does (the intensity reaches 22 mK in the brightest pixel, so 0.1 percent is 22 uK there). Which
+map carries it is not decided by this; the Ka control, whose prediction is built mostly on K
+band, shows only a small feature at the Galactic Center, which points at 30 GHz. At abs(b) > 30
+there is no correlation with intensity, and the residual there anticorrelates with the predicted
+synchrotron (-0.37): the high-latitude deficit is a different thing from the plane residual.
 
 ## Negative control
 

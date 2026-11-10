@@ -1,0 +1,22 @@
+# exploratory, not pre-registered: is the 30 GHz residual in the plane proportional to the 30 GHz intensity (a leakage)?
+# intensity at nside 16 (median removed): rms 2383 uK, at abs(b) < 5: median 1422, max 21941 uK
+abs(b) < 5                               Q D                         : slope on I -0.0895 percent, correlation -0.363, rms of D 9.74 uK, correlation of D with the predicted synchrotron -0.599, n = 320
+abs(b) < 5                               Q D after per-region slopes : slope on I -0.0244 percent, correlation -0.124, rms of D 7.78 uK, correlation of D with the predicted synchrotron -0.251, n = 320
+abs(b) < 5                               U D                         : slope on I +0.1081 percent, correlation +0.620, rms of D 6.88 uK, correlation of D with the predicted synchrotron -0.201, n = 320
+abs(b) < 5                               U D after per-region slopes : slope on I +0.0980 percent, correlation +0.576, rms of D 6.72 uK, correlation of D with the predicted synchrotron +0.031, n = 320
+abs(b) < 5, inner (l < 60 or l > 300)    Q D                         : slope on I -0.1297 percent, correlation -0.543, rms of D 12.73 uK, correlation of D with the predicted synchrotron -0.547, n = 108
+abs(b) < 5, inner (l < 60 or l > 300)    Q D after per-region slopes : slope on I -0.0482 percent, correlation -0.239, rms of D 10.72 uK, correlation of D with the predicted synchrotron -0.101, n = 108
+abs(b) < 5, inner (l < 60 or l > 300)    U D                         : slope on I +0.1029 percent, correlation +0.630, rms of D 8.70 uK, correlation of D with the predicted synchrotron -0.172, n = 108
+abs(b) < 5, inner (l < 60 or l > 300)    U D after per-region slopes : slope on I +0.0913 percent, correlation +0.558, rms of D 8.71 uK, correlation of D with the predicted synchrotron +0.145, n = 108
+abs(b) < 5, outer                        Q D                         : slope on I +0.1203 percent, correlation +0.670, rms of D 4.57 uK, correlation of D with the predicted synchrotron -0.436, n = 212
+abs(b) < 5, outer                        Q D after per-region slopes : slope on I +0.1099 percent, correlation +0.639, rms of D 4.38 uK, correlation of D with the predicted synchrotron -0.356, n = 212
+abs(b) < 5, outer                        U D                         : slope on I +0.0486 percent, correlation +0.363, rms of D 3.41 uK, correlation of D with the predicted synchrotron +0.095, n = 212
+abs(b) < 5, outer                        U D after per-region slopes : slope on I +0.0482 percent, correlation +0.357, rms of D 3.44 uK, correlation of D with the predicted synchrotron +0.156, n = 212
+5 < abs(b) < 20                          Q D                         : slope on I +0.0303 percent, correlation +0.198, rms of D 2.57 uK, correlation of D with the predicted synchrotron -0.200, n = 768
+5 < abs(b) < 20                          Q D after per-region slopes : slope on I +0.0324 percent, correlation +0.212, rms of D 2.57 uK, correlation of D with the predicted synchrotron +0.028, n = 768
+5 < abs(b) < 20                          U D                         : slope on I +0.0274 percent, correlation +0.179, rms of D 2.57 uK, correlation of D with the predicted synchrotron -0.237, n = 768
+5 < abs(b) < 20                          U D after per-region slopes : slope on I +0.0138 percent, correlation +0.094, rms of D 2.47 uK, correlation of D with the predicted synchrotron +0.127, n = 768
+abs(b) > 30                              Q D                         : slope on I +0.0087 percent, correlation +0.080, rms of D 2.32 uK, correlation of D with the predicted synchrotron -0.373, n = 1600
+abs(b) > 30                              Q D after per-region slopes : slope on I +0.0098 percent, correlation +0.099, rms of D 2.13 uK, correlation of D with the predicted synchrotron -0.126, n = 1600
+abs(b) > 30                              U D                         : slope on I +0.0004 percent, correlation +0.004, rms of D 2.29 uK, correlation of D with the predicted synchrotron -0.365, n = 1600
+abs(b) > 30                              U D after per-region slopes : slope on I -0.0029 percent, correlation -0.029, rms of D 2.10 uK, correlation of D with the predicted synchrotron -0.178, n = 1600

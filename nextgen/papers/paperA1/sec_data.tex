@@ -216,9 +216,44 @@ difference 3.3 sd at high latitude); dust index and CMB prior arms; delta bands;
 
 \subsection{K band against 30 GHz}
 
-\pend{E040 stage 2 and E042. K with 30 GHz: $-3.43$ at high latitude against $-3.06$ from K with Ka;
-30 GHz as the lowest band: Plane at $-2.77$. Anatomy: prediction residual, scale cuts, amplitude
-factor, angle.}
+The WMAP K band and the Planck 30 GHz band are 0.22 apart in $\ln\nu$ and are the two most sensitive
+synchrotron channels there are. Their polarization maps have been known to disagree on large scales
+since the 2015 Planck release; \citet{weiland2022} found a K to 30 GHz index of $-3.27$ in the Fan
+region against $-2.90$ from K to Ka and set 30 GHz aside, and \citet{watts2023} attribute the WMAP
+side to poorly measured modes of the K-band map that the released covariance does not fully
+describe. With dense covariances for WMAP and a scale-dependent noise model for LFI we can ask the
+question in likelihood terms.
+
+Table~\ref{tab:bands} gives the answer by band pair. K with Ka gives $-3.06$ at high latitude; K with
+PR4 30 GHz gives $-3.43 \pm 0.02$, steeper by 0.37, an 8 percent difference in amplitude. The gap is
+0.11 in the Spur, 0.22 in the Galactic Center and 0.06 in the Plane. When 30 GHz is instead the
+lowest band, the Plane comes out at $-2.77$, flatter by 0.2 than any fit that includes K band. The
+30 GHz map is faint against both of its neighbours, by an amount that depends on the region.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/fig_resid30.pdf}
+\caption{Left: the PR4 30 GHz Stokes $Q$ and $U$ maps at $N_{\rm side}=16$. Centre: the same maps minus
+their prediction from a fit to WMAP K, Ka, Q, V and 353 GHz that uses no LFI band. Right: the same
+difference for WMAP Ka predicted from K, Q, V and 353 GHz, on the same colour scale (\exref{E042}).}
+\label{fig:resid30}
+\end{figure}
+
+A direct view needs no noise model for 30 GHz at all. We fit K, Ka, Q, V and 353 GHz, predict the 30
+GHz map from the fitted amplitudes and indices, and subtract (Fig.~\ref{fig:resid30}). The same
+exercise with Ka predicted from K, Q, V and 353 GHz is the control. The 30 GHz map is fainter than
+its prediction by $11.4 \pm 0.3$ percent in the High Latitude region, $7.7 \pm 0.2$ percent in the
+Galactic Center and $2.4 \pm 0.4$ percent in the Spur and the Plane; the Ka control is brighter than
+its prediction by 1 to 2 percent (3.7 in the Galactic Center). After the per-region factors are
+removed, the 30 GHz residual still has 16 to 43 times the power of its noise model at multipoles 2
+to 6 and 3 times at the pixel scale, in $B$ as much as in $E$; the Ka control has 2 to 4 times at
+multipoles 2 to 6 and 1.2 at the pixel scale, part of which is the noise of the prediction. Sky
+signal assigned to the wrong index would be mostly $E$. Equal $E$ and $B$ is the signature of
+map-level structure: the residual follows the inner Galactic plane and the Galactic Center, where a
+leakage of intensity into polarization through bandpass mismatch would be largest, and has a
+large-scale component at intermediate latitudes on the side of the Fan region.
+
+\pend{E042 scale cuts, worst K modes, amplitude factor, angle; the PR3 and DR1 maps.}
 
 \subsection{The band set and reference frequency of BeyondPlanck}
 
