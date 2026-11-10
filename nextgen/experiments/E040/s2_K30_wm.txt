@@ -1,0 +1,12 @@
+# E040 nside 16, regions bpxv (4), bands ['K', '30', '353'], CMB prior sd 0.2, band-averaged spectra, dust beta 1.53, 353 bandpass psb, LFI split full, LFI noise model x 1.0 (A x 1.0), window matched to 60.0 arcmin, WMAP bandpass drift correction True
+# effective frequencies for index -3.1: WMAP_K 22.41  Planck_030 28.09
+# profile fit: 8 iterations, 10 evaluations, converged True; chi2_min 16207.2; nominal dof 6140 (a CMB prior counted as one constraint per element); ratio 2.6396; 204 s
+# chi2 per band r^T N^-1 r / n: WMAP_K 0.783  Planck_030 1.845  Planck_353 0.000
+# chi2 by region, sum_b r_R^T (N^-1 r)_R / (n_R n_bands): High Latitude 0.516  Spur 0.502  Galactic Center 8.634  Plane 1.677
+# CMB prior: shift of the index per unit of (true CMB variance / prior variance - 1), in index units and in sandwich sd: High Latitude +0.0019 (+0.10)  Spur +0.0009 (+0.04)  Galactic Center +0.0002 (+0.01)  Plane +0.0004 (+0.02)
+# T / J_c per region (noise share of the score variance): High Latitude 0.0151  Spur 0.0053  Galactic Center 0.0003  Plane 0.0028
+region             n_el  rms a_s   profile  sd naive   sd sand
+High Latitude      4388    15.82   -3.4275    0.0184    0.0185
+Spur                928    29.36   -3.1800    0.0234    0.0234
+Galactic Center     182   125.56   -3.2631    0.0125    0.0125
+Plane               646    35.75   -3.0352    0.0199    0.0199
