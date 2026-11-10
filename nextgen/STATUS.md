@@ -2,6 +2,55 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-10 (Mac mini, 23:00): first real-data results. Same WMAP maps, High Latitude index -3.094 (profile), -3.102 (flat prior at 23 GHz), -2.944 (flat prior at 30 GHz); K band with Planck 30 GHz gives -3.43 where K with Ka gives -3.06
+
+**Learned** (E040, all at nside 16, four BP XV regions, dense WMAP covariances, window-matched)
+- **Baseline, K, Ka, Q, V with 353 GHz for dust, profile likelihood with debiased sandwich
+  errors:** High Latitude -3.094 +- 0.012, Spur -3.097 +- 0.015, Galactic Center -3.087 +- 0.009,
+  Plane -2.995 +- 0.012. Chi-square per element and band 0.58 and 0.59 in the High Latitude and
+  Spur regions (0.6 expected), 0.78 in the Plane, 1.82 in the Galactic Center, which does not fit.
+- **The flat-prior reference shift on real maps.** The same likelihood with flat amplitude priors
+  gives -3.102 at a 23 GHz reference and -2.944 at 30 GHz in the High Latitude region: +0.158
+  from a convention, 13 sd, against a predicted +0.172. Spur +0.075 (predicted +0.079), Plane
+  +0.037 (+0.038). At nside 8, with a quarter of the amplitudes, +0.062.
+- **Band pairs.** K, Ka: -3.062, -3.074, -3.046, -2.980. K, 30 GHz (PR4, noise model of E038):
+  -3.428, -3.180, -3.263, -3.035. No K band (30, 44, 70, Ka, Q, V): -2.994, -3.059, -3.048,
+  -2.766. So PR4 30 GHz is faint against K band and faint against Ka to V; the gap is largest at
+  high latitude (8 percent in amplitude) and is not one multiplicative number. The Plane without
+  K band is 3.7 sd from the published BeyondPlanck value.
+- **E039, four regions:** unbiased to 0.07 sd, coverage 0.69, chi-square 1.0006; the flat-prior
+  shift within 5 percent of the coupled prediction. Two of my six criteria were worded wrongly.
+- **Independent review of `nextgen/lowres`:** no code defect. It corrected my shift formula (the
+  response uses the Hessian of the marginal, J + 2T for one component, not J), the unbiasedness
+  claim with a CMB prior (holds over skies drawn from the prior only) and a docstring. The WMAP
+  team's own routine confirms the bandpass weighting and gave a nine-year drift correction I had
+  missed.
+- **Beams and resolution (E038 c).** Different beams bias the WMAP-only indices by +0.005 to
+  +0.011; a window-matching operator removes it to 0.002 and the real maps move by the predicted
+  amount to 0.0006. Degrading to nside 8 with the dense weights biases the Galactic Center by
+  +0.22 in simulation and +0.23 on the real maps: nside-8 fits are discarded.
+- **A reading to test, not a result:** BeyondPlanck and Cosmoglobe DR1 report the high-latitude
+  index going "unreasonably flat" when fitted freely at a 30 GHz reference and constrain it with
+  a prior. That is the sign of the flat-prior volume term for their band set with a free CMB.
+  Stage 3 of E040 tests it on PR4 maps; expectations are committed.
+- **Machine.** Dense fits do not parallelize across processes here and one nside-16 fit holds 11
+  GB; concurrent jobs swapped and stalled. Everything now runs in one queue.
+
+**Running** (one queue, about until 05:30)
+- E040 stage 3 (BeyondPlanck band set, flat CMB prior), then E042 (anatomy of the K band against
+  30 GHz gap: prediction residual, scale cuts, worst K modes, amplitude factor, angle), the
+  remaining E040 arms, the rest of the E039 48-region simulation and the plug-in addenda.
+- Downloads: the Planck 2018 30 GHz map and its released nside-16 noise covariance (2.5 GB), for
+  a 30 GHz arm with a proper dense covariance.
+
+**Next**
+- Read stage 3 and E042 against their expectations; data figure; Paper A1 Sect. 7.4 to 7.6,
+  abstract, conclusions; then the independent referee read.
+
+**Needs Trygve**
+- Nothing blocks. One thing to know before reading the draft: it now touches the BeyondPlanck
+  polarized index analysis directly (your paper), as a reading to test and not as a claim.
+
 ## 2026-11-10 (Mac mini, 21:21): D030 in force; low-resolution polarized likelihood built and under validation; the error recipe for real data corrected and validated (F46); PR4 LFI noise understated by its map files (F47); Paper A1 draft has six sections
 
 **Learned**
