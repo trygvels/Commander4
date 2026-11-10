@@ -1,0 +1,15 @@
+seed 4242, cases ('B',)
+
+--- case B: 120000 realizations ---
+T/J (diag, reviewer matrices)       [0.4069 0.4982]
+max |T_code - T_ref| / max|T_ref|   4.199507090244288e-15
+J_ref diag                          [0.6724 0.8225]   J_code(noiseless data) diag [0.6724 0.8225]
+score mean                          [-0.0005 -0.0101]  +-  [0.0028 0.0032]   -> z = [-0.1738 -3.1583]
+score sd expected sqrt(diag(J+T))   [0.9726 1.1101]
+score cov diag / (J+T) diag         [1.0079 1.0022]  +-  [0.0043 0.0042]
+score cov off-diag, MC vs J+T       0.005654281452254545 +- 0.0031490047383006215  vs  0.001876128124232196
+E[Hessian] diag / J diag (30000 reps) [0.9949 1.0003]  +-  [0.0039 0.0036]    [J+T would give [1.4069 1.4982] ]
+E[J(a_hat)] diag / (J+T) diag       [1.0002 1.0006]  +-  [0.0007 0.0006]
+E[J(a_hat) - T] diag / J diag       [1.0002 1.0009]  +-  [0.001  0.0009]
+
+elapsed 114 s

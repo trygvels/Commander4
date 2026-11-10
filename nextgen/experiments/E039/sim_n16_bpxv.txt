@@ -1,0 +1,27 @@
+# E039 nside 16, regions bpxv (4), bands ['WMAP_K', 'WMAP_Ka', 'WMAP_Q', 'WMAP_V', 'Planck_353'], CMB prior sd 0.2 uK
+# truth amplitudes at 23 GHz: median |a_s| 8.43 uK_RJ; white-noise sd per element (K) 1.87 uK
+# region  n_el  beta_true  sd_naive  sd_sandwich  ratio
+#   0   4388 -3.150    0.0143    0.0145  1.009
+#   1    928 -3.250    0.0157    0.0158  1.002
+#   2    182 -2.850    0.0104    0.0104  1.000
+#   3    646 -2.950    0.0137    0.0137  1.002
+real 0 prof -3.1304 -3.2325 -2.8589 -2.9523 chi2/dof 0.9885 it 6 [170 s]
+real 1 prof -3.1752 -3.2477 -2.8465 -2.9493 chi2/dof 0.9926 it 6 [326 s]
+real 2 prof -3.1397 -3.2575 -2.8345 -2.9737 chi2/dof 0.9965 it 7 [602 s]
+real 3 prof -3.1317 -3.2466 -2.8618 -2.9513 chi2/dof 1.0215 it 6 [779 s]
+real 4 prof -3.1588 -3.2378 -2.8636 -2.9453 chi2/dof 0.9947 it 6 [981 s]
+real 5 prof -3.1384 -3.2641 -2.8536 -2.9497 chi2/dof 0.9921 it 7 [1306 s]
+real 6 prof -3.1511 -3.2521 -2.8525 -2.9458 chi2/dof 0.9906 it 6 [1520 s]
+real 7 prof -3.1642 -3.2565 -2.8573 -2.9481 chi2/dof 1.0054 it 6 [1721 s]
+real 8 prof -3.1448 -3.2286 -2.8445 -2.9539 chi2/dof 0.9906 it 6 [1924 s]
+real 9 prof -3.1524 -3.2720 -2.8663 -2.9305 chi2/dof 0.9978 it 7 [2106 s]
+real 10 prof -3.1265 -3.2333 -2.8688 -2.9210 chi2/dof 0.9992 it 5 [2284 s]
+real 11 prof -3.1349 -3.2551 -2.8598 -2.9324 chi2/dof 1.0027 it 6 [2530 s]
+
+## profile over 12 realizations: per region mean shift, mean z (sandwich) +- se, sd z sandwich, sd z naive, coverage of +-1 sandwich sd
+  0 +0.0043 +0.299 0.299 1.035 1.044 0.583
+  1 +0.0014 +0.087 0.247 0.855 0.857 0.667
+  2 -0.0057 -0.544 0.274 0.951 0.951 0.583
+  3 +0.0039 +0.284 0.283 0.980 0.981 0.667
+pooled over the 4 regions with sandwich sd < 0.25: mean z +0.031, sd z sandwich 0.989, sd z naive 0.992, coverage 0.625
+chi2_min / (n_band - 2) n: mean 0.9977, sd 0.0091

@@ -1,0 +1,44 @@
+tir. 10 nov. 2026 21.06.29 CET
+Reviewer derivations, written before reading E039/E040 records, nextgen/papers or nextgen/reviews.
+(Only likelihood.py, fit.py, spectra.py, lfi_noise.py, data.py and the test file had been read.)
+
+Notation: stack bands. d = M(beta) x + n, x = (a_s, a_d, a_c), M_b = [diag(s_b), f_b I, c_b I],
+W = N^-1 block diagonal over bands, Lam = prior precision = blockdiag(Lam_s, 0, Lam_c),
+A = M^T W M + Lam, rhs = M^T W d, xhat = A^-1 rhs = B d with B = A^-1 M^T W,
+P = W - W M A^-1 M^T W.  M_r = dM/dbeta_r (only the synchrotron block, only elements of region r).
+
+Joint negative log density: Q(x) + sum_p ln tau_r(p) [sync prior only] + const,
+ Q = (1/2)(d-Mx)^T W (d-Mx) + (1/2) x^T Lam x = (1/2) d^T P d + (1/2)(x-xhat)^T A (x-xhat).
+1. profile = min_x Q = (1/2)(d^T W d - rhs^T A^-1 rhs) = (1/2) d^T P d.
+2. marginal = -ln int exp(-Q) dx = (1/2) d^T P d + (1/2) ln det A (+ sum_p ln tau_r(p)), const (2 pi)^(dim/2).
+3. Gradients. Envelope: d(min Q)/dbeta_r = -(M_r xhat)^T W (d - M xhat).
+   d (1/2) ln det A / dbeta_r = tr(A^-1 M_r^T W M).
+   d/dlog tau_r = sum_{p in r} [ -a_s(p)^2/tau^2 - (A^-1)_pp/tau^2 + 1 ].
+4. Flat priors (Lam = 0): P M = 0, B M = I, P N P = P, B N B^T = A^-1, B N P = 0.
+   P_r = dP/dbeta_r = -P M_r B - B^T M_r^T P. score g_r = (1/2) d^T P_r d = -xhat^T M_r^T P d.
+   At the truth: P d = P n, xhat = a + B n. E g_r = -tr(M_r^T P N B^T) = 0.
+   Cov(g) = (M_r a)^T P (M_r' a) [linear part] + tr(A^-1 M_r^T P M_r') [quadratic part; the cross
+   trace tr(G N G' N) vanishes since P N B^T = 0] = J + T. Cross linear-quadratic is zero (odd moment).
+   E Hessian = J exactly (the trace terms cancel: -T + T). First order: Cov(beta_hat) = J^-1 (J+T) J^-1.
+   Gaussian CMB prior: P and (A^-1)_ss with Lam_c in A are identical to P', A'^-1 of the reduced model
+   (a_s, a_d flat) with noise N~ = N + C Lam_c^-1 C^T. So all flat-prior results hold, with the code's
+   J and T, IF the expectation is over noise AND over CMB skies drawn from N(0, sigma_c^2 I).
+   For one fixed CMB sky a_c (expectation over noise only): P M = B^T Lam != 0 and
+     E[g_r | x] = -x^T M_r^T B^T Lam x + x^T Lam A^-1 M_r^T B^T Lam x - tr(Lam A^-1 M_r^T B^T) != 0,
+   the score covariance is not J + T, and E[J(a_hat)] != J + T (shrinkage, and B N B^T = A^-1 - A^-1 Lam A^-1).
+   Same failure if the true CMB covariance is not sigma_c^2 I (wrong sigma_c, or spatially correlated CMB).
+5. E[J(a_hat)] at the true beta = J + tr(X Cov(a_hat_s)) = J + T (flat priors, or CMB drawn from its prior).
+   J_c = J(a_hat) - T unbiased for J. J_c^-1 J(a_hat) J_c^-1 is a ratio estimator: consistent, not unbiased;
+   fails when the noise in J_c is comparable to J (few elements per region or T >~ J).
+6. s_b(beta; ref') = s_b(beta; ref) (ref/ref')^beta, so M' = M K, K = blockdiag(diag(kappa), I, I),
+   kappa_p = (ref/ref')^beta_r(p). With flat sync prior A' = K A K, rhs' = K rhs: profile unchanged,
+   (1/2) ln det A' = (1/2) ln det A - sum_r n_r beta_r ln(ref'/ref). Matches the claim.
+   First-order shift of the flat-marginal optimum: delta = H_marg^-1 n ln(ref'/ref) with H_marg the Hessian
+   of the MARGINAL objective. E H_marg = J + Hess (1/2) ln det A and
+     Hess_rr' (1/2) ln det A = T_rr' + tr(B M_rr') - tr(B M_r B M_r')   (= 2 T for one component, diagonal noise).
+   So the claimed J^-1 n ln(ref'/ref) is the high signal-to-noise limit only; at T/J of 0.2 to 1 it
+   overstates the shift by roughly 1 + 2 T/J. To be checked numerically.
+7. Woodbury: (r I + Y D Y^T)^-1 = (1/r)[I - Y (r D^-1 + G)^-1 Y^T], det = r^n det(D/r) det(r D^-1 + G). Matches code.
+   2x2 sqrt: sqrt(M) = (M + s I)/t, s = sqrt(det), t = sqrt(tr + 2 s); inverse sqrt = adj/s. Matches code.
+spectra: np.gradient(nu) equals trapezoid weights in the interior on any grid, but gives the FULL first and
+   last interval at the two end points (trapezoid: half). Error = half an end interval times the end response.

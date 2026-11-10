@@ -1,0 +1,16 @@
+case B, seed 90210, 200000 realizations, 20 batches of 10000
+score mean             [-0.0023  0.003 ] +- [0.0022 0.0025]  z [-1.0364  1.2241]
+score var / (J+T)      [0.9986 0.9968] +- [0.0033 0.0032]  z [-0.4289 -0.9832]
+E[J(a_hat)] / (J+T)    [1.0001 1.0003] +- [0.0005 0.0005]  z [0.1127 0.5452]
+batch means: sd between batches [0.0137 0.0106]  expected from within-batch sd [0.0097 0.0111]  ratio [1.4087 0.9592] +- 0.16222142113076254
+batch variances: sd between batches [0.0141 0.0204]  expected [0.0139 0.0179]  ratio [1.0113 1.1381]
+score tails: max |g|/sd [4.8695 4.8651]  excess kurtosis [0.1742 0.1238]  skewness [ 0.0045 -0.0052]
+lag-1 autocorrelation of the score sequence [0.0006211291577042709, -0.0007433782144338596]  (expected 0 +- 0.0022)
+
+batch-size scan on the saved 200000 realizations: (sd of batch means) / (within-batch sd / sqrt(m)); 1 if independent
+batches  2000 of    100: score mean [0.9958 0.9939]  score second moment [1.0132 0.993 ]  J(a_hat) [1.0187 1.002 ]   +- 0.016
+batches   400 of    500: score mean [0.9495 1.0057]  score second moment [1.0017 1.0225]  J(a_hat) [1.0371 0.9622]   +- 0.035
+batches   100 of   2000: score mean [1.0122 1.0398]  score second moment [1.0277 0.9828]  J(a_hat) [1.017  0.9079]   +- 0.071
+batches    40 of   5000: score mean [1.2009 0.9916]  score second moment [1.1238 0.9848]  J(a_hat) [1.0804 0.9904]   +- 0.113
+batches    20 of  10000: score mean [1.4086 0.9591]  score second moment [1.011  1.1378]  J(a_hat) [1.1954 1.1321]   +- 0.162
+batches    10 of  20000: score mean [1.2147 0.8774]  score second moment [1.104  0.9496]  J(a_hat) [1.0494 1.064 ]   +- 0.236

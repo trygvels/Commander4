@@ -1,0 +1,66 @@
+
+--- case A: 20000 realizations ---
+T/J (diag, reviewer matrices)       [0.4625 0.5743]
+max |T_code - T_ref| / max|T_ref|   1.1752300399459175e-13
+J_ref diag                          [0.4994 0.6029]   J_code(noiseless data) diag [0.4994 0.6029]
+score mean                          [-0.01   0.007]  +-  [0.006  0.0068]   -> z = [-1.6739  1.0255]
+score sd expected sqrt(diag(J+T))   [0.8547 0.9742]
+score cov diag / (J+T) diag         [0.9802 0.9877]  +-  [0.0103 0.0103]
+score cov off-diag, MC vs J+T       -0.004018497485543596 +- 0.005765899546155407  vs  0.00043368632292066283
+E[Hessian] diag / J diag (5000 reps) [1.0006 1.0034]    [J+T would give [1.4625 1.5743] ]
+E[J(a_hat)] diag / (J+T) diag       [0.997 0.997]  +-  [0.0018 0.0015]
+E[J(a_hat) - T] diag / J diag       [0.9956 0.9953]  +-  [0.0026 0.0024]
+
+--- case B: 20000 realizations ---
+T/J (diag, reviewer matrices)       [0.4069 0.4982]
+max |T_code - T_ref| / max|T_ref|   4.199507090244288e-15
+J_ref diag                          [0.6724 0.8225]   J_code(noiseless data) diag [0.6724 0.8225]
+score mean                          [-0.0021  0.0037]  +-  [0.0069 0.0079]   -> z = [-0.3107  0.4671]
+score sd expected sqrt(diag(J+T))   [0.9726 1.1101]
+score cov diag / (J+T) diag         [1.0041 1.0004]  +-  [0.0106 0.0103]
+score cov off-diag, MC vs J+T       -0.005846381494819984 +- 0.007686397152575947  vs  0.001876128124232196
+E[Hessian] diag / J diag (5000 reps) [1.0041 0.9947]    [J+T would give [1.4069 1.4982] ]
+E[J(a_hat)] diag / (J+T) diag       [1.0002 1.0002]  +-  [0.0017 0.0015]
+E[J(a_hat) - T] diag / J diag       [1.0003 1.0003]  +-  [0.0024 0.0023]
+
+--- case C: 20000 realizations ---
+T/J (diag, reviewer matrices)       [0.4069 0.4982]
+max |T_code - T_ref| / max|T_ref|   4.199507090244288e-15
+J_ref diag                          [0.6724 0.8225]   J_code(noiseless data) diag [0.6464 0.9456]
+score mean                          [ 0.3042 -0.4026]  +-  [0.0061 0.0074]   -> z = [ 49.6476 -54.1929]
+score sd expected sqrt(diag(J+T))   [0.9726 1.1101]
+score cov diag / (J+T) diag         [0.7936 0.8957]  +-  [0.0082 0.0093]
+score cov off-diag, MC vs J+T       -0.006487220484922618 +- 0.0064023352005058405  vs  0.001876128124232196
+E[Hessian] diag / J diag (5000 reps) [1.2515 0.7911]    [J+T would give [1.4069 1.4982] ]
+E[J(a_hat)] diag / (J+T) diag       [0.9375 1.065 ]  +-  [0.0016 0.0015]
+E[J(a_hat) - T] diag / J diag       [0.9121 1.0973]  +-  [0.0022 0.0022]
+conditional score mean, closed form [ 0.2955 -0.402 ]   (MC above)   in units of score sd: [ 0.3038 -0.3622]
+implied first-order bias of beta_hat, -J^-1 E[g]: [-0.4423  0.4909]   sandwich sd: [1.4466 1.3497]
+
+--- case D: 20000 realizations ---
+T/J (diag, reviewer matrices)       [0.4069 0.4982]
+max |T_code - T_ref| / max|T_ref|   4.199507090244288e-15
+J_ref diag                          [0.6724 0.8225]   J_code(noiseless data) diag [0.6724 0.8225]
+score mean                          [-0.9551 -1.3888]  +-  [0.0093 0.0107]   -> z = [-102.3223 -130.0612]
+score sd expected sqrt(diag(J+T))   [0.9726 1.1101]
+score cov diag / (J+T) diag         [1.842  1.8505]  +-  [0.0198 0.0192]
+score cov off-diag, MC vs J+T       0.04107668409704689 +- 0.014104137878599559  vs  0.001876128124232196
+E[Hessian] diag / J diag (5000 reps) [-0.0725 -0.317 ]    [J+T would give [1.4069 1.4982] ]
+E[J(a_hat)] diag / (J+T) diag       [1.1037 1.1093]  +-  [0.002  0.0018]
+E[J(a_hat) - T] diag / J diag       [1.1459 1.1638]  +-  [0.0028 0.0027]
+
+--- case E: 20000 realizations ---
+T/J (diag, reviewer matrices)       [0.4069 0.4982]
+max |T_code - T_ref| / max|T_ref|   4.199507090244288e-15
+J_ref diag                          [0.6724 0.8225]   J_code(noiseless data) diag [0.6724 0.8225]
+score mean                          [0.3122 0.4606]  +-  [0.0061 0.007 ]   -> z = [51.2516 66.1821]
+score sd expected sqrt(diag(J+T))   [0.9726 1.1101]
+score cov diag / (J+T) diag         [0.7847 0.7862]  +-  [0.008  0.0083]
+score cov off-diag, MC vs J+T       0.005881595540707004 +- 0.005965365480556781  vs  0.001876128124232196
+E[Hessian] diag / J diag (5000 reps) [1.3573 1.4186]    [J+T would give [1.4069 1.4982] ]
+E[J(a_hat)] diag / (J+T) diag       [0.9682 0.9632]  +-  [0.0016 0.0014]
+E[J(a_hat) - T] diag / J diag       [0.9552 0.9449]  +-  [0.0022 0.0021]
+conditional score mean, closed form [0.3174 0.4599]   (MC above)   in units of score sd: [0.3263 0.4143]
+implied first-order bias of beta_hat, -J^-1 E[g]: [-0.4688 -0.5569]   sandwich sd: [1.4466 1.3497]
+
+elapsed 83 s

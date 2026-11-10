@@ -1,0 +1,7 @@
+# power-law fits to the deconvolved DR1 synchrotron spectra over l 20 to 80: EE index -2.54, BB index -1.18
+# WMAP_K: beam 52.8 arcmin, rms of the nside-16 signal 33.66 uK; 17 s
+# Planck_030: beam 32.3 arcmin, rms of the nside-16 signal 17.13 uK; 24 s
+# WMAP_Ka: beam 39.6 arcmin, rms of the nside-16 signal 10.95 uK; 32 s
+# WMAP_Q: beam 30.6 arcmin, rms of the nside-16 signal 6.13 uK; 38 s
+# WMAP_V: beam 21.0 arcmin, rms of the nside-16 signal 2.92 uK; 45 s
+# Planck_353: beam 4.9 arcmin, rms of the nside-16 signal 202.79 uK; 59 s

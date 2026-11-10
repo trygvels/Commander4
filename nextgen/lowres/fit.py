@@ -70,3 +70,20 @@ def sandwich_plugin(like, beta):
         cov_c[np.ix_(idx, idx)] = Ji
         cov_s[np.ix_(idx, idx)] = Ji @ Jp[np.ix_(idx, idx)] @ Ji
     return cov_c, cov_s, Jp, T, sol, ok
+
+
+
+def marginal_hessian(like, beta, h=2e-3):
+    """Hessian in beta of the flat-prior marginal objective, by central differences of its analytic
+    gradient. To first order the optimum of the marginal stated at a reference nu' sits at the optimum for
+    nu plus H^-1 (n ln(nu'/nu)): the response uses this Hessian, J + Hess (1/2) ln det A, and not the
+    profile information J (2026-11-10 stats review; the two agree when T / J is small)."""
+    beta = np.asarray(beta, float)
+    H = np.zeros((beta.size, beta.size))
+    for i in range(beta.size):
+        e = np.zeros(beta.size)
+        e[i] = h
+        _, gp = like.marginal(beta + e, grad=True)
+        _, gm = like.marginal(beta - e, grad=True)
+        H[:, i] = (gp - gm) / (2 * h)
+    return 0.5 * (H + H.T)

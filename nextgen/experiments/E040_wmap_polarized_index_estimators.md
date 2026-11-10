@@ -89,6 +89,26 @@ were running, neither from real data.
    E039 uses J and T at the truth and tests the theory, not the plug-in; the plug-in is tested in
    E041.
 
+**Second amendment before any real-data fit, 2026-11-10 22:03** (from the independent review of the module
+and the E038 beam check; details in the E039 and E038 records).
+
+3. *WMAP bandpass drift.* The team's nine-year correction of the effective frequencies (0.13,
+   0.12, 0.11 and 0.06 percent for K to V) is now applied; arm `--no-drift`.
+   - R11. Without the drift correction the WMAP-only indices change by less than 0.004.
+4. *Window matching.* With each band seen through its own beam a noise-free sky of index -3.1
+   returns +0.005 to +0.011 for these bands (E038 c). `--match-window 60` brings every band to a
+   common 60 arcmin window to multipole 47 with an invertible operator; the residual is below
+   0.0025. By rule D6 of E038 the window-matched fit is the baseline and the unmatched fit an arm.
+   - R12. The window-matched indices are lower (steeper) than the unmatched ones by 0.003 to 0.015
+     in every region.
+5. *Flat-prior shift.* R2 stays as written, against J_c^-1 (n ln(30 / 23)). The corrected
+   prediction H^-1 (n ln(30 / 23)), H the Hessian of the marginal at its optimum, is printed
+   beside it. With T / J below 0.02 the two differ by less than 4 percent.
+6. *CMB prior.* The profile score is unbiased over CMB skies drawn from the prior, not for a
+   variance that differs from it. Each run prints the first-order shift per unit of (true CMB
+   variance over prior variance minus one). R7 is unchanged.
+7. *Errors* are quoted only where T / J_c is below 1.
+
 **Stage 2, Planck LFI and the K band against 30 GHz comparison; expectations written 2026-11-10 21:15,
 before any fit that includes an LFI band.** Inputs: the PR4 30, 44 and 70 GHz Q/U maps with the
 scale-dependent noise model of E038 (b2), band-averaged spectra from the LFI RIMO. What is already

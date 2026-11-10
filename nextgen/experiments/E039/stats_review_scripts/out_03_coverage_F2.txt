@@ -1,0 +1,18 @@
+config F2: n=384 nreg=2 likelihood {'cmb_prior_sd': 1.0} cmb truth 'fixed' sd 1.0  nrep=800
+J diag [10.839  12.5082]  T/J [0.4796 0.4832]  sd sandwich [0.3695 0.3444]  sd naive [0.3037 0.2828]
+elapsed 143 s; fits at a bound: 0; optimizer not converged: 3
+mean(beta_hat - truth)        [-0.0706 -0.0731] +- [0.0125 0.0112]   in units of sandwich sd: [-0.1912 -0.2123]
+empirical sd / truth-sandwich [0.9542 0.9214] +- 0.025  / truth-naive [1.1607 1.1222]
+rms error / truth-sandwich    [0.9726 0.945 ]
+mean J(a_hat) at beta_hat / (J+T) [0.9877 0.989 ]   mean T(beta_hat)/T [0.99   0.9886]
+fraction with all regions ok  1.0   per region [1. 1.]
+coverage (pooled over regions and realizations)
+  truth-sandwich          68.3%: 0.707 +- 0.011   95.4%: 0.964 +- 0.005   sd(z) 0.937 +- 0.018
+  truth-naive J^-1        68.3%: 0.622 +- 0.012   95.4%: 0.911 +- 0.007   sd(z) 1.141 +- 0.018
+  plugin (ok only)        68.3%: 0.722 +- 0.011   95.4%: 0.971 +- 0.004   sd(z) 0.923 +- 0.018
+  plugin, not-ok counted as a miss:  68.3%: 0.722   95.4%: 0.971
+  plugin-curv J_c^-1 (ok) 68.3%: 0.632 +- 0.012   95.4%: 0.913 +- 0.007   sd(z) 1.123 +- 0.018
+  plain plug-in           68.3%: 0.602 +- 0.012   95.4%: 0.900 +- 0.007   sd(z) 1.188 +- 0.018
+median plugin sd / truth-sandwich sd (ok only) [1.0081 1.0074]   16th, 84th percentile [0.9315 0.9378 1.1021 1.0885]
+corr(|err|, plugin sd) per region [0.091, 0.147]
+corr(err, plugin sd) per region   [-0.322, -0.318]

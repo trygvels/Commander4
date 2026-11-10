@@ -1,0 +1,40 @@
+== (a) random basis ==
+   n    k                  theta               code              brute   abs diff
+  60   20        (0.2, 0.0, 1.0)       87.458754872       87.458754872    1.4e-14
+  60   20       (-1.0, 2.0, 2.5)      159.197830276      159.197830276    2.8e-14
+  60   20       (1.5, -3.0, 0.3)      111.117119162      111.117119162    5.7e-14
+  60   20       (-6.0, 6.0, 3.0)    24014.997098092    24014.997098169    7.6e-08
+  60   20      (3.0, -12.0, 0.0)      184.689350277      184.689350277    2.8e-14
+  60   59        (0.2, 0.0, 1.0)       77.930804623       77.930804623    1.4e-14
+  60   59       (-1.0, 2.0, 2.5)      104.788264039      104.788264039    4.3e-13
+  60   59       (1.5, -3.0, 0.3)      107.918190380      107.918190380    1.4e-14
+  60   59       (-6.0, 6.0, 3.0)      312.408886141      312.408886142    1.5e-09
+  60   59      (3.0, -12.0, 0.0)      183.917188248      183.917188248    5.7e-14
+  40   40        (0.2, 0.0, 1.0)       64.170203703       64.170203703    0.0e+00
+  40   40       (-1.0, 2.0, 2.5)      104.394612785      104.394612785    1.7e-13
+  40   40       (1.5, -3.0, 0.3)       76.682206914       76.682206914    2.8e-14
+  40   40       (-6.0, 6.0, 3.0)      775.878487473      775.878487470    3.8e-09
+  40   40      (3.0, -12.0, 0.0)      123.686916569      123.686916569    0.0e+00
+R(theta) vs elementwise sum: max abs diff 4.440892098500626e-16
+
+== (b) real spin-2 basis ==
+nside 2: Y (96, 64), lmax 5; max|G - I| 0.172; eig(G) min 7.27e-01 max 1.278; modes with eig < 0.5: 0
+   theta (0.2, 0.0, 1.0): code 141.235660052 brute 141.235660052 diff 2.8e-14
+   theta (-0.5, 1.0, 2.0): code 239.174507902 brute 239.174507902 diff 2.3e-13
+   max|G - I| restricted to l <= 2 nside: 0.081
+nside 4: Y (384, 280), lmax 11; max|G - I| 0.139; eig(G) min 6.02e-01 max 1.364; modes with eig < 0.5: 0
+   theta (0.2, 0.0, 1.0): code 477.403174314 brute 477.403174314 diff 1.1e-13
+   theta (-0.5, 1.0, 2.0): code 664.873683659 brute 664.873683659 diff 2.3e-13
+   max|G - I| restricted to l <= 2 nside: 0.038
+
+== (c) sqrt_blocks ==
+max rel |sqrt - sqrtm| 6.1e-14;  max rel |sqrt^2 - S| 5.4e-16;  max |isqrt sqrt - I| 5.4e-14  (2000 blocks, incl. edge cases)
+
+== (d) lfi_ninv and whitened_half_difference with an in-memory loader ==
+lfi_ninv vs inv(W^1/2 R W^1/2): max abs diff / max abs 1.6168228647480603e-15
+lfi_ninv returns the full-mission map: True
+whitened_half_difference vs dense: max abs diff 5.551115123125783e-16
+
+== (e) Monte Carlo: mean gradient of neg2loglike at the truth (should be zero) ==
+mean gradient [-0.03518 -0.0285   0.02161] +- [0.18183 0.0522  0.04604]  z = [-0.19348 -0.5459   0.46938]
+negative control (quad only, by subtracting ln det R): mean gradient in ln r -70.15301806038167

@@ -37,6 +37,8 @@ def main():
     ap.add_argument("--regions", default="bpxv", choices=["bpxv", "hp2"])
     ap.add_argument("--common-beam", type=float, default=0.0, help="arcmin; if set, all bands get this beam (control)")
     ap.add_argument("--no-small-scales", action="store_true")
+    ap.add_argument("--match-window", type=float, default=0.0,
+                    help="arcmin; if set, each band is brought to this window with lowres.window before the fit")
     ap.add_argument("--nside-hi", type=int, default=512)
     ap.add_argument("--seed", type=int, default=3803)
     a = ap.parse_args()
@@ -87,6 +89,9 @@ def main():
         return np.concatenate([hp.reorder(hp.ud_grade(mq, 16), r2n=True), hp.reorder(hp.ud_grade(mu, 16), r2n=True)])
 
     bands = []
+    if a.match_window > 0:
+        from lowres.window import WindowMatcher
+        WM = WindowMatcher(16, target_arcmin=a.match_window)
     for b in a.bands:
         if b == "353":
             _, ninv = D.load_planck_qu(D.PR4_353, 16)
@@ -101,13 +106,16 @@ def main():
         s0 = B.power_law(BETA, 30.0)[0][0]                    # thermodynamic response per uK_RJ at 30 GHz
         fd = B.mbb(D.DUST_BETA, D.DUST_T, D.DUST_REF)
         d = s0 * band_map(tE, tB, fw, 0.0) + fd * band_map(dE, dB, max(fw, 10.0), 10.0)
+        if a.match_window > 0:
+            d, ninv = WM.apply(d, ninv, fw)
         bands.append(BandData(B.name, d, ninv, (lambda be, B=B: B.power_law(be, 23.0)), fd))
         print(f"# {B.name}: beam {fw:.1f} arcmin, rms of the nside-16 signal {np.sqrt(np.mean(d ** 2)):.2f} uK; {time.time() - t0:.0f} s", flush=True)
     region = D.bpxv_regions() if a.regions == "bpxv" else D.healpix_regions(2, 16)
     nreg = int(region.max()) + 1
     L = RegionLikelihood(bands, region, cmb_prior_sd=0.2, use_dust=("353" in a.bands))
     bh, res = fit_profile(L, np.full(nreg, BETA))
-    print(f"# bands {a.bands}, regions {a.regions}, common beam {a.common_beam}, small scales {not a.no_small_scales}; "
+    print(f"# bands {a.bands}, regions {a.regions}, common beam {a.common_beam}, small scales {not a.no_small_scales}, "
+          f"window matched to {a.match_window}; "
           f"{res.nit} iterations, chi2_min {2 * res.fun:.2f}; {time.time() - t0:.0f} s")
     print("bias per region (fitted index + 3.1): " + " ".join(f"{x + 3.1:+.4f}" for x in bh))
     print(f"largest abs bias {np.max(np.abs(bh + 3.1)):.4f}; mean {np.mean(bh + 3.1):+.4f}")

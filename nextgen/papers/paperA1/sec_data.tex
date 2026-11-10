@@ -1,2 +1,75 @@
-% stub
-\pend{section to be written}
+\section{The polarized synchrotron index of the public maps, estimator by estimator}
+\label{sec:data}
+
+\subsection{Data and model}
+
+\paragraph{WMAP.} The nine-year low-resolution ($N_{\rm side}=16$) Stokes $Q$ and $U$ maps of the K,
+Ka, Q and V bands with their released dense inverse noise covariance matrices
+\citep{bennett2013}. The matrices carry the correlated noise of the differential scan and
+the poorly constrained large-scale modes. We checked them as released (\exref{E038}): symmetric to
+$10^{-9}$, positive definite with no null space, a pixel noise of 2.0 to 2.2 $\muK$ in brightness
+temperature, and a few modes at multipoles 2 to 6 whose variance is 65 to 164 times the median. A
+white-noise description of these maps is adequate at the pixel scale and wrong by that order for
+anything that lives at the largest scales, which is where a region index gets part of its
+information.
+
+\paragraph{Planck.} The PR4 maps \citep{npipe}: 353 GHz as the dust tracer, and 30, 44 and 70 GHz.
+For 353 GHz the per-pixel $Q/U$ covariance of the map file is combined over the sub-pixels of each
+$N_{\rm side}=16$ pixel, and the map is the corresponding weighted average. For the LFI bands that
+is not enough. The ring-half difference of the PR4 LFI maps, averaged the same way, has a
+$\chi^2$ per element of 1.77, 1.40 and 1.21 against the white-noise columns at 30, 44 and 70 GHz,
+with an excess of 1.7, 1.4 and 1.15 at the pixel scale rising to between 3 and 7 at multipoles 2 to
+6 (\exref{E038}). We model the LFI noise covariance as $\mathsf{W}^{1/2}\mathsf{R}\mathsf{W}^{1/2}$,
+with $\mathsf{W}$ the white covariance of the map file and
+$\mathsf{R} = r\,\mathsf{1} + \mathsf{Y}\,\mathrm{diag}(A\,(\ell/10)^{-\gamma})\,\mathsf{Y}\T$ in the
+basis $\mathsf{Y}$ of $E$ and $B$ harmonics to $\ell = 47$, with $(r, A, \gamma)$ fitted per band to
+the whitened ring-half difference: $(1.46, 1.16, 1.27)$, $(1.28, 0.45, 1.25)$ and $(1.17, 0.16,
+1.69)$. Under the fitted model the half difference passes 22 sub-tests per band (six latitude zones,
+four sky regions, $E$ and $B$ power in six multipole bins) with none beyond $3\sigma$. The model is
+isotropic where the correlated noise follows the scan, it is fitted to one realization, and a
+ring-half difference is blind to errors common to the two halves. We therefore treat every result
+that uses an LFI band as approximate in its error, and show how it moves with the noise model.
+
+\paragraph{Spectra.} Each band enters through its measured bandpass: the WMAP radiometer profiles,
+the LFI and HFI band-averaged transmissions of the Planck instrument model, each in its own
+convention. For a power law of index $-3.1$ the effective frequencies are 22.44, 32.70, 40.34 and
+60.03 GHz for K to V and 28.09, 43.80 and 69.41 GHz for the LFI bands. Two details matter at the
+level of the results. Delta bands at the nominal WMAP frequencies would steepen a K to Ka index by
+0.055. And the 353 GHz band cannot be a delta band: a modified blackbody with index 1.53 and
+temperature 19.6 K \citep{planck2018xi} seen through the band of the polarization-sensitive
+bolometers is 1.12 times its value at 353.0 GHz, so a delta band overstates the dust at every lower
+frequency by that factor.
+
+\paragraph{Beams.} The low-resolution maps are pixel averages of maps with beams from $0.88^\circ$
+(K) to $0.08^\circ$ (353 GHz). A noise-free simulation with index $-3.1$ everywhere, each band seen
+through its own beam, gives region indices biased flat by 0.005 to 0.011 for the WMAP bands and by
+0.009 to 0.020 once 30 GHz is included, an upper estimate because of how the small-scale structure
+was extrapolated (\exref{E038}). That is comparable to the statistical errors below.
+\pend{window matching result and what is adopted}
+
+\paragraph{Model.} Synchrotron as a power law with one index per region and one amplitude per
+element (pixel and Stokes parameter), dust as the modified blackbody above with one amplitude per
+element under a flat prior, and the CMB with one amplitude per element under a Gaussian prior of
+0.2 $\muK$, the size of the signal at this resolution. Regions: the four of
+\citet{svalheim2023} (High Latitude, Spur, Galactic Center, Plane; 4388, 928, 182 and 646 elements).
+No mask is applied. The estimators are those of Table~\ref{tab:targets}: the profile likelihood with
+the curvature and the debiased sandwich error, the flat-prior marginal with the synchrotron amplitude
+defined at 23 and at 30 GHz, and the zero-mean prior with one scale per region. The expectations for
+every run below were written down before the first fit to real data (\exref{E040}).
+
+\subsection{Validation on simulations with the real covariances}
+
+\pend{E039: table of bias, standardized error and coverage for the four regions and for 48 regions;
+flat-prior shift against the coupled prediction; plug-in errors.}
+
+\subsection{The same maps, five answers}
+
+\pend{E040 baseline.}
+
+\subsection{Band subsets, priors and bandpasses}
+
+\pend{E040 arms.}
+
+\subsection{K band against 30 GHz}
+
+\pend{E040 stage 2.}

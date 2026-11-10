@@ -1,0 +1,3 @@
+fit 379: message 'ABNORMAL: ', nit 4, nfev 39; remaining Newton step / sd [ 0. -0.]; restart moves by [0. 0.] sd, restart success False
+fit 396: message 'ABNORMAL: ', nit 5, nfev 36; remaining Newton step / sd [-0. -0.]; restart moves by [0. 0.] sd, restart success False
+2 of 400 fits returned success=False

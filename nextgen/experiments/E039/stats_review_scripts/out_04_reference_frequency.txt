@@ -1,0 +1,64 @@
+== (a), (b) identity ==
+region sizes [12 24 24]
+flat everything    profile diff -3.64e-12   marginal diff +48.4642574297  claim +48.4642574297  rel.err 7.5e-14
+cmb prior 0.3      profile diff -3.64e-12   marginal diff +48.4642574297  claim +48.4642574297  rel.err 7.5e-14
+sync only          profile diff +0.00e+00   marginal diff +48.4642574297  claim +48.4642574297  rel.err 1.5e-14
+sync prior on, same log_tau: marginal diff -250.694852  (flat-prior claim would be +48.464257)
+sync prior on, log_tau' = log_tau + beta ln(ref'/ref): marginal diff -1.14e-13  (exactly invariant if tau is rescaled)
+
+== (c) first-order shift of the flat-marginal optimum, ref 23 -> 30 GHz ==
+columns: region values of the shift beta_hat(30) - beta_hat(23)
+
+sync only, high S/N:  n=320  T/J [0.02899 0.0283 ]  profile opt [-3.13106 -3.15672]  marginal opt(23) [-3.21197 -3.23567]  marginal opt(30) [-3.13769 -3.16152]
+   actual shift                       [0.07428 0.07414]
+   claim  J^-1 n L (J at truth)       [0.07624 0.07389]   ratio claim/actual [1.02646 0.99655]
+   claim  J(a_hat)^-1 n L (plug-in)   [0.07734 0.07736]   ratio [1.04128 1.04339]
+   claim  (J(a_hat)-T)^-1 n L         [0.07954 0.07954]   ratio [1.07083 1.07275]
+   H_marg^-1 n L (numerical Hessian)  [0.07676 0.07677]   ratio [1.03337 1.03539]
+   (J+T+S)^-1 n L (expected Hessian)  [0.07207 0.06993]   ratio [0.97026 0.9432 ]
+   diag: J [515.14436 625.15744]  T [14.9348  17.69452]  S [14.93473 17.69445]  H_marg [512.52664 602.4434 ]  H_profile [484.45331 569.71709]
+
+sync only, T/J~0.46:  n=320  T/J [0.46386 0.45287]  profile opt [-3.27103 -3.24994]  marginal opt(23) [-4.33057 -4.31415]  marginal opt(30) [-3.2657  -3.24988]
+   actual shift                       [1.06488 1.06428]
+   claim  J^-1 n L (J at truth)       [1.21991 1.18222]   ratio claim/actual [1.14558 1.11082]
+   claim  J(a_hat)^-1 n L (plug-in)   [2.00474 1.97955]   ratio [1.88261 1.85999]
+   claim  (J(a_hat)-T)^-1 n L         [3.02433 2.96793]   ratio [2.84008 2.78869]
+   H_marg^-1 n L (numerical Hessian)  [2.18294 2.18415]   ratio [2.04995 2.05224]
+   (J+T+S)^-1 n L (expected Hessian)  [0.63313 0.62058]   ratio [0.59456 0.5831 ]
+   diag: J [32.19652 39.07234]  T [14.9348  17.69452]  S [14.93473 17.69445]  H_marg [18.06084 21.2137 ]  H_profile [4.81144 5.63525]
+
+sync only, T/J~0.93:  n=320  T/J [0.94666 0.92422]  profile opt [-3.37578 -3.2521 ]  marginal opt(23) [-4.6 -4.6]  marginal opt(30) [-3.30355 -3.25077]
+   actual shift                       [1.29645 1.34923]
+   claim  J^-1 n L (J at truth)       [2.4896  2.41269]   ratio claim/actual [1.92032 1.7882 ]
+   claim  J(a_hat)^-1 n L (plug-in)   [3.88781 3.863  ]   ratio [2.99881 2.86312]
+   claim  (J(a_hat)-T)^-1 n L         [8.36139 8.12471]   ratio [6.44944 6.02174]
+   H_marg^-1 n L (numerical Hessian)  [3.28656 3.55172]   ratio [2.53504 2.63241]
+   (J+T+S)^-1 n L (expected Hessian)  [0.86104 0.84745]   ratio [0.66415 0.6281 ]
+   diag: J [15.7763  19.14545]  T [14.9348  17.69452]  S [14.93473 17.69445]  H_marg [11.97384 13.01877]  H_profile [1.13136 0.44724]
+
+3 comp, cmb prior, high S/N:  n=384  T/J [0.01839 0.01849]  profile opt [-3.16876 -3.13974]  marginal opt(23) [-3.24951 -3.22143]  marginal opt(30) [-3.13396 -3.10578]
+   actual shift                       [0.11556 0.11564]
+   claim  J^-1 n L (J at truth)       [0.11451 0.11537]   ratio claim/actual [0.9909  0.99761]
+   claim  J(a_hat)^-1 n L (plug-in)   [0.12202 0.12132]   ratio [1.05589 1.04912]
+   claim  (J(a_hat)-T)^-1 n L         [0.12423 0.12355]   ratio [1.07507 1.06836]
+   H_marg^-1 n L (numerical Hessian)  [0.12131 0.12155]   ratio [1.04977 1.05113]
+   (J+T+S)^-1 n L (expected Hessian)  [0.11323 0.11409]   ratio [0.97985 0.98658]
+   diag: J [410.98939 472.43089]  T [7.55855 8.73378]  S [-2.86341 -3.39063]  H_marg [388.56891 448.98872]  H_profile [383.72141 443.47542]
+
+3 comp, cmb prior, T/J~0.26:  n=384  T/J [0.25862 0.25997]  profile opt [-3.38139 -3.23376]  marginal opt(23) [-4.56482 -4.58256]  marginal opt(30) [-2.99444 -2.8655 ]
+   actual shift                       [1.57038 1.71706]
+   claim  J^-1 n L (J at truth)       [1.61023 1.62232]   ratio claim/actual [1.02538 0.94482]
+   claim  J(a_hat)^-1 n L (plug-in)   [2.38385 2.46957]   ratio [1.51801 1.43825]
+   claim  (J(a_hat)-T)^-1 n L         [3.00889 3.14877]   ratio [1.91603 1.83381]
+   H_marg^-1 n L (numerical Hessian)  [2.44966 2.92341]   ratio [1.55992 1.70256]
+   (J+T+S)^-1 n L (expected Hessian)  [1.3899 1.4019]   ratio [0.88507 0.81645]
+   diag: J [29.22591 33.59509]  T [7.55855 8.73378]  S [-2.86341 -3.39063]  H_marg [19.51053 18.86601]  H_profile [13.79559 12.20726]
+
+3 comp, cmb prior, T/J~0.46:  n=384  T/J [0.45978 0.46217]  profile opt [-3.4762  -3.26996]  marginal opt(23) [-4.6 -4.6]  marginal opt(30) [-2.88875 -2.71266]
+   actual shift                       [1.71125 1.88734]
+   claim  J^-1 n L (J at truth)       [2.86264 2.88413]   ratio claim/actual [1.67283 1.52814]
+   claim  J(a_hat)^-1 n L (plug-in)   [3.66952 3.79753]   ratio [2.14435 2.01211]
+   claim  (J(a_hat)-T)^-1 n L         [5.36824 5.66731]   ratio [3.13702 3.0028 ]
+   H_marg^-1 n L (numerical Hessian)  [3.28145 3.99095]   ratio [1.91757 2.11459]
+   (J+T+S)^-1 n L (expected Hessian)  [2.23325 2.25407]   ratio [1.30504 1.19431]
+   diag: J [16.43958 18.89724]  T [7.55855 8.73378]  S [-2.86341 -3.39063]  H_marg [14.61845 13.85371]  H_profile [8.90683 7.19728]

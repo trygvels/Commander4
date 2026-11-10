@@ -20,12 +20,22 @@ Three objectives (to be minimized), all exact:
     marginal       chi2_min / 2 + (1/2) ln det A [+ sum_p ln tau_r(p) with a synchrotron prior]
 
 With flat synchrotron priors `marginal` is the flat-prior marginal, which depends on nu_ref. With the
-zero-mean prior it is the proper marginal. The profile score is unbiased for Gaussian noise of known
-covariance; its covariance is the sandwich J^-1 K J^-1 with
+zero-mean prior it is the proper marginal. With flat priors on every amplitude the profile score is
+unbiased for any fixed true amplitudes and Gaussian noise of known covariance; the covariance of the
+optimum is the sandwich J^-1 K J^-1 with
 
     J_rr' = (M_r a)^T P (M_r' a),     K = J + T,     T_rr' = tr(A^-1 M_r^T P M_r'),
 
 P = N^-1 - N^-1 M A^-1 M^T N^-1 and M_r = dM / dbeta_r (derivation in the E039 record).
+
+With a Gaussian CMB prior the same statements hold over CMB skies drawn from that prior, with the CMB
+sample variance counted in K. They do not hold conditional on one sky. If the true CMB variance is
+kappa^2 times the prior variance, the expected score is (kappa^2 - 1) t with
+
+    t_r = tr(Lam A^-1 M_r^T B^T),     B = A^-1 M^T N^-1,   Lam the prior precision,
+
+and the optimum is biased by -(kappa^2 - 1) J^-1 t to first order (2026-11-10 stats review, checked by
+Monte Carlo). `information` returns t in `sol["t_cmb"]` so that the sensitivity can be quoted.
 """
 import numpy as np
 import scipy.linalg as sl
@@ -199,4 +209,9 @@ class RegionLikelihood:
         R[self.region, np.arange(n)] = 1.0
         J = R @ (a_s[:, None] * X * a_s[None, :]) @ R.T
         T = R @ (Ai[:n, :n] * X) @ R.T
+        if self.use_cmb and self.cmb_prior_sd:
+            # t_r = sigma_c^-2 sum_{p in r} sum_k (C A^-1)[p, cmb k] (A^-1)[cmb k, sync p]
+            k = self.ic
+            CA = C @ Ai[:, k * n:(k + 1) * n]                                 # (n, n): rows sync p, columns cmb k
+            sol["t_cmb"] = (R @ np.sum(CA * Ai[:n, k * n:(k + 1) * n], axis=1)) / self.cmb_prior_sd ** 2
         return J, T, sol

@@ -1,0 +1,40 @@
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: divide by zero encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: overflow encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: invalid value encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+== (a) profile and logdet vs QR reference (n=48, 6 bands, 3 dense) ==
+config                    profile(code)   rel.diff   marginal(code)   rel.diff  max|x-xref|
+dust+cmb flat               84.60824903    3.3e-14     239.64615633    1.1e-14      7.1e-13
+dust+cmb prior 0.3         102.11327137    3.2e-14     330.66368097    9.8e-15      5.0e-14
+dust only                  102.98550369    6.2e-15     272.58423754    2.3e-15      4.3e-14
+sync only                20797.92053911    3.5e-16   20775.88266154    3.5e-16      3.6e-14
+cmb only prior            8043.76284769    4.5e-16    8102.89184469    4.5e-16      5.0e-14
+sync prior + cmb prior                                 599.85352413    8.5e-15
+
+== (b) proper priors on everything (sync prior, CMB prior, no dust): absolute -ln p(d) ==
+brute 8438.39923968   code+constants 8438.39923968   diff -1.82e-12
+brute 8572.90735842   code+constants 8572.90735842   diff +1.82e-12
+
+== (c) flat priors as the wide-prior limit: f(beta1) - f(beta2), code flat vs explicit Gaussian density ==
+dust+cmb flat          code +3.044220   wide prior sd=1e3 +3.044333   sd=1e4 +3.044222
+dust flat, cmb prior   code +7.213284   wide prior sd=1e3 +7.213154   sd=1e4 +7.213283
+sync only flat         code -3.918353   wide prior sd=1e3 -3.918467   sd=1e4 -3.918354
+
+== (d) direct quadrature, 2 elements, sync only, 4 bands, band 0 dense: -ln int exp(-Q) da ==
+flat         quadrature 0.12745061   code 0.12745061   diff -1.5e-14  (quad rel err 1e-11)
+sync prior   quadrature 28.01421642   code 28.01421642   diff -1.4e-14  (quad rel err 2e-11)
+
+== (e) gradients vs central finite differences (h=1e-5), max |analytic - FD| / max|analytic| ==
+dust+cmb flat          profile 4.7e-08   marginal 5.7e-08
+dust+cmb prior 0.3     profile 1.8e-08   marginal 1.7e-08
+dust only              profile 1.4e-08   marginal 1.3e-08
+sync only              profile 2.2e-09   marginal 3.8e-09
+cmb only prior         profile 1.9e-09   marginal 1.8e-09
+sync+cmb prior, dust   d/dbeta 2.9e-08   d/dlog_tau 1.9e-09
+sync prior only        d/dbeta 2.9e-09   d/dlog_tau 9.8e-10
+
+== (f) profile() and information() with sync_prior=True (no log_tau argument on profile) ==
+profile(beta) raises TypeError unsupported operand type(s) for *: 'float' and 'NoneType'
+information(beta) raises TypeError unsupported operand type(s) for *: 'float' and 'NoneType'

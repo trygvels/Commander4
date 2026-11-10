@@ -203,6 +203,38 @@ covariances as weights. Script `nextgen/scripts/e038_window_check.py`.
 - If D2 fails, the bands are brought to a common window before any index is quoted, or the bias
   is quoted as a systematic per region.
 
+**(c) first results, 2026-11-10 21:21 to 21:32** (`E038/window_control.txt`, `window_wmap.txt`,
+`window_wmap_lfi30.txt`). Bias of the fitted index, noise off, four BP XV regions (High Latitude,
+Spur, Galactic Center, Plane):
+
+| arm | bias |
+|---|---|
+| all bands at a common 60 arcmin beam (control) | 0.0000, 0.0000, 0.0000, 0.0000 |
+| true beams, K, Ka, Q, V, 353 | +0.0072, +0.0048, +0.0111, +0.0064 |
+| true beams, adding LFI 30 GHz | +0.0132, +0.0091, +0.0196, +0.0134 |
+
+- **D1 pass.** **D2: the sign is as expected (positive everywhere), and the size fails in one
+  region** (Galactic Center +0.011 against the 0.01 allowed). **D3 fails**: adding 30 GHz raises the
+  bias by 0.004 to 0.009 where I allowed 0.005, because the K to 30 GHz lever arm is short and a
+  given beam mismatch costs more index.
+- The synthetic small-scale field is an upper estimate: the B-mode spectrum of the DR1 map over
+  multipoles 20 to 80 fits a power law of index -1.2, which is noise in the map and not sky, and
+  the extrapolation carries it to multipole 1024. The arm without small scales gives the lower
+  estimate.
+- These biases are 0.3 to 1.1 of the statistical error of the WMAP-only fit. They cannot be left
+  as they are.
+
+**(c2) window matching, expectation written 2026-11-10 21:34 before it was run.** `nextgen/lowres/window.py`
+brings each band to a common 60 arcmin window with S = 1 + Y diag(f_l - 1) Y^+ on the nside-16
+grid, f_l the ratio of the beam windows to multipole 47, and transforms N^-1 with S^-1 on both
+sides. The map is invertible, so no information is lost (chi-square invariance checked to 12
+digits); what it cannot touch is structure above multipole 47.
+
+- D5. With window matching the bias falls below 0.003 in every BP XV region for both band sets.
+- D6. If D5 holds, window matching is the baseline of E040 and the unmatched fit an arm; the
+  residual bias is quoted as a systematic. If the residual is above 0.005, the cause is found
+  first.
+
 ## Negative control
 
 None for a.1. For (b): the 200 white-noise simulations, whose binned power scatters by the "white

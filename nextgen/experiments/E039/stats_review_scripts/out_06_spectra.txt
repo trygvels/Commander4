@@ -1,0 +1,76 @@
+== constants ==
+H_OVER_K code 0.0479924466 vs CODATA 2018 0.04799243073: rel diff 3.3e-07; g(353) rel diff -1.4e-06
+
+== (a) delta band ==
+nu0   22.8: power law rel diff 8.9e-09, derivative rel diff 8.9e-09, mbb rel diff 1.6e-07, cmb column (f=g) 1.000000000000000
+nu0   44.1: power law rel diff 3.3e-08, derivative rel diff 3.3e-08, mbb rel diff 1.8e-07, cmb column (f=g) 1.000000000000000
+nu0   70.4: power law rel diff 8.3e-08, derivative rel diff 8.3e-08, mbb rel diff 2.2e-07, cmb column (f=g) 1.000000000000000
+nu0  353.0: power law rel diff 1.4e-06, derivative rel diff 1.4e-06, mbb rel diff 1.4e-06, cmb column (f=g) 1.000000000000000
+
+== (b) broad band: derivative and shapes ==
+shapes (3,) (3,)  derivative vs FD rel diff 1.0935120586808011e-09
+power_law(scalar) shape (1,)  CMB column 1.0
+
+== (c) quadrature: np.gradient weights vs trapezoid, smooth bandpass, non-uniform grid ==
+case                                            npts     gradient    trapezoid   (relative error of the band-averaged power law, beta=-3.1)
+ends at 4 sigma (response ~3e-4 of peak)          20    +7.00e-04    +6.27e-04
+ends at 4 sigma (response ~3e-4 of peak)          60    -5.08e-06    -1.99e-05
+ends at 4 sigma (response ~3e-4 of peak)         200    +8.96e-06    +7.94e-07
+truncated at 5% of peak                           20    +3.94e-04    -4.03e-04
+truncated at 5% of peak                           60    +2.07e-04    -1.36e-05
+truncated at 5% of peak                          200    +9.45e-05    -2.18e-06
+truncated at 30% of peak                          20    +4.28e-03    -1.68e-04
+truncated at 30% of peak                          60    -2.38e-04    -4.44e-06
+truncated at 30% of peak                         200    -2.20e-04    +1.76e-07
+interior weights identical to trapezoid on a non-uniform grid: True ; end weights are 2.0 x trapezoid
+
+== (d) real bandpasses ==
+band            npts           nu range          resp end/peak       grid   d s(-3.1)      d ds/s      d dust  s(-3.1) @23
+WMAP K           201    18.00-   26.50   2.90e-07   1.62e-04       0.80   -5.79e-07   +1.52e-07   +3.88e-07  1.09336e+00
+WMAP Ka          201    26.50-   40.00   3.09e-06   0.00e+00       0.86   +2.86e-08   -1.23e-08   -9.18e-09  3.45480e-01
+WMAP Q           201    33.00-   50.00   2.53e-05   0.00e+00       0.89   +1.86e-07   -7.97e-08   -6.24e-08  1.82642e-01
+WMAP V           201    50.00-   75.00   6.32e-05   0.00e+00       0.92   +6.06e-07   -2.57e-07   -2.31e-07  5.60573e-02
+LFI 30           188    21.30-   40.00   8.71e-07   6.01e-08    uniform   +2.05e-08   -9.77e-09   -5.01e-09  5.49278e-01
+LFI 44           151    35.00-   50.00   2.95e-06   1.64e-02    uniform   -8.40e-05   +2.38e-05   +5.67e-05  1.42659e-01
+LFI 70           251    57.50-   82.50   9.44e-02   7.90e-02    uniform   +1.83e-04   -9.46e-05   -2.13e-05  3.68441e-02
+HFI 353 psb      744   290.67-  583.10   8.83e-06   3.30e-05       0.00   +4.46e-08   +2.31e-08   +4.05e-07  2.78512e-03
+HFI 353 full     745   290.67-  584.60   8.78e-06   2.80e-05       0.00   +3.58e-08   +1.74e-08   +3.30e-07  2.79405e-03
+(d s, d dust: relative change code/trapezoid - 1; d ds/s: absolute change of the mean log frequency ratio)
+
+== (d1) docstring claim: sum(w f / g) / sum(w) against sum(w f) / sum(w g), WMAP K to V ==
+WMAP K     relative difference of the two conventions: beta=-3.1 -4.69e-04, beta=-2.5 -3.77e-04
+WMAP Ka    relative difference of the two conventions: beta=-3.1 -6.40e-04, beta=-2.5 -5.16e-04
+WMAP Q     relative difference of the two conventions: beta=-3.1 -9.31e-04, beta=-2.5 -7.43e-04
+WMAP V     relative difference of the two conventions: beta=-3.1 -2.51e-03, beta=-2.5 -2.01e-03
+
+== (d2) hfi_band: samples below the cut are dropped, then np.gradient spans the gaps ==
+PSB: native samples in 176 to 706 GHz 1050, kept 744; native step 0.506 GHz; kept-grid steps above 3x median: 355, largest 1.50 GHz
+     power law s(-3.1): hfi_band / zeros-in-place trapezoid - 1 = +2.45e-12;  dust mbb: +1.92e-11;  dust mbb, 300 to 420 GHz only vs full: -1.96e-02
+all: native samples in 176 to 706 GHz 1050, kept 745; native step 0.506 GHz; kept-grid steps above 3x median: 356, largest 1.50 GHz
+     power law s(-3.1): hfi_band / zeros-in-place trapezoid - 1 = +4.54e-13;  dust mbb: +2.23e-12;  dust mbb, 300 to 420 GHz only vs full: -2.16e-02
+
+== (e) effective_frequency ==
+WMAP K         beta -3.1: nu_eff 22.4413; delta-band response at nu_eff / band average - 1 = -2.1e-05; grid step 0.0021 GHz
+WMAP K         beta -2.5: nu_eff 22.4816; delta-band response at nu_eff / band average - 1 = -8.3e-05; grid step 0.0021 GHz
+LFI 30         beta -3.1: nu_eff 28.0881; delta-band response at nu_eff / band average - 1 = -4.6e-05; grid step 0.0047 GHz
+LFI 30         beta -2.5: nu_eff 28.1395; delta-band response at nu_eff / band average - 1 = -1.3e-04; grid step 0.0047 GHz
+HFI 353 full   beta -3.1: nu_eff 361.2884; delta-band response at nu_eff / band average - 1 = +2.6e-05; grid step 0.0735 GHz
+HFI 353 full   beta -2.5: nu_eff 359.9657; delta-band response at nu_eff / band average - 1 = +1.1e-04; grid step 0.0735 GHz
+delta band: 30.0
+flat band 220 to 420 GHz, beta=-3.1: nu^beta/g has its minimum at 285.9 GHz (inside the band, not monotonic); effective_frequency returns 339.35; number of roots of (y - s): 2
+   WMAP K         nu^-3.1/g monotonic over the band: True
+   WMAP Ka        nu^-3.1/g monotonic over the band: True
+   WMAP Q         nu^-3.1/g monotonic over the band: True
+   WMAP V         nu^-3.1/g monotonic over the band: True
+   LFI 30         nu^-3.1/g monotonic over the band: True
+   LFI 44         nu^-3.1/g monotonic over the band: True
+   LFI 70         nu^-3.1/g monotonic over the band: True
+   HFI 353 psb    nu^-3.1/g monotonic over the band: True
+   HFI 353 full   nu^-3.1/g monotonic over the band: True
+
+== (f) wmap_band detector weighting ==
+WMAP K : detector areas min 1.290 max 2.835; all radiometers on one grid: False; s(-3.1): wmap_band 1.093361e+00, unit area per detector 1.093361e+00, raw sum (area weighted) 1.114574e+00; unit/raw - 1 = -1.90e-02
+WMAP Ka: detector areas min 3.089 max 3.868; all radiometers on one grid: True; s(-3.1): wmap_band 3.454801e-01, unit area per detector 3.454801e-01, raw sum (area weighted) 3.456625e-01; unit/raw - 1 = -5.28e-04
+WMAP Q : detector areas min 2.829 max 4.511; all radiometers on one grid: True; s(-3.1): wmap_band 1.826421e-01, unit area per detector 1.826421e-01, raw sum (area weighted) 1.822003e-01; unit/raw - 1 = +2.42e-03
+WMAP V : detector areas min 2.160 max 6.376; all radiometers on one grid: True; s(-3.1): wmap_band 5.605735e-02, unit area per detector 5.605735e-02, raw sum (area weighted) 5.523915e-02; unit/raw - 1 = +1.48e-02
+change of ln s between the two weightings, regressed on ln nu over K, Ka, Q, V: slope +0.0336 (the size of the shift in a fitted index if the other weighting is the right one)

@@ -9,9 +9,9 @@ antenna temperature, as
 where g converts a thermodynamic temperature difference to antenna temperature. The CMB has f = g, so
 its column is 1 in every band. A delta bandpass at nu_0 gives m = f(nu_0) / g(nu_0).
 
-This is the WMAP convention (Jarosik et al. 2003; Bennett et al. 2013 App. E). Commander3 writes
-the same integral as sum(tau f / g) / sum(tau), which differs at second order in the bandwidth and by
-less than 1e-3 for the WMAP K to V bands.
+This is the WMAP convention (Jarosik et al. 2003; Bennett et al. 2013 App. E). Writing the same
+quantity as sum(tau f / g) / sum(tau) differs at second order in the bandwidth, by up to 2.5e-3 at V band
+for an index of -3.1 (measured in the 2026-11-10 stats review).
 """
 import glob
 import os
@@ -79,20 +79,38 @@ WMAP_RADIOMETERS = {"K": ["K11", "K12"], "Ka": ["Ka11", "Ka12"], "Q": ["Q11", "Q
 WMAP_NOMINAL = {"K": 22.8, "Ka": 33.0, "Q": 40.7, "V": 60.8, "W": 93.5}
 
 
-def wmap_band(band, bandpass_dir):
-    """WMAP band from the nine-year per-radiometer profiles (`wmap_bandpass_<R>_v5.cbp`: frequency in GHz
-    and the response of the two detectors in linear RJ units). Detectors are summed, which weights each by
-    the area under its curve, as the LAMBDA description recommends."""
+# Fractional decrease of the effective band frequencies over the nine-year mission (Bennett et al. 2013;
+# the WMAP team's `effective_freq.pro`, version of 2012-08-10, divides its pre-flight values by 1 + drift).
+WMAP_DRIFT = {"K": 0.0013, "Ka": 0.0012, "Q": 0.0011, "V": 0.0006, "W": 0.0}
+
+
+def wmap_band(band, bandpass_dir, drift=True, weighting="unit"):
+    """WMAP band from the per-radiometer pre-flight profiles (`wmap_bandpass_<R>_v5.cbp`: frequency in GHz
+    and the response of the two detectors in linear RJ units, each normalized to a maximum of one).
+
+    Every detector is calibrated on the dipole, so its response to a thermal spectrum is one whatever the
+    area under its curve: each curve is divided by its area and the detectors and radiometers of a band are
+    averaged with equal weights (`weighting="unit"`). This reproduces the per-radiometer effective
+    frequencies of Jarosik et al. (2003, Table 11) as coded in the WMAP team's `effective_freq.pro` to 0.005
+    GHz for an index of -3, and the team's routine also averages radiometers with equal weights. Summing the
+    peak-normalized curves as they are (`weighting="raw"`) weights detectors by the area under an arbitrary
+    normalization and misses the team's K-band value by 0.15 GHz; it is kept only to show the size of the
+    difference (0.03 in a K to V index).
+
+    `drift=True` divides the frequency axis by 1 + WMAP_DRIFT, the team's correction for the nine-year data
+    (0.13 percent at K band: 0.002 on an index within WMAP, 0.018 on an index between K band and 30 GHz)."""
     nus, resp = None, None
     for rad in WMAP_RADIOMETERS[band]:
         fn = os.path.join(bandpass_dir, f"wmap_bandpass_{rad}_v5.cbp")
         a = np.loadtxt(fn)
         if nus is None:
             nus, resp = a[:, 0], np.zeros(a.shape[0])
-        r = np.interp(nus, a[:, 0], a[:, 1] / np.trapezoid(a[:, 1], a[:, 0]), left=0.0, right=0.0) \
-            + np.interp(nus, a[:, 0], a[:, 2] / np.trapezoid(a[:, 2], a[:, 0]), left=0.0, right=0.0)
-        resp += r
+        for c in (1, 2):
+            norm = np.trapezoid(a[:, c], a[:, 0]) if weighting == "unit" else 1.0
+            resp += np.interp(nus, a[:, 0], a[:, c] / norm, left=0.0, right=0.0)
     resp = np.clip(resp, 0.0, None)
+    if drift:
+        nus = nus / (1.0 + WMAP_DRIFT[band])
     return Band(f"WMAP_{band}", nus, resp)
 
 

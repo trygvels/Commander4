@@ -1,0 +1,48 @@
+
+sync only: n=320, pivot nu_ref 30.91 GHz, T/J [0.2544 0.2483], (T+S)/J [0.5087 0.4966]
+   Hess (1/2) ln det A, finite differences diag [29.8695 35.389 ]   T + S diag [29.8695 35.389 ]   rel diff [0. 0.]
+   marginal optimum - truth at the pivot (mean) [-0.0005  0.018 ] +- [0.0162 0.0103]   fits at a bound: 0
+   measured d beta_hat / d ln nu_ref (mean)      [1.6972 1.64  ] +- [0.0264 0.02  ]
+   claim J^-1 n                                  [2.5175 2.4398]   claim / measured [1.4834 1.4877]
+   (J + T + S)^-1 n                              [1.6692 1.6306]   ratio to measured [0.9835 0.9943]
+   H_marg^-1 n, first 10 realizations: ratio to the measured slope of the same realization, mean and range [1. 1.] 0.9999875698354802 0.9999982413697265
+
+sync only: n=320, pivot nu_ref 30.91 GHz, T/J [0.5136 0.5015], (T+S)/J [1.0273 1.0029]
+   Hess (1/2) ln det A, finite differences diag [29.8695 35.389 ]   T + S diag [29.8695 35.389 ]   rel diff [0. 0.]
+   marginal optimum - truth at the pivot (mean) [0.0027 0.0186] +- [0.0182 0.0128]   fits at a bound: 0
+   measured d beta_hat / d ln nu_ref (mean)      [2.554  2.4772] +- [0.0449 0.0342]
+   claim J^-1 n                                  [5.0839 4.9268]   claim / measured [1.9906 1.9889]
+   (J + T + S)^-1 n                              [2.509  2.4608]   ratio to measured [0.9824 0.9934]
+   H_marg^-1 n, first 10 realizations: ratio to the measured slope of the same realization, mean and range [1. 1.] 0.9999879135493352 0.9999992435022639
+
+sync only: n=320, pivot nu_ref 30.91 GHz, T/J [1.0025 0.9787], (T+S)/J [2.005  1.9575]
+   Hess (1/2) ln det A, finite differences diag [29.8695 35.389 ]   T + S diag [29.8695 35.389 ]   rel diff [0. 0.]
+   marginal optimum - truth at the pivot (mean) [0.0065 0.017 ] +- [0.019  0.0153]   fits at a bound: 0
+   measured d beta_hat / d ln nu_ref (mean)      [3.3608 3.2717] +- [0.0621 0.0475]
+   claim J^-1 n                                  [9.9226 9.616 ]   claim / measured [2.9524 2.9391]
+   (J + T + S)^-1 n                              [3.3043 3.2531]   ratio to measured [0.9832 0.9943]
+   H_marg^-1 n, first 10 realizations: ratio to the measured slope of the same realization, mean and range [1. 1.] 0.9999878087844748 0.9999926815959991
+
+3 comp, cmb prior: n=384, pivot nu_ref 27.68 GHz, T/J [0.2479 0.2492], (T+S)/J [0.154  0.1524]
+   Hess (1/2) ln det A, finite differences diag [4.6951 5.3432]   T + S diag [4.6951 5.3432]   rel diff [0. 0.]
+   marginal optimum - truth at the pivot (mean) [-0.0869 -0.0604] +- [0.025  0.0216]   fits at a bound: 0
+   measured d beta_hat / d ln nu_ref (mean)      [5.0781 5.1096] +- [0.1124 0.0958]
+   claim J^-1 n                                  [5.8089 5.8525]   claim / measured [1.1439 1.1454]
+   (J + T + S)^-1 n                              [5.0426 5.086 ]   ratio to measured [0.993  0.9954]
+   H_marg^-1 n, first 10 realizations: ratio to the measured slope of the same realization, mean and range [1. 1.] 0.9999814563154561 1.0000141069473145
+
+3 comp, cmb prior: n=384, pivot nu_ref 27.68 GHz, T/J [0.5123 0.5149], (T+S)/J [0.3182 0.315 ]
+   Hess (1/2) ln det A, finite differences diag [4.6951 5.3432]   T + S diag [4.6951 5.3432]   rel diff [0. 0.]
+   marginal optimum - truth at the pivot (mean) [-0.1244 -0.0767] +- [0.0337 0.0287]   fits at a bound: 0
+   measured d beta_hat / d ln nu_ref (mean)      [8.9962 9.2096] +- [0.2275 0.2172]
+   claim J^-1 n                                  [12.0035 12.0936]   claim / measured [1.3343 1.3132]
+   (J + T + S)^-1 n                              [9.1351 9.2218]   ratio to measured [1.0154 1.0013]
+   H_marg^-1 n, first 10 realizations: ratio to the measured slope of the same realization, mean and range [1. 1.] 0.999945245492451 0.9999951805935684
+
+3 comp, cmb prior: n=384, pivot nu_ref 27.68 GHz, T/J [0.9916 0.9968], (T+S)/J [0.6159 0.6098]
+   Hess (1/2) ln det A, finite differences diag [4.6951 5.3432]   T + S diag [4.6951 5.3432]   rel diff [0. 0.]
+   marginal optimum - truth at the pivot (mean) [-0.1583 -0.0862] +- [0.0418 0.0358]   fits at a bound: 0
+   measured d beta_hat / d ln nu_ref (mean)      [13.6378 14.4715] +- [0.3566 0.4295]
+   claim J^-1 n                                  [23.2356 23.41  ]   claim / measured [1.7038 1.6177]
+   (J + T + S)^-1 n                              [14.4518 14.6053]   ratio to measured [1.0597 1.0092]
+   H_marg^-1 n, first 10 realizations: ratio to the measured slope of the same realization, mean and range [1. 1.] 0.9999348420917382 1.0000551057230618
