@@ -504,3 +504,33 @@ engineering before the first number.
 
 **Not decided here (Trygve):** items 2 to 5 of the review's Sect. 8 (where the GMRF goes, what
 is sent upstream, the standalone module, the real-intensity section).
+
+## D030 (2026-11-10): D029 is the working plan, on Trygve's instruction to keep working until there is something worth publishing; the open choices are resolved by recommendation; the stopping criterion is a refereed draft of Paper A1
+
+**Decision.** On 2026-11-10 Trygve wrote "keep working and dont stop until we have something
+worth publishing", after the plan of D029 and the ideas for widening it had been put to him. I
+take that as the go-ahead for D029 and proceed as follows.
+
+1. The choices D029 left open are resolved by the recommendation made to him, and each is
+   reversible: the GMRF index field goes to Paper B; the polarized analysis lives in a standalone
+   low-resolution module in this repository (`nextgen/lowres/`); the real-intensity section is cut
+   from Paper A1 down to one paragraph.
+2. The spine of the paper's data section is the estimator comparison on the same public maps
+   that was put to him as idea 1: region indices of polarized synchrotron from WMAP K, Ka, Q, V
+   and Planck 353 GHz with the released dense WMAP covariances, under the flat-prior marginal at
+   two reference frequencies, the profile likelihood with its sandwich width, and a zero-mean
+   prior; then band subsets, and Planck 30 GHz once an official map and a usable noise model are
+   in hand.
+3. Stopping criterion for "worth publishing": a complete draft of Paper A1 with figures and
+   tables, every number traceable to an experiment record, the load-bearing citations checked in
+   the papers, and an independent referee read that finds no fatal objection.
+4. Not covered by the instruction and still his: opening pull requests upstream, contacting the
+   Cosmoglobe or any other team, and submitting or posting anything. Nothing is sent to anyone.
+
+**Why.** The instruction is general, the plan had been stated to him twice, and waiting for five
+separate answers would stop the work he asked to continue. The resolved choices are the ones I
+recommended, none alters a default in Commander4, and none is hard to undo.
+
+**Alternatives considered.** Waiting for an explicit answer on each open choice: rejected as
+contrary to the instruction. Starting with the Commander4 fixes: they are useful and not on the
+path to a paper; they follow, on a feature branch with tests.
