@@ -1,6 +1,6 @@
 # E032: index fields with the collapsed hier prior at WMAP/LFI depth (noise scale 0.03), two runs of two chains
 
-- **Date started / finished:** 2026-11-09 21:59 (scan), run A from 22:17:49, restarted 22:34:00 writing both in-flight chains / running
+- **Date started / finished:** 2026-11-09 21:59 (scan), run A from 22:17:49, restarted 22:34:00 writing both in-flight chains, ended 2026-11-10 05:17:06; run B from 05:17:06 / running
 - **Branch and commit:** `nextgen` at 52061ad
 - **Open question addressed:** Q16, Q18, Q3, and the multi-chain gap of `VALIDATION.md` (referee
   objections 1, 4 and 7 in `../reviews/2026-11-09_referee_report.md`)
@@ -190,7 +190,71 @@ python nextgen/scripts/e032_analyze.py --dir $D --tags gmrf16_cs_mumap_nc_Tmap_m
 
 ## Result
 
-Pending (chain A started 2026-11-09 22:17:49).
+**Run A (seed 7, start at the prior means), interim read written 2026-11-10 05:21; run B started 05:17:06 and
+is untouched by this read.** Run A ran 2026-11-09 22:34:00 to 2026-11-10 05:17:06 (6 h 43 min for
+both in-flight chains), rc 0, 1200 iterations per chain, 700 post-burn. Outputs:
+`E032/runA_two_chains.txt`, `runA_mu_maps.txt`, `runA_cmb_split.txt`, and the two conditional
+checks. A1 is `chain01`, the chain the pre-registration names; A2 is its twin with the same start
+and an independent random stream. Numbers are for A1, with A2 where it differs.
+
+| Item | Pre-registered | Run A | Verdict |
+|---|---|---|---|
+| (i) D025 on each chain | passes | A1: KS p 0.66 (sync), 0.81 (dust); A2: 0.09, 0.32; 100 draws each, scan step 0.6 to 0.75 conditional sd | pass, A2 sync marginally |
+| (ii) field means, two chains | split R-hat below 1.05, means within 0.5 sd | sync 1.014 (0.23 sd), dust 1.047 (0.20 sd) | pass for A1 and A2; run B pending |
+| (ii) amplitude scatters | below 1.05 | 1.000, 0.999 | pass |
+| (ii) region indices | 95 percent below 1.05 | sync 100 percent (max 1.018), dust 99.8 percent (max 1.059) | pass |
+| (ii) GMRF log sigma and range | below 1.10 | sync 1.006 and 1.009; dust 1.40 and 1.44, chain means 1.4 and 1.5 sd apart, ESS 6 to 13 | fail for dust |
+| (iii) field level against the reference | within 0.015 | sync -0.019, dust +0.009 | fail for sync by 0.004 |
+| (iii) field level against the truth mean | sync within 0.02, dust within 0.015 | -0.016, +0.005 | pass |
+| (iv) quartiles against the reference | within 0.03, bright within 0.01 | sync -0.009, -0.026, -0.024, -0.016; dust +0.003, +0.014, +0.026, -0.006 | pass |
+| (v) GMRF sigma | sync 0.04 to 0.09, dust 0.02 to 0.05 | 0.094 +- 0.007; 0.074 +- 0.006 (A2 0.067) | fail, both too large |
+| (vi) pixel RMSE | sync 0.045 to 0.062, dust 0.025 to 0.033, below the constant's 0.0629 and 0.0374 | sync 0.0653 (A2 0.0647); dust 0.0618 (A2 0.0590) | fail: neither field beats a constant index |
+| (vii) calibration | 55 to 80 percent inside one sd per quartile, median z within 0.3 | sync 69, 66, 67, 70 percent, median z -0.20, -0.36, -0.31, -0.23; dust 68, 60, 49, 36 percent, median z +0.22, +0.49, +0.72, -0.11 | sync: coverage passes, median z misses in Q2 and Q3; dust fails in the faint half |
+| (viii) multiplier maps | correlation above 0.9 per quartile, rms below 0.10 | sync 0.997, 0.991, 0.987, 0.988, rms 0.046; dust 0.998, 0.996, 0.983, 0.908, rms 0.087 | pass |
+| (ix) amplitude scatters | log s in -3.1 to -2.6 | -2.710, -2.600 | pass, dust at the edge |
+| (x) CMB bias | below 7 uK all sky, below 0.8 at abs(b) > 20, closure within 3 percent | 4.55 and 0.78; total 5.35 against 5.34 | pass |
+| (xi) no runaway | no region beyond 0.5 | largest 0.33 (sync), 0.26 (dust) | pass |
+
+Cost: 31.0 gradients per iteration after burn-in in both chains (88 and 75 during the 400
+warm-up iterations), 38 and 23 divergences, all in warm-up. The conditional sd of a field mean
+given the rest of the state is 0.0008 (sync) and 0.0001 (dust), so the scans used half-widths of
+0.004 and 0.0006.
+
+Hyperparameters, A1 and A2: sync field mean -3.0160 +- 0.0030 (ESS 50) and -3.0167 +- 0.0031
+(101); dust field mean 1.5449 +- 0.0028 (15) and 1.5455 +- 0.0026 (60); dust log sigma -2.601 (13)
+and -2.711 (8). Region indices: ESS per chain median 320 (sync) and 155 (dust).
+
+CMB bias split at this noise (noise term 2.79 uK), all sky and abs(b) > 20: chain fields 4.55 and
+0.78; constant at the truth means 16.3 and 0.95; constant at the chain's own field means 15.5 and
+0.96; truth region means 5.95 and 0.42; region-fit reference 4.43 and 0.45. With the true dust
+column the chain's sync field leaves 0.59 and 0.24; with the true sync the chain's dust field
+leaves 4.37 and 0.66. So the fields beat a constant index on the CMB bias by 18 percent at high
+latitude and by 72 percent over the sky, and what remains is the dust field's.
+
+**Reading of run A.**
+
+1. *The field-mean displacement of F38 is gone at this depth.* The sync field mean is 0.016 from
+   the truth where the scale 1 chains were +0.30 and -0.16 away, every quartile is within 0.03 of
+   the region-fit reference, and the multiplier maps track the realized template error with
+   correlations of 0.91 to 1.00 (0.25 to 0.72 at scale 1). This is the question the experiment
+   was run for, and the answer is that F29 to F38 are weak-data effects.
+2. *The fields do not beat a constant index.* Pixel RMSE 0.065 against 0.063 for synchrotron and
+   0.060 against 0.037 for dust. The stated alternative outcome applies: this is the answer to
+   the referee's objection 7 on this sky at this depth. The inferred field amplitudes are too
+   large (0.094 against a truth scatter of 0.062; 0.07 against 0.032), so the fields carry noise
+   that a tighter field would have shrunk away.
+3. *Dust is not calibrated in the faint half* (36 to 49 percent of regions inside one sd), and
+   its field amplitude and range do not agree between the two chains (R-hat 1.40 and 1.44). A
+   single chain would have shown neither. Every earlier statement about a dust field amplitude
+   from one chain (F32 to F38) carries this caveat.
+4. A candidate for the dust scatter, not tested: the dust amplitude and template are referenced
+   at 545 GHz, above every band, and the faint-quartile multipliers are uncertain by 0.11 to 0.16,
+   which a lever arm of 1 / ln(545 / 353) = 2.3 turns into index scatter of that size divided by
+   the lever. It is the reference-against-pivot effect of F44 again.
+5. Noise scale 0.03 is WMAP and LFI white-noise depth; for the HFI bands it is 2.6 to 33 times
+   the real noise (E031), so the dust numbers are not a statement about real dust data.
+
+Run B and the four-chain criteria: pending.
 
 ## Negative control
 

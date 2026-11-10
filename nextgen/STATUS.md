@@ -2,6 +2,35 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-10 (Mac mini, 05:28): E032 run A read (two chains): the field-mean displacement is gone at WMAP/LFI depth, but the index fields do not beat a constant index and the dust smoothness parameters do not converge; run B running
+
+**Learned** (interim, `experiments/E032_index_fields_at_wmap_lfi_depth.md`; run B and the
+four-chain criteria pending)
+- No F38 displacement at noise scale 0.03: sync field mean -3.016 +- 0.003 against -3.000, every
+  quartile within 0.03 of the region-fit reference, multiplier maps at correlation 0.91 to 1.00
+  with the realized template error. F29 to F38 are weak-data effects.
+- The fields do not beat a constant index in pixel RMSE: sync 0.065 against 0.063, dust 0.060
+  against 0.037. Inferred field amplitudes 0.094 and 0.07 against truth scatters of 0.062 and
+  0.032. On the CMB bias they do beat a constant (0.78 against 0.95 uK at high latitude).
+- Dust is uncalibrated in the faint half (36 to 49 percent of regions inside one sd), and the
+  dust GMRF amplitude and range disagree between the two chains (R-hat 1.40 and 1.44, ESS 6 to
+  13). A single chain would have hidden both. Field means, amplitude scatters and region indices
+  agree (R-hat at most 1.05).
+- D025 passes on both chains. Cost 31 gradients per iteration after burn-in, 6 h 43 min for the
+  run. Seven of eleven pre-registered items pass or pass in part; (v), (vi) and the dust parts
+  of (ii) and (vii) fail.
+
+**Running**
+- E032 run B (seed 8, dispersed start, both chains written) since 05:17. A waiter is armed on
+  its last file. Then the four-chain criteria and the closing of E032.
+
+**Next**
+- Close E032 and add its finding. No follow-ups (D029, proposed).
+- Unchanged from the entry below.
+
+**Needs Trygve**
+- Unchanged from the entry below: D029 and the four other decisions of the program review.
+
 ## 2026-11-09 (Mac mini, 23:42): program review done; Paper A narrowed to what is A or B grade; three new results (legacy-move law, reference-frequency form of the flat-prior shift, profile and per-region zero-mean prior calibrated for Q/U at real depth); two ingest bugs confirmed on real maps; plan proposed as D029
 
 Read `reviews/2026-11-09_program_review.md` first. It has the verdict, the plan and the decisions

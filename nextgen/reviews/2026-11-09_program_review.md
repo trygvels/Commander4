@@ -48,7 +48,12 @@ assumptions it rests on. Sections 2 to 4 are the audit of what exists.
 6. **The plan was attacked before it was written down.** An independent reviewer rejected the
    first version ("two half-papers") and proposed the reduced one, which is adopted here with one
    open choice for Trygve.
-7. **Not yet known:** the outcome of E032 (running through 2026-11-10), whether a trustworthy LFI
+7. **E032, first run read on 2026-11-10 (interim).** At WMAP and LFI depth the field-mean
+   displacement is gone, but the index fields do not beat a constant index in pixel error and
+   the dust smoothness parameters do not agree between two chains. That supports freezing the
+   template-prior work and moving the field model to the second paper, where it must beat
+   regions and a constant before it is used.
+8. **Not yet known:** the second run of E032 (running through 2026-11-10), whether a trustworthy LFI
    low-resolution covariance exists publicly, and whether the public data determine a
    high-latitude index at all once K band and 30 GHz are allowed to disagree.
 
@@ -229,7 +234,7 @@ Ordered by expected value per effort. "Evidence" is what says it will work.
 | 1 | Paper A1: the legacy move, the incidental-parameter problem (flat, profile with sandwich, proper priors), limits under template error, a Q/U section | A submittable methods paper from A and B grade evidence only | E035, E036, F2, F12, F15, F16, F18, F21, F23 | Six weeks, exact grids on one thread | A referee wants a positive real-data recommendation; the Q/U section supplies it | Do now |
 | 2 | K band against 30 GHz null test with dense covariances: region indices from {K, Ka}, {K, 30}, {30, 44, Ka} | Decides whether Paper B is about an index field or about systematics; a result by itself | The discrepancy is published (Weiland et al. 2022, unverified extract); E022 infrastructure; the K-band map and covariance are fetched and pass their first checks (E038) | Two weeks, grids only | LFI low-resolution covariance quality; a few WMAP modes at multipoles 2 to 6 carry 20 to 90 times the median noise variance | Do now, before any field code |
 | 3 | Report the two ingest bugs, the alm storage of per-pixel amplitudes, the unwritten chain, `get_sky` and the null-prior behaviour upstream; open the pull request for the index-sampler fix | Useful to every Commander4 user today; an outside check of our reading | E034 (measured), F42, F43 (read), the fix branch (tested) | Hours | None technical | Needs Trygve's yes |
-| 4 | E032 (running): the template-prior model at WMAP/LFI white-noise depth, four chains | Closes the intensity template question, pass or fail | Scan predicts shifts below 0.02 | Already running | A fail leaves no at-depth evidence for the template prior, which the plan no longer needs | Finish; no follow-ups |
+| 4 | E032 (run A read, run B running): the template-prior model at WMAP/LFI white-noise depth, four chains | Closes the intensity template question, pass or fail | Run A: no displacement of the field mean; the fields do not beat a constant index; dust smoothness parameters unconverged | Already running | None for the plan, which no longer needs the template prior | Finish; no follow-ups |
 | 5 | The many-seed test of F8 (ridge target 1.9 and 3.7 sd from the input on the validation simulation) | Removes a possible bug under the harness that carries F2 | Referee and challenge both asked for it | Done (E037) | None left: no bug; the harness target is four to five times overconfident, half of it from its per-pixel S/N of 0.05 | Done |
 | 6 | Polarized index field (GMRF, NUTS) at nside 8 with an nside-2 field, on the gates of the challenge report Sect. F | Paper B | F24 (B plus), E036; feasibility: one factorization per second at nside 8 | Six to ten weeks after item 2 | The data may not determine a field: per-region error 0.09 at nside 2 against a sky scatter near 0.06 | After item 2, if its gate passes |
 | 7 | tau from WMAP plus LFI as a paired difference between index models on the same data | The first number for how much the index model moves tau there | Dense likelihood exists once item 2 does | Two weeks after item 2 | Low power for the absolute value, which is not the claim | By-product of items 2 and 6 |
@@ -334,7 +339,8 @@ they gate anything.
 
 1. One session, one machine, with a production chain holding the cores, so every new experiment
    here is a single-thread grid or a toy.
-2. E032 is unread. Its outcome changes one paragraph of Paper A1 and nothing in the plan.
+2. E032's first run is read and its second is running. The interim outcome changes one
+   paragraph of Paper A1 and nothing in the plan.
 3. The referee report is incomplete. The challenge report and this document cover its missing
    sections in part.
 4. No literature statement in this document was checked against a PDF by the main session.

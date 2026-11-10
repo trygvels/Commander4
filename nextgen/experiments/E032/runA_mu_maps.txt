@@ -1,0 +1,5 @@
+posterior-mean template multiplier maps, post-burn draws; quartiles Q1 bright to Q4 faint
+gmrf16_cs_mumap_nc_Tmap_mu03_s7          Synchrotron  mean 0.9894 (realized 1.0017) | corr per quartile +0.997 +0.991 +0.987 +0.988 | all +0.990 | rms(pm - a/g) 0.0460 per quartile 0.022 0.049 0.053 0.052 | median post sd 0.021 0.030 0.034 0.039
+gmrf16_cs_mumap_nc_Tmap_mu03_s7          ThermalDust  mean 1.0456 (realized 1.0542) | corr per quartile +0.998 +0.996 +0.983 +0.908 | all +0.962 | rms(pm - a/g) 0.0869 per quartile 0.019 0.029 0.060 0.159 | median post sd 0.021 0.031 0.045 0.105
+gmrf16_cs_mumap_nc_Tmap_mu03_s7_c2       Synchrotron  mean 0.9892 (realized 1.0017) | corr per quartile +0.997 +0.991 +0.987 +0.988 | all +0.990 | rms(pm - a/g) 0.0458 per quartile 0.022 0.048 0.053 0.053 | median post sd 0.021 0.030 0.034 0.039
+gmrf16_cs_mumap_nc_Tmap_mu03_s7_c2       ThermalDust  mean 1.0462 (realized 1.0542) | corr per quartile +0.998 +0.996 +0.984 +0.911 | all +0.963 | rms(pm - a/g) 0.0855 per quartile 0.019 0.029 0.058 0.157 | median post sd 0.021 0.031 0.045 0.105
