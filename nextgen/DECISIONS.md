@@ -534,3 +534,32 @@ recommended, none alters a default in Commander4, and none is hard to undo.
 **Alternatives considered.** Waiting for an explicit answer on each open choice: rejected as
 contrary to the instruction. Starting with the Commander4 fixes: they are useful and not on the
 path to a paper; they follow, on a feature branch with tests.
+
+## D031 (2026-11-10 23:46): analysis choices for the polarized data section of Paper A1
+
+**Decision.** Five choices made during E038 to E042, each on a pre-registered rule or a measured
+failure, none of which changes a default in Commander4.
+
+1. *Estimator of record*: the profile optimum with the debiased plug-in sandwich error,
+   J_c = J(a_hat) - T, quoted only where T / J_c is below 1. The zero-mean prior and the flat-prior
+   marginal at 23 and 30 GHz are reported beside it. Basis: E041 (F46), E039 stage 1, the
+   independent review of `nextgen/lowres`.
+2. *Window matching to 60 arcmin is the baseline*; the unmatched fit is an arm. Basis: E038 (c2),
+   rule D6 written before the test; the real maps moved by the simulated amount to 0.0006.
+3. *Nside-8 fits of the real maps are discarded.* Basis: the pre-registered cross-check R8 failed
+   and a noise-free simulation reproduced the failure (+0.22 in the Galactic Center) from the
+   degrade alone.
+4. *LFI enters only with the scale-dependent noise model of E038 (b2) and is called approximate*;
+   every LFI result carries a white-noise arm and an arm with the power-law term doubled.
+5. *One dense job at a time on the Mac mini* (COMPUTE.md, measured 2026-11-10).
+
+**Why.** Each is the outcome of a test whose rule was fixed before the test, or of a measured
+failure with its cause shown. Recording them in one place keeps the paper's data section
+reproducible.
+
+**Alternatives considered.** Keeping the zero-mean prior as estimator of record (rejected: biased
+by up to 0.6 sd for heavy-tailed amplitudes under a varying noise pattern, F46). Leaving the
+beams unmatched and quoting a systematic (rejected by rule D6: the correction is understood to
+0.001). Using nside 8 for the bulk of the arms because it is 100 times cheaper (rejected: biased).
+Using the white-noise columns for LFI (rejected: the ring-half difference contradicts them by
+1.2 to 1.8 in chi-square and by up to 10 at the largest scales).
