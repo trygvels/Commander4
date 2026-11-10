@@ -302,6 +302,43 @@ WMAP-only set.
   prior built on 30 GHz (NPIPE Sect. 4.3; second citation report, item 4b), so the three LFI
   bands are not independent witnesses on large scales.
 
+**Stage 3, the BeyondPlanck band set with a flat CMB prior** (`E040/s3_bpset_cmbflat_wm.txt`, 23:43 to
+00:15; 30, 44, 70, Ka, Q, V, 353, no K band, flat priors on every amplitude; a first attempt
+crashed after 32 minutes at its last print statement on a bug in my memory-lean copy of the
+script, which was fixed and exercised end to end at nside 8 before the rerun).
+
+| region | profile | sandwich sd | flat prior at 23 GHz | flat prior at 30 GHz | flat30 - profile | flat30 - flat23 |
+|---|---|---|---|---|---|---|
+| High Latitude | -2.695 | 0.040 | -4.036 | -1.600 (upper bound) | +1.095 | +2.436 |
+| Spur | -2.921 | 0.050 | -3.432 | -2.314 | +0.607 | +1.118 |
+| Galactic Center | -2.819 | 0.025 | -2.885 | -2.752 | +0.067 | +0.132 |
+| Plane | -2.780 | 0.042 | -2.997 | -2.479 | +0.302 | +0.518 |
+
+Reduced chi-square 1.18; by region 0.58, 0.59, 2.13, 1.03. T / J_c 0.07 at high latitude.
+
+- **B1 holds in direction in all four regions and in size at high latitude; the Spur and the Plane
+  exceed my upper bounds** (+0.61 against 0.5 and +0.302 against 0.3). With every amplitude under a
+  flat prior and the synchrotron amplitude defined at 30 GHz, the optimum of the index marginal
+  for the High Latitude region is at the upper bound of the allowed range, 1.1 above the profile
+  optimum; the Spur is at -2.31 and the Plane at -2.48. Stated at 23 GHz the same marginal puts
+  the High Latitude region at -4.04. The pivot of this band set with a free CMB lies between the
+  two, as E022 found (26 GHz).
+- The first-order prediction is useless at this size (it gives +5.3 for a move that the bound
+  stops at +2.4), as Fig. 3 of the paper already shows for shifts above 0.3.
+- **The profile optimum itself depends on the CMB prior for this band set**: -2.695 +- 0.040 with a
+  flat CMB prior against -2.994 +- 0.019 with 0.2 uK (High Latitude), -2.921 against -3.059
+  (Spur), -2.780 against -2.766 (Plane). With a flat prior the optimum is unbiased for any
+  achromatic component; with the 0.2 uK prior it is unbiased only if what is achromatic in the
+  maps has that variance. A 7 sd move at high latitude says these seven maps contain more
+  achromatic structure than a 0.2 uK CMB, which is another view of the 30 GHz problem of E042.
+- What can and cannot be said about the published analyses: in this configuration (their band
+  set and reference, PR4 and WMAP maps, nside 16) a conditional index step inside a Gibbs sweep
+  with flat amplitude priors has a marginal whose optimum is "unreasonably flat" at high latitude
+  by more than a unit of index, from the volume term alone, with no systematics invoked. That is
+  the behaviour Svalheim et al. (2023) and Watts et al. (2023) report and constrain with a prior
+  N(-3.3, 0.1^2). Whether it is what happened in their chains needs their chains: the maps, the
+  pixelization, the CMB treatment and the mixing differ.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies.
