@@ -1,2 +1,29 @@
-% stub
-\pend{section to be written}
+\section{Discussion and conclusions}
+\label{sec:concl}
+
+\paragraph{What to do.} For a spectral index shared by many pixels with linear amplitudes and known
+noise: (i) evaluate the profile likelihood or a proper marginal directly in the acceptance step, never
+the $\chi^2$ at freshly drawn amplitudes; (ii) do not use a flat amplitude prior unless the amplitudes
+are defined at the pivot frequency of the band set, which depends on the other components and their
+priors, and say which reference frequency was used; (iii) quote the profile optimum with the
+debiased sandwich error, Eq.~(\ref{eq:debiased}), and check $\Tm/\J_{\rm c}$; (iv) if a prior is put
+on a component that does not depend on the index, state the sensitivity of the index to that prior's
+variance; (v) model the difference between the beams of the bands, even at $3.7^\circ$ pixels, and
+use measured bandpasses for every band including the dust tracer.
+
+\paragraph{What it changes for published numbers.} \pend{Final numbers from Sect.~\ref{sec:data}: the
+spread between conventions on the same maps against the spread of published values; the K band
+against 30 GHz result.}
+
+\paragraph{What we did not do.} All results are for maps, at low resolution, with one index per
+region and Gaussian noise of known covariance. We did not treat time-ordered data, gain or bandpass
+sampling, or an index field with inferred smoothness, for which a proper amplitude prior is needed
+and has the failure modes of Sect.~\ref{sec:limits}. The real-map test of the tempering law rests on
+an acceptance-noise factor measured from the log of the same chain; the forward prediction (widths of
+13.1 and 13.6 profile widths with amplitudes stored as maps) has not been run. The LFI noise model is
+empirical and isotropic. The misfit of the four-region model on real data is large
+(Sect.~\ref{sec:data}), so the quoted statistical errors are lower limits for the regions as defined.
+
+\paragraph{Reproducibility.} Every number in this paper comes from a script in the repository and an
+experiment record that states the question, the predictions written before the run, the command and
+the outcome, including the predictions that failed. The records are cited inline.

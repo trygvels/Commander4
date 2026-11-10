@@ -40,6 +40,8 @@ def main():
     ap.add_argument("--match-window", type=float, default=0.0,
                     help="arcmin; if set, each band is brought to this window with lowres.window before the fit")
     ap.add_argument("--nside-hi", type=int, default=512)
+    ap.add_argument("--nside-fit", type=int, default=16, choices=[8, 16],
+                    help="fit resolution; 8 degrades data and N^-1 from nside 16 as the real nside-8 arm does")
     ap.add_argument("--seed", type=int, default=3803)
     a = ap.parse_args()
     t0 = time.time()
@@ -108,14 +110,23 @@ def main():
         d = s0 * band_map(tE, tB, fw, 0.0) + fd * band_map(dE, dB, max(fw, 10.0), 10.0)
         if a.match_window > 0:
             d, ninv = WM.apply(d, ninv, fw)
+        if a.nside_fit != 16:
+            d, ninv = D.degrade(d, ninv, 16, a.nside_fit)
         bands.append(BandData(B.name, d, ninv, (lambda be, B=B: B.power_law(be, 23.0)), fd))
         print(f"# {B.name}: beam {fw:.1f} arcmin, rms of the nside-16 signal {np.sqrt(np.mean(d ** 2)):.2f} uK; {time.time() - t0:.0f} s", flush=True)
     region = D.bpxv_regions() if a.regions == "bpxv" else D.healpix_regions(2, 16)
+    if a.nside_fit != 16:
+        if a.regions == "bpxv":
+            k = (16 // a.nside_fit) ** 2
+            r = region[:region.size // 2].reshape(-1, k)
+            region = np.tile(np.array([np.bincount(row, minlength=4).argmax() for row in r]), 2)
+        else:
+            region = D.healpix_regions(2, a.nside_fit)
     nreg = int(region.max()) + 1
     L = RegionLikelihood(bands, region, cmb_prior_sd=0.2, use_dust=("353" in a.bands))
     bh, res = fit_profile(L, np.full(nreg, BETA))
     print(f"# bands {a.bands}, regions {a.regions}, common beam {a.common_beam}, small scales {not a.no_small_scales}, "
-          f"window matched to {a.match_window}; "
+          f"window matched to {a.match_window}, fit at nside {a.nside_fit}; "
           f"{res.nit} iterations, chi2_min {2 * res.fun:.2f}; {time.time() - t0:.0f} s")
     print("bias per region (fitted index + 3.1): " + " ".join(f"{x + 3.1:+.4f}" for x in bh))
     print(f"largest abs bias {np.max(np.abs(bh + 3.1)):.4f}; mean {np.mean(bh + 3.1):+.4f}")

@@ -1,2 +1,24 @@
-% stub
-\pend{section to be written}
+\begin{abstract}
+\noindent
+In pixel-based Bayesian component separation a few spectral indices share the data with a very large
+number of per-pixel amplitudes. We study what three common ways of removing the amplitudes do to
+the index. (1) A Metropolis move that proposes an index, redraws the amplitudes and accepts on the
+$\chi^2$ of the new pair is, on its own, a pseudo-marginal kernel for the profile posterior; inside a
+Gibbs sweep that also redraws the amplitudes it becomes Monte Carlo within Metropolis and converges to
+the profile posterior raised to the power $1/T$, with $T = \tfrac12 + 1/(4c_k) \simeq \sqrt{\pi k/8} +
+\tfrac12$ for $k$ amplitudes. The index error from such a chain is too wide by $0.79\,k^{1/4}$. We
+derive the law, its form for several moves per amplitude draw and for inexact stored amplitudes, and
+confirm it on toy chains to 0.2 percent and on a real-map chain. (2) A flat amplitude prior is exactly
+an exponential prior on the index with rate $n\ln\nu_{\rm ref}$, $n$ the number of amplitudes and
+$\nu_{\rm ref}$ the frequency at which they are defined. The index is shifted by
+$\ln(\nu_{\rm ref}/\nu_{\rm piv})$ times the index variance carried by one amplitude, a shift that does
+not average down over pixels, changes sign across a pivot frequency set by the bands and by the prior
+on the CMB, and has opposite signs for references of 23 and 30 GHz with the WMAP and Planck LFI bands.
+(3) The profile likelihood has an exactly unbiased score, but its curvature is too sharp by
+$\sqrt{1+\Tm/\J}$, where $\Tm/\J$ is the inverse mean squared signal-to-noise ratio of the amplitudes; the
+natural plug-in sandwich correction is biased the wrong way, and a debiased form gives nominal coverage
+over four decades of $\Tm/\J$. A zero-mean amplitude prior with a free scale is the same estimator for
+a uniform noise pattern and is biased by up to 0.6 standard deviations otherwise. We apply the
+estimators side by side to the WMAP nine-year K to V polarization maps with their dense noise
+covariances and to Planck PR4. \pend{Headline numbers of Sect.~\ref{sec:data}.}
+\end{abstract}

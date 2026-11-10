@@ -132,6 +132,38 @@ between 22.4 and 28.1 GHz.
   polarization angle between WMAP and LFI, or the removal of the K-band modes whose released
   variance is above ten times the median. None is fitted before S1 is read.
 
+**Stage 3, the BeyondPlanck band set and reference frequency; expectations written 2026-11-10 22:50, before
+any fit with the flat-prior marginal on a band set that includes LFI.** What prompts it: the second
+citation check (`../research/2026-11-10_citation_verification_paperA1_round2.md`, item 6c; round 1,
+item 10) quotes Svalheim et al. (2023, Sect. 4.4) and Watts et al. (2023, Sect. 2.4): fitted
+freely, the high-latitude polarized synchrotron index goes to "unreasonably flat values, beta_s
+<~ -2.5", read there as unmodelled systematics and handled with a prior N(-3.3, 0.1^2); a wider
+prior "permits synchrotron indices as shallow as beta_s = -2.7" and biases the CMB. Their index
+step is a Metropolis step conditional on the amplitudes inside a Gibbs sweep, whose index marginal
+is the flat-prior marginal (F15), with the synchrotron amplitude defined at 30 GHz. E022 put the
+pivot of that band set at 26 GHz with a free CMB amplitude and at 30 GHz with a CMB prior of 0.19
+uK. So the flat-prior volume term predicts a pull toward flat indices there when the CMB is free.
+This stage tests that reading on PR4 and WMAP maps at nside 16. It does not reproduce their
+pipeline, their maps or their resolution.
+
+Runs: bands 30, 44, 70, Ka, Q, V, 353 (no K band), four BP XV regions, window-matched, LFI noise
+model of E038; profile and flat-prior marginal at references of 23 and 30 GHz; once with a flat
+CMB prior and once with the 0.2 uK prior. Script `nextgen/scripts/e040b_estimators.py` (a
+memory-lean copy of the E040 script; same numerics).
+
+- B1. Flat CMB prior, reference 30 GHz: the flat-prior optimum is flatter than the profile
+  optimum in all four regions, by more than 0.3 in the High Latitude region (or it sits on the
+  upper bound of the allowed range), by 0.1 to 0.5 in the Spur and by 0.05 to 0.3 in the Plane.
+- B2. CMB prior of 0.2 uK, reference 30 GHz: the flat-prior optimum is within 0.05 of the profile
+  optimum in the Spur and the Plane.
+- B3. The profile index of the High Latitude region on this band set is between -3.4 and -2.9
+  with either CMB prior, and its sandwich error is 1.5 to 4 times that of the band set with K.
+- If B1 and B2 hold, the paper says that the flat pull reported for this configuration has the
+  sign and the order of magnitude of the volume term of a flat amplitude prior stated at 30 GHz
+  with an unconstrained CMB amplitude, and that at a finer pixelization it is larger in
+  proportion to the number of amplitudes. It does not say that this is what happened in those
+  analyses: that needs their chains. If B1 fails, the reading is withdrawn.
+
 ## Command
 
 ```bash
@@ -141,7 +173,83 @@ cd /Users/trygvels/code/Commander4; S=nextgen/scripts/e040_wmap_region_indices.p
 
 ## Result
 
-Pending. Not run before E039 is read.
+E039 stage 1 (four regions) was read and recorded at 22:03 on 2026-11-10; the first real-data fit
+started at 22:04. The 48-region arm waits for E039's 48-region simulation.
+
+**Nside 8, four BP XV regions, K, Ka, Q, V, 353, window-matched, every estimator** (`E040/bpxv_n8_wm_all.txt`,
+22:04 to 22:06; this is arm R8 and also the first execution of the script on real maps).
+
+| region | elements | profile | sandwich sd | flat23 - profile | flat30 - profile | flat30 - flat23 | predicted J_c^-1 | predicted H^-1 | zero-mean - profile |
+|---|---|---|---|---|---|---|---|---|---|
+| High Latitude | 1124 | -3.0709 | 0.0145 | -0.0012 | +0.0605 | +0.0618 | +0.0652 | +0.0642 | +0.0004 |
+| Spur | 212 | -3.1305 | 0.0155 | -0.0003 | +0.0247 | +0.0251 | +0.0258 | +0.0256 | +0.0004 |
+| Galactic Center | 50 | -2.8552 | 0.0112 | -0.0002 | +0.0047 | +0.0049 | +0.0054 | +0.0050 | 0.0000 |
+| Plane | 150 | -3.0615 | 0.0143 | -0.0002 | +0.0123 | +0.0125 | +0.0128 | +0.0127 | +0.0001 |
+
+Chi-square at the optimum 7155.9 for 4604 nominal degrees of freedom, ratio 1.554. Per band and
+element: K 0.31, Ka 1.89, Q 1.38, V 0.96, 353 GHz 0.00. By region, per element and band: High
+Latitude 0.72, Spur 0.84, Galactic Center 5.78, Plane 0.80. T / J_c at most 0.005. CMB prior: per
+unit of (true variance over prior variance minus one) the index moves by +0.16 sd (High Latitude)
+and at most +0.06 sd elsewhere.
+
+Read against the expectations (nside 8 only; the nside-16 baseline follows):
+
+- **R2 holds on real maps.** The flat-prior optimum moves between a 23 and a 30 GHz reference by
+  +0.062, +0.025, +0.005 and +0.013, which is 0.95, 0.97, 0.91 and 0.98 of the pre-registered
+  prediction and 0.96, 0.98, 0.98 and 0.98 of the corrected one. For the High Latitude region
+  that is 4.2 sandwich sd from a change of convention. At 23 GHz the flat prior is neutral for
+  this band set (within 0.08 sd).
+- **R3 holds**: the zero-mean prior is within 0.03 sd of the profile optimum.
+- **R4: the misfit is there (1.55), the band is not the one I named.** I expected the largest
+  per-band chi-square at K band; it is the smallest (0.31), because K band fixes the synchrotron
+  amplitude, and Ka is the largest (1.89). The Galactic Center region carries a per-element
+  chi-square seven times that of the other three.
+- **R1, in part**: all four indices are inside their ranges. The Plane is flatter than the High
+  Latitude region by 0.009 and not by the 0.05 to 0.30 I expected; the flat region is the
+  Galactic Center (-2.855).
+
+**Nside 16 baseline: four BP XV regions, K, Ka, Q, V, 353, window-matched, every estimator**
+(`E040/bpxv_n16_wm.txt`, 22:06 to 22:44; 38 min because the script kept four likelihood objects
+alive and the machine swapped).
+
+| region | elements | profile | sandwich sd | flat23 - profile | flat30 - profile | flat30 - flat23 | predicted J_c^-1 | predicted H^-1 | zero-mean - profile |
+|---|---|---|---|---|---|---|---|---|---|
+| High Latitude | 4388 | -3.0940 | 0.0121 | -0.0077 | +0.1498 | +0.1575 | +0.1758 | +0.1721 | +0.0051 |
+| Spur | 928 | -3.0965 | 0.0149 | -0.0034 | +0.0715 | +0.0749 | +0.0804 | +0.0789 | +0.0005 |
+| Galactic Center | 182 | -3.0867 | 0.0088 | -0.0012 | +0.0242 | +0.0254 | +0.0273 | +0.0267 | +0.0090 |
+| Plane | 646 | -2.9950 | 0.0120 | -0.0020 | +0.0345 | +0.0365 | +0.0379 | +0.0378 | +0.0029 |
+
+Chi-square at the optimum 19792.7 for 18428 nominal degrees of freedom, ratio 1.074. Per band and
+element: K 0.14, Ka 1.01, Q 1.06, V 0.99, 353 GHz 0.00. By region, per element and band (0.6 is
+what three free amplitudes on five bands leave): High Latitude 0.58, Spur 0.59, Plane 0.78,
+Galactic Center 1.82. T / J_c at most 0.013. CMB prior sensitivity +0.15 sd (High Latitude) per
+unit of variance mismatch, at most +0.06 sd elsewhere.
+
+- **R1 holds at nside 16**: Plane -2.995, Galactic Center -3.087, Spur -3.097, High Latitude -3.094,
+  all inside their ranges, and the Plane is flatter than the High Latitude region by 0.099.
+- **R2 holds.** Between a 23 and a 30 GHz reference the flat-prior optimum moves by +0.158, +0.075,
+  +0.025 and +0.037: 0.90, 0.93, 0.93 and 0.96 of the pre-registered prediction and 0.92, 0.95,
+  0.95 and 0.97 of the corrected one. In sandwich sd of the profile that is 13.0, 5.0, 2.9 and
+  3.0. The same maps, regions, bands and noise model give a High Latitude index of -3.094
+  (profile), -3.102 (flat prior at 23 GHz) or -2.944 (flat prior at 30 GHz). At nside 8, with a
+  quarter of the amplitudes, the same move was +0.062.
+- **R3 holds in three regions and fails in the Galactic Center**: zero-mean minus profile is
+  +0.42, +0.03 and +0.24 sd, and +1.02 sd in the Galactic Center, the region that does not fit.
+- **R4**: 1.074, above the 1.05 I expected. The misfit sits in the Galactic Center (three times
+  the expected chi-square) and the Plane (1.3 times). The High Latitude and Spur regions fit at
+  0.58 and 0.59 against an expected 0.6. K band is not the worst band, it is the best (0.14).
+- **R8 fails, for a reason that is now understood.** Nside 8 against nside 16: High Latitude
+  +0.023, Spur -0.034, Plane -0.067, Galactic Center +0.232 (1.6, 2.2, 4.7 and 21 sd of the
+  nside-8 error). A noise-free sky with index -3.1 everywhere, degraded from nside 16 to nside 8
+  with the real inverse covariances as the nside-8 arm does, returns +0.006, -0.018, -0.019 and
+  +0.217 (`E038/window_wmap_matched_n8.txt`; the same with a common beam, so it is not the
+  beams). The generalized-least-squares degrade assumes the signal is constant inside a coarse
+  pixel, the dense weights differ between bands, and in the Galactic Center the signal is
+  anything but constant. **Nside-8 fits of the real maps are not a valid cross-check and are
+  discarded.** The E039 simulations are not affected: their truth is constant inside the nside-8
+  pixels by construction. The same mechanism at a smaller scale, sub-pixel weights that differ
+  between bands inside an nside-16 pixel, cannot be excluded for the released maps themselves and
+  is the first suspect for the Galactic Center misfit.
 
 ## Negative control
 
