@@ -1,0 +1,3 @@
+LFI 30: N^-1 built; eigenvalues 0.05962 to 5.564; pixel sd from the inverse, median 1.513 uK_CMB; map chi2 per element 71.98; 58 s
+LFI 44: N^-1 built; eigenvalues 0.07226 to 4.066; pixel sd from the inverse, median 1.579 uK_CMB; map chi2 per element 7.75; 110 s
+LFI 70: N^-1 built; eigenvalues 0.1541 to 7.513; pixel sd from the inverse, median 1.290 uK_CMB; map chi2 per element 4.18; 177 s

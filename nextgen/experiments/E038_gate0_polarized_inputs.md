@@ -181,6 +181,28 @@ is not met: there is none in reach. What replaces it is an empirical model that 
 half-split test it was fitted to in 22 sub-tests per band. Whether that is enough is a judgement
 that the K band against 30 GHz comparison has to carry as a stated caveat.
 
+**(c) restated, expectations written 2026-11-10 21:14 before the check was run.** The released WMAP res 4
+maps are pixel averages of maps with beams of 0.88 (K), 0.66 (Ka), 0.51 (Q) and 0.35 (V) degrees;
+the PR4 maps have 0.54, 0.47 and 0.22 degrees (30, 44, 70 GHz) and 0.08 degrees (353 GHz). The
+region fits treat every band as seeing the same nside-16 sky. Check, noise off: a synchrotron
+sky with index -3.1 everywhere (the DR1 polarized synchrotron map, 60 arcmin, plus a synthetic
+small-scale field that continues its E and B spectra as power laws to multipole 1024, modulated
+by the local polarized intensity) and a dust sky (the DR1 polarized dust map, 10 arcmin), each
+band smoothed with its own beam, averaged to nside 16 and fitted with the real inverse
+covariances as weights. Script `nextgen/scripts/e038_window_check.py`.
+
+- D1. With all bands at a common 1 degree beam (the control) every BP XV region returns -3.1
+  within 0.001.
+- D2. With the true beams the WMAP-only fit (K, Ka, Q, V, 353) is biased by less than 0.01 in
+  every BP XV region, with the largest bias in the Galactic Center or the Plane. Expected sign:
+  positive. K band has the widest beam and loses the most power in the bright pixels that carry
+  the weight, which reads as a flatter spectrum. (The first wording of this item contradicted
+  itself on the sign; corrected before the run, the expectation is positive.)
+- D3. Adding LFI 30 GHz changes the bias by less than 0.005.
+- D4. For the 48 nside-2 regions the largest bias is below 0.03.
+- If D2 fails, the bands are brought to a common window before any index is quoted, or the bias
+  is quoted as a systematic per region.
+
 ## Negative control
 
 None for a.1. For (b): the 200 white-noise simulations, whose binned power scatters by the "white

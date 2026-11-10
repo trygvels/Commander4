@@ -2,6 +2,52 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-10 (Mac mini, 21:21): D030 in force; low-resolution polarized likelihood built and under validation; the error recipe for real data corrected and validated (F46); PR4 LFI noise understated by its map files (F47); Paper A1 draft has six sections
+
+**Learned**
+- **Error bars from one data set (E041, F46).** The profile likelihood's curvature width is too
+  narrow by sqrt(1 + T / J), confirmed within 0.054 over four decades of T / J. The sandwich
+  evaluated at fitted amplitudes, which is what my own code did until today, is narrower still
+  (sd of z up to 5.1), because J at fitted amplitudes has expectation J + T. With J(a_hat) - T the
+  sd of z is 0.95 to 1.05 and coverage 0.65 to 0.72 in 29 of 30 measured cells. Found before any
+  real-data fit.
+- **Zero-mean prior qualified.** With a noise pattern common to the amplitudes it is exactly the
+  profile with its sandwich width. With a varying pattern and heavy-tailed amplitudes it is
+  biased by -0.6 to +0.3 sd, sign set by the sky. The profile with the debiased sandwich is the
+  estimator of record.
+- **Flat-prior shift.** Follows its formula within 4 percent (23 GHz reference) and 15 percent (30
+  GHz) up to shifts of 0.3, zero at the pivot; reaches 36 posterior sd at 8192 amplitudes.
+- **PR4 LFI noise (E038 b, F47).** Official maps fetched. The white-noise columns understate the
+  ring-half difference at nside 16 by 1.77, 1.40, 1.21 in chi-square (30, 44, 70 GHz) and by 3 to
+  10 at multipoles 2 to 5. Two of three expectations failed. A three-parameter scale-dependent
+  model per band passes 22 sub-tests each.
+- **353 GHz is not a delta band (F47).** Dust seen through the band is 1.12 to 1.14 times the
+  delta-band value. E040 amended before any fit.
+- **K band against 30 GHz, first look (not a measurement).** Correlation 0.985 (Q) and 0.970 (U);
+  unweighted ratio 6 to 10 percent below an index of -3.1.
+- **E039 so far.** Six unit tests pass. Nside-16 spot check (12 realizations, four BP XV regions):
+  pooled mean z +0.03, sd of z 0.99, reduced chi-square 0.998 +- 0.009.
+- **Citations.** All 14 load-bearing statements confirmed in the papers, 8 with corrections
+  (`research/2026-11-10_citation_verification_paperA1.md`). Svalheim et al. is BeyondPlanck XIV
+  in print.
+
+**Running**
+- E039 at nside 8: four BP XV regions (200 realizations) and 48 regions (200), about 22:00 and
+  00:00. E038 (c), the beam-mismatch check. An independent stats review of `nextgen/lowres`.
+
+**Next**
+- Read E039 against V1 to V6. Then E040: the WMAP K to V and 353 GHz baseline with every
+  estimator, band subsets and sensitivity arms; then stage 2 with LFI and the K band against 30
+  GHz comparison (five expectations written).
+- Paper A1: data section, abstract, conclusions; then an independent referee read.
+- Still open from before: Commander4 fixes on a feature branch; the per-pixel run with amplitudes
+  stored as maps (predicted legacy widths 13.1 and 13.6); SBC of the ridge and marginal modes.
+
+**Needs Trygve**
+- Nothing blocks. Standing: nothing is sent to anyone or upstream; the paper names the
+  `resolve_chisq` move as it stood in the Commander4 development version, and how that is worded
+  toward the Cosmoglobe developers is yours to decide before anything leaves this machine.
+
 ## 2026-11-10 (Mac mini, 14:18): E032 closed with four chains (F45): no displacement at WMAP/LFI depth, no gain over a constant index, field hyperparameters fail R-hat; local holdings checked against official releases; nothing running
 
 **Learned**

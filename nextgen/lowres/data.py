@@ -96,6 +96,39 @@ def planck_lfi_banddata(freq, nu_ref, nside=16, split="full", dust_beta=DUST_BET
                     B.mbb(dust_beta, DUST_T, DUST_REF))
 
 
+LFI_NOISE_MODEL = "/Users/trygvels/code/Commander4/nextgen/experiments/E038/lfi_noise_model.npz"
+LFI_CACHE = "/Users/trygvels/data/planck_pr4_lfi/lowres"
+
+
+def load_lfi(freq, nside=16, noise="model", split="full", a_scale=1.0):
+    """PR4 LFI Q/U at nside 16 or below with a dense inverse covariance.
+
+    noise = "white": the covariance columns of the map file (understates the noise, E038 b).
+    noise = "model": N = W^(1/2) R W^(1/2) with the scale-dependent R fitted to the ring-half difference
+    (E038 b2); `a_scale` multiplies the amplitude A of its power-law term (a sensitivity arm). The dense
+    matrix at nside 16 is cached under LFI_CACHE."""
+    import os
+    if noise == "white":
+        d, ninv = load_planck_qu(PR4_LFI.format(freq=int(freq), split=split), 16)
+    else:
+        from . import lfi_noise
+        tag = f"{LFI_CACHE}/ninv_{int(freq):03d}_{split}_a{a_scale:g}_n16.npy"
+        d, _ = load_planck_qu(PR4_LFI.format(freq=int(freq), split=split), 16)
+        if os.path.exists(tag):
+            ninv = np.load(tag)
+        else:
+            th = np.array(np.load(LFI_NOISE_MODEL)[f"theta_{int(freq)}"], dtype=float)
+            th[1] += np.log(a_scale)
+            _, ninv = lfi_noise.lfi_ninv(int(freq), th, lfi_noise.NoiseModel(16), 16) if split == "full" else (None, None)
+            if ninv is None:
+                raise ValueError("the noise model is built for the full-mission map only")
+            os.makedirs(LFI_CACHE, exist_ok=True)
+            np.save(tag, ninv)
+    if nside != 16:
+        d, ninv = degrade(d, ninv, 16, nside)
+    return d, ninv
+
+
 def healpix_regions(nside_region, nside=16):
     """Region index per (Q, U) element: the nside_region pixel that contains each pixel (NESTED)."""
     k = (nside // nside_region) ** 2

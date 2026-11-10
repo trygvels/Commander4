@@ -1,2 +1,47 @@
-% stub
-\pend{section to be written}
+\section{Introduction}
+
+Bayesian component separation in the pixel domain fits, in every pixel, the amplitude of each sky
+component, and for the whole sky or for large regions a small number of spectral parameters that say
+how each component scales with frequency. In the Gibbs samplers that the Planck, BeyondPlanck and
+Cosmoglobe analyses are built on \citep{eriksen2008,svalheim2023,watts2023}, the two kinds of
+parameter are updated in turn. The amplitudes are many and each is poorly determined; the spectral
+indices are few and are what the cleaning of large-scale polarization, and therefore the optical
+depth to reionization, depends on. The published polarized synchrotron indices from the same public
+maps span $-2.9$ to $-3.3$ depending on region, band set and method
+\citep{dunkley2009,fuskeland2014,svalheim2023,weiland2022}, which is larger than their quoted errors.
+
+This paper is about the statistical step that sits between the maps and such an index: how the
+amplitudes are removed. That step has three places where it can go wrong without any error message,
+and we treat them in turn.
+
+\emph{The sampler} (Sect.~\ref{sec:legacy}). A move that proposes a new index, re-solves the
+amplitudes and accepts on the $\chi^2$ of the new pair looks like a way to move both together. We
+show that on its own it is a valid pseudo-marginal kernel for the profile posterior, that the
+amplitude step of the Gibbs sweep turns it into Monte Carlo within Metropolis, and that the chain
+then converges to the profile posterior raised to the power $1/T$ with
+$T = \sqrt{\pi k/8} + \tfrac12$ for $k$ amplitudes. The index error bar from such a chain is too wide
+by $0.79\,k^{1/4}$, a factor 16 for the $1.9\times10^5$ amplitudes of an $N_{\rm side}=64$ analysis,
+with an acceptance rate that stays near one half.
+
+\emph{The prior} (Sect.~\ref{sec:flat}). With flat priors on the amplitudes, the standard choice, the
+index posterior contains the volume of amplitude space. This is known to bias indices
+\citep{eriksen2008,dunkley2009,alonso2017}. We show that it is exactly equivalent to an exponential
+prior on the index whose rate is the number of amplitudes times the logarithm of the reference
+frequency at which the amplitudes are defined, give the resulting shift in closed form, and show that
+its sign flips between the two reference frequencies in common use, 23 and 30 GHz, for the WMAP and
+LFI bands. The shift does not shrink as pixels are added.
+
+\emph{The error bar} (Sect.~\ref{sec:profile}). The profile likelihood has neither problem and its
+score is exactly unbiased, but its curvature understates the error where the amplitudes are faint.
+We give the correction in closed form, show that the obvious way to evaluate it on real data is
+biased in the wrong direction, give the version that is not, and show its coverage over four decades
+of the controlling ratio. A zero-mean amplitude prior with a free scale turns out to be the same
+estimator when the noise pattern is uniform, and a biased one when it is not.
+
+Sect.~\ref{sec:data} applies the estimators side by side to the WMAP nine-year $K$ to $V$ band
+polarization maps with their released dense noise covariances and to the Planck PR4 maps, so that
+differences between published indices can be attributed: to the estimator, to the band set, or to
+the maps. Sect.~\ref{sec:limits} states where the recommended estimator stops being enough, and
+Sect.~\ref{sec:impl} describes the implementation and its tests. All results are for
+maps-only analyses at low resolution with amplitudes that enter linearly; we do not treat the
+time-ordered data.

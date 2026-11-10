@@ -89,6 +89,29 @@ were running, neither from real data.
    E039 uses J and T at the truth and tests the theory, not the plug-in; the plug-in is tested in
    E041.
 
+**Stage 2, Planck LFI and the K band against 30 GHz comparison; expectations written 2026-11-10 21:15,
+before any fit that includes an LFI band.** Inputs: the PR4 30, 44 and 70 GHz Q/U maps with the
+scale-dependent noise model of E038 (b2), band-averaged spectra from the LFI RIMO. What is already
+known from E038 and may colour these expectations: on bright elements the unweighted ratio of the
+30 GHz to the K-band map is 0.453 (Q) and 0.470 (U), which read as an index of -3.4 to -3.6
+between 22.4 and 28.1 GHz.
+
+- S1. {K, 30, 353}: the profile index is steeper than that of {K, Ka, Q, V, 353} by 0.1 to 0.5 in
+  at least two of the four BP XV regions, and the difference exceeds 2 combined sd there.
+- S2. {K, Ka, 353}: within 2 combined sd of {K, Ka, Q, V, 353} in every region.
+- S3. {30, 44, 70, Ka, Q, V, 353} (no K band, the BeyondPlanck band set on different maps): Spur and
+  Plane within 2 combined sd of the published -3.17 +- 0.06 and -3.03 +- 0.07.
+- S4. Adding 30, 44 and 70 GHz to {K, Ka, Q, V, 353} moves each region index by less than 2 sd of
+  the WMAP-only error and reduces the error by a factor 1.1 to 2.
+- S5. With the white-noise columns in place of the noise model the LFI-dominated fits move by
+  less than 1 sd and their chi-square per element at 30 GHz rises above 1.5.
+- Arms that go with every LFI result: white covariance times the fitted r; the model with its
+  power-law term doubled.
+- If S1 holds, the discrepancy is the result, and the next step, stated now, is to ask which of
+  three one-parameter descriptions removes it: a calibration factor on K band, a relative
+  polarization angle between WMAP and LFI, or the removal of the K-band modes whose released
+  variance is above ten times the median. None is fitted before S1 is read.
+
 ## Command
 
 ```bash

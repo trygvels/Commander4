@@ -38,8 +38,10 @@ def main():
     ap.add_argument("--bp353", default="psb", choices=["psb", "full", "delta"],
                     help="353 GHz bandpass: polarization-sensitive bolometers, all bolometers, or a delta at 353.0")
     ap.add_argument("--lfi-split", default="full", help="PR4 LFI map: full, full-ringhalf-1 or full-ringhalf-2")
-    ap.add_argument("--lfi-noise-scale", type=float, default=1.0,
-                    help="factor on the LFI white-noise sd (the map covariance has no correlated-noise term)")
+    ap.add_argument("--lfi-noise-scale", type=float, default=1.0, help="factor on the LFI noise sd")
+    ap.add_argument("--lfi-noise", default="model", choices=["model", "white"],
+                    help="scale-dependent model fitted to the ring-half difference (E038 b2), or the map-file columns")
+    ap.add_argument("--lfi-a-scale", type=float, default=1.0, help="factor on the power-law term of the LFI noise model")
     ap.add_argument("--estimators", nargs="+", default=["profile"], choices=["profile", "flat", "zm"])
     ap.add_argument("--out", default="")
     a = ap.parse_args()
@@ -52,7 +54,7 @@ def main():
             B = (Band.delta("Planck_353", 353.0) if (a.delta_bands or a.bp353 == "delta")
                  else hfi_band(353, psb=(a.bp353 == "psb")))
         elif b in LFI_NOMINAL:
-            d, ninv = D.load_planck_qu(D.PR4_LFI.format(freq=int(b), split=a.lfi_split), ns)
+            d, ninv = D.load_lfi(int(b), ns, noise=a.lfi_noise, split=a.lfi_split, a_scale=a.lfi_a_scale)
             if a.lfi_noise_scale != 1.0:
                 ninv = ninv / a.lfi_noise_scale ** 2
             B = Band.delta(f"Planck_{int(b):03d}", LFI_NOMINAL[b]) if a.delta_bands else lfi_band(int(b))
@@ -99,7 +101,7 @@ def main():
     dof = len(raw) * n - ncomp * n - nreg + (n if prior else 0)
     print(f"# E040 nside {ns}, regions {a.regions} ({nreg}), bands {a.bands}, CMB prior sd {a.cmb_prior_sd}, "
           f"{'delta bands at nominal frequencies' if a.delta_bands else 'band-averaged spectra'}, dust beta {a.dust_beta}, "
-          f"353 bandpass {a.bp353}, LFI split {a.lfi_split}, LFI noise scale {a.lfi_noise_scale}")
+          f"353 bandpass {a.bp353}, LFI split {a.lfi_split}, LFI noise {a.lfi_noise} x {a.lfi_noise_scale} (A x {a.lfi_a_scale})")
     print("# effective frequencies for index -3.1: " + "  ".join(
         f"{B.name} {B.effective_frequency(-3.1):.2f}" for B, _, _, _ in raw if B.nu.size > 1 and B.nu.max() < 200))
     print(f"# profile fit: {res.nit} iterations, {res.nfev} evaluations, converged {res.success}; chi2_min {chi2:.1f}; "

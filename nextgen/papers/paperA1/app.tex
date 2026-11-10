@@ -1,2 +1,47 @@
-% stub
-\pend{section to be written}
+\section{Score, curvature and sandwich for the profile likelihood}
+\label{app:sandwich}
+
+Let $\mathsf{H} = \M\A^{-1}\M\T\Ni$ be the projector onto the model space, so that
+$\Pm = \Ni(1 - \mathsf{H})$, $\Pm\M = 0$ and $\chimin = d\T\Pm d$. With $\M_r = \partial\M/\partial\beta_r$
+and $\Pm_r = \partial\Pm/\partial\beta_r$, differentiating $\Pm\M = 0$ gives $\Pm_r\M = -\Pm\M_r$. The
+score is $s_r = -\tfrac12 d\T\Pm_r d$. For $d = \M a + n$:
+\begin{equation}
+  s_r = -\tfrac12 a\T\M\T\Pm_r\M a - a\T\M\T\Pm_r n - \tfrac12 n\T\Pm_r n
+      = (\M_r a)\T\Pm\, n - \tfrac12 n\T\Pm_r n ,
+\end{equation}
+because $\M\T\Pm_r\M = -\M\T\Pm\M_r = 0$. The first term has zero mean. The second has mean
+$-\tfrac12\tr(\Pm_r\mathsf{N}) = \tfrac12\,\partial\,\tr(\mathsf{H})/\partial\beta_r = 0$, since
+$\tr\mathsf{H} = k$ for every $\beta$. So $\E[s_r] = 0$ for any true amplitudes: the profile score is
+unbiased.
+
+The variance of the first term is $(\M_r a)\T\Pm\mathsf{N}\Pm(\M_{r'}a) = (\M_r a)\T\Pm(\M_{r'}a) =
+\J_{rr'}$, using $\Pm\mathsf{N}\Pm = \Pm$. The second term is a quadratic form in Gaussian noise,
+uncorrelated with the first, with covariance $\tfrac12\tr(\Pm_r\mathsf{N}\Pm_{r'}\mathsf{N}) =
+\tfrac12\tr(\mathsf{H}_r\mathsf{H}_{r'})$. Writing $\mathsf{G} = \A^{-1}\M\T\Ni$,
+\begin{equation}
+  \mathsf{H}_r = (1 - \mathsf{H})\M_r\mathsf{G} + \M\A^{-1}\M_r\T\Ni(1 - \mathsf{H}) ,
+\end{equation}
+and since $\mathsf{G}(1-\mathsf{H}) = 0$ and $(1-\mathsf{H})\M = 0$ the two squared terms vanish in the
+trace and the cross terms give
+\begin{equation}
+  \tfrac12\tr(\mathsf{H}_r\mathsf{H}_{r'}) = \tr\!\big(\A^{-1}\M_r\T\Pm\,\M_{r'}\big) = \Tm_{rr'} .
+\end{equation}
+The expected curvature follows from differentiating the score once more:
+$\E[\partial^2(\tfrac12\chimin)/\partial\beta_r\partial\beta_{r'}] = \J_{rr'}$. The estimator
+$\hat\beta$ that solves $s(\hat\beta) = 0$ therefore has covariance $\J^{-1}(\J+\Tm)\J^{-1}$ to
+leading order, Eq.~(\ref{eq:sandwich}).
+
+A Gaussian prior on a component whose spectrum does not depend on the index (the CMB with variance
+$\sigma_{\rm c}^2$ per element) fits in by treating the prior as an extra data set: the prior mean
+is a datum with noise covariance $\mathsf{S}$, and the same algebra applies with the enlarged $\M$,
+$\mathsf{N}$ and $d$, provided the true amplitudes of that component are a draw from the prior. If
+they are not, the score is biased by a term proportional to the mismatch.
+
+For the fitted amplitudes $\hat a = a + e$ with $\mathrm{Cov}(e) = \A^{-1}$,
+$\E[(\M_r\hat a)\T\Pm(\M_{r'}\hat a)] = \J_{rr'} + \tr(\A^{-1}\M_r\T\Pm\M_{r'}) = \J_{rr'} + \Tm_{rr'}$,
+which gives Eq.~(\ref{eq:debiased}).
+
+For one power-law component, delta bands and diagonal noise, $\M_r a$ has elements
+$a_p m_b \ln(\nu_b/\nuref)$, the projector removes the component of $\ln\nu$ along the amplitude
+direction, and $\J = \sum_p a_p^2 A_p V_p$, $\Tm = \sum_p V_p$ with $A_p = \sum_b w_{pb}m_b^2$ and
+$V_p$ the weighted variance of $\ln\nu_b$ under the weights $w_{pb}m_b^2$, Eq.~(\ref{eq:uV}).

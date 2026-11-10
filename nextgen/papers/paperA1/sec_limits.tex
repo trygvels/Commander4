@@ -1,2 +1,38 @@
-% stub
-\pend{section to be written}
+\section{Limits: when a proper amplitude prior is needed}
+\label{sec:limits}
+
+The profile likelihood settles the question for a handful of indices that the data determine. It
+does not settle it for an index field with a hierarchical prior at low signal to noise, where a
+proper amplitude prior is needed, and there the prior becomes a model component with failure modes
+of its own. We list what we established, as limits on what the earlier sections recommend. All of it
+is on simulations.
+
+\paragraph{A scale shared across index regions on a scale map.} If the zero-mean prior takes its
+scale from a map, $a_p \sim \mathcal{N}(0, (s\,g_p)^2)$ with one $s$ for the sky, a scale map that is
+wrong differently in different regions biases their indices with a sign that again depends on the
+reference frequency. On the sky of Table~\ref{tab:flat}, a map that is 30 percent high at
+$|b| > 30^\circ$ moves the high-latitude indices by $-0.026$ at a 23 GHz reference, $+0.029$ at 30 GHz
+and $0.000$ at the pivot (\exref{E036}). The effect is coherent over a zone and of the order of its
+pooled error. One free scale per index region does not have it.
+
+\paragraph{Template-tied priors in intensity.} For positive intensity amplitudes we implemented
+$a_p \sim \mathcal{N}(\mu\, g_p, (s\, g_p)^2)$ with a template $g$ and inferred $\mu$ and $s$ per
+component. This prior passes simulation-based calibration on data drawn from itself (600
+replicates, \exref{E016}) and gives calibrated index fields down to index-pixel signal-to-noise
+ratios below one. It is exact only for its own template-error law. A template error of the same
+size with a different conditional law, such as a template that is the true amplitude divided by a
+30 percent scatter, shifts the faint-sky dust index by 0.11 at four stated standard deviations
+(\exref{E021}): regressing amplitudes on a noisy template is itself an errors-in-variables problem.
+At high signal to noise with a template built from the data and a sky outside the model class
+(PySM \texttt{d1s1}), the posterior runs away: the index removes the component from all bands but
+one because that lowers the prior cost by more than it raises $\chi^2$ (\exref{E020}). At the
+white-noise depth of the WMAP and LFI intensity maps with a 30 percent template error the field mean
+is recovered ($-3.017$ against $-3.000$), but the inferred field does not beat a constant index in
+pixel error on that sky, and the field hyperparameters fail a four-chain split-$\hat R$ criterion
+(1.11 to 1.42) although every chain passes its own convergence check (\exref{E032}).
+
+\paragraph{What follows.} An index field with inferred smoothness is a different paper. The
+conclusion for this one is narrower: where the question is one index per region and the region is
+measured, use the profile likelihood with the debiased sandwich; do not use a flat amplitude prior
+unless the reference frequency is the pivot; and do not share one amplitude scale across index
+regions on a template.
