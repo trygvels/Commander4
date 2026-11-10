@@ -69,6 +69,25 @@ of the three descriptions.
 - If X1 fails (the gap survives the removal of multipoles 2 to 20 at 30 GHz), the large-scale
   reading is wrong and the amplitude and bandpass descriptions come first.
 
+**Added 2026-11-10 23:00, before any E042 fit: (g) prediction residual.** After the pre-registration E040
+returned the band set without K band (30, 44, 70, Ka, Q, V, 353): High Latitude -2.994 +- 0.019,
+Spur -3.059 +- 0.024, Galactic Center -3.048 +- 0.012, Plane -2.766 +- 0.018. So 30 GHz is faint
+against K band (steep K to 30 index) and faint against Ka to V (flat index when 30 GHz is the
+lowest band). A direct look: fit K, Ka, Q, V, 353 without any Planck LFI band, predict the 30 GHz
+map from the fitted amplitudes and indices, and study the difference D = observed - predicted
+(`nextgen/scripts/e042b_predict30.py`): its regression on the predicted synchrotron per region
+(a fractional deficit), its chi-square under the 30 GHz noise model, its E and B power by
+multipole bin against that model, and its map.
+
+- X7. The regression slope of D on the predicted synchrotron is negative in all four regions
+  (30 GHz fainter than predicted), between -0.03 and -0.10 at high latitude and between 0 and
+  -0.03 in the Plane.
+- X8. After removing the per-region slope the residual has excess power over the noise model at
+  multipoles 2 to 6 (ratio above 2) and is consistent with it above multipole 20 (ratio between
+  0.8 and 1.3).
+- X9. The same residual for Ka predicted from K, Q, V, 353 (the control) has per-region slopes
+  within 0.02 of zero.
+
 ## Command
 
 Pending.

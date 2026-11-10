@@ -251,6 +251,39 @@ unit of variance mismatch, at most +0.06 sd elsewhere.
   between bands inside an nside-16 pixel, cannot be excluded for the released maps themselves and
   is the first suspect for the Galactic Center misfit.
 
+**Window arm** (`E040/bpxv_n16.txt`, unmatched, profile only): -3.0873, -3.0940, -3.0782, -2.9915. The
+window-matched indices are steeper by 0.0067, 0.0025, 0.0085 and 0.0035. **R12 holds in three
+regions** and misses in the Spur by 0.0005 (0.0025 against a lower bound of 0.003). The noise-free
+simulation of E038 (c) predicted that matching removes 0.0070, 0.0030, 0.0088 and 0.0041: the real
+maps agree with it to 0.0006 in every region.
+
+**Stage 2, first pairs** (window-matched, profile, debiased sandwich; `E040/bpxv_n16_KKa_wm.txt`,
+`s2_K30_wm.txt`; 22:48 to 22:55).
+
+| bands | High Latitude | Spur | Galactic Center | Plane | chi-square per element: K, second band |
+|---|---|---|---|---|---|
+| K, Ka, Q, V, 353 (baseline) | -3.094 +- 0.012 | -3.097 +- 0.015 | -3.087 +- 0.009 | -2.995 +- 0.012 | 0.14, Ka 1.01 |
+| K, Ka, 353 | -3.062 +- 0.016 | -3.074 +- 0.020 | -3.046 +- 0.011 | -2.980 +- 0.016 | 0.10, Ka 1.02 |
+| K, 30, 353 | -3.428 +- 0.019 | -3.180 +- 0.023 | -3.263 +- 0.013 | -3.035 +- 0.020 | 0.78, 30 GHz 1.85 |
+
+- **S1 holds.** With K band and 30 GHz alone the index is steeper than the WMAP baseline by 0.334
+  (High Latitude), 0.083 (Spur), 0.176 (Galactic Center) and 0.040 (Plane); two regions are in the
+  0.1 to 0.5 band and beyond 2 combined sd (15 and 11.5), the Spur is at 3.0 sd and the Plane at
+  1.7. Against K with Ka the gap is 0.365, 0.106, 0.217 and 0.055. In amplitude the High Latitude
+  gap is 8.2 percent between two maps 0.2245 apart in ln nu.
+- **S2 holds in three regions and fails in the Galactic Center** by the combined-sd measure I wrote
+  down (K, Ka against the baseline: 1.6, 0.9, 2.8 and 0.8). The measure was too lenient: the two
+  fits share K and Ka, so the proper sd of the difference is sqrt(sd_sub^2 - sd_full^2), and by
+  that the High Latitude difference of +0.032 is 3.3 sd and the Galactic Center one 5.7 sd. Adding
+  Q and V steepens every region by 0.015 to 0.041. Candidates: a spectrum that steepens with
+  frequency, or the dust extrapolation from 353 GHz to V band; the dust-index arms bear on the
+  second.
+- The reduced chi-square of the K, 30 fit is 2.64, carried by the Galactic Center (8.6 per
+  element and band) and the Plane (1.7); the High Latitude and Spur regions are at 0.52 and 0.50.
+  At high latitude the two maps are each consistent with a power law and the power law is the
+  wrong one by 0.37: this is what a multiplicative or a smooth large-scale difference between the
+  maps does, and what a random mismatch does not do. E042 takes it apart.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies.
