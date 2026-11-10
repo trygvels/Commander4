@@ -1,0 +1,47 @@
+# E037: nside 16, common beam 480.0 arcmin, pixels per smoothing kernel 10.80, 40 seeds, noise scale 0.1
+# median per-pixel S/N of the synchrotron signal at 30 GHz 0.620 and of the dust signal at 353 GHz 0.413 (white noise, before any smoothing)
+# z = (posterior mean - input) / posterior sd for beta_s, beta_d; variants h (harness), w (white control), c (harness, noise variance times N_eff); targets ridge and flat-prior marginal
+  0  w/ridge  +0.98  -2.08  w/marg -17.38 +594.50
+  1  w/ridge  -0.11  +0.56  w/marg -16.79 +659.24
+  2  w/ridge  -0.58  +0.88  w/marg -17.48 +578.54
+  3  w/ridge  -0.36  +1.00  w/marg -17.03 +648.73
+  4  w/ridge  +0.15  -1.54  w/marg -17.94 +535.74
+  5  w/ridge  -0.31  -0.62  w/marg -18.04 +575.98
+  6  w/ridge  +0.54  +0.12  w/marg -16.34 +640.70
+  7  w/ridge  -0.55  +0.92  w/marg -17.20 +675.30
+  8  w/ridge  -0.02  +2.21  w/marg -16.50 +611.88
+  9  w/ridge  +0.37  -0.53  w/marg -17.31 +573.70
+ 10  w/ridge  +0.95  +1.46  w/marg -16.15 +594.38
+ 11  w/ridge  -0.83  -0.40  w/marg -18.31 +592.05
+ 12  w/ridge  -0.32  -0.19  w/marg -17.64 +607.92
+ 13  w/ridge  +0.31  -1.20  w/marg -17.34 +604.61
+ 14  w/ridge  -0.54  -0.70  w/marg -17.80 +611.51
+ 15  w/ridge  +0.22  -1.43  w/marg -17.88 +595.69
+ 16  w/ridge  +1.69  -0.86  w/marg -16.37 +531.28
+ 17  w/ridge  +0.45  -0.03  w/marg -16.60 +611.06
+ 18  w/ridge  -0.73  +0.94  w/marg -18.01 +595.89
+ 19  w/ridge  -0.92  +1.14  w/marg -17.92 +592.02
+ 20  w/ridge  +0.10  +1.05  w/marg -16.44 +657.36
+ 21  w/ridge  -0.73  +0.59  w/marg -17.69 +605.83
+ 22  w/ridge  +1.28  -1.00  w/marg -16.98 +513.79
+ 23  w/ridge  -0.37  -1.90  w/marg -18.71 +529.13
+ 24  w/ridge  +2.07  -1.71  w/marg -16.41 +555.95
+ 25  w/ridge  -0.26  -0.06  w/marg -17.56 +607.49
+ 26  w/ridge  -1.26  +1.92  w/marg -17.61 +646.25
+ 27  w/ridge  +0.46  -0.17  w/marg -17.05 +588.79
+ 28  w/ridge  -1.34  +0.02  w/marg -18.78 +602.03
+ 29  w/ridge  -0.37  +0.44  w/marg -18.08 +533.63
+ 30  w/ridge  +0.18  +1.02  w/marg -16.71 +593.80
+ 31  w/ridge  -0.79  -0.74  w/marg -18.88 +481.90
+ 32  w/ridge  -0.62  -0.40  w/marg -18.39 +562.26
+ 33  w/ridge  -0.76  -0.25  w/marg -18.20 +610.39
+ 34  w/ridge  -2.38  +1.36  w/marg -18.84 +630.98
+ 35  w/ridge  +0.00  -0.70  w/marg -17.97 +502.45
+ 36  w/ridge  +0.28  +0.35  w/marg -16.94 +599.79
+ 37  w/ridge  +0.17  -0.90  w/marg -17.24 +648.68
+ 38  w/ridge  +0.22  -0.75  w/marg -17.86 +550.39
+ 39  w/ridge  -0.28  +1.39  w/marg -16.93 +626.79
+
+# summary: variant/target, mean z (se) and sd of z for beta_s and beta_d, median posterior sd
+w/ridge beta_s mean z  -0.10 (0.13) sd z  0.82 | beta_d mean z  -0.02 (0.17) sd z  1.07 | median sd 0.0339 0.0292
+w/marg  beta_s mean z -17.48 (0.12) sd z  0.75 | beta_d mean z +591.96 (7.07) sd z 44.69 | median sd 0.0330 0.0015

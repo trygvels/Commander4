@@ -35,7 +35,7 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F4 | C | "Principled default" is a convention, not a result; literature sentence corrected |
 | F5, F6 | C | One seed per cell; the qualitative result is known |
 | F7 | B | Amended: the stored mean maps are not band-limited either; 1.9 k of chi-square inside the E014 mask; stored amplitude samples under-dispersed; maps instead of alms (Q6) is now a correctness item |
-| F8 | C | One realization; the audit estimates up to 3.3 in width (item D2); Q7 open |
+| F8 | B | Amended by E037: over 40 seeds the offset is a zero-mean scatter of 4.4 and 4.8 posterior sd; the white-noise control alone gives 2.6 and 7.8, from the per-pixel S/N of 0.04 to 0.06; no bug |
 | F9 | C | Code reading, confirmed by a second reading (audit G1); no experiment |
 | F10, F11 | B for the code facts, C for their impact | Commander3 was never run |
 | F12, F15, F18 | A on simulations | Stand |
@@ -203,10 +203,21 @@ index result of F12 to F38 changes. The amplitudes written to the chain files ar
 every per-pixel run. This re-implements the draw and the round trip with Commander4's library
 calls and has not been confirmed by a Commander4 run with map storage (Q6, Q23).
 
-**F8. The per-pixel model treats smoothed noise as white** (E006). After smoothing to a common beam
+**F8. The per-pixel model treats smoothed noise as white** (E006; amended 2026-11-10 by E037, see
+the end of this entry). After smoothing to a common beam
 the noise is correlated; the per-pixel likelihood ignores that, and in the validation simulation
 the exact ridge target sat 1.9 sd (beta_s) and 3.7 sd (beta_d) from the input. This is a model
 issue, not a sampler issue (Q7).
+**Amended (2026-11-10, E037: 40 seeds of the harness simulation, exact grids, a white-noise
+control):** the 1.9 and 3.7 sd of the single realization are typical draws of a zero-mean scatter
+with sd 4.4 (beta_s) and 4.8 (beta_d); there is no significant bias (-0.18 +- 0.69 and -0.51 +-
+0.76). The smoothing is not the only cause: with white noise and no smoothing the same ridge
+target is overconfident by 2.6 and 7.8, because the harness has a per-pixel amplitude S/N of 0.04
+to 0.06, where the curvature of the profile likelihood understates the error. With the noise
+divided by 10 and by 30 the white control is calibrated (sd of z 0.82 and 1.07, then 0.80 and
+0.97), so there is no bug in the harness or the target. The harness tests a sampler against its
+target (F2 is untouched); its target is not a calibrated statement about the input indices. The
+split between the smoothing and the per-pixel S/N is not measured (Q7).
 
 **F9. The two-chain pipelining in `cli.py` is valid**: each chain's TOD step uses its own chain's
 latest sky.

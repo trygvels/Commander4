@@ -56,8 +56,9 @@ that need Trygve.
 - E032: the E030 chain 1 model at noise scale 0.03, run A (seed 7) since 22:34 with both in-flight
   chains written, run B (seed 8, dispersed start) after it. About 7 hours each. Waiter armed on
   run A's last file. Analysis script `nextgen/scripts/e032_analyze.py`.
-- E037 on one thread: the validation harness over 40 seeds (is the F8 offset the smoothed noise
-  or a bug), with a white-noise control.
+- Nothing else. E037 (the validation harness over 40 seeds) is done: no bug behind F8; the
+  harness target is overconfident by 4.4 to 4.8, and the white-noise control alone by 2.6 and
+  7.8 at its per-pixel S/N of 0.05, calibrated at one tenth of the noise.
 
 **Next**
 - Read E032 run A when it ends, then run B; write Result and Conclusion. No follow-ups (D029).

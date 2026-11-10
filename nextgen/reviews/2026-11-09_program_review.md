@@ -63,7 +63,7 @@ assumptions it rests on. Sections 2 to 4 are the audit of what exists.
    against real maps. E033: what the CMB metric used since E026 measures. E034: the audit's two
    ingest suspicions, on the real maps. E035: what the legacy index move converges to. E036:
    amplitude priors for signed Q/U amplitudes at real depth. E037: the validation harness over 40
-   seeds. E038: first input checks for polarization. E032: the template-prior model at real
+   seeds (no bug behind F8). E038: first input checks for polarization. E032: the template-prior model at real
    intensity depth with four chains (running).
 3. **Corrections to the record.** `FINDINGS.md` now opens with a reading guide and a grade per
    finding. E030 is closed with the chain 3 verdict. The registry, the literature table and the
@@ -230,7 +230,7 @@ Ordered by expected value per effort. "Evidence" is what says it will work.
 | 2 | K band against 30 GHz null test with dense covariances: region indices from {K, Ka}, {K, 30}, {30, 44, Ka} | Decides whether Paper B is about an index field or about systematics; a result by itself | The discrepancy is published (Weiland et al. 2022, unverified extract); E022 infrastructure; the K-band map and covariance are fetched and pass their first checks (E038) | Two weeks, grids only | LFI low-resolution covariance quality; a few WMAP modes at multipoles 2 to 6 carry 20 to 90 times the median noise variance | Do now, before any field code |
 | 3 | Report the two ingest bugs, the alm storage of per-pixel amplitudes, the unwritten chain, `get_sky` and the null-prior behaviour upstream; open the pull request for the index-sampler fix | Useful to every Commander4 user today; an outside check of our reading | E034 (measured), F42, F43 (read), the fix branch (tested) | Hours | None technical | Needs Trygve's yes |
 | 4 | E032 (running): the template-prior model at WMAP/LFI white-noise depth, four chains | Closes the intensity template question, pass or fail | Scan predicts shifts below 0.02 | Already running | A fail leaves no at-depth evidence for the template prior, which the plan no longer needs | Finish; no follow-ups |
-| 5 | The many-seed test of F8 (ridge target 1.9 and 3.7 sd from the input on the validation simulation) | Removes a possible bug under the harness that carries F2 | Referee and challenge both ask for it | An hour of grids; pre-registered as E037 and queued | It might be a bug | Running |
+| 5 | The many-seed test of F8 (ridge target 1.9 and 3.7 sd from the input on the validation simulation) | Removes a possible bug under the harness that carries F2 | Referee and challenge both asked for it | Done (E037) | None left: no bug; the harness target is four to five times overconfident, half of it from its per-pixel S/N of 0.05 | Done |
 | 6 | Polarized index field (GMRF, NUTS) at nside 8 with an nside-2 field, on the gates of the challenge report Sect. F | Paper B | F24 (B plus), E036; feasibility: one factorization per second at nside 8 | Six to ten weeks after item 2 | The data may not determine a field: per-region error 0.09 at nside 2 against a sky scatter near 0.06 | After item 2, if its gate passes |
 | 7 | tau from WMAP plus LFI as a paired difference between index models on the same data | The first number for how much the index model moves tau there | Dense likelihood exists once item 2 does | Two weeks after item 2 | Low power for the absolute value, which is not the claim | By-product of items 2 and 6 |
 | 8 | Reader fix behind a switch and the E014 grid rerun (Q19) | A real-map demonstration that fits | E034 | Three days | D2, D3, D7, D10 remain | Only if the real-intensity section is kept |
@@ -261,8 +261,9 @@ Remaining work for it, all exact grids unless stated:
    reference frequencies.
 3. The dense-covariance upgrade of E022 with K band on the four BP XV regions and on nside-2
    regions (shared with the null test below).
-4. The many-seed F8 test (E037, queued); the Commander4 legacy mode with 1 and 20 steps per
-   draw, amplitudes as maps and as alms (Q6, Q23; needs cores).
+4. The Commander4 legacy mode with 1 and 20 steps per draw, amplitudes as maps and as alms (Q6,
+   Q23; needs cores). The many-seed F8 test is done (E037: no bug), and it gives three more
+   points of the profile's coverage against per-pixel S/N.
 5. An SBC of the Commander4 `ridge` and `marginal` modes at small size, 300 replicates.
 
 **The K band against 30 GHz null test (two weeks, overlapping).** Gate 0 of the challenge report
@@ -326,7 +327,7 @@ they gate anything.
 | The data determine an index field, not only a mean and a latitude trend | Marginal. Hand estimate from the E036 region errors with white noise: the variance of the field is detectable at 2 to 3.5 sigma for a sky scatter of 0.06 and at 3.5 to 6 sigma for 0.10 to 0.15, with 48 or 192 regions. A correlation length is hardly constrained. Real large-scale noise is worse (E038) | The exact posterior of the field amplitude and range for a field seen with those errors and the real covariances | With the null test |
 | Dense NUTS is affordable | Supported at nside 8 (1 s per factorization), not at nside 16 (a minute) | Gate 5 | Timed by the challenge |
 | The legacy-move law describes Commander4 | Supported on simulations and, with the storage noise measured from the chain's log, on real maps to 3 percent | A Commander4 run with amplitudes kept as maps (Q6, Q23); predicted widths 13.1 and 13.6, no dust shift | After E032 |
-| The validation harness has no bug behind F8 | Untested | E037: 40 seeds, exact grids, a white-noise control | Queued behind E036 |
+| The validation harness has no bug behind F8 | Tested | E037: 40 seeds, exact grids, white-noise controls at three noise levels | No bug. The offset is a zero-mean scatter of 4.4 and 4.8 posterior sd. The white control is overconfident by 2.6 and 7.8 at the harness noise (per-pixel S/N 0.04 to 0.06) and calibrated at one tenth of it, so the cause is the profile's width at low per-pixel S/N as much as the smoothing |
 | The literature numbers that gate decisions are right | Unverified extracts | Five or six PDFs to read: Weiland 2018 and 2022, Dunkley 2009, QUIJOTE XII, BP XV, Ball et al. 2003 | Before they are cited |
 
 ## 10. Limits of this review

@@ -1,0 +1,49 @@
+# E037: nside 16, common beam 480.0 arcmin, pixels per smoothing kernel 10.80, 40 seeds
+# z = (posterior mean - input) / posterior sd for beta_s, beta_d; variants h (harness), w (white control), c (harness, noise variance times N_eff); targets ridge and flat-prior marginal
+  0  h/ridge  +1.38  -9.41  h/marg  -5.97 +1705.18  w/ridge  -1.58 -12.86  w/marg +274.44 +1803.11  c/ridge  -0.07  -1.76
+  1  h/ridge  -0.53  +0.92  h/marg +105.68 +1726.62  w/ridge  -1.00  +7.09  w/marg +289.23 +1855.12  c/ridge  -0.24  +0.28
+  2  h/ridge  +0.69  +0.08  h/marg +134.10 +1624.49  w/ridge  +0.20  -3.58  w/marg +286.11 +1818.70  c/ridge  +0.11  +0.03
+  3  h/ridge  -3.95  +1.98  h/marg -13.64 +1784.74  w/ridge  -6.88 +21.08  w/marg +276.56 +1864.15  c/ridge  -1.29  +0.38
+  4  h/ridge  -0.08  -3.64  h/marg  -7.20 +1705.37  w/ridge  +2.63  -6.25  w/marg +293.73 +1819.05  c/ridge  -0.39  -1.08
+  5  h/ridge  +2.23  -5.16  h/marg  -3.35 +1700.00  w/ridge  -4.29  +0.74  w/marg +273.82 +1833.69  c/ridge  +0.26  -1.34
+  6  h/ridge  +1.07  +1.43  h/marg +168.36 +1721.92  w/ridge  +2.51  +0.95  w/marg +298.03 +1840.96  c/ridge  +0.25  +0.43
+  7  h/ridge  -1.99  +4.75  h/marg +127.05 +1755.25  w/ridge  -3.37 +29.12  w/marg +289.56 +1876.72  c/ridge  -0.61  +1.32
+  8  h/ridge  -1.72  +8.19  h/marg +136.18 +1770.99  w/ridge  +0.20  +5.07  w/marg +297.44 +1846.58  c/ridge  -0.49  +2.57
+  9  h/ridge  +0.19  -1.65  h/marg  +0.49 +1699.71  w/ridge  -0.34  -1.19  w/marg +276.45 +1818.29  c/ridge  -0.16  -0.43
+ 10  h/ridge  +0.67  +7.15  h/marg +188.82 +1748.90  w/ridge  +2.45  +8.19  w/marg +305.05 +1860.52  c/ridge  +0.23  +2.21
+ 11  h/ridge  -2.56  +1.54  h/marg  -4.70 +1780.23  w/ridge  +0.60  -4.92  w/marg +287.59 +1825.70  c/ridge  -0.85  +0.37
+ 12  h/ridge  +0.94  -2.31  h/marg +90.21 +1671.87  w/ridge  -0.28 +21.33  w/marg +293.74 +1872.86  c/ridge  +0.03  -0.64
+ 13  h/ridge  +2.62  -5.52  h/marg +133.91 +1653.33  w/ridge  +1.93  -6.01  w/marg +291.64 +1831.47  c/ridge  +0.32  -1.05
+ 14  h/ridge  -1.29  -1.12  h/marg  -5.39 +1746.59  w/ridge  -1.80  -0.40  w/marg +275.68 +1839.60  c/ridge  -0.56  -0.33
+ 15  h/ridge  +6.83 -17.45  h/marg +114.35 +1544.96  w/ridge  -0.03  -4.91  w/marg +273.54 +1816.74  c/ridge  +1.54  -2.55
+ 16  h/ridge  +7.43  -4.31  h/marg +155.68 +1657.91  w/ridge  -3.61  +7.21  w/marg +282.80 +1848.98  c/ridge  +1.95  -0.98
+ 17  h/ridge  -0.52  +1.91  h/marg +116.49 +1634.15  w/ridge  +4.33  -1.40  w/marg +300.93 +1827.25  c/ridge  -0.20  +0.53
+ 18  h/ridge  -2.47  +4.78  h/marg  +1.69 +1646.72  w/ridge  +0.78  -0.13  w/marg +286.43 +1821.03  c/ridge  -0.79  +1.35
+ 19  h/ridge  -0.60  -0.96  h/marg  -4.47 +1782.48  w/ridge  -3.27  +3.61  w/marg +280.71 +1840.77  c/ridge  -0.36  -0.25
+ 20  h/ridge  -1.13  +5.59  h/marg +151.08 +1705.06  w/ridge  -4.37  +4.79  w/marg +283.92 +1850.54  c/ridge  -0.34  +1.65
+ 21  h/ridge  -2.25  +0.60  h/marg  -5.33 +1796.66  w/ridge  -2.80  +5.83  w/marg +284.53 +1846.32  c/ridge  -0.78  +0.12
+ 22  h/ridge  +2.43  -2.34  h/marg +105.73 +1612.42  w/ridge  -0.55  +1.23  w/marg +287.56 +1841.66  c/ridge  +0.54  -0.68
+ 23  h/ridge  +0.35  -5.80  h/marg -11.11 +1760.91  w/ridge  -4.14  -0.97  w/marg +271.38 +1825.45  c/ridge  -0.36  -1.33
+ 24  h/ridge  +1.75  +0.15  h/marg +109.17 +1632.78  w/ridge  +4.54  -7.96  w/marg +296.03 +1814.82  c/ridge  +0.44  +0.05
+ 25  h/ridge  -1.80  +2.84  h/marg  +0.43 +1691.88  w/ridge  -5.67  +5.90  w/marg +276.72 +1847.82  c/ridge  -0.59  +0.77
+ 26  h/ridge  -2.82  +7.33  h/marg  -4.07 +1829.39  w/ridge  -2.80  +4.10  w/marg +279.68 +1834.95  c/ridge  -0.88  +2.21
+ 27  h/ridge  +5.12  -4.73  h/marg +129.01 +1662.48  w/ridge  +0.43  +1.94  w/marg +295.86 +1851.08  c/ridge  +1.13  -1.13
+ 28  h/ridge  +1.43  -4.80  h/marg  +0.61 +1653.27  w/ridge  -2.58  +5.65  w/marg +283.60 +1844.42  c/ridge  +0.00  -1.12
+ 29  h/ridge  +2.72  -1.67  h/marg +109.46 +1611.10  w/ridge  -1.53  -0.49  w/marg +282.20 +1829.16  c/ridge  +0.66  -0.45
+ 30  h/ridge  +4.05  +0.26  h/marg +209.28 +1668.76  w/ridge  +0.84  +6.03  w/marg +305.10 +1856.79  c/ridge  +1.10  +0.20
+ 31  h/ridge  +0.10  -4.01  h/marg -10.20 +1725.66  w/ridge  -2.43  -5.46  w/marg +268.20 +1799.00  c/ridge  -0.35  -1.11
+ 32  h/ridge  -2.40  -0.97  h/marg -12.88 +1750.10  w/ridge  -2.66  +0.57  w/marg +274.28 +1832.84  c/ridge  -0.90  -0.40
+ 33  h/ridge  -4.87  +1.82  h/marg  -9.02 +1780.55  w/ridge  -1.35  -0.05  w/marg +273.99 +1830.65  c/ridge  -1.69  +0.38
+ 34  h/ridge -21.85  +4.89  h/marg -34.46 +1790.70  w/ridge  -3.83  +2.73  w/marg +279.29 +1835.79  c/ridge  -3.40  +1.14
+ 35  h/ridge  +1.67  -0.35  h/marg +112.16 +1642.76  w/ridge  -2.18  -1.79  w/marg +273.11 +1822.34  c/ridge  +0.40  -0.08
+ 36  h/ridge  +1.21  +2.72  h/marg +155.39 +1641.78  w/ridge  +1.20  +0.22  w/marg +296.99 +1833.73  c/ridge  +0.31  +0.79
+ 37  h/ridge  +2.43  -2.00  h/marg +83.52 +1552.64  w/ridge  +0.59  -1.72  w/marg +284.13 +1826.68  c/ridge  +0.59  -0.60
+ 38  h/ridge  -0.29  -3.20  h/marg  -4.99 +1678.41  w/ridge  +0.40  -1.78  w/marg +288.87 +1825.62  c/ridge  -0.38  -0.98
+ 39  h/ridge  -1.44  +2.11  h/marg +115.34 +1687.50  w/ridge  +0.10  +1.84  w/marg +290.75 +1841.38  c/ridge  -0.48  +0.56
+
+# summary: variant/target, mean z (se) and sd of z for beta_s and beta_d, median posterior sd
+h/ridge beta_s mean z  -0.18 (0.69) sd z  4.39 | beta_d mean z  -0.51 (0.76) sd z  4.83 | median sd 0.1272 0.0976
+h/marg  beta_s mean z +65.44 (11.63) sd z 73.55 | beta_d mean z +1698.41 (10.66) sd z 67.43 | median sd 0.0114 0.0005
+w/ridge beta_s mean z  -0.99 (0.41) sd z  2.59 | beta_d mean z  +2.08 (1.24) sd z  7.82 | median sd 0.2562 0.1559
+w/marg  beta_s mean z +285.24 (1.53) sd z  9.71 | beta_d mean z +1836.31 (2.72) sd z 17.21 | median sd 0.0035 0.0005
+c/ridge beta_s mean z  -0.16 (0.14) sd z  0.90 | beta_d mean z  -0.03 (0.18) sd z  1.13 | median sd 0.3735 0.2701

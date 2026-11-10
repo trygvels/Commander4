@@ -46,7 +46,10 @@ def posterior(d, w, use_logdet):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--nseed", type=int, default=40)
+    ap.add_argument("--noise-scale", type=float, default=1.0, help="multiplies every band's rms")
+    ap.add_argument("--variants", nargs="+", default=["h", "w", "c"])
     a = ap.parse_args()
+    V.RMS = [r * a.noise_scale for r in V.RMS]
     nside, npix = V.NSIDE, hp.nside2npix(V.NSIDE)
     fwhm, lmax = np.radians(V.FWHM_ARCMIN / 60.0), 3 * V.NSIDE - 1
     sig_b = fwhm / np.sqrt(8.0 * np.log(2.0))
@@ -55,7 +58,11 @@ def main():
     lat = np.abs(90 - np.degrees(hp.pix2ang(nside, np.arange(npix))[0]))
     t = np.exp(-lat / 15.0)
     M0 = V.mixing(*truth)
-    print(f"# E037: nside {nside}, common beam {V.FWHM_ARCMIN} arcmin, pixels per smoothing kernel {neff:.2f}, {a.nseed} seeds")
+    print(f"# E037: nside {nside}, common beam {V.FWHM_ARCMIN} arcmin, pixels per smoothing kernel {neff:.2f}, {a.nseed} seeds, "
+          f"noise scale {a.noise_scale}")
+    snr = [np.median(np.abs(M0[0, 1] * 10 ** (0.3 + 2.0 * t)) / V.RMS[0]), np.median(np.abs(M0[-1, 2] * 10 ** (0.5 + 1.5 * t)) / V.RMS[-1])]
+    print(f"# median per-pixel S/N of the synchrotron signal at {V.FREQS[0]:g} GHz {snr[0]:.3f} and of the dust signal at "
+          f"{V.FREQS[-1]:g} GHz {snr[1]:.3f} (white noise, before any smoothing)")
     print("# z = (posterior mean - input) / posterior sd for beta_s, beta_d; variants h (harness), w (white control), "
           "c (harness, noise variance times N_eff); targets ridge and flat-prior marginal")
     Z = {}
@@ -72,6 +79,7 @@ def main():
             wh[i] = 1.0 / n.std() ** 2
         ww = np.array([np.full(npix, 1.0 / rms ** 2) for rms in V.RMS])
         cases = {"h": (dh, wh), "w": (data + white, ww), "c": (dh, wh / neff)}
+        cases = {k: v for k, v in cases.items() if k in a.variants}
         line = [f"{seed:3d}"]
         for cn, (d, w) in cases.items():
             for tn, ld in (("ridge", False), ("marg", True)):
