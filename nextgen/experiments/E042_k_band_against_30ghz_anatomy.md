@@ -162,6 +162,43 @@ is the yardstick.
   about -1.5 percent at high latitude and less elsewhere. The control shares it. The joint fits
   below do not have it.
 
+**(a) and (b) Scale cuts, 2026-11-11 00:16 to 01:01** (`E042/base_cuts.txt`; K, 30, 353; the modes of one
+map at multipoles 2 to L projected out; profile index with debiased sandwich error).
+
+| cut | modes | High Latitude | Spur | Galactic Center | Plane |
+|---|---|---|---|---|---|
+| none | 0 | -3.428 +- 0.019 | -3.180 +- 0.023 | -3.263 +- 0.013 | -3.035 +- 0.020 |
+| 30 GHz, L = 3 | 24 | -3.329 +- 0.019 | -3.055 +- 0.025 | -3.202 +- 0.013 | -2.974 +- 0.021 |
+| 30 GHz, L = 5 | 64 | -3.318 +- 0.020 | -3.026 +- 0.028 | -3.194 +- 0.013 | -2.913 +- 0.023 |
+| 30 GHz, L = 8 | 154 | -3.270 +- 0.022 | -2.976 +- 0.032 | -3.154 +- 0.014 | -2.767 +- 0.026 |
+| 30 GHz, L = 12 | 330 | -3.224 +- 0.024 | -2.966 +- 0.037 | -3.103 +- 0.015 | -2.703 +- 0.030 |
+| 30 GHz, L = 20 | 874 | -3.129 +- 0.031 | -2.903 +- 0.044 | -3.043 +- 0.018 | -2.683 +- 0.035 |
+| K band, L = 3 | 24 | -3.344 +- 0.020 | -3.071 +- 0.026 | -3.195 +- 0.013 | -2.964 +- 0.022 |
+| K band, L = 5 | 64 | -3.334 +- 0.020 | -3.053 +- 0.029 | -3.188 +- 0.013 | -2.895 +- 0.024 |
+| K band, L = 8 | 154 | -3.291 +- 0.022 | -3.007 +- 0.033 | -3.150 +- 0.014 | -2.734 +- 0.027 |
+| K band, L = 12 | 330 | -3.247 +- 0.025 | -3.004 +- 0.038 | -3.099 +- 0.015 | -2.667 +- 0.030 |
+| K band, L = 20 | 874 | -3.159 +- 0.032 | -2.960 +- 0.046 | -3.040 +- 0.018 | -2.644 +- 0.035 |
+| for reference: K, Ka, 353 | | -3.062 +- 0.016 | -3.074 +- 0.020 | -3.046 +- 0.011 | -2.980 +- 0.016 |
+| K, Ka, 30, 353 | | -3.215 +- 0.013 | -3.111 +- 0.016 | -3.130 +- 0.009 | -3.004 +- 0.013 |
+
+The reduced chi-square of the K, 30 fit falls from 2.64 (no cut) to 1.79 (L = 20), and the
+30 GHz chi-square per element from 1.85 to 1.19.
+
+- **X1 fails narrowly, and the expectation behind it was too simple.** With multipoles 2 to 8 of
+  30 GHz marginalized the High Latitude index moves 43 percent of the way to the K, Ka value
+  (-3.270), where I required half; at L = 12 it is 56 percent, at L = 20, 82 percent. The error
+  grows by 1.16 (L = 8), inside the 2.5 allowed. But the index does not converge on the K, Ka
+  value and stop: in every region it keeps flattening as large scales are removed, and in the
+  Spur and the Plane it passes the K, Ka value at L = 3 to 5 and ends 0.17 and 0.30 flatter. **The
+  index between K band and 30 GHz depends on angular scale**: steepest at the largest scales,
+  flattest at the smallest, by 0.30 (High Latitude), 0.28 (Spur), 0.22 (Galactic Center) and
+  0.35 (Plane) between no cut and L = 20. In amplitude the ratio of the 30 GHz map to the K-band
+  map rises by 5 to 8 percent from the largest scales to multipoles above 20.
+- **X2 was ill-posed.** In a fit with two synchrotron bands a mode informs the index only if both
+  bands measure it, so projecting it out of either band removes the same information: the K-band
+  cuts reproduce the 30 GHz cuts within 0.03 at every L. The comparison cannot say which map
+  carries the scale dependence. The control with Ka (below) can.
+
 **Exploratory, not pre-registered, prompted by the residual map** (`E042/leakage_check.txt`,
 `nextgen/papers/paperA1/figures/fig_resid30.pdf`). The map of D shows a band along the inner
 Galactic plane and a blob at the Galactic Center. Regression of D on the PR4 30 GHz intensity at
