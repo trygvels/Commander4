@@ -27,7 +27,7 @@ Newest entry on top. Keep each entry short: learned (with numbers), running, nex
   no index; the K band against 30 GHz anatomy and the BeyondPlanck reading move to Paper B.
 - **E040 stage 4, LCDM covariance as the CMB prior** (the referee showed that the white 0.2 uK prior
   understates the LCDM E-mode variance 200 times at the quadrupole): the four profile indices become
-  -3.083 +- 0.013, -3.080 +- 0.017, -3.081 +- 0.009, -2.964 +- 0.013, flatter than with the white
+  -3.082 +- 0.012, -3.080 +- 0.016, -3.081 +- 0.009, -2.964 +- 0.013, flatter than with the white
   prior by 0.012, 0.017, 0.006, 0.031 (0.9, 1.0, 0.7 and 2.3 sd). My expectation (within 1 sd)
   failed for the Spur and the Plane, so the LCDM version becomes the paper's central table. The
   flat-prior reference shift holds in this version too: +0.167, +0.095, +0.029, +0.049 from 23 to 30

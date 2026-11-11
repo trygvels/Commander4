@@ -20,5 +20,8 @@ run e040b_estimators.py l_bpxv_n16_delta_wm    --regions bpxv --delta-bands $W -
 for L in 20 12 30; do
   [ -s $X2/lowpass${L}_lcdm.txt ] && grep -q "^K,Ka,353" $X2/lowpass${L}_lcdm.txt || DYLD_INSERT_LIBRARIES=$C $P nextgen/scripts/e042e_lowpass.py --lmax $L --sets K,Ka,Q,V,353 K,Ka,353 --cmb-prior-lcdm --out $X2/lowpass${L}_lcdm.npz > $X2/lowpass${L}_lcdm.txt 2> $X2/lowpass${L}_lcdm.err
 done
+# simulation spot checks at the working resolution (E040 C4 and E039 addendum B), before the no-K band set
+DYLD_INSERT_LIBRARIES=$C $P nextgen/scripts/e039d_cmbprior_sim.py --nside 16 --nreal 6 --priors lcdm white > $E/cmbprior_sim_n16.txt 2> $E/cmbprior_sim_n16.err
+DYLD_INSERT_LIBRARIES=$C $P nextgen/scripts/e039e_lowpass_sim_n16.py --lmax 20 --nreal 6 > nextgen/experiments/E039/lowpass_n16_l20.txt 2> nextgen/experiments/E039/lowpass_n16_l20.err
 run e040b_estimators.py s3_bpset_lcdm_wm       --regions bpxv --bands 30 44 70 Ka Q V 353 $W --cmb-prior-lcdm --estimators profile flat
 run e040b_estimators.py s3_bpset_cmb02_wm      --regions bpxv --bands 30 44 70 Ka Q V 353 $W --estimators profile flat

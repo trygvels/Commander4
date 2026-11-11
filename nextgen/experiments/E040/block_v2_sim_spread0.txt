@@ -1,0 +1,13 @@
+# E040 stage 5, simulation check: nside 8, blocks per region [44, 23, 4, 15], true index spread between blocks 0.0 (a new offset per block in every realization)
+real 0 index -3.1498 -3.2613 -2.8584 -2.9547 | CR0/CR2/CR3 over sandwich, High Latitude 1.10 1.14 1.19 Plane 0.84 0.86 0.89 | n_eff 8.4 7.2 2.6 4.1 | sum D / J_c 1.00 1.00 1.00 0.99 [32 s]
+real 10 index -3.1738 -3.2611 -2.8464 -2.9595 | CR0/CR2/CR3 over sandwich, High Latitude 1.23 1.33 1.45 Plane 0.41 0.45 0.49 | n_eff 8.6 7.1 2.6 4.2 | sum D / J_c 1.00 1.00 1.00 1.00 [458 s]
+real 20 index -3.1432 -3.2515 -2.8390 -2.9393 | CR0/CR2/CR3 over sandwich, High Latitude 1.03 1.05 1.07 Plane 0.48 0.52 0.57 | n_eff 8.3 7.0 2.6 4.2 | sum D / J_c 1.00 1.00 1.00 1.00 [829 s]
+real 30 index -3.1336 -3.2360 -2.8559 -2.9582 | CR0/CR2/CR3 over sandwich, High Latitude 1.04 1.07 1.10 Plane 0.38 0.40 0.43 | n_eff 8.4 7.3 2.6 4.2 | sum D / J_c 1.00 1.00 1.00 1.00 [1262 s]
+real 40 index -3.1676 -3.2290 -2.8525 -2.9567 | CR0/CR2/CR3 over sandwich, High Latitude 1.15 1.22 1.32 Plane 1.02 1.17 1.36 | n_eff 8.4 7.2 2.6 4.2 | sum D / J_c 1.00 1.00 1.00 1.00 [1661 s]
+real 50 index -3.1413 -3.3119 -2.8588 -2.9339 | CR0/CR2/CR3 over sandwich, High Latitude 1.02 1.05 1.08 Plane 0.85 1.02 1.24 | n_eff 8.2 7.3 2.6 4.2 | sum D / J_c 1.00 1.00 1.00 1.00 [2034 s]
+## over 60 realizations: rms of the estimate about the region truth, against the median quoted errors
+region           blocks  n_eff      rms  sandwich      CR0      CR2      CR3   rms of z with: sandwich    CR0    CR2    CR3
+High Latitude        44    8.4   0.0158    0.0152   0.0170   0.0180   0.0191                      1.04   0.92   0.87   0.82
+Spur                 23    7.2   0.0190    0.0165   0.0148   0.0159   0.0171                      1.14   1.39   1.30   1.20
+Galactic Center       4    2.6   0.0097    0.0107   0.0074   0.0088   0.0113                      0.91   1.50   1.26   1.03
+Plane                15    4.2   0.0133    0.0145   0.0122   0.0137   0.0156                      0.92   1.26   1.14   1.02

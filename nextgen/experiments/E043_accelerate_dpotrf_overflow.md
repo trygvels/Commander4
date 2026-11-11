@@ -160,6 +160,12 @@ recorded output in every character apart from the timings.
 
 No OVERFLOW line in any run made since the fix (all run under the canary).
 
+**Guard allocator on a whole fit (04:01).** A complete fit at order 4608 (profile and marginal with
+gradients, the optimizer, the plug-in sandwich, a noise Cholesky at order 1536) under
+`/usr/lib/libgmalloc.dylib`, which faults on a write one byte past any heap block of any size: exit 0 on the
+sound path, segmentation fault on the old path (`LOWRES_CHOLESKY_UPLO_U=1`). So the sound path is clean for
+small blocks too, which the canary (blocks of 64 kB and more) does not see.
+
 (V3 and V5 to be filled)
 
 ## Conclusion

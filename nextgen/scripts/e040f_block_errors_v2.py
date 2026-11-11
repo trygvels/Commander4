@@ -122,6 +122,12 @@ def run_sim(a):
                   "| n_eff", " ".join(f"{x:.1f}" for x in neff), "| sum D / J_c", " ".join(f"{x:.2f}" for x in dsum), f"[{time.time() - t0:.0f} s]", flush=True)
     est, sm, ne = np.array(est), np.array(sm), np.array(ne)
     sb = {k: np.array(v) for k, v in sb.items()}
+    if a.out:
+        np.savez(a.out, est=est, truth=beta_reg, sd_model=sm, neff=ne, **sb)
+    print("## ratio of the block error to the sandwich error over the realizations: median, 84th and 97.5th percentile, maximum")
+    for k in KINDS:
+        q = sb[k] / sm
+        print(f"   {k}: " + "; ".join(f"{NAMES[j]} {np.median(q[:, j]):.2f} {np.percentile(q[:, j], 84):.2f} {np.percentile(q[:, j], 97.5):.2f} {q[:, j].max():.2f}" for j in range(4)))
     scat = np.sqrt(np.mean((est - beta_reg) ** 2, axis=0))            # rms about the region truth
     print(f"## over {len(est)} realizations: rms of the estimate about the region truth, against the median quoted errors")
     print(f"{'region':16s} {'blocks':>6s} {'n_eff':>6s} {'rms':>8s} {'sandwich':>9s} " + " ".join(f"{k:>8s}" for k in KINDS)

@@ -396,6 +396,37 @@ Against the expectations:
   with the LCDM prior where they are quoted as indices and kept as differences where they are quoted as
   differences.
 
+### Stage 4 result (ii): flat CMB prior, read 2026-11-11 05:06
+
+`E040/s4_bpxv_n16_wm_cmbflat.txt` (run on the sound Cholesky path under the canary, no OVERFLOW line;
+chi2_min 12104.2 for 12284 nominal degrees of freedom, ratio 0.985; T / J_c at most 0.027).
+
+| Region | Profile | Sandwich error | flat23 - profile | flat30 - profile | 30 - 23 | Predicted (H) | zero-mean - profile |
+|---|---|---|---|---|---|---|---|
+| High Latitude | -3.0277 | 0.0288 | +0.5167 | +1.3161 | +0.7993 | +0.8740 | +0.0053 |
+| Spur | -3.0548 | 0.0358 | +0.2355 | +0.6154 | +0.3799 | +0.4230 | -0.0080 |
+| Galactic Center | -3.0082 | 0.0200 | +0.0737 | +0.2095 | +0.1358 | +0.1359 | +0.0330 |
+| Plane | -2.9881 | 0.0300 | +0.1236 | +0.3315 | +0.2078 | +0.2251 | +0.0020 |
+
+Against the expectations:
+
+- **C2 fails in its first clause for two regions.** Against the white-prior values the profile index moves
+  by +0.066 (2.3 of the flat-prior sd) at High Latitude and +0.079 (3.9 sd) in the Galactic Center; the
+  Spur (+0.042, 1.2 sd) and the Plane (+0.007, 0.2 sd) are within the 1.5 sd written. Against the LCDM-prior
+  values: +0.055, +0.025, +0.073, -0.024, which in units of the paired scatter of the C4 simulation (0.031,
+  0.037, 0.021, 0.034 at nside 8) is +1.8, +0.7, +3.4, -0.7. The Galactic Center, where the model does not
+  fit, is the region whose index depends on the CMB prior by more than a LCDM sky allows.
+- C2, the rest, holds: the errors are 2.27 to 2.50 times the white-prior errors (1.2 to 2.5 written), the
+  flat-amplitude-prior optimum is flatter than the profile at both references (+0.52 and +1.32 at High
+  Latitude), and the difference between the references is five times that of the white-prior version.
+- **C3 holds, and beyond where I asked:** the move between the references is within 0.1 and 8 percent of
+  H^-1 (n ln(30 / 23)) for the two regions below 0.3 (Galactic Center, Plane) and within 9 and 10 percent
+  for the two above (0.80 against 0.87 at High Latitude, 0.38 against 0.42 in the Spur).
+- What this says about flat amplitude priors with a free CMB on WMAP alone: with K band in the band set and
+  the synchrotron amplitude defined at 30 GHz the High Latitude optimum is at -1.71, and at 23 GHz at
+  -2.51, where the profile likelihood of the same maps says -3.03 +- 0.03. A free achromatic component
+  moves the pivot of the band set below K band, and then both conventions are far from it.
+
 ### Stage 4, check C4, pre-registered 2026-11-11 03:45: is the move between the CMB priors what a LCDM sky does?
 
 C1 failed: with the LCDM prior the four indices are flatter than with the white prior by 0.012, 0.017, 0.006
@@ -420,6 +451,46 @@ with a few realizations if the answer depends on resolution.
   cautionary arm. Under (b) the table shows both and the text says that the difference measures
   large-scale achromatic structure in the maps that is not LCDM, by region, and that the index is uncertain
   by that amount on top of everything else.
+
+### Stage 4, check C4 result at nside 8 (read 2026-11-11 04:54)
+
+`E040/cmbprior_sim_n8.txt`: 60 realizations, CMB drawn from the LCDM covariance (rms per element 0.145 uK at
+nside 8), each fitted with three CMB priors. Regions in the usual order.
+
+| CMB prior in the fit | Mean estimate minus truth | sd of z | Coverage of 1 sd | Median quoted error | Scatter of the estimate |
+|---|---|---|---|---|---|
+| LCDM (matched) | -0.0015, -0.0028, +0.0011, +0.0009 (se 0.0022, 0.0023, 0.0013, 0.0024) | 1.08, 0.98, 0.93, 1.14 | 0.60, 0.68, 0.70, 0.62 | 0.0159, 0.0181, 0.0108, 0.0161 | 0.0172, 0.0178, 0.0100, 0.0184 |
+| white 0.2 uK | -0.0025, -0.0048, +0.0008, -0.0001 (se 0.0026, 0.0027, 0.0013, 0.0024) | 1.32, 1.24, 0.96, 1.30 | 0.55, 0.48, 0.72, 0.65 | 0.0152, 0.0166, 0.0107, 0.0145 | 0.0201, 0.0207, 0.0103, 0.0188 |
+| flat | +0.0002, -0.0021, -0.0026, -0.0006 (se 0.0042, 0.0044, 0.0030, 0.0048) | 0.92, 0.89, 0.89, 1.05 | 0.73, 0.77, 0.72, 0.68 | 0.0357, 0.0381, 0.0266, 0.0356 | 0.0327, 0.0337, 0.0236, 0.0372 |
+
+Paired, same realization: white minus LCDM has mean -0.0009, -0.0020, -0.0002, -0.0010 (se 0.0009, 0.0012,
+0.0004, 0.0009) and sd 0.0073, 0.0093, 0.0028, 0.0071; flat minus LCDM has mean +0.0017, +0.0007, -0.0037,
+-0.0015 and sd 0.031, 0.037, 0.021, 0.034. No OVERFLOW line.
+
+Against the expectations:
+
+- C4a holds: the matched prior is unbiased (mean z within 1.2 se of zero) and calibrated (sd of z 0.93 to
+  1.14).
+- C4b holds: the flat prior is unbiased and calibrated, with errors 2.2 to 2.5 times those of the matched
+  prior (the upper end of the range written).
+- C4c: the mean paired difference is below 0.003 in every region, as written. But neither of my two
+  readings is the result. On a LCDM sky the white-prior fit is **unbiased on average and over-confident**:
+  its quoted error is too small by 32, 24 and 30 percent at High Latitude, in the Spur and in the Plane
+  (sd of z 1.32, 1.24, 1.30; coverage 0.55, 0.48, 0.65), because the large-scale CMB E modes that the white
+  prior does not allow move the estimate from sky to sky by a further 0.007, 0.009, 0.003 and 0.007.
+- The move on the real maps in those units: white minus LCDM is -0.0115, -0.0166, -0.0060, -0.0309, that
+  is -1.6, -1.8, -2.2 and -4.4 paired standard deviations. With the simulated covariance of the four paired
+  differences (they correlate at 0.4 between the three regions off the plane), the observed vector has a
+  squared Mahalanobis distance of 24.8 on 4 degrees of freedom (no simulation of 60 above 10.7; Hotelling
+  p = 6e-4). Without the Plane it is 5.2 on 3 (22 percent of the simulations are above). So at High
+  Latitude, in the Spur and in the Galactic Center the move between the two priors is what a LCDM sky does
+  to a white-prior fit, and in the Plane it is four times larger than that, which points at the misfit
+  there and not at the CMB.
+- Caveat: the simulation is at nside 8 and the maps at nside 16. The paired scatter at nside 16 is measured
+  next (`E040/cmbprior_sim_n16.txt`, 6 realizations, in queue 10).
+- For the paper: the LCDM prior is the calibrated choice and stays the central table. The white-prior
+  errors quoted for the baseline in drafts 1 and 2 (0.012, 0.015, 0.012) were too small by a quarter to a
+  third for a LCDM sky, before any misfit.
 
 ### Stage 4b, pre-registered 2026-11-11 03:58: the arms repeated with the LCDM prior
 
@@ -502,6 +573,42 @@ Against the expectations:
   being checked on the same simulations, with and without a true spread of the index between blocks, and
   the maps are rerun with them for both CMB priors. Which version is quoted is decided by those
   simulations: the one whose rms of z is closest to one in both, and in doubt the more conservative.
+
+### Stage 5 results, second part: leverage-corrected block errors (read 2026-11-11 04:37 and 05:18)
+
+Three forms, `e040f_block_errors_v2.py`: CR0 (plain), CR2 (score sums divided by sqrt(1 - h)), CR3 (divided
+by 1 - h; in linear regression G / (G - 1) times the delete-one-cluster jackknife variance, Bell and
+McCaffrey 2002). h is the share of the region's information carried by the block, from a central
+difference of the block scores; the sum of the block informations equals J_c to 1 percent in every case
+(printed as a check). References verified in `research/2026-11-11_citation_verification_cluster_robust.md`.
+
+**Simulation, the model true** (`E040/block_v2_sim_spread0.txt`, nside 8, 60 realizations):
+
+| Region | Blocks | n_eff | rms of estimate - truth | Sandwich | CR0 | CR2 | CR3 | rms of z: sandwich, CR0, CR2, CR3 |
+|---|---|---|---|---|---|---|---|---|
+| High Latitude | 44 | 8.4 | 0.0158 | 0.0152 | 0.0170 | 0.0180 | 0.0191 | 1.04, 0.92, 0.87, 0.82 |
+| Spur | 23 | 7.2 | 0.0190 | 0.0165 | 0.0148 | 0.0159 | 0.0171 | 1.14, 1.39, 1.30, 1.20 |
+| Galactic Center | 4 | 2.6 | 0.0097 | 0.0107 | 0.0074 | 0.0088 | 0.0113 | 0.91, 1.50, 1.26, 1.03 |
+| Plane | 15 | 4.2 | 0.0133 | 0.0145 | 0.0122 | 0.0137 | 0.0156 | 0.92, 1.26, 1.14, 1.02 |
+
+A variance estimate with nu degrees of freedom gives a z with rms sqrt(nu / (nu - 2)): 1.15 for nu = 8, 1.41
+for nu = 4. CR3 is the closest to that in three regions and conservative at High Latitude; CR0 is too
+small in three.
+
+**Maps, LCDM CMB prior** (`E040/block_v2_maps_lcdm.txt`):
+
+| Region | Blocks | n_eff | Largest h | Index | Sandwich | CR0 | CR2 | CR3 | CR3 / sandwich |
+|---|---|---|---|---|---|---|---|---|---|
+| High Latitude | 46 | 5.7 | 0.37 | -3.0825 | 0.0125 | 0.0304 | 0.0361 | 0.0437 | 3.51 |
+| Spur | 29 | 8.8 | 0.23 | -3.0799 | 0.0165 | 0.0330 | 0.0351 | 0.0377 | 2.29 |
+| Galactic Center | 4 | 2.5 | 0.48 | -3.0807 | 0.0088 | 0.0533 | 0.0642 | 0.0789 | 8.92 |
+| Plane | 16 | 5.1 | 0.36 | -2.9641 | 0.0133 | 0.0869 | 0.0926 | 0.0999 | 7.52 |
+
+One block carries 37 percent of the High Latitude information and one 36 percent of the Plane's. The block
+error of the High Latitude region is 0.044, of the Spur 0.038 and of the Plane 0.100: with these errors the
+four regions are consistent with one index near -3.07, and what the fit measures is the index of a few
+bright patches per region. The version with a true spread of the index between blocks, the null
+distribution of the ratio, and the white-prior maps follow.
 
 ## Negative control
 

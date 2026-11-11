@@ -1285,7 +1285,7 @@ Grade A.
 
 **F53. The profile index of the WMAP K to V fit depends on the shape of the CMB prior at the level
 of its statistical error** (E040 stage 4). With the LCDM pixel covariance as the prior in place of a
-white 0.2 uK prior of the same total variance, the four indices are -3.083 +- 0.013, -3.080 +- 0.017,
+white 0.2 uK prior of the same total variance, the four indices are -3.082 +- 0.012, -3.080 +- 0.016,
 -3.081 +- 0.009 and -2.964 +- 0.013: flatter by 0.012, 0.017, 0.006 and 0.031 (0.9, 1.0, 0.7 and 2.3
 sd). The pre-registered criterion (within 1 sd) failed, so the LCDM version is the central table of
 the paper. The flat-prior reference shift holds in both versions (+0.167, +0.095, +0.029, +0.049 from
