@@ -610,6 +610,33 @@ four regions are consistent with one index near -3.07, and what the fit measures
 bright patches per region. The version with a true spread of the index between blocks, the null
 distribution of the ratio, and the white-prior maps follow.
 
+### Stage 5 results, third part: a true spread of the index between blocks, and the choice of estimator (read 2026-11-11 05:40)
+
+`E040/block_v2_sim_spread01.txt`: the same simulations with an index offset of sd 0.1 per nside-2 block, drawn
+anew in every realization (60 realizations). The target is the rms of the estimate about the region's mean
+index.
+
+| Region | n_eff | rms of estimate - region mean | Sandwich | CR0 | CR2 | CR3 | rms of z: sandwich, CR0, CR2, CR3 |
+|---|---|---|---|---|---|---|---|
+| High Latitude | 8.3 | 0.0371 | 0.0152 | 0.0440 | 0.0513 | 0.0582 | 2.43, 0.79, 0.69, 0.59 |
+| Spur | 7.3 | 0.0405 | 0.0166 | 0.0320 | 0.0355 | 0.0391 | 2.44, 1.17, 1.08, 0.99 |
+| Galactic Center | 2.6 | 0.0585 | 0.0107 | 0.0584 | 0.0749 | 0.0982 | 5.44, 1.62, 1.30, 1.03 |
+| Plane | 4.2 | 0.0445 | 0.0145 | 0.0404 | 0.0463 | 0.0523 | 3.08, 1.24, 1.07, 0.91 |
+
+- The sandwich error is too small by 2.4 to 5.4, as it must be. All three block errors follow the real
+  scatter; at High Latitude all three are conservative (CR3 by a factor 1.7).
+- **Choice by the rule written in advance** (closest to one in both simulations over the three quoted
+  regions, in doubt the more conservative): summed distance of the rms of z from one, CR0 1.35, CR2 1.03,
+  CR3 0.91. CR3 is quoted. It is conservative at High Latitude in both simulations (0.82 and 0.59).
+- The expected rms with a spread sigma is sqrt(sigma^2 / n_eff + sandwich^2): 0.038, 0.041, 0.063, 0.051
+  against the measured 0.037, 0.041, 0.059, 0.045. So the block error is, to a good approximation, the
+  spread between blocks divided by the square root of the effective number of blocks.
+- Reading of the maps (LCDM prior; CR3 over sandwich 3.5, 2.3 and 7.5 at High Latitude, in the Spur and in
+  the Plane): in this simulation a spread of 0.1 gives median ratios of 3.8, 2.4 and 3.6. The High Latitude
+  and Spur regions look like a spread of about 0.1 between 30-degree patches, the Plane like about 0.2.
+  This is indicative only: the simulation is at nside 8 and the maps at nside 16, and misfit of any other
+  kind (dust, beams, noise model) scatters the block scores as well as a varying index does.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies.

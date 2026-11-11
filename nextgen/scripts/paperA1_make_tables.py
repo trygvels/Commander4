@@ -117,7 +117,6 @@ def tab_moves():
     rows = [
         (r"CMB prior: white, 0.2 $\mu$K", os.path.join(E40, "bpxv_n16_wm.npz"), None),
         ("CMB prior: flat", os.path.join(E40, "s4_bpxv_n16_wm_cmbflat.npz"), None),
-        ("no window matching", os.path.join(E40, "l_bpxv_n16_nowm.npz"), None),
         (r"index from $\ell \le 30$", os.path.join(E42, "lowpass30_lcdm.npz"), "K_Ka_Q_V_353"),
         (r"index from $\ell \le 20$", os.path.join(E42, "lowpass20_lcdm.npz"), "K_Ka_Q_V_353"),
         (r"index from $\ell \le 12$", os.path.join(E42, "lowpass12_lcdm.npz"), "K_Ka_Q_V_353"),
@@ -129,6 +128,10 @@ def tab_moves():
         ("delta bandpasses at the nominal frequencies", os.path.join(E40, "l_bpxv_n16_delta_wm.npz"), None),
     ]
     notes = []
+    # window matching: the LCDM prior is built on the window operator, so this arm exists with the white prior only
+    w0, w1 = prof(os.path.join(E40, "bpxv_n16.npz")), prof(os.path.join(E40, "bpxv_n16_wm.npz"))
+    if w0 is not None and w1 is not None:
+        s += row("no window matching (white CMB prior, against its own baseline)", w0[0] - w1[0], sgn)
     for label, path, key in rows:
         r = prof(path, key)
         if r is None:

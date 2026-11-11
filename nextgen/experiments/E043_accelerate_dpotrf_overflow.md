@@ -166,8 +166,29 @@ gradients, the optimizer, the plug-in sandwich, a noise Cholesky at order 1536) 
 sound path, segmentation fault on the old path (`LOWRES_CHOLESKY_UPLO_U=1`). So the sound path is clean for
 small blocks too, which the canary (blocks of 64 kB and more) does not see.
 
-(V3 and V5 to be filled)
+**V3 holds (05:40).** E039 stage 1 rerun with the band model of the original run (`--no-drift`), on the sound
+path under the canary (`E043/sim_n8_bpxv_rerun.txt`): 200 of 200 realizations compared, 1480 numbers, largest
+absolute difference 0.00 as printed (four decimals in the indices and in chi-square per degree of freedom);
+198 lines identical in every character and 2 that differ only in the iteration count of the optimizer; every
+summary line identical (mean z, sd of z, coverage, chi-square 1.0006 +- 0.0220, the flat-prior shifts and
+their predictions). No OVERFLOW line. The validation table of Paper A1 stands as recorded.
+
+(V5, the 48-region stage, to be filled; it is not used in the paper)
 
 ## Conclusion
 
-(to be filled)
+The crashes came from a heap overflow in Apple Accelerate's `dpotrf` with uplo = U on macOS 27.0 (26A5388g),
+reached through scipy's `cho_factor(lower=True)` and `cholesky(lower=True)` on C-ordered arrays, for matrix
+orders of about 1500 to 6000. It is not in our code and not in scipy's arithmetic; the returned factor is
+correct. The fix is the other triangle.
+
+Every exposed result that the paper uses has been rerun on the sound path under a malloc canary and
+compared as printed: E039 stage 1 (200 realizations, 1480 numbers), the plug-in addendum (40 realizations),
+the nside-8 window checks and the nside-8 real-data arm. **No recorded number changed.** The nside-16 fits
+were never exposed, which the baseline rerun on the old path under the canary shows directly. The 48-region
+stage of E039 (V5) is being rerun and completed on the sound path; it is not used in the paper.
+
+What this establishes: F52. What it does not: that the overflow never altered a number in a run we did not
+keep; that other LAPACK routines of this OS build are sound at orders we have not used; that the order
+thresholds are stable under other loads or OS builds. What changes: D033 (the sound triangle, and every
+dense run on this machine under the canary); a paragraph in the paper; a memory note for future sessions.

@@ -1,0 +1,2 @@
+# E040 stage 5, simulation check: nside 8, blocks per region [44, 23, 4, 15], true index spread between blocks 0.0 (a new offset per block in every realization)
+real 0 index -3.1498 -3.2613 -2.8584 -2.9547 | CR0/CR2/CR3 over sandwich, High Latitude 1.10 1.14 1.19 Plane 0.84 0.86 0.89 | n_eff 8.4 7.2 2.6 4.1 | sum D / J_c 1.00 1.00 1.00 0.99 [28 s]

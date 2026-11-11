@@ -1,0 +1,6 @@
+# E040 stage 5, maps: K, Ka, Q, V, 353, window-matched, nside 16, CMB prior white 0.2 uK; 668 s
+region           blocks  n_eff  max h sum D/J_c     index  sandwich      CR0      CR2      CR3  ratio to sandwich:    CR0    CR2    CR3
+High Latitude        46    6.2   0.35      1.00   -3.0940    0.0121   0.0322   0.0386   0.0471                       2.66   3.19   3.89
+Spur                 29    8.0   0.26      1.00   -3.0965    0.0149   0.0245   0.0261   0.0279                       1.64   1.75   1.87
+Galactic Center       4    2.5   0.47      1.01   -3.0867    0.0088   0.0531   0.0640   0.0788                       6.04   7.28   8.96
+Plane                16    4.8   0.37      1.00   -2.9950    0.0120   0.0732   0.0786   0.0858                       6.08   6.53   7.13

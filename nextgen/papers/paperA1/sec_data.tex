@@ -43,17 +43,21 @@ through its own Gaussian beam, gives region indices biased flat by 0.005 to 0.01
 operator on the $N_{\rm side}=16$ grid, $\mathsf{S}_b = 1 + \mathsf{Y}\,\mathrm{diag}(f_\ell - 1)\,
 \mathsf{Y}^{+}$ with $f_\ell$ the ratio of the beam windows to multipole 47, transforming the data and
 the covariance together. In the simulation the residual bias is 0.002 or less, and on the real maps
-the correction moves the four indices by 0.007, 0.003, 0.009 and 0.004 where the simulation
-predicted 0.007, 0.003, 0.009 and 0.004.
+the correction moves the four indices by 0.0068, 0.0025, 0.0085 and 0.0035 where the simulation
+predicted 0.0070, 0.0030, 0.0088 and 0.0041 (white CMB prior).
 
 \paragraph{Model.} Synchrotron as a power law with one index per region and one amplitude per
 element (pixel and Stokes parameter); dust as the modified blackbody above with one amplitude per
-element under a flat prior; and the CMB with one amplitude per element. For the CMB we show three
-priors side by side, because the choice matters for the pivot of Sect.~\ref{sec:flat}: a white
-Gaussian prior of 0.2 $\muK$ per element; the $\Lambda$CDM covariance of $E$ and $B$ modes through
-the working window; and a flat prior, for which the profile score is unbiased whatever the CMB is.
-The white prior has the right total variance and the wrong shape: it understates the $\Lambda$CDM
-$E$-mode variance by a factor of 200 at the quadrupole and overstates it above multipole 10.
+element under a flat prior; and the CMB with one amplitude per element. The prior on the CMB
+amplitudes is the $\Lambda$CDM covariance of $E$ and $B$ modes on the grid: spectra from CAMB
+\citep{lewis2000} for the Planck 2018 parameters \citep{planck2018vi} with an optical depth of 0.054,
+through the working window and the pixel window, plus a white floor of 0.01 $\muK$. Two other choices
+are shown beside it, because the choice matters both for the index and for the pivot of
+Sect.~\ref{sec:flat}: a white Gaussian prior of 0.2 $\muK$ per element, which we used first, and a
+flat prior, for which the profile score is unbiased whatever the CMB is. The white prior has nearly
+the right total variance (0.17 $\muK$ per element for $\Lambda$CDM) and the wrong shape: it
+understates the $\Lambda$CDM $E$-mode variance by a factor of 200 at the quadrupole and overstates it
+above multipole 10.
 Regions: the four of \citet{svalheim2023} (High Latitude, Spur, Galactic Center, Plane; 4388, 928,
 182 and 646 elements). No mask is applied.
 
@@ -229,17 +233,29 @@ and 5 for the four regions on the maps, out of 46, 29, 4 and 16 patches with dat
 one sky is therefore itself uncertain by a third or so and should be read with the quantiles of a
 $t$ distribution with few degrees of freedom \citep{bell2002,cameron2015}; for the Galactic Center we
 quote none. On the simulations of the previous subsection, where the model is true, the block error
-reproduces the scatter of the estimate (root mean square of the standardized error 0.82, 1.20 and
-1.02 at High Latitude, in the Spur and in the Plane, where 1.1 to 1.3 is expected for a variance
-estimate with 4 to 8 degrees of freedom), and the form without the leverage correction is too small
-(1.26 and 1.39 in the Plane and the Spur). \pend{With a true spread of the index between patches.}
+reproduces the scatter of the estimate: the root mean square of the standardized error is 0.82, 1.20
+and 1.02 at High Latitude, in the Spur and in the Plane, where 1.1 to 1.3 is expected for a variance
+estimate with 4 to 8 degrees of freedom, and the form without the leverage correction is too small
+(1.39 and 1.26 in the Spur and the Plane). When the same simulations are given a true spread of the
+index of 0.1 between patches, drawn anew for each realization, the sandwich error is too small by a
+factor of 2.4 to 3.1 and the block error follows the scatter of the estimate about the mean index of
+the region (0.59, 0.99 and 0.91; at High Latitude it is conservative in both tests). In that test the
+scatter of the estimate is, within 10 percent, the spread between patches divided by the square root
+of the effective number of patches, added in quadrature to the sandwich error. The rule for choosing
+between this form and two others, closest to one in both tests and in doubt the more conservative,
+was written before either test was read; the three forms differ by 15 to 45 percent on the maps and
+all are in the record (\exref{E040}).
 
 On the maps the block error is 3.5, 2.3 and 7.5 times the sandwich error at High Latitude, in the
 Spur and in the Plane (Table~\ref{tab:e040}): 0.04, 0.04 and 0.10 where the model gives 0.012, 0.016
-and 0.013. Under the model that ratio has a median near one and exceeded 1.6 in none of the 60
-simulations \pend{check the maximum}. The regions are not one index each, the Plane least of all, and
-the error of ``the index of this region'' is three to eight times the error of the estimator under
-the model.
+and 0.013. \pend{Under the model the ratio has a median near one; its largest value in 60
+simulations.} In the simulation with a spread of 0.1 its median is 3.8, 2.4 and 3.6. So the High
+Latitude and Spur regions look like a spread of the index of about 0.1 between patches of $30^\circ$,
+and the Plane like twice that, with the caveat that any other misfit (dust, beams, the noise model)
+scatters the patch scores as a varying index does, and that the simulation is at $N_{\rm side}=8$.
+What the fit of a region returns is the index of the half dozen patches that carry its information,
+and the error of ``the index of this region'' is two to eight times the error of the estimator under
+the model. With the block errors the four regions do not differ from each other.
 
 The comparison between the rows of Table~\ref{tab:e040} is differential. It does not need the model
 to be right, only to be the same in every row.
