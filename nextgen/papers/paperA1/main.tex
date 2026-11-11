@@ -10,6 +10,9 @@
 \captionsetup{font=small,labelfont=bf}
 
 \newcommand{\pend}[1]{\textcolor{red}{[#1]}}
+% numbers of the data section, written by nextgen/scripts/paperA1_make_e044.py as \N{key}
+\newcommand{\N}[1]{\textcolor{red}{[#1 pending]}}
+\IfFileExists{gen_numbers.tex}{\input{gen_numbers}}{}
 \newcommand{\exref}[1]{\textsf{\small #1}}
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\T}{^{\mathsf{T}}}
