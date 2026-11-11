@@ -69,6 +69,10 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F45 | B | Four chains, one sky; closes the intensity template-prior sequence |
 | F46 | A for (a) to (d) in one dimension, B for (e) | Exact one-dimensional targets, 400 realizations per cell, pre-registered; the coupled dense case is E039 |
 | F47 | B | Deterministic input checks; the LFI noise model is empirical |
+| F48 | A for the shift, B for the values | Pre-registered; real maps; see F49 for the values |
+| F49 | B | Found through a failed control; stability across the cut pending |
+| F50 | B, C for the leakage reading | Band pairs pre-registered; the PR4 against PR3 part is exploratory |
+| F51 | B for the numbers, D for the reading of published chains | Not their maps, pixelization or chains |
 
 ## 1. Sampler correctness
 
@@ -1184,3 +1188,60 @@ PR4 30 GHz agree in sign and units (correlation 0.985 in Q, 0.970 in U on elemen
 and their unweighted ratio is 0.453 and 0.470 against 0.502 for an index of -3.1 with
 band-averaged spectra. That is not a measurement: an unweighted fit gives the poorly measured
 large-scale modes of the K-band map full weight.
+
+## 9. Real polarization data (2026-11-10 and 11)
+
+**F48. On the WMAP nine-year K to V polarization maps the flat-prior reference shift is there at
+the predicted size, and the profile likelihood gives indices near -3.1 with errors of 0.01 to
+0.02** (E040, four BP XV regions, nside 16, released dense covariances, 353 GHz for dust through
+its measured bandpass, CMB prior 0.2 uK, bands brought to a common window; expectations written
+before the first fit; E039 stage 1 passed first). Profile optimum with debiased sandwich error,
+all scales: High Latitude -3.094 +- 0.012, Spur -3.097 +- 0.015, Galactic Center -3.087 +- 0.009,
+Plane -2.995 +- 0.012; chi-square per element and band 0.58, 0.59, 1.82, 0.78 against an expected
+0.6. The same likelihood under flat amplitude priors: -3.102 (reference 23 GHz) and -2.944
+(reference 30 GHz) at high latitude, a move of +0.158 against a first-order prediction of +0.172
+(Spur +0.075 against +0.079, Galactic Center +0.025 against +0.027, Plane +0.037 against +0.038);
+12 sandwich sd at high latitude. At nside 8 the move was +0.062. The zero-mean prior is within
+0.4 sd of the profile in the three regions that fit. Grade A for the shift (an identity,
+confirmed on simulations with the real covariances in E039 and on the maps), B for the index
+values, which carry F49.
+
+**F49. The pixel scale of the nside-16 maps carries a beam-aliasing bias toward a flatter index,
+0.02 to 0.07 for WMAP K to V** (E042 negative control and low-pass arm; E038 c2). Removing
+multipoles 2 to 20 from one band moved the K, Ka index by +0.08, +0.16, +0.11 and +0.37 where the
+pre-registered control required no movement. Every amplitude ratio to K band rises by 6 to 10
+percent at multipoles 35 to 47 (Ka over K: 0.32 to 0.33 up to multipole 34, 0.35 above). The maps
+are pixel averages of skies that are not band-limited and K band has the widest beam; the window
+operator of E038 works to multipole 47 only, and its validating simulation had no compact
+structure. With the lowest band and 353 GHz at all scales and the other bands informing the index
+through multipoles 2 to 20 only, K, Ka, Q, V gives -3.113 +- 0.014, -3.112 +- 0.017, -3.140 +-
+0.011 and -3.061 +- 0.014: steeper by 0.019, 0.015, 0.053 and 0.066, errors 10 to 20 percent
+larger. A separate failure of the same family: degrading to nside 8 with the dense weights biases
+the Galactic Center by +0.22 in simulation and +0.23 on the maps (E040 R8). Grade B: one cut
+value read so far; stability across L = 12, 20, 30 pending.
+
+**F50. Planck 30 GHz polarization cannot be combined with WMAP K to V in one power law at this
+precision, and the answer depends on the release** (E040 stage 2, E042). Index from multipoles 2
+to 20: K with PR4 30 GHz -3.590 +- 0.023, -3.244 +- 0.028, -3.553 +- 0.017, -3.217 +- 0.025
+against K with Ka -3.092, -3.085, -3.109, -3.042; 30 GHz with Ka -2.31 to -2.79. PR4 30 GHz is
+fainter than the extrapolation of K band by 4 to 11 percent. With the PR3 map (all scales) the
+K to 30 GHz index is -2.921 at high latitude where PR4 gives -3.428, with a reduced chi-square of
+6. Observed minus predicted for PR4 30 GHz from a WMAP-only fit: 16 to 43 times the noise model
+at multipoles 2 to 6 in B as in E, against 2 to 4 for the Ka control. Projecting out the 20
+K-band modes with more than ten times the median variance moves the high-latitude index by 0.03.
+Exploratory (found after looking at the residual map): for abs(b) < 5 in the inner Galaxy PR4 is
+15 percent fainter than PR3 (slope 0.854), 4 percent for 5 to 20 degrees, equal above 20, and the
+plane residual follows the intensity at 0.05 to 0.13 percent, the size of a difference between
+two bandpass-leakage corrections. Grade B for the band-pair indices, C for the leakage reading.
+
+**F51. For the BeyondPlanck band set and reference (30 to 70 GHz, Ka, Q, V, 353; no K band; flat
+priors on every amplitude; amplitude defined at 30 GHz) the flat-prior optimum is at the upper
+bound of the allowed range at high latitude** (E040 stage 3, PR4 and WMAP maps, nside 16). Profile
+-2.695 +- 0.040, -2.921, -2.819, -2.780; flat prior at 30 GHz -1.600 (bound), -2.314, -2.752,
+-2.479; flat prior at 23 GHz -4.036, -3.432, -2.885, -2.997. Svalheim et al. (2023) and Watts et
+al. (2023) report "unreasonably flat" high-latitude indices for a conditional index step at a 30
+GHz reference and constrain them with N(-3.3, 0.1^2). The volume term has that sign and more than
+that size in this configuration. Grade B for the numbers, D for any statement about those
+chains, which were not examined. The profile index of this band set moves by 0.3 with the CMB
+prior, which is F50 from another side.
+
