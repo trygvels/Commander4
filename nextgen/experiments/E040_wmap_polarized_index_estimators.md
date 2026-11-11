@@ -164,6 +164,29 @@ memory-lean copy of the E040 script; same numerics).
   proportion to the number of amplitudes. It does not say that this is what happened in those
   analyses: that needs their chains. If B1 fails, the reading is withdrawn.
 
+**Stage 4, after the referee report on draft 1 of the paper (`../reviews/2026-11-11_referee_report_paperA1_draft1.md`);
+expectations written 2026-11-11 02:43 before these fits.** The referee's check: a white CMB prior of 0.2 uK
+per element understates the LCDM E-mode variance by factors of 199, 128, 66, 29 and 12 at
+multipoles 2 to 6 and overstates it above multipole 10 and for every B mode. The central table of
+the paper (the four estimators on K, Ka, Q, V, 353, window-matched, nside 16) is repeated with
+(i) the LCDM pixel covariance as the CMB prior (`lowres.window.lcdm_cmb_precision`: CAMB, Planck
+2018 parameters, tau 0.0544, the 60 arcmin window and the pixel window, a 0.01 uK white floor;
+checked: rms 0.17 uK per element, per-mode variance 7.95 uK^2 at multipole 2) and (ii) a flat CMB
+prior, for which the profile score is unbiased for any CMB.
+
+- C1. LCDM prior: each profile index is within 1 sandwich sd of the white-prior value, and the
+  move of the flat-prior optimum from a 23 to a 30 GHz reference is within 15 percent of the
+  white-prior move (+0.158, +0.075, +0.025, +0.037).
+- C2. Flat CMB prior: each profile index is within 1.5 sd (of the flat-prior error) of the
+  white-prior value, the errors are 1.2 to 2.5 times larger (R7), and the flat-prior optimum is
+  flatter than the profile at both references (the pivot moves to or below the lowest band), by
+  more at 30 GHz than at 23 GHz; the difference between the two references is larger than with
+  the white prior.
+- C3. In all three versions the difference between the references agrees with H^-1 (n ln(30 / 23))
+  within 25 percent wherever it is below 0.3.
+- If C1 fails, the white prior was shaping the baseline and the LCDM version replaces it in the
+  paper's table.
+
 ## Command
 
 ```bash

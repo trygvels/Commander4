@@ -45,3 +45,26 @@ class WindowMatcher:
         S, Si = self.operators(fwhm_arcmin)
         out = Si.T @ ninv @ Si
         return S @ d, 0.5 * (out + out.T)
+
+
+
+def lcdm_cmb_precision(matcher, floor_uk=0.01, tau=0.0544):
+    """Prior precision (2 npix, 2 npix) for CMB Q/U amplitudes on the grid from the LCDM E and B spectra
+    (CAMB, Planck 2018 base parameters), seen through the matcher's target Gaussian window and the pixel
+    window, plus a white floor that keeps the matrix invertible outside the harmonic basis. With the basis
+    columns y = Y_real sqrt(Omega_pix), the covariance of a field with spectrum C_l is Y diag(C_l / Omega_pix) Y^T.
+    Returns the precision and the covariance."""
+    import camb
+    lmax = matcher.lmax
+    pars = camb.set_params(H0=67.36, ombh2=0.02237, omch2=0.1200, tau=tau, As=2.1e-9, ns=0.9649, lmax=max(300, lmax))
+    cls = camb.get_results(pars).get_cmb_power_spectra(pars, CMB_unit="muK", raw_cl=True)["total"]
+    bl = hp.gauss_beam(np.radians(matcher.target / 60.0), lmax=lmax, pol=True)[:, 1]
+    pw = hp.pixwin(matcher.nside, pol=True, lmax=lmax)[1]
+    w2 = (bl * pw) ** 2
+    npix = hp.nside2npix(matcher.nside)
+    omega = 4 * np.pi / npix
+    nE = matcher.Y.shape[1] // 2
+    cl = np.concatenate([(cls[: lmax + 1, 1] * w2)[matcher.ell[:nE]], (cls[: lmax + 1, 2] * w2)[matcher.ell[nE:]]])
+    cov = (matcher.Y * (cl / omega)[None, :]) @ matcher.Y.T + floor_uk ** 2 * np.eye(matcher.Y.shape[0])
+    cov = 0.5 * (cov + cov.T)
+    return np.linalg.inv(cov), cov

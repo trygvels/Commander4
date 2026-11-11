@@ -1,0 +1,35 @@
+(a) c_k and T(k)
+  k=      1 c_k=3.183099e-01 quad=3.183099e-01 T=    1.285 lead=    0.627 T-lead-0.5=+0.1587 acc=0.5+c_k=0.818 sqrtT/k^0.25=1.1338
+  k=      2 c_k=2.500000e-01 quad=2.500000e-01 T=    1.500 lead=    0.886 T-lead-0.5=+0.1138 acc=0.5+c_k=0.750 sqrtT/k^0.25=1.0299
+  k=     10 c_k=1.230469e-01 quad=1.230469e-01 T=    2.532 lead=    1.982 T-lead-0.5=+0.0501 acc=0.5+c_k=0.623 sqrtT/k^0.25=0.8948
+  k=    100 c_k=3.979462e-02 quad=3.979462e-02 T=    6.782 lead=    6.267 T-lead-0.5=+0.0157 acc=0.5+c_k=0.540 sqrtT/k^0.25=0.8235
+  k=   1000 c_k=1.261251e-02 quad=1.261251e-02 T=   20.322 lead=   19.817 T-lead-0.5=+0.0050 acc=0.5+c_k=0.513 sqrtT/k^0.25=0.8016
+  k=  10000 c_k=3.989323e-03 quad=nan T=   63.167 lead=   62.666 T-lead-0.5=+0.0016 acc=0.5+c_k=0.504 sqrtT/k^0.25=0.7948
+  k= 100000 c_k=1.261563e-03 quad=nan T=  198.667 lead=  198.166 T-lead-0.5=+0.0005 acc=0.5+c_k=0.501 sqrtT/k^0.25=0.7926
+  k= 200000 c_k=8.920609e-04 quad=nan T=  280.750 lead=  280.250 T-lead-0.5=+0.0004 acc=0.5+c_k=0.501 sqrtT/k^0.25=0.7923
+  k= 190825 c_k=9.132546e-04 quad=nan T=  274.246 lead=  273.746 T-lead-0.5=+0.0004 acc=0.5+c_k=0.501 sqrtT/k^0.25=0.7923
+(b) R_n
+  n=    1 R_n=1.0000  sqrt(R_n)=1.0000
+  n=    2 R_n=0.8333  sqrt(R_n)=0.9129
+  n=    3 R_n=0.7440  sqrt(R_n)=0.8625
+  n=    5 R_n=0.6465  sqrt(R_n)=0.8041
+  n=   10 R_n=0.5428  sqrt(R_n)=0.7367
+  n=   20 R_n=0.4666  sqrt(R_n)=0.6831
+  n=   50 R_n=0.3956  sqrt(R_n)=0.6289
+  n=  100 R_n=0.3567  sqrt(R_n)=0.5972
+  n= 1000 R_n=0.2761  sqrt(R_n)=0.5254
+  R_2 - 5/6 = -1.11e-16
+  local exponent of R_n in ln n between n=100 and 1000: -0.632 (paper: width as (ln n)^-1/4, so R as -1/2)
+(c) half-covariance repair
+  k=    4 2 I_1/3(k/2,k/2) = 5.185e-01
+  k=    8 2 I_1/3(k/2,k/2) = 3.466e-01
+  k=   16 2 I_1/3(k/2,k/2) = 1.765e-01
+  k=   64 2 I_1/3(k/2,k/2) = 6.239e-03
+  k=  100 2 I_1/3(k/2,k/2) = 6.183e-04
+  k= 1000 2 I_1/3(k/2,k/2) = 1.992e-27
+  decay rate d ln(acc)/dk = -0.05906; 0.5 ln(8/9) = -0.05889
+(d) toy chain, chi2_min = beta^2, k = 1000, one move per redraw, step 0.1 sqrt(T)
+  T=20.322  Var(beta)/profile var = 20.230 +- 0.113  acceptance=0.511 (0.5+c_k=0.513)
+(e) what Eq. (Rn) gives for the real-map settings (k=190825, n=20, small steps)
+  T_1=274.2, sqrt(T_1)=16.56, sqrt(R_20 T_1)=11.31; small-step acceptance per proposal (H_21-1)/20=0.132
+  with the measured noise factor 2.44 in variance: sqrt(R_20 (0.5+sqrt(pi k 2.44/8)))=14.13

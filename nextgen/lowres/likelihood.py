@@ -60,7 +60,11 @@ class BandData:
 
 
 class RegionLikelihood:
-    def __init__(self, bands, region, use_dust=True, use_cmb=True, cmb_prior_sd=None, sync_prior=False):
+    def __init__(self, bands, region, use_dust=True, use_cmb=True, cmb_prior_sd=None, sync_prior=False,
+                 cmb_prior_prec=None):
+        """cmb_prior_sd: white Gaussian prior per element. cmb_prior_prec: dense prior precision (n, n) for the
+        CMB amplitudes, for example the inverse of an LCDM pixel covariance; give one or the other."""
+        assert not (cmb_prior_sd and cmb_prior_prec is not None)
         self.bands = bands
         self.region = np.asarray(region, dtype=int)
         self.n = self.region.size
@@ -85,6 +89,9 @@ class RegionLikelihood:
         if use_cmb and cmb_prior_sd:
             k = self.ic
             self.A_const[k * n:(k + 1) * n, k * n:(k + 1) * n][np.diag_indices(n)] += 1.0 / cmb_prior_sd ** 2
+        if use_cmb and cmb_prior_prec is not None:
+            k = self.ic
+            self.A_const[k * n:(k + 1) * n, k * n:(k + 1) * n] += cmb_prior_prec
 
     def _nuisance_columns(self):
         cols = []

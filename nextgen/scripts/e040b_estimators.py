@@ -49,6 +49,8 @@ def main():
     ap.add_argument("--match-window", type=float, default=0.0,
                     help="arcmin; bring every band to this common window at nside 16 before the fit (lowres.window; E038 c2)")
     ap.add_argument("--beta0", type=float, default=-3.1, help="start value of every region index")
+    ap.add_argument("--cmb-prior-lcdm", action="store_true",
+                    help="CMB prior from the LCDM E and B spectra through the working window (needs --match-window and nside 16)")
     ap.add_argument("--no-drift", action="store_true", help="pre-flight WMAP bandpasses without the nine-year drift correction")
     ap.add_argument("--out", default="")
     a = ap.parse_args()
@@ -105,6 +107,15 @@ def main():
     prior = a.cmb_prior_sd if a.cmb_prior_sd > 0 else None
     has_dust = "353" in a.bands
     kw = dict(cmb_prior_sd=prior, use_dust=has_dust)
+    if a.cmb_prior_lcdm:
+        from lowres.window import lcdm_cmb_precision
+        assert WM is not None and ns == 16
+        prec, cov_c = lcdm_cmb_precision(WM)
+        print(f"# CMB prior: LCDM E and B spectra through the {a.match_window:.0f} arcmin window and the pixel window; rms per element "
+              f"{np.sqrt(np.mean(np.diag(cov_c))):.3f} uK")
+        del cov_c
+        kw = dict(cmb_prior_sd=None, cmb_prior_prec=prec, use_dust=has_dust)
+        prior = True
     L = RegionLikelihood(bands_for(23.0), region, **kw)
     bh, res = fit_profile(L, np.full(nreg, a.beta0))
     # errors from this one data set: J(a_hat) - T estimates J, and J(a_hat) the score covariance (fit.sandwich_plugin)

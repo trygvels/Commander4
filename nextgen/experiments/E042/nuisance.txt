@@ -1,0 +1,2 @@
+# E042: profile index and debiased sandwich error per region (High Latitude, Spur, Galactic Center, Plane); chi2; chi2 per band and element
+# amp_global: gradient check, parameter 4: analytic +11072.4755, numerical +11072.1515

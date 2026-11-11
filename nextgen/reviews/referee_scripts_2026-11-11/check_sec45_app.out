@@ -1,0 +1,36 @@
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: divide by zero encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: overflow encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: invalid value encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+(A) tilt identity, Eq. (tilt)
+  betas=[-3.1 -2.8]: d chimin=-2.07e-12  d lnL_flat=-9.4856030167  sum n_r beta_r ln(30/23)=-9.4856030167
+  betas=[-2.5 -3.6]: d chimin=+5.54e-13  d lnL_flat=-9.4324623835  sum n_r beta_r ln(30/23)=-9.4324623835
+(B) Hessian of (1/2) ln det A against 2T
+  one component, diagonal noise     : Hess(1/2 ln det A)=   2.1098  T=   1.0549  ratio Hess/T=2.0000
+  sync + free CMB, diagonal noise   : Hess(1/2 ln det A)=  -2.0037  T=   0.4808  ratio Hess/T=-4.1676
+  one component, dense noise        : Hess(1/2 ln det A)=   1.9947  T=   0.9842  ratio Hess/T=2.0268
+(C) first-order shift of the flat-prior optimum from the profile optimum
+  T/J= 0.010 nuref=23 nupiv=23.65: exact shift=-0.01633  g/(J+2T)=-0.01620  g/J=-0.01652  n ln(nuref/nupiv)/(J+2T)=-0.01620
+  T/J= 0.010 nuref=26 nupiv=23.65: exact shift=+0.05338  g/(J+2T)=+0.05478  g/J=+0.05585  n ln(nuref/nupiv)/(J+2T)=+0.05478
+  T/J= 0.010 nuref=30 nupiv=23.65: exact shift=+0.12928  g/(J+2T)=+0.13762  g/J=+0.14032  n ln(nuref/nupiv)/(J+2T)=+0.13762
+  T/J= 0.084 nuref=23 nupiv=23.65: exact shift=-0.12886  g/(J+2T)=-0.12136  g/J=-0.14180  n ln(nuref/nupiv)/(J+2T)=-0.12136
+  T/J= 0.084 nuref=26 nupiv=23.65: exact shift=+0.34913  g/(J+2T)=+0.41030  g/J=+0.47941  n ln(nuref/nupiv)/(J+2T)=+0.41030
+  T/J= 0.084 nuref=30 nupiv=23.65: exact shift=+0.73623  g/(J+2T)=+1.03086  g/J=+1.20448  n ln(nuref/nupiv)/(J+2T)=+1.03086
+  T/J= 0.366 nuref=23 nupiv=23.65: exact shift=-0.42464  g/(J+2T)=-0.35588  g/J=-0.61645  n ln(nuref/nupiv)/(J+2T)=-0.35588
+  T/J= 0.366 nuref=26 nupiv=23.65: exact shift=+0.84456  g/(J+2T)=+1.20318  g/J=+2.08413  n ln(nuref/nupiv)/(J+2T)=+1.20318
+  T/J= 0.366 nuref=30 nupiv=23.65: exact shift=+1.50000  g/(J+2T)=+3.02291  g/J=+5.23624  n ln(nuref/nupiv)/(J+2T)=+3.02291
+(D) Monte Carlo of score, curvature and plug-in information (2 regions, sync+CMB+dust, dense noise)
+  mean score = [-0.00025366 -0.00074261] +- [0.00098868 0.00076308]
+  Var(s)/(J+T): [0,0] 0.9951  [1,1] 0.9984  [0,1] cov 0.0003 vs 0.0002
+  E[curvature of chimin/2]_00 = 0.0045 +- 0.0002;  J_00 = 0.0046;  (J+T)_00 = 0.0393
+  E[J(a_hat)]_00 = 0.0392 +- 0.0001;  (J+T)_00 = 0.0393;  T/J_00 = 7.628
+  first-order estimator variance / sandwich: 0.9949, 0.9982
+(E) zero-mean prior, maximized scale, common noise pattern
+  q/n range 7.48 to 7.49; max |numerical - (q/2 - n/2 ln q) - const| = 2.27e-13
+  optimum: profile -3.099315, zero-mean -3.099314; curvature ratio 0.8666; 1-n/q = 0.8666; 1/(1+T/J) at truth = 0.8637
+(F) appendix: expected score with a Gaussian prior of the wrong variance on the CMB
+  kappa^2=1.00: exact E[s]=-0.00000   (kappa^2-1) t=-0.00000   -(kappa^2-1) t=+0.00000
+  kappa^2=0.25: exact E[s]=-0.90377   (kappa^2-1) t=+0.90377   -(kappa^2-1) t=-0.90377
+  kappa^2=4.00: exact E[s]=+3.61507   (kappa^2-1) t=-3.61507   -(kappa^2-1) t=+3.61507
