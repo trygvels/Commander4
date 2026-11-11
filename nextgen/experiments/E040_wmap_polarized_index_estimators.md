@@ -583,6 +583,28 @@ noise model doubled. With the white CMB prior and the noise model the fit gave -
   the statement of the paper that these maps cannot be combined in one power law rests on the noise model
   and is weakened accordingly.
 
+### Stage 4c results: K band with PR4 30 GHz under the LCDM prior (read 2026-11-11 07:52 to 08:03)
+
+`E040/l_K30_wm.txt`, `l_K30_wm_white.txt`, `l_K30_wm_a2.txt` (sound path, canary, no OVERFLOW line).
+
+| Fit | Indices | Sandwich errors | chi2_min over nominal dof |
+|---|---|---|---|
+| K, Ka, 353 (reference) | -3.0583, -3.0683, -3.0431, -2.9664 | 0.0159, 0.0207, 0.0115, 0.0170 | 1.122 |
+| K, 30, 353, noise model of E038 | -3.4167, -3.1707, -3.2610, -3.0246 | 0.0186, 0.0235, 0.0125, 0.0200 | 2.637 |
+| the same, white-noise columns only | -3.4357, -3.2411, -3.3169, -3.1040 | 0.0136, 0.0164, 0.0098, 0.0140 | 4.194 |
+| the same, power-law term of the noise model doubled | -3.3974, -3.1442, -3.2362, -2.9824 | 0.0207, 0.0268, 0.0135, 0.0226 | 2.320 |
+
+- F1 holds: with the LCDM prior the K, 30 indices are steeper than the K, Ka indices by 0.358 at High Latitude
+  and 0.218 in the Galactic Center (and 0.102, 0.058 in the Spur and the Plane), and the reduced chi-square is
+  2.64. The white-prior values were -3.4275, -3.1800, -3.2631, -3.0352 with 2.64: the CMB prior does not matter here.
+- F2 holds except for one region: with white noise only the reduced chi-square rises to 4.19 and the indices
+  move by -0.019, -0.070, -0.056, -0.079 (all below 0.1). With the power-law term doubled it falls to
+  2.32, above 1.5, and the gap to K, Ka closes by 5, 26, 11, 73 percent; I wrote "less than half" and
+  the Plane, whose gap is the smallest (0.058), closes by more.
+- The condition under which the paper's statement would rest on the noise model (reduced chi-square below 1.3
+  and more than half of the gap closed) is not met: doubling the correlated-noise term leaves a reduced
+  chi-square of 2.32 and a High Latitude gap of 0.34.
+
 ### Stage 5, pre-registered 2026-11-11 03:20: errors that do not assume the model fits (referee item 8)
 
 The sandwich error assumes that the model is right inside each region: one index, the stated noise. The
