@@ -1,0 +1,5 @@
+order 4608 repetition 0: logdet 7865.2280, sum of the solution 840.41621872 [0 s]
+order 4608 repetition 1: logdet 7856.5905, sum of the solution 842.29533452 [1 s]
+order 4608 repetition 2: logdet 7876.0205, sum of the solution 838.12487479 [2 s]
+order 4608 repetition 3: logdet 7864.7615, sum of the solution 840.53356693 [3 s]
+order 4608 repetition 4: logdet 7866.3620, sum of the solution 839.83837292 [3 s]

@@ -176,6 +176,12 @@ absolute difference 0.00 as printed (four decimals in the indices and in chi-squ
 summary line identical (mean z, sd of z, coverage, chi-square 1.0006 +- 0.0220, the flat-prior shifts and
 their predictions). No OVERFLOW line. The validation table of Paper A1 stands as recorded.
 
+**More factorizations on the old path at the nside-16 orders (08:15).** `e043_oldpath_repeat.py` under the canary: 20
+new matrices of order 18432 and 20 of order 12288 factorized in place with `lower=True`: no OVERFLOW line.
+The same script at order 4608 as the positive control: 5 of 5 overrun. With the dozen factorizations of the
+real baseline (V1) this is what "not exposed" rests on for the nside-16 fits: 52 factorizations at their
+orders without an overrun, against an overrun in every factorization tried between orders 1500 and 5000.
+
 **V5, interim (08:07; 29 of 95 realizations of the first part).** 1421 numbers compared: 93.3 percent identical as
 printed, 99.4 percent within 1e-4, largest difference 3e-4. Nine entries exceed the tolerance of 2e-4 that I
 wrote, in three realizations, all in regions whose sandwich error at the truth is 0.15 to 0.34 (regions that the
