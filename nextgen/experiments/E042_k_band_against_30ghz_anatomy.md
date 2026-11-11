@@ -221,6 +221,54 @@ band, shows only a small feature at the Galactic Center, which points at 30 GHz.
 there is no correlation with intensity, and the residual there anticorrelates with the predicted
 synchrotron (-0.37): the high-latitude deficit is a different thing from the plane residual.
 
+**Negative control, 2026-11-11 01:01 to 01:17** (`E042/modes_ctrl.txt`): the same cuts in the K, Ka, 353 fit.
+
+| cut | High Latitude | Spur | Galactic Center | Plane |
+|---|---|---|---|---|
+| none | -3.062 +- 0.016 | -3.074 +- 0.020 | -3.046 +- 0.011 | -2.980 +- 0.016 |
+| Ka, L = 8 | -3.048 +- 0.019 | -2.992 +- 0.033 | -2.992 +- 0.013 | -2.754 +- 0.028 |
+| K band, L = 8 | -3.051 +- 0.019 | -2.994 +- 0.033 | -2.993 +- 0.013 | -2.735 +- 0.029 |
+| Ka, L = 20 | -2.979 +- 0.030 | -2.912 +- 0.046 | -2.937 +- 0.017 | -2.615 +- 0.037 |
+| K band, L = 20 | -2.989 +- 0.030 | -2.916 +- 0.048 | -2.936 +- 0.018 | -2.599 +- 0.039 |
+
+- **The negative control fails.** I required the K, Ka index to move by less than 2 sd of its
+  enlarged error. It moves by +0.014, +0.082, +0.054 and +0.226 at L = 8 (0.7, 2.5, 4.1 and 8.2
+  sd) and by +0.083, +0.162, +0.109 and +0.365 at L = 20. Within WMAP too, the index flattens as
+  large scales are removed.
+- So the scale dependence of (a) is not a property of 30 GHz. In amplitude, the ratio to K band at
+  multipoles above 20 against all scales rises by 3, 6, 4 and 14 percent for Ka and by 7, 6, 5
+  and 8 percent for PR4 30 GHz (the four regions in order): K band has less power at the pixel
+  scale than the other bands, relative to what the window model gives it.
+- Mechanism, consistent with the last bin of the ratio table (every ratio to K band up by 6 to 10
+  percent at multipoles 35 to 47): the nside-16 maps are pixel averages of maps that are not
+  band-limited. Structure above multipole 47, of which the bright plane has plenty, aliases into
+  the pixel scale with each band's own beam, and K band has the widest. The window operator works
+  to multipole 47 and cannot touch this. The E038 (c) simulation did not show it at this size
+  because its sky had no compact structure and its fits used all scales.
+- **Consequence for (a):** the statement "the index between K band and 30 GHz depends on angular
+  scale" is withdrawn as a statement about 30 GHz. Net of the control, only the High Latitude
+  region keeps a 30 GHz-specific large-scale effect (about 4 percent in amplitude between all
+  scales and multipoles above 20).
+- **Consequence for E040:** every fit that uses the pixel scale carries this bias toward a flatter
+  index, largest where the sky is bright and structured. It has to be measured from the other
+  side, with fits that do not use the pixel scale.
+
+**Low-pass arm, expectations written 2026-11-11 01:17 before it is run** (`nextgen/scripts/e042e_lowpass.py`).
+Every band restricted to multipoles 2 to L by keeping its harmonic coefficients with their
+covariance; L = 20 first, then 12 and 30. Band sets K, Ka, Q, V; K, Ka; K, 30; 30, Ka (all with
+353).
+
+- Z1. At L = 20 the K, Ka, Q, V indices are steeper than the all-scale baseline by 0 to 0.04 at
+  high latitude and by 0.02 to 0.12 in the Plane and the Spur.
+- Z2. At L = 20 the K, 30 (PR4) index is between -3.7 and -3.3 in the Plane and between -3.6 and
+  -3.3 at high latitude: with the pixel scale gone, the plane deficit of PR4 that the ratio table
+  shows (0.44 to 0.47 against 0.505) is no longer masked.
+- Z3. At L = 20 the 30, Ka index is flatter than -2.6 in the Plane.
+- Z4. The indices at L = 12, 20 and 30 for K, Ka, Q, V agree with each other within 2 sd of the
+  L = 12 error; if they do, L = 20 becomes the baseline of the paper's tables and the all-scale
+  fit is reported as the arm that carries the aliasing bias. If they do not, there is no
+  resolution-independent index for these regions at this depth and the paper says so.
+
 **Exploratory, not pre-registered: amplitude ratios by multipole and PR4 against PR3, 2026-11-11
 01:02 to 01:03** (`E042/cross_ratio.txt`, `E042/pr3_vs_pr4_direct.txt`). Prompted by the scale
 dependence of (a). Two model-light diagnostics on the window-matched nside-16 maps.

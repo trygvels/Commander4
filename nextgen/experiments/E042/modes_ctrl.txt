@@ -1,0 +1,5 @@
+# E042: profile index and debiased sandwich error per region (High Latitude, Spur, Galactic Center, Plane); chi2; chi2 per band and element
+K Ka 353, Ka cut l<=8        -3.0480 +- 0.0193  -2.9924 +- 0.0325  -2.9917 +- 0.0132  -2.7538 +- 0.0275 | chi2     6451.5 | WMAP_K 0.096  WMAP_Ka 0.949  Planck_353 0.000 | 355 s
+K Ka 353, K cut l<=8         -3.0510 +- 0.0194  -2.9940 +- 0.0332  -2.9927 +- 0.0132  -2.7346 +- 0.0290 | chi2     6447.1 | WMAP_K 0.096  WMAP_Ka 0.948  Planck_353 0.000 | 595 s
+K Ka 353, Ka cut l<=20       -2.9793 +- 0.0300  -2.9123 +- 0.0464  -2.9367 +- 0.0174  -2.6153 +- 0.0374 | chi2     5549.1 | WMAP_K 0.087  WMAP_Ka 0.812  Planck_353 0.000 | 788 s
+K Ka 353, K cut l<=20        -2.9891 +- 0.0304  -2.9156 +- 0.0484  -2.9360 +- 0.0175  -2.5989 +- 0.0385 | chi2     5545.0 | WMAP_K 0.087  WMAP_Ka 0.811  Planck_353 0.000 | 982 s
