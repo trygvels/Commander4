@@ -11,12 +11,32 @@ on a component that does not depend on the index, state the sensitivity of the i
 variance; (v) model the difference between the beams of the bands, even at $3.7^\circ$ pixels, and
 use measured bandpasses for every band including the dust tracer.
 
-\paragraph{What it changes for published numbers.} \pend{Final numbers from Sect.~\ref{sec:data}: the
-spread between conventions on the same maps against the spread of published values; the K band
-against 30 GHz result.}
+\paragraph{What it changes for published numbers.} From WMAP K to V alone, at multipoles up to 20,
+with dense covariances and the profile likelihood, the polarized synchrotron index is $-3.11$ in the
+High Latitude and Spur regions and $-3.06$ in the Plane, with statistical errors of 0.01 to 0.02
+(Eq.~\ref{eq:result}). These agree with the WMAP-based estimates of \citet{dunkley2009} ($-3.08 \pm
+0.06$ at high and $-3.00 \pm 0.04$ at low latitude) and \citet{fuskeland2014}, and with the Spur
+value of \citet{svalheim2023} ($-3.17 \pm 0.06$), within their errors, which are four to five times
+ours. The differences between regions are smaller than in the all-scale fit: half of the apparent
+flattening toward the Galactic plane was aliasing at the pixel scale.
+
+Three choices that are usually not reported each move the answer by more than these errors. The
+reference frequency of a flat amplitude prior moves the high-latitude index by 0.16 at
+$N_{\rm side}=16$, more at finer pixelization, and by more than a unit for a band set without K band
+and with a free CMB amplitude. The pixel scale of the low-resolution maps moves it by 0.02 to 0.07.
+And the inclusion of Planck 30 GHz moves it by up to 0.5, in a direction that depends on the release.
+The spread of published values, $-2.9$ to $-3.3$ for the same sky, is of the size of these three
+effects, not of the statistical errors.
+
+For the analyses that sample the index conditional on the amplitudes at a 30 GHz reference and
+report flat high-latitude indices unless an informative prior is applied
+\citep{svalheim2023,watts2023}, Sect.~\ref{sec:bpset} offers a reading that does not need unmodelled
+systematics. It is a reading of a configuration, tested on other maps at another resolution, and
+whether it describes those chains can only be settled with them.
 
 \paragraph{What we did not do.} All results are for maps, at low resolution, with one index per
-region and Gaussian noise of known covariance. We did not treat time-ordered data, gain or bandpass
+region and Gaussian noise of known covariance. The beam-aliasing bias at the pixel scale was found
+through a failed control and is handled by excluding that scale from the index, not by modelling it. We did not treat time-ordered data, gain or bandpass
 sampling, or an index field with inferred smoothness, for which a proper amplitude prior is needed
 and has the failure modes of Sect.~\ref{sec:limits}. The real-map test of the tempering law rests on
 an acceptance-noise factor measured from the log of the same chain; the forward prediction (widths of

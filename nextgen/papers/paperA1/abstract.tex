@@ -7,8 +7,8 @@ $\chi^2$ of the new pair is, on its own, a pseudo-marginal kernel for the profil
 Gibbs sweep that also redraws the amplitudes it becomes Monte Carlo within Metropolis and converges to
 the profile posterior raised to the power $1/T$, with $T = \tfrac12 + 1/(4c_k) \simeq \sqrt{\pi k/8} +
 \tfrac12$ for $k$ amplitudes. The index error from such a chain is too wide by $0.79\,k^{1/4}$. We
-derive the law, its form for several moves per amplitude draw and for inexact stored amplitudes, and
-confirm it on toy chains to 0.2 percent and on a real-map chain. (2) A flat amplitude prior is exactly
+derive the law, its form for several moves per amplitude draw and for inexact stored amplitudes,
+confirm it on toy chains to 0.2 percent, and use it to account for a real-map chain. (2) A flat amplitude prior is exactly
 an exponential prior on the index with rate $n\ln\nu_{\rm ref}$, $n$ the number of amplitudes and
 $\nu_{\rm ref}$ the frequency at which they are defined. The index is shifted by
 $\ln(\nu_{\rm ref}/\nu_{\rm piv})$ times the index variance carried by one amplitude, a shift that does
@@ -20,5 +20,17 @@ natural plug-in sandwich correction is biased the wrong way, and a debiased form
 over four decades of $\Tm/\J$. A zero-mean amplitude prior with a free scale is the same estimator for
 a uniform noise pattern and is biased by up to 0.6 standard deviations otherwise. We apply the
 estimators side by side to the WMAP nine-year K to V polarization maps with their dense noise
-covariances and to Planck PR4. \pend{Headline numbers of Sect.~\ref{sec:data}.}
+covariances and to the Planck 30 to 70 GHz maps. On the same maps, regions and noise model, the
+high-latitude polarized synchrotron index is $-3.09$ with the profile likelihood, $-3.10$ with a
+flat amplitude prior stated at 23 GHz and $-2.94$ with the same prior stated at 30 GHz: twelve
+standard deviations from a change of convention, as the identity predicts to 8 percent. For a band
+set without K band and with an unconstrained CMB amplitude, the flat-prior optimum at a 30 GHz
+reference lies at the upper edge of the allowed range at high latitude, more than a unit of index
+from the profile optimum, which offers a reading of the flat high-latitude indices reported by
+earlier analyses in that configuration. Two instrumental effects turn out to matter at the level of
+the statistical errors: the pixel scale of the low-resolution maps carries a beam-aliasing bias
+toward flat indices, of 0.02 to 0.07, and the Planck 30 GHz polarization map cannot be combined with
+WMAP in one power law, its index against K band differing by 0.5 between the 2018 and PR4 releases.
+From WMAP K to V at multipoles up to 20 we find $\beta_{\rm s} = -3.11 \pm 0.01$ at high latitude,
+$-3.11 \pm 0.02$ in the North Polar Spur and $-3.06 \pm 0.01$ in the Galactic plane (statistical).
 \end{abstract}

@@ -28,4 +28,9 @@ check the gradients against finite differences, the diagonal-noise closed forms,
 against $\sum u V$ and $\sum V$, the sandwich against the scatter of 300 fits, the plug-in bias and
 its correction, and the identity of Eq.~(\ref{eq:tilt}) to nine digits. The bandpass readers
 reproduce the published LFI colour-correction ratios to $3\times10^{-4}$ and the HFI unit conversions
-to 0.3 percent. \pend{An independent statistical review of the module is in progress.}
+to 0.3 percent. An independent statistical review of the module, by a reviewer who derived the targets from the
+stated model before reading our derivations, found no code defect; it corrected the response formula
+of Sect.~\ref{sec:flat} (the curvature of the marginal in place of the profile information), the
+condition under which the profile score is unbiased when a component carries a prior
+(App.~\ref{app:sandwich}), and a docstring, and it measured the limits of the plug-in error quoted in
+Sect.~\ref{sec:profile} (\exref{E039}, independent review).
