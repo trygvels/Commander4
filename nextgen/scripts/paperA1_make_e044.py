@@ -29,8 +29,19 @@ def load(tag):
     return np.load(p, allow_pickle=True)
 
 
+def fm(val, fmt):
+    """Format a number; a value that rounds to zero is printed without a sign."""
+    s = fmt.format(val)
+    try:
+        if float(s) == 0.0:
+            s = s.replace("-", "").replace("+", "")
+    except ValueError:
+        pass
+    return s.replace("-", "$-$")
+
+
 def put(key, val, fmt="{:.3f}"):
-    nums[key] = fmt.format(val).replace("-", "$-$") if not isinstance(val, str) else val
+    nums[key] = fm(val, fmt) if not isinstance(val, str) else val
 
 
 def put4(key, vals, fmt="{:.3f}"):
@@ -39,7 +50,7 @@ def put4(key, vals, fmt="{:.3f}"):
     lo, hi = float(np.min(np.abs(vals))), float(np.max(np.abs(vals)))
     a, b = fmt.format(lo).replace("+", ""), fmt.format(hi).replace("+", "")
     nums[f"{key}.range"] = a if a == b else f"{a} to {b}"
-    nums[f"{key}.list"] = ", ".join(fmt.format(float(v)).replace("-", "$-$") for v in vals[:-1]) + " and " + fmt.format(float(vals[-1])).replace("-", "$-$")
+    nums[f"{key}.list"] = ", ".join(fm(float(v), fmt) for v in vals[:-1]) + " and " + fm(float(vals[-1]), fmt)
 
 
 def row(label, vals, f):

@@ -219,6 +219,44 @@ when the noise pattern differs between amplitudes; here, with three components, 
 High Latitude region, it is larger. This changes one sentence of the paper's abstract and one recommendation:
 the zero-mean prior is not a substitute for the profile likelihood on these maps.
 
+### R3, the white CMB prior judged under the LCDM covariance (read 2026-11-11 10:21)
+
+`E044/white.txt` (white prior of 0.2 uK per element; profile and flat estimators; `lowres.mismatch` with the LCDM
+covariance as the truth; canary, no OVERFLOW line; every fit converged). chi2_min 16932.8 / 17420 = 0.972.
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| profile index, white prior | -3.1728 | -3.1365 | -3.1035 | -3.0396 |
+| error the white-prior fit quotes | 0.0264 | 0.0248 | 0.0187 | 0.0143 |
+| the same over the LCDM fit's error | 0.906 | 0.902 | 0.966 | 0.956 |
+| first-order true error if the CMB is LCDM | 0.0321 | 0.0301 | 0.0204 | 0.0157 |
+| true over quoted | 1.218 | 1.214 | 1.086 | 1.098 |
+| true over the LCDM fit's error | 1.103 | 1.096 | 1.050 | 1.049 |
+| first-order bias | -0.0023 | -0.0004 | -0.0009 | -0.0003 |
+| bias over quoted error | -0.09 | -0.02 | -0.05 | -0.02 |
+| white minus LCDM optimum | -0.0258 | +0.0028 | -0.0124 | -0.0005 |
+| expected sd of that difference, sqrt(true^2 - LCDM^2) | 0.0136 | 0.0123 | 0.0062 | 0.0047 |
+| difference minus bias, in that sd | -1.74 | +0.26 | -1.87 | -0.05 |
+| flat 30 GHz minus flat 23 GHz, white prior | +0.4156 | +0.0939 | +0.1769 | +0.0675 |
+| the same over first order (marginal curvature; J_c) | 0.79; 0.74 | 0.89; 0.84 | 0.89; 0.85 | 0.93; 0.91 |
+| chi-square per element and band | 0.573 | 0.588 | 0.570 | 0.616 |
+
+- **H5 holds for the white prior.** The quoted error is too small by 22, 21, 9 and 10 percent (written: 5 to 40,
+  most at High Latitude; the Spur equals it). The bias is 0.09 quoted sd or less (written: below 0.3). The two
+  optima differ by 1.74, 0.26, 1.87 and 0.05 of the expected sd of their difference (written: below 2). Two of
+  the four are near the limit and have the same sign; the two indices are correlated at 0.2, so this is weaker
+  than two independent 1.8 sd events, and I read it as consistent, not as confirmed to better than that.
+- The white-prior fit quotes an error that is 3 to 10 percent smaller than the LCDM fit's, and if the sky is
+  LCDM its true error is 5 to 10 percent larger than the LCDM fit's. The white prior looks better and is worse.
+- Size against the earlier statements: E040 stage 4c (nside 8, other regions, simulation) had "a quarter to a
+  third"; relative to the matched prior on the same skies 14 to 27 percent. Here, exact to first order at the
+  configuration of the map fit: 9 to 22 percent.
+- Flat prior with the white CMB prior: the pivot stays at 23.2 to 23.3 GHz and the move between the two
+  reference frequencies is 0.42, 0.09, 0.18, 0.07 (15.7, 3.8, 9.4, 4.7 of its own quoted errors), smaller than
+  with the LCDM prior in the Spur (0.154), where the white prior holds the small-scale CMB tighter.
+- Limits: the calculation is first order in the mismatch and takes the LCDM covariance of the paper (multipoles
+  2 to 47, floor 0.01 uK) as the truth. Its unit test (1500 fits) is at a toy configuration.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).

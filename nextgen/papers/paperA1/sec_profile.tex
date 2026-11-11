@@ -112,7 +112,9 @@ the cells where the index is measured,
 with a sign that belongs to the amplitude configuration and not to the noise level, while its
 coverage stays within 0.59 to 0.73. On the realistic sky of Table~\ref{tab:flat} it was within 0.11
 standard deviations except in one class at four times the real noise ($-0.30$; \exref{E036}). A scale
-map in place of a single scale reduces it there. We therefore take the profile likelihood with the
+map in place of a single scale reduces it there. With three components, dense noise and a faint
+high-latitude region, the configuration of Sect.~\ref{sec:same}, it reaches one standard deviation in
+simulations and more on the maps (\exref{E044}). We therefore take the profile likelihood with the
 debiased sandwich as the estimator of record and report the zero-mean prior beside it. What the
 prior offers in exchange is a generative model for the amplitudes, which a hierarchical model of an
 index field needs.
@@ -134,8 +136,9 @@ $\ln(\nuref/\nupiv)\,\sigma_1^2$ (\exref{E036}, \exref{E041}) & curvature & yes:
 $e^{n\beta\ln\nuref}$ \\
 profile likelihood & unbiased (\exref{E036}, \exref{E041}) & curvature too narrow by
 $\sqrt{1+\Tm/\J}$; debiased sandwich calibrated (\exref{E041}) & no \\
-zero-mean prior, free scale per region & unbiased for a common noise pattern; up to 0.6 sd otherwise
-(\exref{E041}) & calibrated where unbiased & no \\
+zero-mean prior, free scale per region & unbiased for a common noise pattern; biased otherwise, by up
+to 0.6 sd in the ladder and one sd in Sect.~\ref{sec:same} (\exref{E041}, \exref{E044}) & calibrated
+where unbiased & no \\
 re-solve move inside a Gibbs sweep & close to the profile optimum & too wide by $\sqrt{T}$,
 Eq.~(\ref{eq:Tk}) (\exref{E035}) & no \\
 \bottomrule
