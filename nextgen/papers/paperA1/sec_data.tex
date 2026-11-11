@@ -189,36 +189,75 @@ $N_{\rm side}=16$ pixel, cannot be excluded for the released maps themselves, wh
 differ from band to band \citep{bennett2013}, and is our first suspect for the misfit in the
 Galactic Center.
 
-\subsection{Band subsets, priors and bandpasses}
+\subsection{Band subsets and the pixel scale}
 
 \begin{table}
 \centering
-\caption{Profile index and debiased sandwich error by band set, same regions, resolution, window and
-priors as Table~\ref{tab:e040} (\exref{E040}). LFI bands are PR4 with the noise model of
-Sect.~\ref{sec:data}. The last column is the reduced $\chi^2$ of the fit.}
+\caption{Profile index and debiased sandwich error by band set, in the regions, window and priors of
+Table~\ref{tab:e040} (\exref{E040}, \exref{E042}). Top: fits that use all scales of the
+$N_{\rm side}=16$ maps. Bottom: fits in which the first band listed and 353 GHz keep all scales, to
+fix the amplitudes, and the other bands inform the index through multipoles 2 to 20 only. LFI bands
+are PR4 with the noise model of this section unless marked PR3. All sets include 353 GHz.}
 \label{tab:bands}
 \small
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-bands (all with 353 GHz) & High Latitude & Spur & Galactic Center & Plane & $\chi^2/{\rm dof}$ \\
+bands & High Latitude & Spur & Galactic Center & Plane \\
 \midrule
-K, Ka, Q, V & $-3.094 \pm 0.012$ & $-3.097 \pm 0.015$ & $-3.087 \pm 0.009$ & $-2.995 \pm 0.012$ & 1.07 \\
-K, Ka & $-3.062 \pm 0.016$ & $-3.074 \pm 0.020$ & $-3.046 \pm 0.011$ & $-2.980 \pm 0.016$ & 1.12 \\
-K, 30 & $-3.428 \pm 0.019$ & $-3.180 \pm 0.023$ & $-3.263 \pm 0.013$ & $-3.035 \pm 0.020$ & 2.64 \\
-30, 44, 70, Ka, Q, V & $-2.994 \pm 0.019$ & $-3.059 \pm 0.024$ & $-3.048 \pm 0.012$ & $-2.766 \pm 0.018$ & 1.28 \\
-\pend{remaining band sets} & & & & & \\
+\multicolumn{5}{l}{\emph{all scales}} \\
+K, Ka, Q, V & $-3.094 \pm 0.012$ & $-3.097 \pm 0.015$ & $-3.087 \pm 0.009$ & $-2.995 \pm 0.012$ \\
+K, Ka & $-3.062 \pm 0.016$ & $-3.074 \pm 0.020$ & $-3.046 \pm 0.011$ & $-2.980 \pm 0.016$ \\
+K, 30 & $-3.428 \pm 0.019$ & $-3.180 \pm 0.023$ & $-3.263 \pm 0.013$ & $-3.035 \pm 0.020$ \\
+K, 30 (PR3) & $-2.921 \pm 0.018$ & $-2.799 \pm 0.024$ & $-2.710 \pm 0.013$ & $-2.706 \pm 0.020$ \\
+30, 44, 70, Ka, Q, V & $-2.994 \pm 0.019$ & $-3.059 \pm 0.024$ & $-3.048 \pm 0.012$ & $-2.766 \pm 0.018$ \\
+\midrule
+\multicolumn{5}{l}{\emph{index from multipoles 2 to 20}} \\
+K, Ka, Q, V & $-3.113 \pm 0.014$ & $-3.112 \pm 0.017$ & $-3.140 \pm 0.011$ & $-3.061 \pm 0.014$ \\
+K, Ka & $-3.092 \pm 0.018$ & $-3.085 \pm 0.022$ & $-3.109 \pm 0.014$ & $-3.042 \pm 0.018$ \\
+K, 30 & $-3.590 \pm 0.023$ & $-3.244 \pm 0.028$ & $-3.553 \pm 0.017$ & $-3.217 \pm 0.025$ \\
+30, Ka & $-2.312 \pm 0.055$ & $-2.787 \pm 0.066$ & $-2.321 \pm 0.040$ & $-2.683 \pm 0.057$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:bands} repeats the profile fit on subsets of the bands. Within WMAP the answer is
-stable at the level of 0.03. K and Ka alone give indices flatter than the four bands together by
-0.032, 0.023, 0.041 and 0.015. The two fits share K and Ka, so the standard deviation of their
-difference is $(\sigma_{\rm sub}^2 - \sigma_{\rm full}^2)^{1/2}$, and the differences are 3.3, 1.8,
-5.7 and 1.4 of it: adding Q and V steepens the index, significantly at high latitude and in the
-Galactic Center. A spectrum that steepens with frequency would do this, and so would a dust model
-that predicts too much polarized dust at 41 and 61 GHz from 353 GHz. \pend{The dust-index arms
-decide between them: numbers.} \pend{CMB prior arms; delta bands; drift; start values.}
+Table~\ref{tab:bands} repeats the profile fit on subsets of the bands, and in two versions, because a
+control that we had fixed in advance for another purpose failed and exposed a bias in the first.
+
+\paragraph{The pixel scale is biased.} To ask at which angular scales K band and 30 GHz disagree we
+marginalized the modes of one map at multipoles 2 to $L$ and refitted, with the same cut in the K, Ka
+fit as the control, where nothing should move (\exref{E042}). The K, Ka index moved, in every
+region, toward flat: by $+0.08$, $+0.16$, $+0.11$ and $+0.37$ at $L = 20$. With large scales removed
+a fit in a bright region draws on the pixel scale, and there every band is brighter relative to K
+band than at large scales, by 3 to 14 percent for Ka. The cause is aliasing. The maps are pixel
+averages of skies that are not band-limited; structure below the pixel scale folds into it through
+each band's own beam, and K band has the widest. The window operator works to multipole 47 and
+cannot reach this, and the simulation that validated it had no compact structure. An amplitude
+ratio per multipole bin, estimated from cross spectra with a third map so that it has no noise
+bias, shows the same thing directly: Ka over K band is 0.32 to 0.33 from multipole 2 to 34, and
+0.35 from 35 to 47.
+
+The remedy is to let only the larger scales inform the index. In the lower block of
+Table~\ref{tab:bands} the lowest band and 353 GHz keep all their modes, which fixes the amplitudes in
+every pixel, and every other band enters through its harmonic coefficients at multipoles 2 to 20 with
+their covariance. The errors grow by 10 to 20 percent only: most of the information is there. The
+WMAP indices become steeper by 0.02 in the High Latitude and Spur regions, 0.05 in the Galactic
+Center and 0.07 in the Plane, and the regions come closer together:
+\begin{equation}
+  \beta_{\rm s} = -3.11 \pm 0.01\ \mbox{(High Latitude)}, \quad -3.11 \pm 0.02\ \mbox{(Spur)}, \quad
+  -3.14 \pm 0.01\ \mbox{(Galactic Center)}, \quad -3.06 \pm 0.01\ \mbox{(Plane)} .
+  \label{eq:result}
+\end{equation}
+These are the values we quote for WMAP K to V. The flatter Plane of the all-scale fit ($-3.00$) was
+half aliasing. \pend{$L = 12$ and $L = 30$: stability.} The comparison of estimators in
+Table~\ref{tab:e040} is not affected in what it shows, since all its rows share the bias.
+
+\paragraph{Within WMAP.} K and Ka alone give indices flatter than the four bands together by about
+0.02 to 0.03 in either version of the fit. The two fits share K and Ka, so the standard deviation of
+their difference is $(\sigma_{\rm sub}^2 - \sigma_{\rm full}^2)^{1/2}$, and in the low-pass version
+the differences are 1.9, 2.0, 3.6 and 1.7 of it. Adding Q and V steepens the index mildly. A spectrum
+that steepens with frequency would do this, and so would a dust model that predicts too much
+polarized dust at 41 and 61 GHz from 353 GHz. \pend{The dust-index arms; CMB prior arms; delta bands;
+drift; start values.}
 
 \subsection{K band against 30 GHz}
 
@@ -227,14 +266,18 @@ synchrotron channels there are. Their polarization maps have been known to disag
 since the 2015 Planck release; \citet{weiland2022} found a K to 30 GHz index of $-3.27$ in the Fan
 region against $-2.90$ from K to Ka and set 30 GHz aside, and \citet{watts2023} attribute the WMAP
 side to poorly measured modes of the K-band map that the released covariance does not fully
-describe. With dense covariances for WMAP and a scale-dependent noise model for LFI we can ask the
-question in likelihood terms.
+describe. With dense covariances for WMAP and a scale-dependent noise model for LFI the question
+can be put in likelihood terms.
 
-Table~\ref{tab:bands} gives the answer by band pair. K with Ka gives $-3.06$ at high latitude; K with
-PR4 30 GHz gives $-3.43 \pm 0.02$, steeper by 0.37, an 8 percent difference in amplitude. The gap is
-0.11 in the Spur, 0.22 in the Galactic Center and 0.06 in the Plane. When 30 GHz is instead the
-lowest band, the Plane comes out at $-2.77$, flatter by 0.2 than any fit that includes K band. The
-30 GHz map is faint against both of its neighbours, by an amount that depends on the region.
+Table~\ref{tab:bands} gives the answer by band pair. From multipoles 2 to 20, K with Ka gives $-3.09$
+at high latitude and K with PR4 30 GHz gives $-3.59 \pm 0.02$: steeper by 0.50, an 11 percent
+difference in amplitude between maps 0.22 apart in $\ln\nu$. The gap is 0.16 in the Spur, 0.44 in the
+Galactic Center and 0.18 in the Plane, and the index between 30 GHz and Ka is $-2.3$ to $-2.8$. The
+PR4 30 GHz map is faint against both of its neighbours, by 4 to 11 percent depending on the region.
+With the 2018 (PR3) 30 GHz map in place of PR4, in the all-scale fit, the K to 30 GHz index is
+$-2.92$ at high latitude where PR4 gives $-3.43$, and the fit is far worse (a reduced $\chi^2$ of 6
+against 2.6). Two official maps of the same 30 GHz data give indices against K band that differ by
+0.5, with the K, Ka value between them.
 
 \begin{figure}
 \centering
@@ -245,85 +288,36 @@ difference for WMAP Ka predicted from K, Q, V and 353 GHz, on the same colour sc
 \label{fig:resid30}
 \end{figure}
 
-A direct view needs no noise model for 30 GHz at all. We fit K, Ka, Q, V and 353 GHz, predict the 30
-GHz map from the fitted amplitudes and indices, and subtract (Fig.~\ref{fig:resid30}). The same
-exercise with Ka predicted from K, Q, V and 353 GHz is the control. The 30 GHz map is fainter than
-its prediction by $11.4 \pm 0.3$ percent in the High Latitude region, $7.7 \pm 0.2$ percent in the
-Galactic Center and $2.4 \pm 0.4$ percent in the Spur and the Plane; the Ka control is brighter than
-its prediction by 1 to 2 percent (3.7 in the Galactic Center). After the per-region factors are
-removed, the 30 GHz residual still has 16 to 43 times the power of its noise model at multipoles 2
-to 6 and 3 times at the pixel scale, in $B$ as much as in $E$; the Ka control has 2 to 4 times at
-multipoles 2 to 6 and 1.2 at the pixel scale, part of which is the noise of the prediction. Sky
-signal assigned to the wrong index would be mostly $E$. Equal $E$ and $B$ is the signature of
-map-level structure: the residual follows the inner Galactic plane and the Galactic Center, where a
-leakage of intensity into polarization through bandpass mismatch would be largest, and has a
-large-scale component at intermediate latitudes on the side of the Fan region.
+A direct view needs no noise model for 30 GHz. We fit K, Ka, Q, V and 353 GHz, predict the 30 GHz
+map from the fitted amplitudes and indices, and subtract (Fig.~\ref{fig:resid30}); the same exercise
+with Ka predicted from K, Q, V and 353 GHz is the control. The PR4 30 GHz map is fainter than its
+prediction by 11 percent in the High Latitude region, 8 percent in the Galactic Center and 2 percent
+in the Spur and the Plane, where the Ka control is brighter than its prediction by 1 to 2 percent.
+After the per-region factors are removed, the 30 GHz residual has 16 to 43 times the power of its
+noise model at multipoles 2 to 6, in $B$ as much as in $E$, against 2 to 4 times for the control.
+Sky signal assigned to the wrong index would be mostly $E$. Equal $E$ and $B$ is the signature of
+map-level structure.
 
-\paragraph{A test that failed its control, and what it exposed.} If the two maps differed by an
-index, removing a set of modes from one of them would change the error and not the answer. We
-marginalized the modes of the 30 GHz map at multipoles 2 to $L$ in the K, 30 fit and found the index
-flattening steadily with $L$ in every region, by 0.30 at high latitude and 0.35 in the Plane at
-$L = 20$ (Table~\ref{tab:cuts}). The control was the same cut in the K, Ka fit, where nothing should
-move. It moved by $+0.08$, $+0.16$, $+0.11$ and $+0.37$. So the flattening is not about 30 GHz. With
-large scales removed, a fit in a bright region draws on the pixel scale, and at the pixel scale every
-band is brighter relative to K band than at large scales: by 3 to 14 percent for Ka and 5 to 8 percent
-for 30 GHz. The maps are pixel averages of skies that are not band-limited; structure below the pixel
-scale aliases into it through each band's own beam, and K band has the widest. The window operator of
-Sect.~\ref{sec:data} works to multipole 47 and cannot reach this, and the simulation that validated
-it had no compact structure. Net of the control, a 30 GHz-specific dependence on scale remains only
-at high latitude, about 4 percent in amplitude.
+Three further tests narrow the cause without settling it. (i) The released K-band covariance has
+20 eigenmodes with more than ten times the median variance. Projecting all of them out moves the
+high-latitude K, 30 index by 0.03 and the K, Ka index by less than 0.02: the modes that the WMAP
+covariance itself flags as poorly measured do not carry the gap. (ii) In the Galactic plane the PR4
+map is 7 to 15 percent fainter than the PR3 map at all angular scales (a regression slope of 0.85
+for $|b| < 5^\circ$ in the inner Galaxy and 0.96 for $5^\circ < |b| < 20^\circ$), while above $20^\circ$
+the two agree to 1 to 3 percent. The residual of Fig.~\ref{fig:resid30} follows the 30 GHz intensity
+in the plane at the level of 0.05 to 0.13 percent, with a sign that changes between the inner and
+the outer Galaxy. Where the polarized fraction is of order one percent, a difference of a tenth of a
+percent of the intensity between two corrections for bandpass leakage is a tenth of the
+polarization. This part is an exploratory finding, made after looking at the figure. (iii) At high
+latitude the two 30 GHz maps agree with each other and the gap to K band is concentrated at
+multipoles below about ten. \pend{Amplitude factor and angle fits; PR3 with its released covariance;
+DR1.}
 
-The consequence reaches beyond the K against 30 GHz question: any fit that uses the pixel scale of
-these maps is biased toward a flatter index where the sky is bright and structured.
-\pend{Low-pass arm: fits restricted to multipoles 2 to 20; which baseline the tables use.}
-
-\begin{table}
-\centering
-\caption{Profile index when the $E$ and $B$ modes of one map at multipoles 2 to $L$ are marginalized
-(\exref{E042}): for K with PR4 30 GHz, cutting the 30 GHz map, and for the control, K with Ka, cutting
-Ka. Cutting K band instead gives the same numbers within 0.03.}
-\label{tab:cuts}
-\small
-\begin{tabular}{llrrrr}
-\toprule
-bands & cut & High Latitude & Spur & Galactic Center & Plane \\
-\midrule
-K, 30 & none & $-3.428 \pm 0.019$ & $-3.180 \pm 0.023$ & $-3.263 \pm 0.013$ & $-3.035 \pm 0.020$ \\
- & $\ell \le 8$ & $-3.270 \pm 0.022$ & $-2.976 \pm 0.032$ & $-3.154 \pm 0.014$ & $-2.767 \pm 0.026$ \\
- & $\ell \le 20$ & $-3.129 \pm 0.031$ & $-2.903 \pm 0.044$ & $-3.043 \pm 0.018$ & $-2.683 \pm 0.035$ \\
-\midrule
-K, Ka & none & $-3.062 \pm 0.016$ & $-3.074 \pm 0.020$ & $-3.046 \pm 0.011$ & $-2.980 \pm 0.016$ \\
- & $\ell \le 8$ & $-3.048 \pm 0.019$ & $-2.992 \pm 0.033$ & $-2.992 \pm 0.013$ & $-2.754 \pm 0.028$ \\
- & $\ell \le 20$ & $-2.979 \pm 0.030$ & $-2.912 \pm 0.046$ & $-2.937 \pm 0.017$ & $-2.615 \pm 0.037$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Which map.} A model-light diagnostic separates the cases. For two maps $x$ and $y$ and a
-third map $z$ with independent noise, $\sum c_x c_z / \sum c_y c_z$ over the harmonic coefficients of a
-multipole bin estimates the amplitude ratio of $x$ to $y$ without noise bias. Within WMAP the ratio
-of Ka to K band is $0.32$ to $0.33$ from multipole 2 to 34, with either Q band or 30 GHz as the third
-map, against 0.321 for an index of $-3.06$, rising to 0.35 in the last bin (35 to 47), where every
-ratio to K band is high by 6 to 10 percent: the aliasing just described. For $|b| < 20^\circ$ the ratio of
-PR4 30 GHz to K band is 0.44 to 0.47 over multipoles 4 to 34, with errors of 0.005 to 0.009, against
-an expected 0.505; the ratio of the 2018 (PR3) 30 GHz map to K band is 0.485 to 0.507; and PR4 over
-PR3 is 0.91 to 0.93. A direct regression of the PR4 map on the PR3 map gives 0.85 for $|b| < 5^\circ$
-in the inner Galaxy, 0.96 for $5^\circ < |b| < 20^\circ$ and 0.99 to 1.03 above $20^\circ$. \emph{In the
-Galactic plane the PR4 30 GHz polarization map is 7 to 15 percent fainter than the PR3 map, at all
-angular scales, and it is the PR3 map that agrees with the extrapolation of WMAP K band} (to 4
-percent). This is an exploratory finding, made after looking at Fig.~\ref{fig:resid30} and not
-predicted in advance. It has a natural candidate cause: in the inner plane the polarized fraction at
-30 GHz is of order one percent, the residual of Fig.~\ref{fig:resid30} follows the 30 GHz intensity
-there at the level of 0.05 to 0.13 percent with a sign that changes between the inner and the outer
-Galaxy, and the two releases correct the leakage of intensity into polarization through bandpass
-mismatch in different ways. A difference of a tenth of a percent of the intensity is a tenth of the
-polarization. At $|b| > 20^\circ$ the two 30 GHz maps agree with each other to 1 to 3 percent, and both
-are consistent with the K-band extrapolation above multipole 10; below it both are low by about 5
-percent, at three standard deviations taken together, which is the large-scale discrepancy described
-by \citet{weiland2022} and \citet{watts2023} and which this analysis does not assign to either map.
-
-\pend{Joint fits: worst K modes, amplitude factor, angle; PR3 with the released covariance; DR1.}
-
+We draw one conclusion for the purpose of this paper. At the present level of statistical error,
+0.01 to 0.02 in the index, the 30 GHz polarization maps cannot be combined with WMAP K to V in one
+power-law fit: the answer moves by several tenths with the release of the 30 GHz map and with which
+neighbour dominates. An index that mixes them, including the band set of the next subsection, is
+set by this and not by the sky.
 
 \subsection{A band set without K band, a free CMB and a 30 GHz reference}
 \label{sec:bpset}
