@@ -613,3 +613,32 @@ a factor of 200 at the quadrupole. No default in Commander4 is involved.
 **Alternatives considered.** Keeping the white prior as pre-registered baseline and reporting LCDM as
 an arm (rejected by the rule). A flat CMB prior as the central choice (unbiased for any CMB, but the
 errors double and the pivot of the flat amplitude prior moves; shown as a row).
+
+## D035 (2026-11-11 08:45): after the second referee read, the real-data demonstration is redone on regions defined by geometry with a processing mask, and Paper A1 loses its 30 GHz and no-K sections
+
+**Decision.**
+1. The regions of E022 and E040 (a reconstruction of the BeyondPlanck XV regions from the released index map)
+   are retired for anything that names a region. New regions by geometry (|b| > 30 degrees; the northern
+   Spur; 10 to 30 degrees; |b| < 10 degrees) with the brightest 5 percent of the DR1 polarized synchrotron
+   model and a 7.5 degree disc around Tau A masked, removed exactly through the Schur complement (E044,
+   `lowres/regions.py`, `lowres/mask.py`).
+2. Paper A1 keeps, of the real data: the estimator comparison on these regions, the CMB-prior comparison
+   with the exact first-order calculation of what a wrong CMB covariance does (`lowres/mismatch.py`), block
+   errors from each region's own scores read against a null at the configuration of the fit, and one table
+   of analysis choices that move the index. The sections on Planck 30 GHz and on the band set without K band
+   go to Paper B with E042.
+3. The claim that a region "is not one index" is made only where the own-score block error exceeds a
+   configuration-matched null, and then with the other readings named.
+4. The memory fault of E043 is reported in the implementation section and not in the abstract.
+
+**Why.** `reviews/2026-11-11_referee_report_paperA1_draft3.md`: the methods stand; one fatal objection (the
+High Latitude block error is 65 percent the Galactic Center's scores); the "High Latitude" region holds the
+inner plane (55 percent of its squared amplitude within 10 degrees of the plane, confirmed 08:44); Tau A
+unmasked carries 58 percent of the Plane's block variance; the white-prior statement was worded beyond its
+simulation. The principal investigator wrote the analysis whose regions these were meant to be; a region
+called High Latitude that is mostly inner plane would not survive his first look.
+
+**Alternatives considered.** Renaming the old regions and qualifying every sentence (cheaper by five hours;
+rejected: the misfit diagnostics and every arm would still describe an unmasked sky with Tau A in it).
+Obtaining the BeyondPlanck region and mask files (not on disk; asking for them is contact with the
+collaboration, which is Trygve's call). A finer partition (48 patches): that is Paper B (Q24).

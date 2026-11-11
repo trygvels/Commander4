@@ -87,7 +87,8 @@ covariances (\exref{E039}): 200 noise realizations at $N_{\rm side}=8$, the firs
 estimator. $z$ is the error of the profile optimum in units of the sandwich error at the truth.
 The last block compares the difference between the flat-prior optima at 30 and 23 GHz with
 Eq.~(\ref{eq:shift}) applied to each region alone and with the coupled form,
-Eq.~(\ref{eq:coupled}).}
+Eq.~(\ref{eq:coupled}), evaluated with $\J^{-1}$ in place of $\mathsf{H}^{-1}$ (the two agree here, where
+$\Tm/\J$ is below 0.02).}
 \label{tab:e039}
 \small
 \begin{tabular}{lrrrr}
@@ -106,7 +107,7 @@ flat prior at 30 GHz minus profile & $+0.0680$ & $+0.0270$ & $+0.0074$ & $+0.013
 \quad in units of $\sigma$ & $+4.5$ & $+1.6$ & $+0.7$ & $+0.9$ \\
 30 GHz minus 23 GHz, measured & $+0.0687$ & $+0.0270$ & $+0.0076$ & $+0.0142$ \\
 \quad predicted, each region alone & $+0.0692$ & $+0.0156$ & $+0.0015$ & $+0.0085$ \\
-\quad predicted, coupled & $+0.0723$ & $+0.0278$ & $+0.0078$ & $+0.0145$ \\
+\quad predicted, coupled, with $\J^{-1}$ & $+0.0723$ & $+0.0278$ & $+0.0078$ & $+0.0145$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -122,7 +123,7 @@ band set with the white CMB prior the pivot sits at 23 GHz: a flat prior stated 
 the same prior stated at 30 GHz moves the High Latitude index by 4.5 standard deviations. The
 single-region formula predicts that move for the large region and fails for the three small ones,
 which move by 1.7 to 5 times their own prediction: they are dragged by the large region through the
-shared noise. The coupled form, Eq.~(\ref{eq:coupled}), is within 5 percent in all four. Two of our
+shared noise. The coupled form, Eq.~(\ref{eq:coupled}) with $\J^{-1}$, is within 5 percent in all four. Two of our
 six criteria failed as written, one because it was worded wrongly (a lower bound of 1.0 on a ratio
 that scatters around one) and one because it was written for the single-region formula. In these
 regions $\Tm/\J$ is below 0.02, so the errors taken from each realization (Eq.~\ref{eq:debiased})

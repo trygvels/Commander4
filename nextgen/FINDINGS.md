@@ -1316,3 +1316,30 @@ to 39 percent; the choice of form was made by a rule written before the tests we
 reproduces the High Latitude and Spur ratios of the maps; the Plane needs about twice that. With the block
 errors the four region indices (-3.08, -3.08, -3.08, -2.96) do not differ. Any misfit scatters the block
 scores, so "a spread of the index" is one reading, not a measurement. Grade B.
+
+**Amendment of 2026-11-11 08:50 to F48 to F54, after the second referee read of Paper A1
+(`reviews/2026-11-11_referee_report_paperA1_draft3.md`).** Every region name in F48 to F54 refers to the E022
+surrogate regions with no mask, and those are not what they are named:
+
+- "High Latitude" contains the inner Galactic plane at 25 to 70 degrees from the centre on both sides (140 of
+  2194 pixels within 10 degrees of the plane, holding 55 percent of the region's squared fitted amplitude;
+  pixels above 30 degrees hold 27 percent). Its index (-3.08) is mostly an inner-plane index.
+- Tau A is in "Plane", unmasked: fitted polarized amplitude 175 uK against a region median of 38; by the
+  referee's first-order calculation its patch carries 58 percent of the Plane's block variance and moves the
+  Plane index by 0.07 (from -2.96 to about -3.04).
+- **F54 is withdrawn for High Latitude.** 65 percent of that region's block variance involves the Galactic
+  Center's scores, through a 0.20 correlation of the two indices in J_c^-1; from the region's own scores the
+  block error is 0.026 (2.1 sandwich errors), which 4 of 60 null simulations exceed. For the Plane the scatter
+  is real and mostly one source. What stands of F54: the estimator, its tests, and the statement that half a
+  dozen patches carry each region's information.
+- F53: "a quarter to a third" is from a simulation at nside 8 with a prior variance 1.9 times the simulated
+  one; relative to the matched prior on the same skies the understatement is 14 to 27 percent in three regions,
+  with a Monte Carlo error of 10 points, and the independent review found the opposite sign in another setup.
+  What stands: a white prior of the wrong shape miscalibrates the error by tens of percent, with a sign that
+  depends on the configuration. E044 replaces the simulation by an exact first-order calculation.
+- F48, F53: the estimator comparison is differential and stands as measured (flat prior at 23 GHz -3.092, at
+  30 GHz -2.925, profile -3.082 on identical maps and regions), with two repairs: the change of convention is
+  13.4 model sd (12.6 is the distance of the 30 GHz optimum from the profile optimum), and "predicted to 9
+  percent" is a first-order step with the curvature of the fitted marginal; the prediction that needs no
+  flat-prior fit (J_c) is off by 11 percent, and 18 percent with a free CMB.
+- E044 redoes the real-data results on regions defined by geometry with a processing mask (D035).

@@ -27,6 +27,8 @@ from lowres import data as D  # noqa: E402
 from lowres.block import KINDS, block_errors  # noqa: E402
 from lowres.fit import fit_profile, sandwich_plugin  # noqa: E402
 from lowres.likelihood import BandData, RegionLikelihood  # noqa: E402
+from lowres.mask import marginalize, restrict_prior  # noqa: E402
+from lowres.regions import named_regions  # noqa: E402
 from lowres.spectra import g_rj, hfi_band, wmap_band  # noqa: E402
 from lowres.window import FWHM_ARCMIN, WindowMatcher, lcdm_cmb_precision  # noqa: E402
 
@@ -44,14 +46,18 @@ def band_objects():
     return out
 
 
-def geometry(ns):
+def geometry(ns, kind="bpxv"):
+    """region, block, keep per element. kind "named": the regions and mask of E044 (`lowres.regions`)."""
+    if kind == "named":
+        region, keep, block = named_regions(ns)
+        return region, block, keep
     region = D.bpxv_regions()
     if ns != 16:
         rr = region[:region.size // 2].reshape(-1, (16 // ns) ** 2)
         region = np.tile(np.array([np.bincount(row, minlength=4).argmax() for row in rr]), 2)
     n = region.size
     block = np.tile(np.arange(n // 2) // (ns // 2) ** 2, 2)
-    return region, block
+    return region, block, np.ones(n, dtype=bool)
 
 
 def truth_sync_30(nside):
@@ -67,7 +73,7 @@ def draw(a):
     os.makedirs(a.dir, exist_ok=True)
     WM = WindowMatcher(ns, target_arcmin=60.0)
     Bs = band_objects()
-    region, _ = geometry(ns)
+    region, _, _ = geometry(ns, a.geometry)
     n = region.size
     d353 = None
     roots = []
@@ -86,6 +92,7 @@ def draw(a):
         gc.collect()
     prec, cov_c = lcdm_cmb_precision(WM)
     np.save(os.path.join(a.dir, "cmb_prec.npy"), prec)
+    np.save(os.path.join(a.dir, "cmb_cov.npy"), cov_c)
     Lc = np.linalg.cholesky(cov_c)
     del prec, cov_c
     a_s = truth_sync_30(ns) * (23.0 / 30.0) ** BETA_TRUE[region]
@@ -102,7 +109,7 @@ def draw(a):
     Yk, Ypk = WM.Y[:, keep], WM.Yp[keep]
     err_id = float(np.abs(Ypk @ Yk - np.eye(Yk.shape[1])).max())
     assert err_id < 1e-8, err_id
-    np.savez(os.path.join(a.dir, "sim.npz"), data=data, fd=np.array(fd), Yk=Yk, Ypk=Ypk, lmax=a.lmax, nside=ns, seed=a.seed)
+    np.savez(os.path.join(a.dir, "sim.npz"), data=data, fd=np.array(fd), Yk=Yk, Ypk=Ypk, lmax=a.lmax, nside=ns, seed=a.seed, geometry=a.geometry)
     print(f"# drew {a.nreal} realizations at nside {ns} into {a.dir}; low-pass cut {a.lmax} ({int(keep.sum())} of {WM.Y.shape[1]} modes, "
           f"|Y_k^+ Y_k - 1| {err_id:.1e})", flush=True)
 
@@ -110,7 +117,7 @@ def draw(a):
 def load(a, lowpass=False):
     z = np.load(os.path.join(a.dir, "sim.npz"))
     ns = int(z["nside"])
-    region, block = geometry(ns)
+    region, block, keep = geometry(ns, str(z["geometry"]) if "geometry" in z.files else "bpxv")
     Bs = band_objects()
     ninv = [np.load(os.path.join(a.dir, f"ninv_{b}.npy")) for b in BANDS]
     low = {}
@@ -119,37 +126,42 @@ def load(a, lowpass=False):
         for i in (1, 2, 3):
             Cc = Ypk @ np.linalg.inv(ninv[i]) @ Ypk.T
             nl = Ypk.T @ np.linalg.inv(0.5 * (Cc + Cc.T)) @ Ypk
-            low[i] = 0.5 * (nl + nl.T)
+            low[i] = marginalize(np.zeros(keep.size), 0.5 * (nl + nl.T), keep, pinv=True)[1]
             ninv[i] = None                                    # the full covariance of a low-passed band is not needed
             del Cc, nl
             gc.collect()
-    return z, ns, region, block, Bs, ninv, low
+    if not keep.all():
+        ninv = [None if m is None else marginalize(np.zeros(keep.size), m, keep)[1] for m in ninv]
+    return z, ns, region[keep], block[keep], Bs, ninv, low, keep
 
 
-def bands_for(z, Bs, ninv, low, r_):
+def bands_for(z, Bs, ninv, low, r_, keep):
     out = []
     for i, B in enumerate(Bs):
         d_ = z["data"][r_, i]
         if i in low:
-            out.append(BandData(B.name, z["Yk"] @ (z["Ypk"] @ d_), low[i], (lambda be, B=B: B.power_law(be, 23.0)), float(z["fd"][i])))
+            out.append(BandData(B.name, (z["Yk"] @ (z["Ypk"] @ d_))[keep], low[i], (lambda be, B=B: B.power_law(be, 23.0)), float(z["fd"][i])))
         else:
-            out.append(BandData(B.name, d_, ninv[i], (lambda be, B=B: B.power_law(be, 23.0)), float(z["fd"][i])))
+            out.append(BandData(B.name, d_[keep], ninv[i], (lambda be, B=B: B.power_law(be, 23.0)), float(z["fd"][i])))
     return out
 
 
 def fits(a):
     t0 = time.time()
-    z, ns, region, block, Bs, ninv, low = load(a, lowpass=(a.mode == "lowpass"))
+    z, ns, region, block, Bs, ninv, low, keep = load(a, lowpass=(a.mode == "lowpass"))
+    names = ["High Latitude", "Spur", "Intermediate", "Plane"] if ("geometry" in z.files and str(z["geometry"]) == "named") else NAMES
     if a.mode == "white":
         kw = dict(cmb_prior_sd=0.2)
-    else:
+    elif keep.all():
         kw = dict(cmb_prior_sd=None, cmb_prior_prec=np.load(os.path.join(a.dir, "cmb_prec.npy")))
+    else:
+        kw = dict(cmb_prior_sd=None, cmb_prior_prec=restrict_prior(np.load(os.path.join(a.dir, "cmb_cov.npy")), keep))
     nreal = min(a.nreal, z["data"].shape[0])
     print(f"# E040 nside-{ns} simulation, stage {a.mode}: truth {BETA_TRUE}; {nreal} realizations; setup {time.time() - t0:.0f} s", flush=True)
-    keys = ["b", "s"] + (["neff", "levmax", "nneg", "cross", "dj"] + list(KINDS) if a.mode == "blocknull" else [])
+    keys = ["b", "s"] + (["neff", "levmax", "nneg", "cross", "dj"] + list(KINDS) + [k + "_own" for k in KINDS] if a.mode == "blocknull" else [])
     store = {k: [] for k in keys}
     for r_ in range(a.first, nreal):
-        L = RegionLikelihood(bands_for(z, Bs, ninv, low, r_), region, **kw)
+        L = RegionLikelihood(bands_for(z, Bs, ninv, low, r_, keep), region, **kw)
         bh, res = fit_profile(L, BETA_TRUE)
         if a.mode == "blocknull":
             out = block_errors(L, bh, block, 48)
@@ -158,7 +170,8 @@ def fits(a):
             store["cross"].append(out["cross"]); store["dj"].append(out["d_over_jc"])
             for k in KINDS:
                 store[k].append(out[k])
-            extra = (" | CR3/sd " + " ".join(f"{x:.2f}" for x in out["CR3"] / sd) + " | CR0/sd " + " ".join(f"{x:.2f}" for x in out["CR0"] / sd)
+                store[k + "_own"].append(out[k + "_own"])
+            extra = (" | CR3own/sd " + " ".join(f"{x:.2f}" for x in out["CR3_own"] / sd) + " | CR3/sd " + " ".join(f"{x:.2f}" for x in out["CR3"] / sd) + " | CR0/sd " + " ".join(f"{x:.2f}" for x in out["CR0"] / sd)
                      + " | n_eff " + " ".join(f"{x:.1f}" for x in out["neff"]) + f" | neg D {int(out['n_neg'].sum())} cross {out['cross']:.3f} sumD/Jc "
                      + " ".join(f"{x:.2f}" for x in out["d_over_jc"]))
             del out
@@ -181,9 +194,9 @@ def fits(a):
           + "median error " + " ".join(f"{x:.4f}" for x in np.median(S["s"], axis=0)))
     if a.mode == "blocknull":
         print("## block error over sandwich error under the model, per region: median, maximum")
-        for k in KINDS:
+        for k in list(KINDS) + ["CR3_own"]:
             q = S[k] / S["s"]
-            print(f"   {k}: " + "; ".join(f"{NAMES[j]} {np.nanmedian(q[:, j]):.2f} {np.nanmax(q[:, j]):.2f}" for j in range(4)))
+            print(f"   {k}: " + "; ".join(f"{names[j]} {np.nanmedian(q[:, j]):.2f} {np.nanmax(q[:, j]):.2f}" for j in range(4)))
         print("   effective number of blocks, median: " + " ".join(f"{x:.1f}" for x in np.median(S["neff"], axis=0))
               + f"; blocks with negative information, total {int(S['nneg'].sum())}; cross-region share, largest {S['cross'].max():.3f}")
 
@@ -198,6 +211,7 @@ def main():
     ap.add_argument("--seed", type=int, default=39)
     ap.add_argument("--nside", type=int, default=16, choices=[8, 16], help="8 is for an end-to-end test of this script only")
     ap.add_argument("--out", default="")
+    ap.add_argument("--geometry", default="bpxv", choices=["bpxv", "named"], help="for `draw`; the fit stages read it from the saved file")
     a = ap.parse_args()
     a.dir = os.path.expanduser(a.dir)
     draw(a) if a.mode == "draw" else fits(a)
