@@ -37,23 +37,28 @@ def main():
     nper = np.bincount(region, minlength=nreg)
     dof = nb * n - 2 * n - nreg
     print(f"# E044 chi-square under the model, nside {ns}: {n} elements kept, nominal dof {dof}, sd of the ratio {np.sqrt(2.0 / dof):.4f}", flush=True)
-    R, C, P = [], [], []
+    R, C, P, Bn = [], [], [], []
     for r_ in range(min(a.nreal, z["data"].shape[0])):
         L = RegionLikelihood(S.bands_for(z, Bs, ninv, low, r_, keep), region, **kw)
         bh, res = fit_profile(L, S.BETA_TRUE)
         sol = sandwich_plugin(L, bh)[4]
         rb = L.residuals(sol)
         creg = np.zeros(nreg)
+        cband = []
         for b, r in zip(L.bands, rb):
-            creg += np.bincount(region, weights=r * b.apply(r), minlength=nreg)
+            w = r * b.apply(r)
+            creg += np.bincount(region, weights=w, minlength=nreg)
+            cband.append(float(w.sum()) / n)
         chi2 = 2.0 * res.fun
-        R.append(chi2 / dof); C.append(creg / (nper * nb)); P.append(chi2 - creg.sum())
-        print(f"real {r_} chi2_min/dof {R[-1]:.4f} | per element and band " + " ".join(f"{x:.4f}" for x in C[-1]) + f" | prior penalty {P[-1]:.1f} | conv {res.success} [{time.time() - t0:.0f} s]", flush=True)
+        R.append(chi2 / dof); C.append(creg / (nper * nb)); P.append(chi2 - creg.sum()); Bn.append(cband)
+        print(f"real {r_} chi2_min/dof {R[-1]:.4f} | per element and band " + " ".join(f"{x:.4f}" for x in C[-1]) + " | per band " + " ".join(f"{x:.4f}" for x in cband)
+              + f" | prior penalty {P[-1]:.1f} | conv {res.success} [{time.time() - t0:.0f} s]", flush=True)
         del L, sol, rb
         gc.collect()
         if a.out:
-            np.savez(a.out, ratio=np.array(R), creg=np.array(C), penalty=np.array(P), dof=dof, nper=nper)
-    R, C, P = np.array(R), np.array(C), np.array(P)
+            np.savez(a.out, ratio=np.array(R), creg=np.array(C), penalty=np.array(P), cband=np.array(Bn), dof=dof, nper=nper)
+    R, C, P, Bn = np.array(R), np.array(C), np.array(P), np.array(Bn)
+    print("## residual chi-square per element by band, mean: " + " ".join(f"{x:.4f}" for x in Bn.mean(0)) + "; sd: " + " ".join(f"{x:.4f}" for x in Bn.std(0, ddof=1)))
     print(f"## {len(R)} realizations: chi2_min/dof mean {R.mean():.4f} +- {R.std(ddof=1) / np.sqrt(len(R)):.4f}, sd {R.std(ddof=1):.4f} (theory {np.sqrt(2.0 / dof):.4f}); "
           f"prior penalty mean {P.mean():.1f}")
     print("## per element and band, mean: " + " ".join(f"{x:.4f}" for x in C.mean(0)) + "; sd: " + " ".join(f"{x:.4f}" for x in C.std(0, ddof=1)))

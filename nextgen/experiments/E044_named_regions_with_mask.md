@@ -131,6 +131,9 @@ and seen; nothing at nside 16.
   others at the profile optimum, shifted by the coupling. The direct evaluation at 30 GHz equals the 23 GHz
   value plus sum_r n_r beta_r ln(30/23) to 1e-6 relative. If the flat-CMB scan has an interior maximum, the
   statement "no interior optimum" is withdrawn and the bound hit is reported as an optimizer result only.
+  Amended 10:58, before any scan: the grid is the whole allowed range, -4.6 to -1.6 in steps of 0.15, because a
+  marginal that is convex at the profile optimum could also rise toward the lower edge. Expected: the value at
+  the upper edge is the largest on the grid for both references.
 
 ## Command
 
