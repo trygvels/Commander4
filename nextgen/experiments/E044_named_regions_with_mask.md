@@ -135,6 +135,37 @@ and seen; nothing at nside 16.
   marginal that is convex at the profile optimum could also rise toward the lower edge. Expected: the value at
   the upper edge is the largest on the grid for both references.
 
+- **H12 to H15, written 2026-11-11 13:16 after the third referee read
+  (`reviews/2026-11-11_referee_report_paperA1_draft4.md`: no fatal objection; twelve major items), before any of
+  these runs exists.** The referee's points that these test: the mask was never varied; regions and mask were
+  changed together, so "the scale dependence went with the masked emission" is not shown; the split of the
+  chi-square by region gives the Plane 993 for 862 along the CMB spectrum (+3.1 sd, which I had not looked at)
+  with a sampling error that is assumed and not simulated; six realizations at nside 16 cannot place the block
+  errors of the maps.
+  - **H12, the present regions without the mask** (`--no-mask`, all scales with block errors, and l <= 20). High
+    Latitude has no masked pixel, so its index moves by less than 0.01 and its chi-square stays at 0.577. The Plane
+    (576 pixels with the inner plane and Tau A back in): chi-square per element and band above 0.75; index between
+    -3.06 and -2.95; own-score block error above 2.5 sandwich errors. If the mask is what removed the scale
+    dependence, the unmasked Plane's index from l <= 20 is steeper than its all-scale index by more than 0.04 and
+    by more than 3 of the expected sd. If it is within 2, the sentence "the dependence on angular scale went away
+    with the emission that the mask removes" is withdrawn, and the change is put down to the regions.
+    Intermediate (11 bright pixels back): chi-square above 0.60. No sharp expectation for the Spur.
+  - **H13, the threshold** (`--bright-fraction 0.03` and `0.10`). At 0.10 (less data): every index within 2 of
+    sqrt(sd_10^2 - sd_5^2) of the 5 percent fit; chi-square per element and band between 0.56 and 0.62. At 0.03
+    (more data): every index within 2.5 of sqrt(sd_5^2 - sd_3^2); Plane chi-square at most 0.66. If the Plane
+    fails either at 0.03, the result depends on where between 3 and 5 percent the threshold is put, and the paper
+    says so.
+  - **H14, the sampling error of the chi-square split** (`e044_chi2_split_null.py`, 40 realizations of the first
+    nside-8 set, LCDM-prior and flat-prior fit of each). Per region, (chi-square of the LCDM fit minus that of the
+    flat fit, by region) over its expectation has mean 1.00 +- 0.03 and a standard deviation within 25 percent of
+    sqrt(2 / n_region). If the Plane's is more than 1.3 times that, its 3.1 sd is scaled down by the same factor.
+    The flat-fit chi-square per region over 2 n_region: mean 1.00, sd within 25 percent of sqrt(1 / n_region).
+  - **H15, forty realizations at nside 16** (seed 45, regions, mask and prior of the fit, block errors). Medians
+    of the own-score ratio within 0.15 of the nside-8 medians (1.34, 1.28, 1.13, 1.07). Between 1 and 14 of the 40
+    exceed each map value (1.63, 1.44, 1.28) at High Latitude, Intermediate and Plane; if none does in a region,
+    that region's block error is outside the null and "agree" is withdrawn for it. Calibration: mean z within
+    +-0.4 and sd of z between 0.78 and 1.22 in every region.
+
 ## Command
 
 ```bash

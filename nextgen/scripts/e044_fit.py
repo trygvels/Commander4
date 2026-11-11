@@ -55,6 +55,7 @@ def main():
     ap.add_argument("--geometry", default="named", choices=["named", "bpxv"])
     ap.add_argument("--no-mask", action="store_true")
     ap.add_argument("--tau-a-only", action="store_true", help="mask the disc around Tau A but not the brightest 5 percent")
+    ap.add_argument("--bright-fraction", type=float, default=0.05, help="fraction of pixels masked by polarized amplitude (referee read 3: 0.03 and 0.10 as arms)")
     ap.add_argument("--beta0", type=float, default=-3.1)
     ap.add_argument("--nside", type=int, default=16, choices=[8, 16])
     ap.add_argument("--out", default="")
@@ -62,14 +63,14 @@ def main():
     t0 = time.time()
     ns = a.nside
     if a.geometry == "named":
-        region, keep, block = named_regions(ns, mask=not a.no_mask, bright_fraction=(0.0 if a.tau_a_only else 0.05))
+        region, keep, block = named_regions(ns, mask=not a.no_mask, bright_fraction=(0.0 if a.tau_a_only else a.bright_fraction))
         names = NAMES
     else:
         assert ns == 16
         region = D.bpxv_regions()
         keep = np.ones(region.size, dtype=bool)
         if not a.no_mask:
-            _, keep, _ = named_regions(16, bright_fraction=(0.0 if a.tau_a_only else 0.05))
+            _, keep, _ = named_regions(16, bright_fraction=(0.0 if a.tau_a_only else a.bright_fraction))
         block = np.tile(np.arange(region.size // 2) // 64, 2)
         names = BPXV_NAMES
     WM16 = WindowMatcher(16, target_arcmin=60.0)
@@ -129,7 +130,7 @@ def main():
     sdn, sds = np.sqrt(np.diag(Ji)), np.sqrt(np.diag(Sw))
     chi2 = 2.0 * res.fun
     dof = len(raw) * n - L.ncomp * n - nreg + (n if a.prior != "flat" else 0)
-    print(f"# E044 nside {ns}, geometry {a.geometry}, mask {'none' if a.no_mask else ('Tau A disc' if a.tau_a_only else 'brightest 5 percent and Tau A disc')} "
+    print(f"# E044 nside {ns}, geometry {a.geometry}, mask {'none' if a.no_mask else ('Tau A disc' if a.tau_a_only else f'brightest {100 * a.bright_fraction:g} percent and Tau A disc')} "
           f"({int(keep.sum())} of {keep.size} elements kept), bands {a.bands}, CMB prior {a.prior}"
           + (f" (floor {a.floor_uk} uK)" if a.prior == "lcdm" else (f" ({a.white_sd} uK)" if a.prior == "white" else ""))
           + f", dust beta {a.dust_beta}, 353 bandpass {a.bp353}, {'delta bands' if a.delta_bands else 'band-averaged spectra'}, "
