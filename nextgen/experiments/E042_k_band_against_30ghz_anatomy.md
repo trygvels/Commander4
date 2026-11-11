@@ -286,6 +286,32 @@ covariance; L = 20 first, then 12 and 30. Band sets K, Ka, Q, V; K, Ka; K, 30; 3
   fit is reported as the arm that carries the aliasing bias. If they do not, there is no
   resolution-independent index for these regions at this depth and the paper says so.
 
+**Low-pass arm at L = 20, 2026-11-11 01:40 to 01:56** (`E042/lowpass20.txt`; anchor band and 353 GHz at
+all scales, every other band through multipoles 2 to 20 only; T / J_c at most 0.008).
+
+| bands | High Latitude | Spur | Galactic Center | Plane |
+|---|---|---|---|---|
+| K, Ka, Q, V, low-pass | -3.113 +- 0.014 | -3.112 +- 0.017 | -3.140 +- 0.011 | -3.061 +- 0.014 |
+| the same at all scales (E040) | -3.094 +- 0.012 | -3.097 +- 0.015 | -3.087 +- 0.009 | -2.995 +- 0.012 |
+| K, Ka, low-pass | -3.092 +- 0.018 | -3.085 +- 0.022 | -3.109 +- 0.014 | -3.042 +- 0.018 |
+| the same at all scales | -3.062 +- 0.016 | -3.074 +- 0.020 | -3.046 +- 0.011 | -2.980 +- 0.016 |
+| K, 30 (PR4), low-pass | -3.590 +- 0.023 | -3.244 +- 0.028 | -3.553 +- 0.017 | -3.217 +- 0.025 |
+| the same at all scales | -3.428 +- 0.019 | -3.180 +- 0.023 | -3.263 +- 0.013 | -3.035 +- 0.020 |
+| 30 (PR4), Ka, low-pass | -2.312 +- 0.055 | -2.787 +- 0.066 | -2.321 +- 0.040 | -2.683 +- 0.057 |
+
+- **Z1 holds at high latitude and in the Plane and misses in the Spur by 0.005**: without the pixel
+  scale the WMAP indices are steeper by 0.019, 0.015, 0.053 and 0.066. The errors grow by 10 to 20
+  percent only: most of the information is at multipoles up to 20. The four regions come closer
+  together (a spread of 0.08 against 0.10), and the Plane is no longer the flat one by 0.10 but
+  by 0.05.
+- **Z2 holds at high latitude (-3.59) and misses in the Plane** (-3.22 where I expected -3.3 to
+  -3.7). **Z3 misses by 0.08** (-2.68 where I expected flatter than -2.6). The direction of both is
+  as expected: with the pixel scale out, the PR4 30 GHz map is fainter than the extrapolation of
+  K band by 11, 4, 10 and 4 percent in the four regions, and the index between 30 GHz and Ka is
+  -2.3 to -2.8.
+- Within WMAP, K with Ka is still flatter than the four bands together, by 0.021, 0.027, 0.032
+  and 0.019 (1.9, 2.0, 3.6 and 1.7 nested sd).
+
 **Exploratory, not pre-registered: amplitude ratios by multipole and PR4 against PR3, 2026-11-11
 01:02 to 01:03** (`E042/cross_ratio.txt`, `E042/pr3_vs_pr4_direct.txt`). Prompted by the scale
 dependence of (a). Two model-light diagnostics on the window-matched nside-16 maps.

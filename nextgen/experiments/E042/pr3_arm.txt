@@ -1,0 +1,2 @@
+# PR3 30 GHz: z^T z / n = 1.5982; noise model r = 1.350, A(l=10) = 0.999, gamma = 1.436; converged True; 31 s
+# PR3 against PR4 30 GHz at nside 16: correlation 0.9664; slope of PR3 on PR4 over elements above 10 uK 1.0628; rms of the difference 4.599 uK
