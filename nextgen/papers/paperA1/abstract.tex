@@ -19,19 +19,23 @@ and 30 GHz with the WMAP and Planck LFI bands. (3) The profile likelihood has an
 by $\sqrt{1+\Tm/\J}$, where $\Tm/\J$ is the inverse mean squared signal-to-noise ratio of the amplitudes;
 the natural plug-in sandwich correction is biased the wrong way, and a debiased form gives nominal
 coverage over four decades of $\Tm/\J$. For one component and a uniform noise pattern a zero-mean
-amplitude prior with a free scale is the same estimator; otherwise it is biased by up to 0.6 standard
-deviations. We then apply the estimators side by side to the WMAP nine-year K to V polarization maps
-with their dense noise covariances and a $\Lambda$CDM prior on the CMB. On the same maps, regions and
-noise model the high-latitude polarized synchrotron index is $-3.08$ with the profile likelihood,
-$-3.09$ with a flat amplitude prior stated at 23 GHz and $-2.92$ with the same prior stated at 30 GHz:
-12.6 statistical standard deviations from a change of convention, as the identity predicts to 9
-percent. With a free CMB amplitude the same change of convention moves it by 0.8, again as predicted.
-A white prior on the CMB with the right total variance leaves the index unbiased on simulated
-$\Lambda$CDM skies and makes its error bar too small by a quarter to a third. We do not quote an
-index. The scatter of the score over patches of sky shows that the high-latitude region and the
-Galactic plane are not one index each, and gives errors of 0.04 and 0.10 where the model gives 0.012
-and 0.013; the index also moves by 0.02 to 0.11 with the angular scales that inform it, by 0.01 to
-0.07 with the prior on the CMB and by up to 0.03 for 0.05 in the fixed dust index; and the official
-Planck 30 GHz polarization maps do not fit one power law with WMAP K band. We also report a silent memory fault in a vendor Cholesky routine that sat under every
-low-resolution fit of this size on our machine, how we found it, and that no number changed.
+amplitude prior with a free scale is the same estimator; otherwise it is biased, by up to 0.6 standard
+deviations in controlled tests and by one standard deviation in simulations of the configuration below.
+We then apply the estimators side by side to the WMAP nine-year K to V polarization maps with their
+dense noise covariances, a $\Lambda$CDM prior on the CMB, four regions defined by geometry, and the
+brightest emission and Tau A masked. On the same maps, regions and noise model the polarized
+synchrotron index at $|b| > 30^\circ$ is \N{prof2.HL} with the profile likelihood, \N{f23two.HL} with
+a flat amplitude prior stated at 23 GHz and \N{f30two.HL} with the same prior stated at 30 GHz. The
+change of convention moves the index by \N{d3023two.range} in the four regions, \N{d3023sd.range}
+statistical standard deviations, and the first-order form of the identity predicts every move, too
+high by \N{predH.over.range} percent. With a free CMB amplitude the move at high latitude is
+\N{flat.d3023two.HL}. The zero-mean prior lands \N{zmsd.abs.HL} standard deviations from the profile
+optimum at high latitude. A white prior on the CMB in place of the $\Lambda$CDM covariance, with nearly
+the same total variance, makes the error bar too small by \N{mm.percent.range} percent, by an exact
+first-order calculation that we give. With the mask the simple model fits in every region and errors
+from the scatter of the score over patches of sky agree with the model's. We do not quote an index:
+it moves by \pend{sizes} with the angular scales that inform it, the prior on the CMB and the fixed
+dust index; and an earlier version of this analysis, on regions reconstructed from a published index
+map and without a mask, had regions that did not fit and one region whose index a single source,
+Tau A, moved by \N{tauA.absmove.Plane}, six of its statistical errors.
 \end{abstract}

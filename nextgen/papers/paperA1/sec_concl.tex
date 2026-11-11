@@ -10,30 +10,38 @@ reference frequency was used; (iii) quote the profile optimum with the debiased 
 Eq.~(\ref{eq:debiased}), and check $\Tm/\J_{\rm c}$; (iv) if a prior is put on a component that does
 not depend on the index, state the sensitivity of the index to that prior.
 
-\paragraph{What the real maps show.} On the WMAP K to V polarization maps, changing nothing but the
-frequency at which a flat amplitude prior is stated, from 23 to 30 GHz, moves the high-latitude index
-by 0.17 at $N_{\rm side}=16$, 12.6 times its statistical error; with a flat prior on the CMB as well
-the move is 0.8; for a band set without K band it is more than a unit. In every case that we could
-check (four regions, three CMB priors, shifts from 0.03 to 0.8) the first-order identity predicts the
-move to 10 percent. The profile likelihood and the zero-mean prior do not depend on the convention.
-That comparison is differential and does not rest on the sky model being right. The prior on the CMB
-matters in a second way: a white prior with the right total variance and the wrong shape leaves the
-index unbiased on $\Lambda$CDM skies and understates its error by a quarter to a third.
+\paragraph{What the real maps show.} On the WMAP K to V polarization maps, with regions defined by
+geometry and the brightest emission masked, changing nothing but the frequency at which a flat
+amplitude prior is stated, from 23 to 30 GHz, moves the index by \N{d3023two.range} in the four
+regions: \N{d3023sd.range} times its statistical error. With a flat prior on the CMB as well the move
+at high latitude is \N{flat.d3023two.HL}. The identity behind this is exact. Its first-order form
+predicts every move that we could check and is always too high, by \N{predH.over.range} percent with
+the curvature of the fitted marginal and by \N{predJ.over.range} percent with the information of the
+profile fit alone. The profile likelihood does not depend on the convention. That comparison is
+differential and does not rest on the sky model being right. Two further results are specific to
+this configuration. The zero-mean prior with a free scale, which is the same estimator as the profile
+likelihood for one component and uniform noise, is not here: it lands \N{zmsd.abs.list} standard
+deviations from the profile optimum in the four regions, and in simulations it is the one that is
+biased. And the prior on the CMB matters beyond the pivot: a white prior of nearly the right total
+variance in place of the $\Lambda$CDM covariance understates the error of the index by
+\N{mm.percent.range} percent on these maps, by a first-order calculation that needs no simulation
+(Eq.~\ref{eq:mismatch}).
 
 \paragraph{What they do not show.} We have not measured the polarized synchrotron index. The profile
-index of the simple model is near $-3.08$ at high latitude, in the North Polar Spur and in the
-Galactic Center and $-2.96$ in the Galactic plane, with errors of 0.01 to 0.02 if each region has one
-index. At high latitude and in the plane it does not: the scatter of the score over patches of sky
-gives errors of 0.04 and 0.10 there (and 0.04 in the Spur, where it is within what the model allows),
-half a dozen patches carry the information of each region, and with those errors the regions do not
-differ. The index also moves by 0.02 to 0.11 with the angular scales that inform it, in every region
-and by several times what the model allows for nested fits; by 0.01 to 0.07 with the prior on the
-CMB; by up to 0.03 for a change of 0.05 in the dust index, which is fixed; and by up to 0.04 with the
-band subset. The model misfits in the plane and fails in the Galactic Center; and the official 30 GHz maps do not fit one power law with
-K band. The spread of published values for this sky, $-2.9$ to $-3.3$, is of the size of these
-effects and of the convention effect together, not of the statistical errors. A measurement needs a
-model in which a region is more than one index, the scale dependence understood, and simulations of
-each added step.
+index of the simple model is \N{prof2.list} at high latitude, in the Spur, at intermediate latitude
+and in the plane, with statistical errors of \N{sd.range}; with the mask the model fits in every
+region, and errors from the scatter of the score over patches of sky agree with the model's within
+what a dozen patches can say. But the index moves \pend{by ... with the angular scales that inform it,
+the prior on the CMB, the fixed dust index and the band subset}, and the route to these numbers is
+itself a caution. An earlier version of this analysis used four regions reconstructed from a published
+index map and no mask. Its tables were internally consistent and passed our own checks; its
+``High Latitude'' region was mostly inner Galactic plane, its misfit was the brightest emission, and
+one source, Tau A, moved the index of one region by \N{tauA.absmove.Plane}, six of its statistical
+errors. An independent referee found this from the saved fit products, by asking where on the sky the
+misfit sat. A $\chi^2$ that is too large is a question about the sky before it is a statement about a
+model, and a region is a choice that has to be shown. The spread of published values for this sky,
+$-2.9$ to $-3.3$, is of the size of these effects and of the convention effect together, not of the
+statistical errors.
 
 \paragraph{What we did not do.} All results are for maps, at low resolution, with one index per
 region and Gaussian noise of known covariance. We did not treat time-ordered data, gain or bandpass
@@ -41,12 +49,15 @@ sampling, or an index field with inferred smoothness, for which a proper amplitu
 and has the failure modes of Sect.~\ref{sec:limits}. The account of the real-map chain in
 Sect.~\ref{sec:legacy} uses a factor measured from the log of the same chain, and the forward test
 has not been run. Simulation-based calibration of the exact modes inside Commander4 itself has not
-been run; they are tested against grids of their targets. The estimator that reads the index from large scales only is unbiased and calibrated on
-simulations in which the model is true; that says nothing about what it does with whatever makes the
-real maps depend on scale. The noise model for 30 GHz is empirical and isotropic. The block errors treat patches of sky as exchangeable and independent, rest on five to nine effective
-patches per region, are too small if the index varies coherently over several patches, and have to
-be read against simulations with the covariances of the fit. The $\Lambda$CDM prior describes
-multipoles up to 47; the power above that changes the indices by less than 0.001.
+been run; they are tested against grids of their targets. The estimator that reads the index from
+large scales only is unbiased and calibrated on simulations in which the model is true; that says
+nothing about what it does with whatever makes real maps depend on scale. The block errors treat
+patches of sky as exchangeable and independent, rest on a dozen effective patches or fewer, are too
+small if the index varies coherently over several patches, and have to be read against simulations
+with the covariances of the fit. The $\Lambda$CDM prior describes multipoles up to 47. The mask
+follows a published description and is not a published file; the Spur region rests on a published
+index map. We did not use the Planck LFI bands: at this precision the official 30 GHz polarization
+maps do not fit one power law with WMAP K band in our hands, which is the subject of other work.
 
 \paragraph{Reproducibility.} Every number in this paper comes from a script in the repository and an
 experiment record that states the question, the predictions written before the run, the command and

@@ -117,11 +117,14 @@ def main():
         put4("predH", z["pred_marg"], "{:+.3f}"); put4("predJ", z["pred_jc"], "{:+.3f}")
         put4("ratioH", dd / z["pred_marg"], "{:.2f}"); put4("ratioJ", dd / z["pred_jc"], "{:.2f}")
         put("ratioH.percentHL", float(100 * (z["pred_marg"][0] / dd[0] - 1)), "{:.0f}")
+        put4("f23two", z["flat23"], "{:.2f}"); put4("f30two", z["flat30"], "{:.2f}"); put4("d3023two", dd, "{:.2f}")
+        put4("predH.over", 100 * (z["pred_marg"] / dd - 1), "{:.0f}"); put4("predJ.over", 100 * (z["pred_jc"] / dd - 1), "{:.0f}")
         hn = z["pred_marg"] / np.log(30 / 23)
         put4("pivot", 23.0 / np.exp(d23 / hn), "{:.1f}")
         put("flatconv", "yes" if bool(np.all(z["flat_converged"])) else "NO", "{}")
     if "zm" in z.files:
         put4("zm", z["zm"]); put4("zmsd", (z["zm"] - b0) / s0, "{:+.1f}"); put4("zmm", z["zm"] - b0, "{:+.3f}")
+        put4("zmsd.abs", np.abs(z["zm"] - b0) / s0, "{:.1f}")
     if "blk_CR3" in z.files:
         put4("cr3", z["blk_CR3"]); put4("cr3own", z["blk_CR3_own"]); put4("neff", z["blk_neff"], "{:.1f}"); put4("levmax", z["blk_lev_max"], "{:.2f}")
         put4("cr3ratio", z["blk_CR3"] / s0, "{:.1f}"); put4("cr3ownratio", z["blk_CR3_own"] / s0, "{:.1f}")
@@ -139,6 +142,7 @@ def main():
             put4(f"{k}.prof", zz["beta"]); put4(f"{k}.sd", zz["sd_sand"]); put4(f"{k}.move", zz["beta"] - b0, "{:+.3f}")
             put4(f"{k}.movesd", (zz["beta"] - b0) / s0, "{:+.1f}"); put4(f"{k}.sdratio", zz["sd_sand"] / s0, "{:.2f}")
             put4(f"{k}.d3023", zz["flat30"] - zz["flat23"], "{:+.3f}"); put4(f"{k}.f23m", zz["flat23"] - zz["beta"], "{:+.3f}")
+            put4(f"{k}.d3023two", zz["flat30"] - zz["flat23"], "{:.2f}")
             put4(f"{k}.f30", zz["flat30"]); put4(f"{k}.f23", zz["flat23"]); put4(f"{k}.ratioH", (zz["flat30"] - zz["flat23"]) / zz["pred_marg"], "{:.2f}")
             put4(f"{k}.ratioJ", (zz["flat30"] - zz["flat23"]) / zz["pred_jc"], "{:.2f}"); put4(f"{k}.chi", zz["chi2_region"])
             nest = np.sqrt(np.abs(zz["sd_sand"] ** 2 - s0 ** 2))
@@ -190,6 +194,7 @@ def main():
         zo = np.load(old)
         for j, sname in enumerate(("HL", "Spur", "GC", "Plane")):
             put(f"tauA.move.{sname}", float(zt["beta"][j] - zo["beta"][j]), "{:+.3f}"); put(f"tauA.prof.{sname}", float(zt["beta"][j])); put(f"old.prof.{sname}", float(zo["beta"][j]))
+            put(f"tauA.absmove.{sname}", abs(float(zt["beta"][j] - zo["beta"][j])), "{:.2f}")
             put(f"tauA.chi.{sname}", float(zt["chi2_region"][j])); put(f"tauA.cr3own.{sname}", float(zt["blk_CR3_own"][j])); put(f"tauA.sd.{sname}", float(zt["sd_sand"][j]))
     # null simulations of the block-error ratio at the configuration of the fit
     for tag, key in (("sim_n8_blocknull", "null8"), ("sim_n16_blocknull", "null16")):

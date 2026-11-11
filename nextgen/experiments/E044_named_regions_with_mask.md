@@ -171,6 +171,24 @@ Against the expectations:
   simulation of the zero-mean prior at this configuration is running (`E044/sim_n8_zm.txt`); its first realization
   has the same sign in all four regions.
 
+### R2, the old regions with only the disc around Tau A masked (read 2026-11-11 09:54)
+
+`E044/bpxv_tauA.txt` (LCDM prior; 28 of 6144 elements removed). Against the unmasked fit of E040 (`s4_bpxv_n16_wm_lcdm`):
+
+| Old region | Index, unmasked | Index, Tau A masked | Move | chi2 per element and band, before and after | Own-score block error over sandwich |
+|---|---|---|---|---|---|
+| High Latitude | -3.0825 | -3.0884 +- 0.0125 | -0.006 | 0.584, 0.585 | 2.25 |
+| Spur | -3.0799 | -3.0986 +- 0.0167 | -0.019 | 0.592, 0.591 | 1.57 |
+| Galactic Center | -3.0807 | -3.0823 +- 0.0089 | -0.002 | 1.782, 1.786 | 8.6 |
+| Plane | -2.9641 | -3.0483 +- 0.0144 | -0.084 | 0.770, 0.596 | 2.28 |
+
+- **H6 holds for the Plane**: the index moves by -0.084 (written: -0.05 to -0.10; the referee's first-order value was
+  -0.074), six of its statistical errors, and the chi-square falls from 0.770 to 0.596 (written: below 0.68), that
+  is to the expectation. One source did both. The joint block error of that region falls from 0.100 to 0.032.
+- H6 fails in one detail: the old Spur moves by -0.019 where I wrote "less than 0.01". Its strips along the edge
+  of the plane reach the masked disc, and it is coupled to the Plane through the noise.
+- The old Galactic Center still does not fit (1.79); that is the brightest emission, which the full mask removes.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).

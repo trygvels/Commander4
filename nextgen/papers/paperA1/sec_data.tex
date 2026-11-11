@@ -305,7 +305,22 @@ scatter the patch scores. And it rests on few patches: the effective number,
 $(\sum_B D_B)^2/\sum_B D_B^2$ (an analogue, in shares of the information, of the effective number of
 clusters of \citealt{carter2017}), is \N{neff.list} here.
 
-On the maps the block error is \N{cr3ownratio.list} times the sandwich error in the four regions.
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/fig_blocks.pdf}
+\caption{What the block errors of Table~\ref{tab:same} are made of. For each patch of sky (a pixel of the
+$N_{\rm side}=2$ grid) that carries information on the index of a region: the index that the patch alone
+would move to in one Newton step from the fitted index of the region, with the error it would have under
+the model, against the share of the region's information that the patch carries. Patches with a one-step
+error above 0.12 are not drawn, and an arrow marks a value outside the frame. Dark band: the sandwich error
+of the region's index. Light band: its block error (none for the Spur). The fitted index of the region is
+given beside its name. The one-step values are first-order and for display; the block error is computed
+from the scores, Eq.~(\ref{eq:block}) (\exref{E044}).}
+\label{fig:blocks}
+\end{figure}
+
+On the maps the block error is \N{cr3ownratio.list} times the sandwich error in the four regions
+(Fig.~\ref{fig:blocks}).
 Under the model, in \N{nullall.n} simulations at $N_{\rm side}=8$ with these regions, this mask and
 the $\Lambda$CDM prior (synchrotron from the DR1 model smoothed to $5^\circ$, noise from the
 window-matched covariances, a $\Lambda$CDM CMB, one index per region), the ratio has a median of
@@ -319,8 +334,10 @@ error from a dozen patches can tell.
 
 That was not so before the mask. On the four regions of the earlier version, unmasked, the
 joint block errors were 2.3 to 9 times the sandwich errors and the $\chi^2$ per element and band was
-1.78 and 0.77 in its Galactic Center and Plane. \pend{With only the disc around Tau A masked on
-those regions: index of its Plane, its $\chi^2$, its block error (\exref{E044}, H6).} The misfit and
+1.78 and 0.77 in its Galactic Center and Plane. With nothing but the disc around Tau A masked on
+those regions, the index of its Plane moves from \N{old.prof.Plane} to \N{tauA.prof.Plane}, six of its
+statistical errors, and its $\chi^2$ falls to \N{tauA.chi.Plane}; we had predicted both before the fit, the
+referee's first-order estimate of the move being $-0.07$ (\exref{E044}). The misfit and
 the scatter of those fits sat in the emission that the mask removes, and one source carried most of
 it in one region.
 

@@ -46,15 +46,14 @@ Cholesky routine of the Accelerate framework, called with the upper-triangle opt
 correct, so no test of values can see the fault; what lies behind the buffer in memory is
 overwritten. We found it with the system's guard allocator and measured it with a malloc canary that
 is now part of the repository, switched the module to the other triangle (same cost, same numbers),
-and added a test that runs the likelihood under the canary (\exref{E043}). The fits at
-$N_{\rm side} = 16$ (orders 12\,288 and 18\,432) were not exposed: twenty test matrices at each of
-those orders do not overrun where every one at order 4608 does, the baseline fit run again on the old
-path under the canary (about a dozen factorizations at order 18\,432) does not overrun, and its output
-is reproduced in every printed digit. The
-simulations at $N_{\rm side} = 8$ (orders 1536 and 4608) were exposed, and every one of them was run
-again on the sound path under the canary and compared with the original output as printed.
-For the 200 realizations of Table~\ref{tab:e039} all 1480 printed numbers agree to the last digit, as do the
-40 realizations with errors from each data set, and no run made since has touched the canary.
+and added a test that runs the likelihood under the canary (\exref{E043}). The simulations at $N_{\rm side} = 8$ (orders 1536 and 4608) were exposed. Every one of
+them that this paper uses was run again on the sound path under the canary and compared with the
+original output as printed: for the 200 realizations of Table~\ref{tab:e039} all 1480 printed numbers
+agree to the last digit, as do the 40 realizations with errors from each data set. Fits at
+$N_{\rm side} = 16$ (orders 12\,288 to 18\,432) are outside the range: twenty test matrices at each
+end of it do not overrun where every one at order 4608 does. All real-data fits reported in this
+paper were in any case run after the fix, on the sound path under the canary, and none of those runs
+touched it.
 We report this because the failure is silent, because dense low-resolution likelihoods of exactly
 this size are common in this field, and because a result that passes every statistical test can
 still have been computed next to an overwritten buffer.

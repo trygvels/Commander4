@@ -13,7 +13,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-NAMES = ["High Latitude", "Spur", "Galactic Center", "Plane"]
+NAMES = ["High Latitude", "Spur", "Intermediate", "Plane"]
 INK, MUTED = "#0b0b0b", "#52514e"
 POINT = "#2a78d6"                       # one series, one hue
 BAND_MODEL, BAND_BLOCK = "#b9b8b2", "#e6e5df"
@@ -27,7 +27,10 @@ def main():
     ap.add_argument("--ylim", type=float, default=0.42)
     a = ap.parse_args()
     z = np.load(a.data)
-    G, D, beta, sd, cr3, neff = z["G"], z["D"], z["beta"], z["sd_model"], z["CR3"], z["neff"]
+    if "blk_G" in z.files:                                   # E044 output: block errors from each region's own scores
+        G, D, beta, sd, cr3, neff = z["blk_G"], z["blk_D"], z["beta"], z["sd_sand"], z["blk_CR3_own"], z["blk_neff"]
+    else:
+        G, D, beta, sd, cr3, neff = z["G"], z["D"], z["beta"], z["sd_model"], z["CR3"], z["neff"]
     fig, axs = plt.subplots(2, 2, figsize=(6.6, 5.6), sharey=True, sharex=True)
     axes = axs.ravel()
     for r, ax in enumerate(axes):
@@ -38,7 +41,7 @@ def main():
             delta, err = -g / d, 1.0 / np.sqrt(d)
         sel = pos & (err < a.max_err)
         x = 100 * share[sel]
-        if np.isfinite(cr3[r]) and r != 2:
+        if np.isfinite(cr3[r]) and neff[r] >= 4.0:
             ax.axhspan(-cr3[r], cr3[r], color=BAND_BLOCK, lw=0, zorder=0)
         ax.axhspan(-sd[r], sd[r], color=BAND_MODEL, lw=0, zorder=1)
         ax.axhline(0.0, color=MUTED, lw=0.6, zorder=2)
