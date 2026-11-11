@@ -1431,3 +1431,24 @@ F57 with the third null set (E044 R8, 360 realizations at nside 8): ratio median
 percentile 1.95, 3.04, 1.66, 1.74; 51, 244, 50 and 78 of the 360 lie above the map values. The sandwich error is
 calibrated: sd of z 1.02, 1.06, 0.97, 0.98 (+- 0.04), mean of z +0.05, -0.11, 0.00, -0.05 (+- 0.05).
 
+**Amendment of 2026-11-11 13:40 to F58 to F60, after the third referee read of Paper A1
+(`reviews/2026-11-11_referee_report_paperA1_draft4.md`; no fatal objection).**
+
+- F58: the explanation recorded with R5 ("the curvature of the flat-prior marginal at the profile optimum is
+  negative") was wrong; that number was the curvature at the bound. The marginal has no optimum because the
+  volume term rises toward the index at which the synchrotron and CMB spectra are degenerate over K to V
+  (about -0.08): slope +399 per unit index at the profile optimum for 2974 amplitudes, a pivot of 20.1 GHz,
+  reproduced by a one-element calculation. The finding itself (monotonic over the allowed range) stands.
+  "9 to 22 percent too small" is the true error over the quoted one minus one; the formula is first order
+  and drops two terms of relative order T/J.
+- F59: "no test rejects the one-index model" is too strong. The chi-square split by direction does: in the
+  Plane the one degree of freedom per element along the CMB spectrum has 993 for 862 (3.0 sd with a simulated
+  sampling error), and the excess sits on the brightest thermal sources (W51, Cygnus X, W43; test H16
+  pending). The scale dependence is shown gone for the Plane only; the Spur and Intermediate changes are as
+  large as on the old regions, inside a noise three to five times larger (two expected sd at l <= 20 are 0.04
+  to 0.07). The K and Ka arm and the flat-CMB arm are one pattern at two sd: the index from the K to Ka lever
+  arm is flatter.
+- F60: by region the deficit along the directions outside the model is 0.963, 1.020, 0.929, 0.963 (+- 0.018,
+  0.061, 0.024, 0.034) and the direction of the CMB spectrum has 0.970, 0.927, 1.012, 1.153. The literature
+  points both ways (Jarosik et al. 2007 measure the r4 noise above the r9 value).
+
