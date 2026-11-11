@@ -216,8 +216,12 @@ noise (\exref{E044}).
 optimum on these regions: it is steeper by \N{zmm.list}, that is \N{zmsd.list} sandwich errors. For
 one component and a common noise pattern the two are the same estimator (Sect.~\ref{sec:profile});
 here there are three components, the noise pattern differs from band to band, and at High Latitude
-the amplitudes are faint. \pend{Simulation of the zero-mean prior at this configuration: which of the
-two is biased, and by how much.}
+the amplitudes are faint. In \N{zmsim.n} simulations with these regions, this mask and this prior at
+$N_{\rm side}=8$, in which the profile optimum is unbiased, the zero-mean optimum of each realization is
+steeper than its profile optimum by \N{zmsim.paired.list} sandwich errors, the same from one noise
+realization to the next (scatter \N{zmsim.pairedscatter.range}). So it is the zero-mean prior that is biased
+here, by an amount set by the sky and the noise pattern; the maps at $N_{\rm side}=16$ show the same sign
+and order across the regions, about three times larger in index (\exref{E044}).
 
 \begin{table}
 \centering

@@ -220,6 +220,8 @@ def main():
         put4(f"{key}.meanz", dz.mean(0), "{:+.2f}"); put4(f"{key}.profmeanz", dp.mean(0), "{:+.2f}")
         put4(f"{key}.paired", ((zs["b"] - zs["prof"]) / zs["s"]).mean(0), "{:+.2f}")
         put4(f"{key}.pairedse", ((zs["b"] - zs["prof"]) / zs["s"]).std(0, ddof=1) / np.sqrt(m), "{:.2f}")
+        put4(f"{key}.pairedscatter", ((zs["b"] - zs["prof"]) / zs["s"]).std(0, ddof=1), "{:.2f}")
+        put4(f"{key}.pairedindex", (zs["b"] - zs["prof"]).mean(0), "{:+.3f}")
         put(f"{key}.se", 1.0 / np.sqrt(m), "{:.2f}")
     zb = load("sim_n8_blocknull_b")
     za = load("sim_n8_blocknull")

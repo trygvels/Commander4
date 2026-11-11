@@ -189,6 +189,25 @@ Against the expectations:
   of the plane reach the masked disc, and it is coupled to the Plane through the noise.
 - The old Galactic Center still does not fit (1.79); that is the brightest emission, which the full mask removes.
 
+### Simulations at this configuration, nside 8 (read 2026-11-11 10:07)
+
+**Second null set** (`E044/sim_n8_blocknull_b.txt`, 60 realizations with other seeds): mean z -0.08, -0.02, +0.02, -0.02;
+sd of z 1.12, 1.05, 1.02, 0.87. The Spur's -0.39 +- 0.13 of the first set was a fluctuation: pooled over 120
+realizations the four mean z are -0.05, -0.20, +0.02, +0.03 (se 0.09) and the sd of z 1.11, 1.02, 1.01, 0.98.
+Own-score block error over sandwich, pooled: median 1.33, 1.30, 1.11, 1.12; 97.5th percentile 2.02, 3.11, 1.69,
+1.72. Of the 120 simulations 15, 85, 12 and 31 lie above the map values (1.63, 1.00, 1.44, 1.28). All four
+regions are inside the null.
+
+**The zero-mean prior** (`E044/sim_n8_zm.txt`, 24 of 30 realizations read): in the same simulated data the
+zero-mean optimum is steeper than the profile optimum by 1.05, 0.54, 0.44 and 0.22 sandwich errors (0.030, 0.015,
+0.009, 0.004 in index), with a scatter between realizations of 0.02 or less. The profile optimum is unbiased in
+these simulations; so the zero-mean prior with a free scale per region is biased at this configuration, by an
+amount that does not depend on the noise draw. On the maps at nside 16 the difference is 0.104, 0.043, 0.030,
+0.004: the same sign and order, about three times larger in index. E041 had found up to 0.6 sd on its ladder
+when the noise pattern differs between amplitudes; here, with three components, dense noise and a faint
+High Latitude region, it is larger. This changes one sentence of the paper's abstract and one recommendation:
+the zero-mean prior is not a substitute for the profile likelihood on these maps.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).
