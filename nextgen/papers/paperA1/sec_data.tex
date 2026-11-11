@@ -366,8 +366,9 @@ block: the fit with a flat prior on the CMB, whose residual has exactly two degr
 element in the directions that the three amplitudes do not span, and the difference between the two
 nested fits, which has one degree of freedom per element in the direction of a CMB spectrum (the
 fitted CMB amplitude against its noise and its prior). Third block: the fit to K, Ka and 353 GHz
-alone, with one degree of freedom per element. The errors are sampling errors under the model.
-Every entry of the last three rows has an expectation of one.}
+alone, with one degree of freedom per element. Last row: the direction of the CMB spectrum again,
+with the brightest thermal sources of the plane masked as well. The errors are sampling errors under
+the model. Every entry below the first block has an expectation of one.}
 \label{tab:chi}
 \small
 \resizebox{\textwidth}{!}{\input{gen_tab_chi}}
@@ -390,12 +391,26 @@ error of the split measured in \N{chisplit.n} simulations at $N_{\rm side}=8$ (f
 within about 10 percent of the errors of Table~\ref{tab:chi}; at High Latitude the two parts are
 anticorrelated and the flat-prior part scatters a fifth more than the table says).
 From K, Ka and 353 GHz alone the Plane is at its
-expectation. So in the Plane the Q and V maps hold something with a spectrum close to that of the CMB
-that the model does not have, against the power law that K and Ka define: an index that varies from
-pixel to pixel, a spectrum that steepens with frequency, and leakage of intensity into polarization
-would each do it. The block errors below do not see it, and in Table~\ref{tab:moves} it appears as an
-index from K and Ka that is flatter by \N{KKa.move.Plane}. All that the totals show is that no region
-has a $\chi^2$ above its expectation; the model does not fit the Plane in every direction.
+expectation. So in the Plane the Q and V maps hold something that the model does not have, with a
+spectrum flatter than the power law that K and Ka define.
+
+We asked where on the sky it sits. In the saved residuals of the two fits, with diagonal weights, a
+dozen of the Plane's 435 pixels carry nearly all of the excess, and the largest are the pixels of
+W51, Cygnus X and W43: the brightest thermal sources of the Galactic plane, bright in intensity and
+not in polarized synchrotron, so that a mask set on polarized amplitude keeps them. We wrote down
+what should happen if they are the cause, and then masked the brightest 2 percent of pixels in the
+free-free intensity of the Cosmoglobe DR1 model as well, which removes \N{ff.npix.new} more pixels,
+all in the Plane. The Plane's ratio along the CMB spectrum falls to
+$\N{ff.chi.dir.Plane} \pm \N{ff.chi.dir.se.Plane}$, inside the interval we had written (the pixels
+that left had carried \N{ff.gone.obs} where \N{ff.gone.exp} are expected); the other three regions do
+not move (last row of Table~\ref{tab:chi}); and the index of the Plane goes from \N{prof.Plane} to
+\N{ff.prof.Plane}, a change of \N{ff.nest.Plane.abs} times what the removal of that much data at
+random would give and \N{ff.movesd.Plane.abs} of its statistical error, where we had expected less than
+0.02. Leakage of intensity into polarization at the brightest sources would do this, and so would
+polarized emission of the sources themselves with a flatter spectrum; we do not separate the two.
+The Plane index of Table~\ref{tab:same} includes these pixels and is flatter by 0.02 for it. The
+block errors below did not see them. All that the totals of the central fit show is that no region
+has a $\chi^2$ above its expectation.
 
 The deficit has two readings. As a fluctuation it has the probabilities above. As a statement about
 the released covariances it is a noise that is overstated, by \N{chi.noisepercent} to
@@ -584,7 +599,8 @@ worth 0.05 (the bandpasses, if ignored) and 0.02 (the dust index, in the Plane).
 amplitude priors the same fit moves by \N{d3023two.range} with a convention. We give these numbers as
 the answer of this model on these regions and not as a measurement of the polarized synchrotron
 index, and the reason is not the size of any entry of Table~\ref{tab:moves}. It is that the regions
-and the mask are one choice; that in the Plane the model fails along the CMB spectrum
+and the mask are one choice; that in the Plane the central fit fails along the CMB spectrum until the
+brightest thermal sources are masked, which moves its index by \N{ff.move.Plane.abs}
 (Table~\ref{tab:chi}); that the index from the K to Ka lever arm is flatter than from four bands; and
 that the $\chi^2$ against the released covariances is not understood. An earlier set of regions, without a mask, gave \N{old.prof.HL} to
 \N{old.prof.Plane} with errors of 0.01 and passed the checks we then had.

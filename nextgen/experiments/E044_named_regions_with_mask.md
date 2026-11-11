@@ -616,6 +616,38 @@ criterion: mean inside +-0.5, rms inside 0.66 to 1.34).
 The Plane's six values lie between 0.78 and 1.09. Six cannot place the maps; H15 has forty more. Calibration of
 the profile optimum in the six: pooled mean z +0.05 +- 0.20, rms 1.05.
 
+### R11, the brightest thermal sources masked as well (H16; read 2026-11-11 14:20)
+
+`E044/ffmask_lcdm.txt` and `ffmask_flat.txt`: the mask of the central fit plus the brightest 2 percent of pixels in
+the DR1 free-free intensity model (`mask_ff02.npy`; 27 new pixels, all in the Plane, which keeps 408 of 576).
+Canary, no OVERFLOW line; converged.
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| along the CMB spectrum, central mask | 0.970 | 0.927 | 1.012 | 1.153 +- 0.048 |
+| along the CMB spectrum, thermal sources masked | 0.970 | 0.927 | 1.012 | 1.062 +- 0.050 |
+| flat-prior fit, chi2 / 2n, thermal sources masked | 0.963 | 1.020 | 0.928 | 0.955 |
+| profile index, thermal sources masked | -3.1487 | -3.1351 | -3.0941 | -3.0597 +- 0.0163 |
+| change of the index | -0.0018 | +0.0042 | -0.0030 | -0.0207 |
+| own-score block error over sandwich | 1.58 | 1.05 | 1.47 | 1.24 |
+
+chi2_min / dof: 0.9677 (LCDM prior), 0.9546 (flat prior). Along the CMB spectrum over all regions: 0.994 +- 0.019.
+
+- **H16 holds.** The Plane's ratio along the CMB spectrum falls from 1.153 to 1.062 (written: between 0.92 and
+  1.08): 859 for 808 expected, +1.3 sd where it was +3.2. The 27 pixels that left carried 134 where 53 are
+  expected (54 elements), 7.9 sd. The other three regions do not move (written: within 0.02). The total stays
+  low (0.968; written 0.965 to 0.980).
+- H16 fails in one clause, by a hair: the Plane index moves by -0.0207 where I wrote "less than 0.02". That is
+  3.2 times sqrt(sd_new^2 - sd_old^2) = 0.0065: the thermal-source pixels pull the Plane index flat by 0.02,
+  which is 1.4 of its statistical error. The central fit's Plane index (-3.039) includes that pull.
+- So the Plane's misfit along the CMB spectrum is located and has a cause that was tested with a prediction:
+  emission at the brightest thermal sources of the plane (W51, W43, Cygnus X and their like) that the model does
+  not have, with a spectrum flatter than the synchrotron power law. Leakage of intensity into polarization fits
+  that; polarized emission of the sources themselves is not excluded. What remains in the Plane (+1.3 sd) is
+  not significant.
+- The look that led here was after the fact (the split was the third referee's; the localization mine, from
+  saved residuals). The test was written down before the two fits.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).
