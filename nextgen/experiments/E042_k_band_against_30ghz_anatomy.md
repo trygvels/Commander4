@@ -256,12 +256,17 @@ ratios of (i) are not.)
 
 What these say, as observations to be checked and not yet as results:
 
-- **Two different things are in the gap.** (A) In the Galactic plane the PR4 30 GHz polarization is
-  9 to 15 percent fainter than PR3, at all scales, and PR3 agrees with the K-band extrapolation
-  there (0.503 against 0.502 to 0.505 expected in the inner plane; 0.49 to 0.51 for abs(b) < 20
-  at multipoles 4 to 34). (B) At high latitude PR3 and PR4 agree with each other within 1 to 3
-  percent and both are fainter than the K-band extrapolation at multipoles below about 10 (by 4
-  to 17 percent), and consistent with it from 11 to 34.
+- **Two different things are in the gap, and only the first is secure.** With bootstrap errors over
+  the modes of each bin (`E042/cross_ratio_errors.txt`, added 01:04 after the first reading):
+  (A) for abs(b) < 20 the PR4 30 GHz over K ratio is 0.440 to 0.469 with errors of 0.005 to 0.009
+  at multipoles 4 to 34, 5 to 8 sd below 0.505 in every bin; the PR3 ratio is 0.485 to 0.507, 2 to
+  4 percent low up to multipole 16 and consistent above; and PR4 over PR3 is 0.905 to 0.926 with
+  errors of 0.011 to 0.018. In the Galactic plane PR4 is 7 to 10 percent fainter than PR3 at all
+  scales, and PR3 is within 4 percent of the K-band extrapolation.
+  (B) For abs(b) > 20 both 30 GHz maps are consistent with the K-band extrapolation within 2 sd
+  in every bin; over multipoles 2 to 10 together PR4 is 0.481 +- 0.008 and PR3 0.474 +- 0.011,
+  about 5 percent and 3 sd low. PR4 over PR3 there is 1.01 to 1.03. I first wrote "4 to 17
+  percent" for (B) from the point values alone; with errors it is a 3 sd hint, not a result.
 - (A) fits the leakage check above: the plane residual follows the intensity at 0.05 to 0.13
   percent, and the polarized fraction in the inner plane at 30 GHz is of order one percent, so a
   difference of 0.1 percent of intensity between the two releases' bandpass-leakage corrections is
