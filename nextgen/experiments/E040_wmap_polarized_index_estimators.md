@@ -794,6 +794,21 @@ the regions and the blocks. Blocks with negative information: 1.6 per realizatio
 - The nside-16 version (12 realizations) is in queue 12 and decides whether these statements hold at the
   resolution of the map fit.
 
+### Stage 5 and the prior: maps with the tested module, and the floor of the LCDM prior (read 2026-11-11 07:29 and 07:40)
+
+`E040/block_v3_maps_lcdm.txt` (`e040i_block_maps.py`, which uses `lowres/block.py`): identical to the earlier
+run in every printed digit (CR3 0.0437, 0.0377, 0.0789, 0.0999). Diagnostics the review asked for: 2 blocks
+with negative information at High Latitude and none elsewhere; cross-region share of the block Jacobian 0.24
+(the same as in the LCDM-prior simulations, 0.26); sum of the block informations over J_c 1.001 to 1.008;
+largest leverage 0.48, so no clipping. The block scores and informations are saved and drawn in the
+paper's Fig. `fig:blocks`.
+
+`E040/block_v3_maps_lcdm_floor011.txt`: the same with the white floor of the LCDM prior raised from 0.01 to
+0.11 uK, the LCDM power above the band limit of the basis as the review computed it (rms per element 0.202
+uK). Indices change by -0.0006, -0.0004, -0.0001, -0.0003 (0.01 to 0.05 sd), sandwich errors by 0.2 to 0.3
+percent, block errors by 0.6 percent or less; chi2_min 19723.2 against 19767.7. The review's estimate (of
+order 0.01 sd) holds; the truncation of the prior at multipole 47 does not matter at this noise level.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies.

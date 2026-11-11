@@ -1,0 +1,7 @@
+# E040 stage 5, maps: K, Ka, Q, V, 353, window-matched, nside 16, CMB prior lcdm with a white floor of 0.11 uK (rms per element 0.202 uK); converged True; chi2_min 19723.2; 608 s
+# blocks with negative information per region: [2, 0, 0, 0]; cross-region share of the block Jacobian: 0.2428
+region           blocks  n_eff  max h sum D/J_c     index  sandwich      CR0      CR2      CR3  ratio to sandwich:    CR0    CR2    CR3
+High Latitude        46    5.7   0.37     1.001   -3.0831    0.0125   0.0305   0.0363   0.0440                       2.44   2.90   3.52
+Spur                 29    8.8   0.23     1.003   -3.0803    0.0165   0.0329   0.0351   0.0376                       1.99   2.12   2.28
+Galactic Center       4    2.5   0.48     1.008   -3.0808    0.0089   0.0533   0.0642   0.0789                       6.01   7.24   8.89
+Plane                16    5.1   0.36     1.002   -2.9644    0.0133   0.0869   0.0926   0.0999                       6.52   6.94   7.49

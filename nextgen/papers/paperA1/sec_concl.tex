@@ -26,9 +26,10 @@ Galactic Center and $-2.96$ in the Galactic plane, with errors of 0.01 to 0.02 i
 index. At high latitude and in the plane it does not: the scatter of the score over patches of sky
 gives errors of 0.04 and 0.10 there (and 0.04 in the Spur, where it is within what the model allows),
 half a dozen patches carry the information of each region, and with those errors the regions do not
-differ. \pend{The index also moves by 0.02 to 0.09 with the
-angular scales that inform it and by 0.02 to 0.04 with the band subset;} the model misfits in the
-plane and fails in the Galactic Center; and the official 30 GHz maps do not fit one power law with
+differ. The index also moves by 0.02 to 0.11 with the angular scales that inform it, in every region
+and by several times what the model allows for nested fits; by 0.01 to 0.07 with the prior on the
+CMB; by up to 0.03 for a change of 0.05 in the dust index, which is fixed; and by up to 0.04 with the
+band subset. The model misfits in the plane and fails in the Galactic Center; and the official 30 GHz maps do not fit one power law with
 K band. The spread of published values for this sky, $-2.9$ to $-3.3$, is of the size of these
 effects and of the convention effect together, not of the statistical errors. A measurement needs a
 model in which a region is more than one index, the scale dependence understood, and simulations of
@@ -40,10 +41,12 @@ sampling, or an index field with inferred smoothness, for which a proper amplitu
 and has the failure modes of Sect.~\ref{sec:limits}. The account of the real-map chain in
 Sect.~\ref{sec:legacy} uses a factor measured from the log of the same chain, and the forward test
 has not been run. Simulation-based calibration of the exact modes inside Commander4 itself has not
-been run; they are tested against grids of their targets. \pend{The estimator that reads the index
-from large scales only: outcome of its simulation test.} The noise model for 30 GHz is empirical and
-isotropic. The block errors treat patches of sky as independent and rest on five to nine effective
-patches per region.
+been run; they are tested against grids of their targets. The estimator that reads the index from large scales only is unbiased and calibrated on
+simulations in which the model is true; that says nothing about what it does with whatever makes the
+real maps depend on scale. The noise model for 30 GHz is empirical and isotropic. The block errors treat patches of sky as exchangeable and independent, rest on five to nine effective
+patches per region, are too small if the index varies coherently over several patches, and have to
+be read against simulations with the covariances of the fit. The $\Lambda$CDM prior describes
+multipoles up to 47; the power above that changes the indices by less than 0.001.
 
 \paragraph{Reproducibility.} Every number in this paper comes from a script in the repository and an
 experiment record that states the question, the predictions written before the run, the command and
