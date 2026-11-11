@@ -8,7 +8,8 @@ whatever the true amplitudes are (App.~\ref{app:sandwich}). The amplitudes are f
 distribution is assumed for them, and nothing depends on the reference frequency. This is the
 functional errors-in-variables model with known error covariance. There the consistency of the slope
 is classical, and so is the caveat that the variance of the estimator is not the one derived from
-the Fisher information matrix \citep[][and references therein]{engel1985}; \citet{stompor2009} remark
+the Fisher information matrix \citep[][and references therein; \citealt{fuller1987} is the textbook]{engel1985};
+\citet{stompor2009} remark
 of the profile curvature that it gives ``useful, if not strictly precise'' uncertainties. What
 follows is the form of that caveat for several components and dense noise, with its size. In the notation of Eq.~(\ref{eq:JT}) the score variance is $\J + \Tm$ while the
 curvature of $\tfrac12\chimin$ is $\J$, so the estimator has covariance
@@ -47,6 +48,11 @@ was meant to widen. The consistent estimate is
 \end{equation}
 and a region for which $\J_{\rm c}$ is not positive has fitted amplitudes consistent with noise and no
 measured index. Both $\J(\hat a)$ and $\Tm$ come from quantities already formed in the fit.
+Subtracting the expected noise contribution from a quantity built on noisy regressors is the classical
+correction of the measurement-error literature: the corrected score and corrected observed information of
+\citet{nakamura1990}, and in astronomy the debiased sample variance of \citet{akritas1996}. What is
+specific here is the closed form of $\Tm$ for several components with dense noise, and that the
+uncorrected plug-in errs on the narrow side.
 
 \begin{figure}
 \centering
