@@ -510,6 +510,23 @@ Expectations, before any of them has run:
 - E4. The no-K band set: the profile index with the LCDM prior lies between the white-prior value
   (-2.994 at High Latitude) and the flat-prior value (-2.695).
 
+### Stage 4c, pre-registered 2026-11-11 05:44: K band with PR4 30 GHz under the LCDM prior, and its noise-model arms (referee item 9)
+
+`nextgen/scripts/e043_queue11.sh`: K, 30 GHz (PR4), 353 GHz, window-matched, LCDM CMB prior, with (i) the
+noise model of E038, (ii) the white-noise columns of the map file only, (iii) the power-law term of the
+noise model doubled. With the white CMB prior and the noise model the fit gave -3.4275 +- 0.0185, -3.1800,
+-3.2631, -3.0352 with a reduced chi-square of 2.64. Expectations:
+
+- F1. With the LCDM prior the indices stay steeper than the K, Ka values of the same prior (-3.058, -3.068,
+  -3.043, -2.966) by more than 0.1 at High Latitude and in the Galactic Center, and the reduced chi-square
+  stays above 2.
+- F2. White-noise columns: the reduced chi-square rises (the noise is understated) and the indices move by
+  less than 0.1. Doubled power-law term: the reduced chi-square falls, stays above 1.5, and the indices
+  move toward the K, Ka values by less than half of the gap.
+- If the doubled-noise arm brings the reduced chi-square below 1.3 and closes more than half of the gap,
+  the statement of the paper that these maps cannot be combined in one power law rests on the noise model
+  and is weakened accordingly.
+
 ### Stage 5, pre-registered 2026-11-11 03:20: errors that do not assume the model fits (referee item 8)
 
 The sandwich error assumes that the model is right inside each region: one index, the stated noise. The
@@ -636,6 +653,65 @@ index.
   and Spur regions look like a spread of about 0.1 between 30-degree patches, the Plane like about 0.2.
   This is indicative only: the simulation is at nside 8 and the maps at nside 16, and misfit of any other
   kind (dust, beams, noise model) scatters the block scores as well as a varying index does.
+
+### Stage 5 results, fourth part: the ratio under the model, and the maps with the white prior (read 2026-11-11 05:30 and 06:14)
+
+`E040/block_v2_sim_spread0_full.txt` (the model-true simulation again, with per-realization values kept in
+`block_v2_sim_spread0_full.npz`; its summary rows are identical to the first run). Ratio of the block error
+to the sandwich error over 60 realizations, median / 84th percentile / 97.5th percentile / maximum:
+
+| Form | High Latitude | Spur | Galactic Center | Plane |
+|---|---|---|---|---|
+| CR0 | 1.11 / 1.32 / 1.42 / 2.03 | 0.89 / 1.20 / 1.53 / 1.61 | 0.69 / 1.28 / 1.90 / 2.18 | 0.83 / 1.16 / 1.49 / 1.66 |
+| CR2 | 1.18 / 1.41 / 1.59 / 2.34 | 0.96 / 1.31 / 1.64 / 1.80 | 0.82 / 1.68 / 2.51 / 2.89 | 0.94 / 1.30 / 1.79 / 1.94 |
+| CR3 | 1.25 / 1.54 / 1.81 / 2.72 | 1.03 / 1.41 / 1.80 / 2.03 | 1.05 / 2.21 / 3.34 / 3.85 | 1.07 / 1.50 / 2.16 / 2.30 |
+
+The maps (CR3, LCDM prior) give 3.51, 2.29, 8.92, 7.52: above the largest of 60 simulations in every
+region, narrowly in the Spur (2.29 against 2.03).
+
+Maps with the white CMB prior (`E040/block_v2_maps_white.txt`), CR3: 0.0471 (High Latitude, 3.89 times the
+sandwich error), 0.0279 (Spur, 1.87), 0.0788 (Galactic Center, 8.96), 0.0858 (Plane, 7.13); n_eff 6.2, 8.0,
+2.5, 4.8. With the white prior the Spur is inside the range of the simulations (1.87 against a 97.5th
+percentile of 1.80 and a maximum of 2.03), so the evidence that the Spur is more than one index is weak;
+for the High Latitude region and the Plane it does not depend on the CMB prior.
+
+### Stage 5, independent review and what it changes (2026-11-11 06:25; pre-registration of the null test 06:35)
+
+`reviews/2026-11-11_stats_review_prior_block_lowpass.md`: no error in the algebra or the code of the LCDM
+prior, the block errors or the low-pass construction (identities to 1e-13 to 1e-15, small simulations
+calibrated). Conditions it measured, which my text above did not state:
+
+- With covariances that couple blocks (strong large-scale noise modes, a dense prior) the block scores are
+  negatively correlated and all three block errors are too large under the model, by up to a factor 2. So
+  **the ratio of block error to sandwich error under the model has to come from simulations with the
+  covariances and the prior of the map fit**; the nside-8 white-prior null above is not that. The High
+  Latitude and Spur ratios are not established as misfit until it exists; the Plane and Galactic Center
+  ratios (6 to 9) exceed every null the reviewer could build.
+- If index offsets are correlated between neighbouring blocks the block error is too small (0.6 to 0.7 of
+  the true rms for a correlation length of two blocks).
+- The block error is the error for the mean of a population of exchangeable blocks; for the
+  information-weighted mean index as realized on this sky the sandwich error is the right one.
+- CR3 under the model with independent blocks gives an rms of z of 1.07 to 1.18, not sqrt(nu / (nu - 2)).
+- The LCDM covariance is that of multipoles up to 3 nside - 1; the pixel-averaged LCDM sky at nside 16 has a
+  further 0.11 uK rms per element, nearly white, where the prior has a floor of 0.01 uK. Estimated effect on
+  the index at WMAP noise: of order 0.01 sd. Checked on the maps with the floor raised to 0.11 uK (below).
+- Code: `lowres/block.py` now holds the block errors with the diagnostics asked for (blocks with negative
+  information, cross-region share, no leverage-corrected error above h = 0.9), with unit tests
+  (`tests/test_block_prior_lowpass.py`, 8 tests: gradient and Hessian identities, expectations for independent
+  blocks, a true spread, the dense prior, the LCDM covariance, the low-pass identities).
+
+**Null test at the configuration of the map fit, expectations written before it is read** (`e040h_sim_n16.py`:
+nside 16, window-matched covariances, LCDM CMB and prior, one true index per region; 12 realizations, and 60
+at nside 8 with the same prior). A first look at two nside-8 realizations during the end-to-end test of the
+script gave CR3 over sandwich of 1.0 to 2.3 and a cross-region share of 0.25, so I expect:
+
+- G1. Under the model the median CR3 ratio is above the white-prior null (1.25, 1.03, 1.07): between 1.2 and
+  2.0 in every region.
+- G2. The map ratio of the Plane (7.5) is above every simulated value. The High Latitude ratio (3.5) is above
+  the 97.5th percentile of the nside-8 null and above the largest of the 12 nside-16 values. For the Spur
+  (2.3) I expect it to be inside the null range.
+- G3. Consequence: a region whose map ratio is inside the null range is not called "more than one index" in
+  the paper, and its block error is reported as an upper limit on the error, not as evidence of misfit.
 
 ## Negative control
 

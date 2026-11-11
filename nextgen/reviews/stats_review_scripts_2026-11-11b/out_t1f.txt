@@ -1,0 +1,10 @@
+## white to l = 11
+   variance per element, model / exact pixel average of the same multipoles (l <= 11): mean 1.031, 10 to 90 percent 0.982 to 1.109, extremes 0.982 1.518; elements off by more than 10 percent: 48 of 384, all within 24 deg of a pole
+   model / exact pixel average of all multipoles to 64: mean 0.522 (the sky has 1.92 times the prior variance)
+   true / prior variance along the prior's principal directions, floor variance 1.00e-04: median 1.65, 90th percentile 142309.9, maximum 146775.8; directions with more than twice the prior variance: 140 of 384
+   true / prior variance along the prior's principal directions, floor variance 6.94e+00: median 0.92, 90th percentile 2.0, maximum 2.1; directions with more than twice the prior variance: 90 of 384
+## LCDM stretched: C'(l) = 16 C(4 l), window 240 arcmin
+   variance per element, model / exact pixel average of the same multipoles (l <= 11): mean 1.029, 10 to 90 percent 0.978 to 1.099, extremes 0.977 1.495; elements off by more than 10 percent: 32 of 384, all within 24 deg of a pole
+   model / exact pixel average of all multipoles to 64: mean 0.421 (the sky has 2.37 times the prior variance)
+   true / prior variance along the prior's principal directions, floor variance 1.00e-04: median 12.00, 90th percentile 343.0, maximum 508.4; directions with more than twice the prior variance: 240 of 384
+   true / prior variance along the prior's principal directions, floor variance 1.30e-02: median 0.81, 90th percentile 2.8, maximum 3.9; directions with more than twice the prior variance: 61 of 384

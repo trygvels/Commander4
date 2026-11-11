@@ -1,0 +1,18 @@
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: divide by zero encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: overflow encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/trygvels/code/Commander4/.venv/lib/python3.13/site-packages/numpy/linalg/_linalg.py:2366: RuntimeWarning: invalid value encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+# t1c: dense CMB prior precision in RegionLikelihood against the reference (40 elements, 5 bands, 3 regions)
+profile, code - reference at three beta: -2.70e-13 -2.56e-13 +7.11e-14 (values 61.9853 66.4397 78.3670)
+marginal, code - reference (must be one constant: ln det of the CMB block of A): +88.3804692996 +88.3804692996 +88.3804692996 ; spread 3.41e-13
+gradient at [-3.1 -2.9 -3.3]: profile max |analytic - finite difference| 5.39e-08 (|g| 9.79e+00); marginal 5.56e-08 (|g| 9.30e+00)
+gradient at [-2.9 -3.2 -3.2]: profile max |analytic - finite difference| 2.57e-08 (|g| 1.84e+01); marginal 2.46e-08 (|g| 1.81e+01)
+noiseless data: max |a_hat_s - a_s| 4.66e-15; J code/reference - 1: 2.44e-14; T code/reference - 1: 1.11e-15
+   J diag [ 2.48 39.55  1.33]  T diag [0.225 0.559 0.365]  T/J [0.091 0.014 0.275]
+exact score moments (CMB drawn from the prior): |mean| max 4.97e-15; max |Cov(g) - (J + T)| / max(J + T) 8.86e-16
+Hessian of the expected profile objective at the truth against J: max |H - J| / max J 4.25e-07
+E[J(a_hat)] - J - T = tr(X Cov(a_hat_s)) - T with Cov(a_hat_s) = [At^-1]_ss: identity by construction; check [A^-1]_ss of the code against [At^-1]_ss of the reference: 9.99e-16
+Monte Carlo of the code's score, 4000 draws: mean / se -1.11 -0.59 -0.62; variance / (J + T) diag 0.978 0.993 0.979 (se 0.022)
+negative control, true CMB covariance 4 times the prior: exact mean score / sd(score) -0.36 -0.22 -0.85; first-order bias of the index in units of the sandwich sd +0.36 +0.22 +0.84

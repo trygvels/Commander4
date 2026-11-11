@@ -1,0 +1,18 @@
+# pixel-averaged modes built: (384, 8442), 4 s
+# (i) effective window of the pixel average at nside 4 against the tabulated polarization window squared
+   l        :      2      4      8     11     12     16     24     32     48     64
+   exact    : 0.9538 0.8820 0.6558 0.4605 0.3983 0.1907 0.0192 0.0158 0.0030 0.0037
+   tabulated: 0.9885 0.9113 0.6697 0.4634 0.3981 0.1834      -      -      -      -
+# CAMB as called by the code (lmax 300) against lmax 2000 with accurate lensing: EE ratio at l = 2, 10, 47: 1.0000 0.9992 0.9995; BB ratio: 0.929 0.929 0.928
+# check of the self-similar scaling on the tabulated range: tabulated w^2(nside 16, l) against w_eff^2(nside 4, l / 4)
+   l = 16, 32, 47, 64: tabulated 0.9068 0.6776 0.4266 0.1945; scaled 0.8820 0.6558 0.4139 0.1907
+# (ii) variance per element of pixel-averaged LCDM Q or U [uK^2]: sum_l (2l+1)/(8 pi) (C_EE + C_BB) b_l^2 w_l^2
+   nside 16, window 60 arcmin: l <= 47: 0.02877 (rms 0.170 uK); 48 <= l <= 64 (tabulated window): 0.00619; 64 < l <= 256 (scaled window): 0.00640; above the band limit in total: 0.01259 (rms 0.112 uK; with the exact-average window throughout 0.01244) = 0.44 of the in-band variance and 126 times the floor variance 1e-4
+   nside  8, window 60 arcmin: l <= 23: 0.02091 (rms 0.145 uK); 24 <= l <= 32 (tabulated window): 0.00073; 32 < l <= 128 (scaled window): 0.00190; above the band limit in total: 0.00263 (rms 0.051 uK; with the exact-average window throughout 0.00263) = 0.13 of the in-band variance and 26 times the floor variance 1e-4
+   nside  4, window 60 arcmin: l <= 11: 0.01895 (rms 0.138 uK); 12 <= l <= 16 (tabulated window): 0.00012; 16 < l <= 64 (scaled window): 0.00028; above the band limit in total: 0.00040 (rms 0.020 uK; with the exact-average window throughout 0.00040) = 0.02 of the in-band variance and 4 times the floor variance 1e-4
+# (iii) nside 4, unit white spectrum (C_l = 1) above the band limit, exact pixel average: share of that variance inside span(Y) (280 of 384 dimensions) and outside
+   l 12 to 16: inside 0.307, outside 0.693; variance per coefficient at l <= 4 (leak into the largest scales) / variance per element: 0.0214
+   l 17 to 32: inside 0.621, outside 0.379; variance per coefficient at l <= 4 (leak into the largest scales) / variance per element: 0.3776
+   l 33 to 64: inside 0.560, outside 0.440; variance per coefficient at l <= 4 (leak into the largest scales) / variance per element: 0.1930
+# in band (l <= 11, unit spectrum), exact pixel average against the pixel-window model: max |difference| / max |exact| 0.335; diagonal ratio model/exact 1.0228 (element to element 0.982 to 1.518)
+# done, 6 s

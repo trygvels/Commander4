@@ -1,0 +1,12 @@
+# CMB prior: LCDM E and B spectra through the 60 arcmin window and the pixel window; rms per element 0.170 uK
+# E040 nside 16, regions bpxv (4), bands ['K', 'Ka', 'Q', 'V', '353'], CMB prior sd 0.2, band-averaged spectra, dust beta 1.48, 353 bandpass psb, LFI split full, LFI noise model x 1.0 (A x 1.0), window matched to 60.0 arcmin, WMAP bandpass drift correction True
+# effective frequencies for index -3.1: WMAP_K 22.41  WMAP_Ka 32.66  WMAP_Q 40.30  WMAP_V 59.99
+# profile fit: 7 iterations, 9 evaluations, converged True; chi2_min 19830.3; nominal dof 18428 (a CMB prior counted as one constraint per element); ratio 1.0761; 537 s
+# chi2 per band r^T N^-1 r / n: WMAP_K 0.140  WMAP_Ka 1.009  WMAP_Q 1.061  WMAP_V 1.000  Planck_353 0.000
+# chi2 by region, sum_b r_R^T (N^-1 r)_R / (n_R n_bands): High Latitude 0.585  Spur 0.592  Galactic Center 1.790  Plane 0.782
+# T / J_c per region (noise share of the score variance): High Latitude 0.0136  Spur 0.0053  Galactic Center 0.0003  Plane 0.0027
+region             n_el  rms a_s   profile  sd naive   sd sand
+High Latitude      4388    16.51   -3.0949    0.0125    0.0126
+Spur                928    28.79   -3.0879    0.0165    0.0165
+Galactic Center     182   132.44   -3.0850    0.0089    0.0089
+Plane               646    36.09   -2.9916    0.0135    0.0135

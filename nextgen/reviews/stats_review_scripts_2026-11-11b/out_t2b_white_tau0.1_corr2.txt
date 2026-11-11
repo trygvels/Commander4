@@ -1,0 +1,21 @@
+# t2b: arm white, spread of the true index between blocks 0.1 (correlation length 2.0 blocks), 1500 realizations; 192 elements, 24 blocks, regions of [132, 60] elements, truth [-3.1  -2.95]
+  realization 0: index [-3.0958 -2.8486], sandwich [0.0196 0.0276], CR3 [0.0267 0.024 ], n_eff [10.   4.2] [0 s]
+  realization 500: index [-3.0934 -2.8806], sandwich [0.0196 0.0277], CR3 [0.0396 0.063 ], n_eff [9.9 4.4] [36 s]
+  realization 1000: index [-3.135 -2.855], sandwich [0.0199 0.0282], CR3 [0.0391 0.064 ], n_eff [9.9 4.3] [63 s]
+## claim (a), first three realizations: |sum_B G_B| / max |G_B| at the optimum; |sum G - finite-difference gradient| / |gradient| away from it; |sum_B D_B - finite-difference Hessian| / Hessian; sum_B D_B / J_c per region
+   1.3e-06   8.3e-09   2.6e-15   0.995 0.998
+   6.0e-09   3.7e-08   5.5e-16   1.001 1.003
+   5.0e-06   1.1e-08   1.4e-15   1.000 1.004
+## claim (b): sum_B D_B / J_c over the realizations (code's printed check): median [1. 1.], 2.5 and 97.5 percentiles [0.991 0.987] [1.008 1.013]
+## n_eff median [10.2   4.13]; largest leverage median [0.15 0.39]; realizations with a negative D_B 0; with a leverage at the 0.9 clip 0; cross-region share of |dG_B,r/dbeta_s| 0.0000
+## estimate: mean - region truth [-0.00171 -0.00181] +- [0.00151 0.00198]; rms about the region truth [0.05854 0.07679]; rms about the realized information-weighted mean of the block indices [0.02021 0.02904]
+error                                        sqrt(mean var)/rms     median/rms       rms of z  68 pct of |z|    cover +-1    cover +-2
+sandwich (model)                               0.335     0.370   0.335  0.369    2.99   2.71    3.03   2.73  0.268 0.283  0.505 0.539
+CR0 (code)                                     0.530     0.496   0.492  0.437    2.15   2.91    2.00   2.42  0.391 0.353  0.681 0.613
+CR2 (code)                                     0.562     0.583   0.521  0.502    2.04   2.59    1.90   2.11  0.411 0.398  0.703 0.667
+CR3 (code)                                     0.597     0.698   0.552  0.580    1.94   2.30    1.79   1.79  0.439 0.454  0.731 0.718
+CR0, observed Hessian, full Jacobian           0.531     0.496   0.493  0.438    2.15   2.91    2.01   2.42  0.391 0.355  0.682 0.614
+CR3, observed Hessian, full Jacobian           0.597     0.699   0.553  0.581    1.94   2.30    1.80   1.80  0.440 0.453  0.731 0.719
+   sqrt(nu / (nu - 2)) at nu = median n_eff: 1.12 1.39; at n_eff - 1: 1.13 1.67; a t distribution has 68 percent of |z| below 1.00 (nu large), 1.14 (nu 4), 1.20 (nu 3), 1.32 (nu 2)
+   CR3 (code) / CR3 (observed Hessian, full Jacobian): median [0.9997 0.9999], 2.5 to 97.5 percent [0.991 0.987] [1.008 1.013]
+# done, 91 s

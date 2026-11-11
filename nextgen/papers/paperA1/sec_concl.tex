@@ -38,8 +38,11 @@ region and Gaussian noise of known covariance. We did not treat time-ordered dat
 sampling, or an index field with inferred smoothness, for which a proper amplitude prior is needed
 and has the failure modes of Sect.~\ref{sec:limits}. The account of the real-map chain in
 Sect.~\ref{sec:legacy} uses a factor measured from the log of the same chain, and the forward test
-has not been run. The estimator that reads the index from large scales only has not been validated
-on simulations. The noise model for 30 GHz is empirical and isotropic.
+has not been run. Simulation-based calibration of the exact modes inside Commander4 itself has not
+been run; they are tested against grids of their targets. \pend{The estimator that reads the index
+from large scales only: outcome of its simulation test.} The noise model for 30 GHz is empirical and
+isotropic. The block errors treat patches of sky as independent and rest on five to nine effective
+patches per region.
 
 \paragraph{Reproducibility.} Every number in this paper comes from a script in the repository and an
 experiment record that states the question, the predictions written before the run, the command and

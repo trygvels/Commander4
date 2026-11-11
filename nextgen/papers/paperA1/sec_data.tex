@@ -126,6 +126,9 @@ differ from the errors at the truth by less than a percent: with the errors take
 realizations the standardized error has a standard deviation of 0.97 and the 68 percent coverage is
 0.70, for the curvature, plug-in and debiased errors alike. The correction itself is tested in
 Fig.~\ref{fig:ladder}, not here.
+These simulations were first run on a numerical path that was later found to overwrite memory
+(Sect.~\ref{sec:impl}); they were run again on a sound path and every number in
+Table~\ref{tab:e039} and in this paragraph was reproduced to the last printed digit (\exref{E043}).
 
 \subsection{The same maps, several answers}
 \label{sec:same}
@@ -136,9 +139,10 @@ Fig.~\ref{fig:ladder}, not here.
 353 GHz for dust) in the four regions of \citet{svalheim2023}, at $N_{\rm side}=16$ with the dense
 noise covariances, all bands brought to a common window, and the $\Lambda$CDM covariance as the prior
 on the CMB (\exref{E040}). Top: the profile optimum with two errors, the debiased sandwich error,
-which assumes one index per region, and a block error from the scatter of the score over patches of
-sky, which does not (see the text; none is quoted for the Galactic Center, where three patches carry
-the information). Then the answer when the same likelihood is instead marginalized over flat
+which assumes one index per region (in parentheses for the Galactic Center, where that model does
+not fit), and a block error from the scatter of the score over patches of sky, which does not (see
+the text; none is quoted for the Galactic Center, where fewer than three patches carry the
+information). Then the answer when the same likelihood is instead marginalized over flat
 amplitude priors with the synchrotron amplitude defined at 23 or at 30 GHz, or under a zero-mean
 prior with a free scale. Middle: the difference between the two flat-prior answers against
 Eq.~(\ref{eq:coupled}). Bottom: goodness of fit, as $\chi^2$ per element and band, for which three
@@ -153,8 +157,9 @@ maps, the same regions, the same bands, the same bandpasses and the same noise c
 differ only in how the amplitudes are removed.
 
 Under flat amplitude priors the answer depends on where the amplitudes are defined. For this band set
-with a $\Lambda$CDM prior on the CMB the pivot lies just below 23 GHz, and a flat prior stated at 23
-GHz agrees with the profile optimum to 0.8 standard deviations. The same prior stated at 30 GHz gives
+with a $\Lambda$CDM prior on the CMB the pivot lies just above 23 GHz (23.3 to 23.4 GHz for the four
+regions, to first order), and a flat prior stated at 23 GHz agrees with the profile optimum to 0.8
+standard deviations. The same prior stated at 30 GHz gives
 a High Latitude index of $-2.92$ instead of $-3.08$: flatter by 0.16, 12.6 standard deviations of
 the sandwich error, with no change in the data or the model. The Spur moves by 0.09 and the Plane by
 0.05. The difference between the two conventions is 0.91 to 0.95 of the first-order prediction,
@@ -203,7 +208,9 @@ A free CMB amplitude also moves the pivot of Sect.~\ref{sec:flat}, and with it t
 convention effect. With a flat CMB prior and flat priors on the other amplitudes, the High Latitude
 optimum of these same four WMAP bands is at $-2.51$ when the synchrotron amplitude is defined at 23
 GHz and at $-1.71$ when it is defined at 30 GHz, where the profile likelihood says $-3.03 \pm 0.03$:
-the pivot has moved below the K band, and both conventions are far from it. The difference between
+the pivot has moved below the K band (to 19.7 to 19.9 GHz, to first order), and both conventions
+are far from it. The simulated band set of Table~\ref{tab:flat}, which includes the LFI bands, has its
+pivots about 3 GHz higher in both cases and shows the same drop when the CMB is freed. The difference between
 them, 0.80, is 0.92 of the first-order prediction, and the prediction is within 10 percent in every
 region and for every prior in Table~\ref{tab:cmbprior}, for shifts between 0.03 and 0.8.
 
@@ -248,8 +255,10 @@ all are in the record (\exref{E040}).
 
 On the maps the block error is 3.5, 2.3 and 7.5 times the sandwich error at High Latitude, in the
 Spur and in the Plane (Table~\ref{tab:e040}): 0.04, 0.04 and 0.10 where the model gives 0.012, 0.016
-and 0.013. \pend{Under the model the ratio has a median near one; its largest value in 60
-simulations.} In the simulation with a spread of 0.1 its median is 3.8, 2.4 and 3.6. So the High
+and 0.013. Under the model the ratio has a median of 1.25, 1.03 and 1.07 and its largest value in 60
+simulations is 2.7, 2.0 and 2.3: the maps are outside that range in all three regions, narrowly in
+the Spur, where the evidence is weak (with the white CMB prior the Spur ratio is 1.9, inside the
+range). In the simulation with a spread of 0.1 the median is 3.8, 2.4 and 3.6. So the High
 Latitude and Spur regions look like a spread of the index of about 0.1 between patches of $30^\circ$,
 and the Plane like twice that, with the caveat that any other misfit (dust, beams, the noise model)
 scatters the patch scores as a varying index does, and that the simulation is at $N_{\rm side}=8$.

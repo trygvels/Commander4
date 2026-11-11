@@ -1,0 +1,18 @@
+# t1a: basis covariance Y diag(C_l / Omega) Y^T against the analytic two-point function
+nside 2, lmax 5, random C_l^EE in [0.5, 2], C_l^BB in [0.05, 0.4]:
+   max |code - analytic| / max |analytic|: all 1.45e-15; QQ 1.45e-15; QU 6.88e-16; UU 1.43e-15
+   diagonal: code min 2.179744 max 2.179744; analytic sum (2l+1)/(8 pi)(C_E + C_B) = 2.179744
+   controls (same statistic): E and B swapped 8.10e-01; U sign flipped (IAU) 6.38e-01; RING order instead of NESTED 6.04e-01; m > 0 columns not divided by sqrt 2 5.00e-01
+   basis: 64 columns on 96 elements; eigenvalues of Y^T Y from 0.7275 to 1.2778 (condition number 1.8); max |Y^T Y - 1| 0.172
+nside 4, lmax 11, random C_l^EE in [0.5, 2], C_l^BB in [0.05, 0.4]:
+   max |code - analytic| / max |analytic|: all 1.28e-14; QQ 1.28e-14; QU 2.47e-15; UU 1.19e-14
+   diagonal: code min 7.638066 max 7.638066; analytic sum (2l+1)/(8 pi)(C_E + C_B) = 7.638066
+   controls (same statistic): E and B swapped 3.30e-01; U sign flipped (IAU) 5.71e-01; RING order instead of NESTED 6.03e-01; m > 0 columns not divided by sqrt 2 5.00e-01
+   basis: 280 columns on 384 elements; eigenvalues of Y^T Y from 0.6023 to 1.3638 (condition number 2.3); max |Y^T Y - 1| 0.139
+# lcdm_cmb_precision itself (CAMB spectra), nside 4
+target 60 arcmin: max |cov - floor - analytic| / max |analytic| 2.75e-15; rms per element 0.1380 uK; prec * cov - 1: 4.1e-12; eigenvalues of cov 1.00e-04 to 4.93e-01 (floor 1e-4)
+   controls: EE and BB columns swapped 5.00e-01; window not squared 3.90e-02; temperature pixel window 2.36e-02
+target 600 arcmin: max |cov - floor - analytic| / max |analytic| 3.33e-15; rms per element 0.1334 uK; prec * cov - 1: 5.9e-12; eigenvalues of cov 1.00e-04 to 4.88e-01 (floor 1e-4)
+   controls: EE and BB columns swapped 5.16e-01; window not squared 6.83e-02; temperature pixel window 2.36e-02
+# CAMB spectra used: D_l^EE = l(l+1) C_l / 2 pi at l = 2, 4, 6, 10, 20, 47 [uK^2]: 0.0311 0.0348 0.0131 0.0031 0.0052 0.0979
+#                   C_l^BB at l = 2, 10, 47 [uK^2]: 1.778e-06 1.782e-06 1.826e-06 ; white-floor equivalent C = floor^2 Omega_pix at nside 16: 4.091e-07

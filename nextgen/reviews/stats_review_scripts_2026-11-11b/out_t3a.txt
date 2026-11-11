@@ -1,0 +1,17 @@
+# t3a (1): projector properties, nside 4, basis to lmax 11, kept multipoles 2 to 5
+   Y: (384, 280), kept columns 64; condition number of Y^T Y 2.26
+   |Y+ Y - 1| 5.1e-15;  |Y_k+ Y_k - 1| 5.1e-15;  |Y_k+ Y_high| 6.6e-16;  |Y_k+ (1 - Y Y+)| 7.2e-16
+   alternative projector pinv(Y_k): |pinv(Y_k) Y_high| 0.050 (rms 0.003); |pinv(Y_k) (1 - Y Y+)| 7.3e-16
+   N'^-1: rank 64 of 384 (kept modes 64); |N'^-1 N N'^-1 - N'^-1| / |N'^-1| 2.3e-15; |N'^-1 Y_k Y_k+ - N'^-1| / |N'^-1| 1.6e-15
+   quadratic form with (d', N'^-1) against the Gaussian form of c = Y_k+ d with Cov(c): 2778.21105989 against 2778.21105989 (difference 4.5e-13)
+   N'^-1 annihilates: basis columns above the cut 7.0e-16; the complement of span(Y) 2.0e-15
+# t3a (2): exact reference at nside 2 (96 elements, basis to lmax 5, 64 columns; kept multipoles 2 and 3, 24 columns)
+   profile, code - reference: -6.57e-12 +1.67e-11 +4.68e-12 (value 36.4304)
+   marginal, code - reference, spread over three beta (a constant is allowed): 2.31e-11
+   profile gradient against finite differences: 8.51e-07 (|g| 3.61e+01)
+   noiseless data: |a_hat_s - a_s| 8.0e-15; J code / reference - 1 3.8e-15; T code / reference - 1 6.7e-16; T/J [0.0048 0.001 ]
+   exact moments of the score of the coefficient likelihood: |mean| 2.0e-13; |Cov - (J + T)| / |J + T| 2.2e-15
+   Hessian of the expected objective at the truth against J: 5.5e-07
+   Monte Carlo of the code's score at the truth, 3000 draws: mean / se -0.55 +0.02; variance / (J + T) 1.023 0.992 (se 0.026)
+   information J (diag): all scales [ 141.6 1256.9]; low-pass arm [ 47.4 279.2]; the two full bands alone (23 and 353 GHz, all scales) [0. 0.] = [0. 0.] of the low-pass arm
+   no CMB prior: eigenvalues of A below 1e-10 of the largest: 48 of 288 (n - min(regions, low-passed bands) x kept modes = 48: one free direction per element, less what the low-passed bands see); with the prior: smallest / largest 5.4e-02
