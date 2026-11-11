@@ -2,6 +2,44 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-11 (Mac mini, 09:05): second referee read of Paper A1. Methods stand. One fatal objection to one claim, and the regions of the real-data section are not what they are named. The real-data section is being redone on proper regions with a mask (E044)
+
+**Learned**
+- **Second independent referee read** (`reviews/2026-11-11_referee_report_paperA1_draft3.md`, 607 lines, with its
+  own scripts): Sects. 3 to 5 stand and every correction of the first report is in. Fatal objection to one
+  claim: "the High Latitude region is not one index" does not follow, because 65 percent of that region's
+  block variance comes from the Galactic Center's scores through the coupling of the two indices.
+- **The regions were wrong, and I confirmed it.** The four regions carried over from E022 are a
+  reconstruction of the BeyondPlanck XV regions from the released index map. Their "High Latitude" contains
+  the inner Galactic plane on both sides of the centre (55 percent of its squared amplitude within 10 degrees
+  of the plane). No mask was applied, so Tau A sat in the "Plane" (175 uK against a median of 38) and carries
+  58 percent of that region's block variance. Every region name in F48 to F54 and in drafts 1 to 3 is affected.
+  The comparison of estimators on identical maps is not, apart from its labels.
+- Also from the referee: the white-prior statement was worded beyond its simulation; the headline 12.6 sd is
+  13.4 for the change of convention; "predicted to 9 percent" is a first-order step, not the identity; 26
+  number slips or misattributions in hand-written prose (the generated tables had none).
+- The 48-region rerun of E043 agrees with the record except for optimizer noise in unmeasured regions.
+
+**Decided (D035)**
+- New regions by geometry (|b| > 30, northern Spur, 10 to 30, |b| < 10) with the brightest 5 percent and a
+  disc around Tau A masked, removed exactly from the dense covariances. E044, pre-registered (H1 to H8).
+- Paper A1 loses its 30 GHz and no-K sections (Paper B) and its memory-fault sentence in the abstract.
+- New tested code: `lowres/regions.py`, `mask.py`, `mismatch.py` (the exact first-order bias and error of a
+  fit with the wrong CMB covariance, which replaces my simulation at the wrong resolution), own-score block
+  errors. 11 new unit tests pass.
+
+**Running**
+- E044 queue at nside 16: central fit with all estimators and block errors, the old regions with only Tau A
+  masked, white and flat CMB priors, low-pass and other arms. About five hours. Nulls at nside 8 beside it.
+
+**Next**
+- Rewrite the data section from E044 with every number generated; third referee read.
+
+**Needs Trygve**
+- The BeyondPlanck XV region and mask files are not on disk. With them the regions could be the published
+  ones. Asking for them is contact with the collaboration, so it is yours to decide.
+- Unchanged: reporting the Accelerate fault upstream; wording about the legacy move and Commander3.
+
 ## 2026-11-11 (Mac mini, 07:10): the Cholesky fault changed no number (all reruns identical); the regions are not one index each (block errors 0.04 to 0.10 against 0.012); a white CMB prior makes the error bar a quarter to a third too small; independent stats review of the three new pieces found no error
 
 **Learned**
