@@ -113,7 +113,7 @@ def tab_moves():
     s += row(r"baseline: all scales, $\Lambda$CDM CMB prior", b0, val)
     s += row("statistical error (sandwich)", s0, lambda x: f"{x:.3f}")
     s += "\\midrule\n"
-    s += row(r"flat amplitude prior at 30 GHz (Table~\ref{tab:e040})", d["flat30"] - b0, sgn)
+    s += row(r"flat amplitude prior at 30 GHz", d["flat30"] - b0, sgn)
     rows = [
         (r"CMB prior: white, 0.2 $\mu$K", os.path.join(E40, "bpxv_n16_wm.npz"), None),
         ("CMB prior: flat", os.path.join(E40, "s4_bpxv_n16_wm_cmbflat.npz"), None),
@@ -125,13 +125,13 @@ def tab_moves():
         ("dust index 1.58", os.path.join(E40, "l_bpxv_n16_bd158_wm.npz"), None),
         ("no bandpass drift correction", os.path.join(E40, "l_bpxv_n16_nodrift_wm.npz"), None),
         ("353 GHz: all bolometers", os.path.join(E40, "l_bpxv_n16_bp353full_wm.npz"), None),
-        ("delta bandpasses at the nominal frequencies", os.path.join(E40, "l_bpxv_n16_delta_wm.npz"), None),
+        ("delta bandpasses, nominal frequencies", os.path.join(E40, "l_bpxv_n16_delta_wm.npz"), None),
     ]
     notes = []
     # window matching: the LCDM prior is built on the window operator, so this arm exists with the white prior only
     w0, w1 = prof(os.path.join(E40, "bpxv_n16.npz")), prof(os.path.join(E40, "bpxv_n16_wm.npz"))
     if w0 is not None and w1 is not None:
-        s += row("no window matching (white CMB prior, against its own baseline)", w0[0] - w1[0], sgn)
+        s += row("no window matching (white CMB prior)", w0[0] - w1[0], sgn)
     for label, path, key in rows:
         r = prof(path, key)
         if r is None:
@@ -143,7 +143,7 @@ def tab_moves():
     if os.path.exists(lp):
         a, b = prof(lp, "K_Ka_353"), prof(lp, "K_Ka_Q_V_353")
         dlt = a[0] - b[0]
-        s += row(r"K and Ka only, both from $\ell \le 20$ (against the row above for $\ell \le 20$)", dlt, sgn)
+        s += row(r"K and Ka only, both fits from $\ell \le 20$", dlt, sgn)
         notes.append("% K, Ka against four bands at l <= 20, in units of sqrt(sd_sub^2 - sd_full^2): "
                      + " ".join(f"{x / np.sqrt(max(u * u - v * v, 1e-30)):+.1f}" for x, u, v in zip(dlt, a[1], b[1])))
     st = prof(os.path.join(E40, "l_bpxv_n16_start27_wm.npz"))

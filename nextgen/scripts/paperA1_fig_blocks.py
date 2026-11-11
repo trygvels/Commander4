@@ -28,7 +28,8 @@ def main():
     a = ap.parse_args()
     z = np.load(a.data)
     G, D, beta, sd, cr3, neff = z["G"], z["D"], z["beta"], z["sd_model"], z["CR3"], z["neff"]
-    fig, axes = plt.subplots(1, 4, figsize=(12.0, 3.7), sharey=True)
+    fig, axs = plt.subplots(2, 2, figsize=(6.6, 5.6), sharey=True, sharex=True)
+    axes = axs.ravel()
     for r, ax in enumerate(axes):
         d, g = D[:, r], G[:, r]
         pos = d > 0
@@ -41,7 +42,7 @@ def main():
             ax.axhspan(-cr3[r], cr3[r], color=BAND_BLOCK, lw=0, zorder=0)
         ax.axhspan(-sd[r], sd[r], color=BAND_MODEL, lw=0, zorder=1)
         ax.axhline(0.0, color=MUTED, lw=0.6, zorder=2)
-        ax.errorbar(x, delta[sel], yerr=err[sel], fmt="o", ms=4.5, color=POINT, ecolor=POINT, elinewidth=1.0, capsize=0,
+        ax.errorbar(x, delta[sel], yerr=err[sel], fmt="o", ms=4.0, color=POINT, ecolor=POINT, elinewidth=1.0, capsize=0,
                     markeredgecolor="white", markeredgewidth=0.6, zorder=3, clip_on=True)
         out_of_range = np.abs(delta[sel]) > a.ylim
         for xx, dd in zip(x[out_of_range], delta[sel][out_of_range]):
@@ -52,20 +53,21 @@ def main():
         ax.set_ylim(-a.ylim, a.ylim)
         ax.set_xticks([1, 3, 10, 30])
         ax.set_xticklabels(["1", "3", "10", "30"])
-        ax.set_title(f"{NAMES[r]}   {beta[r]:.2f}".replace("-", "\u2212"), fontsize=10, color=INK, loc="left", pad=16)
+        ax.set_title(f"{NAMES[r]}   {beta[r]:.2f}".replace("-", "\u2212"), fontsize=9, color=INK, loc="left", pad=13)
         ax.text(0.0, 1.02, f"{int(sel.sum())} of {int(pos.sum())} patches drawn, effective number {neff[r]:.1f}", transform=ax.transAxes,
-                fontsize=8, color=MUTED, ha="left", va="bottom")
+                fontsize=7.5, color=MUTED, ha="left", va="bottom")
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
         for s in ("left", "bottom"):
             ax.spines[s].set_color(MUTED)
-        ax.tick_params(colors=MUTED, labelsize=8)
-        ax.set_xlabel("share of the region's information (percent)", fontsize=9, color=INK)
-    axes[0].set_ylabel("index of the patch minus index of the region", fontsize=9, color=INK)
+        ax.tick_params(colors=MUTED, labelsize=7.5)
+    for ax in axs[1]:
+        ax.set_xlabel("share of the region's information (percent)", fontsize=8.5, color=INK)
+    fig.supylabel("index of the patch minus index of the region", fontsize=8.5, color=INK)
     # direct labels for the two bands, once, in the first panel
-    axes[0].annotate("error if the region\nhas one index", xy=(45, sd[0]), xytext=(7.0, 0.33), fontsize=8, color=INK,
+    axes[0].annotate("error if the region\nhas one index", xy=(45, sd[0]), xytext=(6.0, 0.33), fontsize=7.5, color=INK,
                      arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6), va="center")
-    axes[0].annotate("block error", xy=(45, -cr3[0] * 0.92), xytext=(10.0, -0.30), fontsize=8, color=INK,
+    axes[0].annotate("block error", xy=(45, -cr3[0] * 0.92), xytext=(10.0, -0.30), fontsize=7.5, color=INK,
                      arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6), va="center")
     fig.tight_layout()
     fig.savefig(a.out)
