@@ -57,12 +57,14 @@ $p(a \mid \beta) \propto \det \A(\beta)^{1/2}$, a Jeffreys prior for the amplitu
 the index. It is not the marginal under the joint Jeffreys prior of $(a, \beta)$, which depends on $a$.
 
 \paragraph{Gaussian amplitude prior.} With $a \sim \mathcal{N}(\mu, \mathsf{S})$ the marginal keeps the
-form of Eq.~(\ref{eq:Lflat}) with $\A \to \A + \mathsf{S}^{-1}$ and the prior mean entering $\chimin$.
+form of Eq.~(\ref{eq:Lflat}) with $\A \to \A + \mathsf{S}^{-1}$, the prior mean entering $\chimin$, and a
+factor $\det\mathsf{S}^{-1/2}$ that matters when $\mathsf{S}$ is itself inferred.
 We use two cases. A zero-mean prior with one free scale per index region,
-$a_{\rm s}(p) \sim \mathcal{N}(0, \tau_r^2)$ for $p$ in region $r$, with $\tau_r$ maximized or
-marginalized under a prior flat in $\ln\tau_r$. And, for intensity, a prior whose mean and scale are
+$a_{\rm s}(p) \sim \mathcal{N}(0, \tau_r^2)$ for $p$ in region $r$, with $\tau_r$ maximized jointly with
+the index (a prior flat in $\ln\tau_r$ needs a lower cutoff to be proper, since the likelihood tends to a
+constant as $\tau_r \to 0$). And, for intensity, a prior whose mean and scale are
 tied to a template, with hyperparameters inferred. Under a change of reference frequency $\tau_r$
-rescales by $(\nuref'/\nuref)^{\beta_r}$, and both maximization and a log-flat prior are invariant
+rescales by $(\nuref'/\nuref)^{\beta_r}$, and maximization is invariant
 under that rescaling, so the first case does not depend on the reference frequency.
 
 \paragraph{Re-solving the amplitudes inside the index move.} A fourth route is procedural: propose
@@ -82,7 +84,9 @@ $s_r = -\tfrac12\,\partial\chimin/\partial\beta_r$ has zero mean and covariance
   \label{eq:JT}
 \end{equation}
 while the expected curvature of $\tfrac12\chimin$ is $\J$ alone (derivation in
-App.~\ref{app:sandwich}). $\J$ is the Fisher information on the indices with the amplitudes
+App.~\ref{app:sandwich}). These statements are for flat priors on every amplitude; with a Gaussian
+prior on a component they hold on average over realizations of that component drawn from the prior,
+with its precision included in $\A$. $\J$ is the Fisher information on the indices with the amplitudes
 profiled out. $\Tm$ does not depend on the signal: it is the part of the score variance that the
 noise in the fitted amplitudes contributes. For one power-law component, diagonal noise with weights
 $w_{pb} = 1/\sigma_{pb}^2$ and one region, these reduce to

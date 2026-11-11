@@ -10,7 +10,9 @@ Sect.~\ref{sec:legacy} with a warning; \texttt{auto} resolves to \texttt{ridge} 
 applies and to \texttt{conditional} otherwise. Each exact option is tested against a grid evaluation
 of its target in unit tests. End to end, a seven-rank run on simulated maps matched the exact profile
 posterior within 0.03 posterior standard deviations with width ratios 0.94 and 0.97
-(\exref{E006}). On real nside-64 intensity maps the \texttt{ridge} chain matched an independent grid
+(\exref{E006}); in that realization the target itself sat 1.9 and 3.7 standard deviations from the
+input indices, which a 40-seed repetition showed to be scatter of the harness at its noise level and
+not an offset (\exref{E037}). On real nside-64 intensity maps the \texttt{ridge} chain matched an independent grid
 evaluation of its target with shifts of $-0.06 \pm 0.04$ and $+0.06 \pm 0.05$ standard deviations and
 width ratios 0.96 and 0.94 for the two indices (\exref{E014}). On the same maps the conditional Gibbs
 step has a standard deviation 180 times smaller than the marginal one for the synchrotron index and
@@ -22,13 +24,14 @@ ridge and marginal modes in Commander4 itself (300 replicates) is not yet run.}
 dense implementation (\texttt{nextgen/lowres}): band-averaged spectra from the instrument
 bandpasses, the collapsed objectives of Sect.~\ref{sec:model} for several coupled regions with dense
 noise covariances, analytic gradients, and $\J$ and $\Tm$ of Eq.~(\ref{eq:JT}). At
-$N_{\rm side} = 16$ with three components the amplitude system has 18\,432 unknowns; a Cholesky
-factorization takes 9 s and one profile evaluation with its gradient 12 s on ten cores. Unit tests
+$N_{\rm side} = 16$ with three components the amplitude system has 18\,432 unknowns, and a profile fit
+of four regions takes three to five minutes on a desktop machine. Unit tests
 check the gradients against finite differences, the diagonal-noise closed forms, $\J$ and $\Tm$
 against $\sum u V$ and $\sum V$, the sandwich against the scatter of 300 fits, the plug-in bias and
 its correction, and the identity of Eq.~(\ref{eq:tilt}) to nine digits. The bandpass readers
 reproduce the published LFI colour-correction ratios to $3\times10^{-4}$ and the HFI unit conversions
-to 0.3 percent. An independent statistical review of the module, by a reviewer who derived the targets from the
+to 0.3 percent (\exref{E038}), and the per-radiometer effective frequencies of the WMAP team's own
+routine to 0.005 GHz (\exref{E039}). An independent statistical review of the module, by a reviewer who derived the targets from the
 stated model before reading our derivations, found no code defect; it corrected the response formula
 of Sect.~\ref{sec:flat} (the curvature of the marginal in place of the profile information), the
 condition under which the profile score is unbiased when a component carries a prior

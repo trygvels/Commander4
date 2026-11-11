@@ -6,9 +6,11 @@
 For amplitudes that enter linearly with known noise, the profile score is exactly unbiased
 whatever the true amplitudes are (App.~\ref{app:sandwich}). The amplitudes are fixed unknowns, no
 distribution is assumed for them, and nothing depends on the reference frequency. This is the
-errors-in-variables model with known error covariance, for which the consistency of the slope is
-classical; the classical caveat is that the variance of the estimator is not the inverse Fisher
-information. In the notation of Eq.~(\ref{eq:JT}) the score variance is $\J + \Tm$ while the
+functional errors-in-variables model with known error covariance. There the consistency of the slope
+is classical, and so is the caveat that the variance of the estimator is not the one derived from
+the Fisher information matrix \citep[][and references therein]{engel1985}; \citet{stompor2009} remark
+of the profile curvature that it gives ``useful, if not strictly precise'' uncertainties. What
+follows is the form of that caveat for several components and dense noise, with its size. In the notation of Eq.~(\ref{eq:JT}) the score variance is $\J + \Tm$ while the
 curvature of $\tfrac12\chimin$ is $\J$, so the estimator has covariance
 \begin{equation}
   \mathrm{Cov}(\hat\beta) = \J^{-1} (\J + \Tm)\, \J^{-1} ,
@@ -69,9 +71,9 @@ Eq.~(\ref{eq:sdz}) within 0.054 in all 30 cells where the index is measured, up 
 $\Tm/\J = 1.56$, and 68 percent intervals cover the truth as rarely as 49 percent of the time. With
 the plug-in sandwich they cover it 38 percent of the time. With Eq.~(\ref{eq:debiased}) the
 standardized error has standard deviation 0.95 to 1.05 and the coverage is 0.65 to 0.72 in 29 cells
-and 0.635 in one; the mean standardized error is within 0.10 everywhere. The coupled case with
-several regions, three components and the dense WMAP covariances is tested in
-Sect.~\ref{sec:data}. Two limits of the recipe, found by an independent check: the first-order
+and 0.635 in one; the mean standardized error is within 0.10 everywhere. Sect.~\ref{sec:data} repeats
+the test of the error taken from each realization for several coupled regions, three components and
+the dense WMAP covariances, in a regime where $\Tm/\J$ is small. Two limits of the recipe, found by an independent check: the first-order
 sandwich is about 3 percent narrow on average and up to 7 percent at $\Tm/\J \simeq 1$, and above
 $\Tm/\J \simeq 1.5$ the plug-in estimate is too noisy to use even when $\J_{\rm c}$ is positive, so
 we quote an error only where $\Tm/\J_{\rm c} < 1$. With a Gaussian prior on a component that does
@@ -92,20 +94,22 @@ maximizing over $\tau$ gives
 \end{equation}
 a monotonic function of the profile log-likelihood $\tfrac12 q$. The optimum is the profile optimum,
 and the curvature is the profile's times $1 - n/q$, which is the plug-in form of $1/(1+\Tm/\J)$. In
-this case the zero-mean prior with a free scale \emph{is} the profile likelihood with its sandwich
-width: the prior learns from the scatter of the fitted amplitudes how much of them is noise.
+this case (one component, a common noise pattern, the scale maximized) the zero-mean prior with a
+free scale \emph{is} the profile likelihood with its sandwich width: the prior learns from the scatter of the fitted amplitudes how much of them is noise.
 Simulation confirms the identity to the tolerance of the optimizer (\exref{E041}).
 
 When the noise pattern varies between the amplitudes, as it does on real maps, the two estimators
 part. The Gaussian prior is then a model for the amplitudes, real polarized amplitudes are far from
 Gaussian, and the bright ones carry whatever noise pattern they happen to have. In the ladder the
-resulting bias of the zero-mean prior is between $-0.6$ and $+0.3$ posterior standard deviations,
+resulting bias of the zero-mean prior is between $-0.6$ and $+0.2$ posterior standard deviations in
+the cells where the index is measured,
 with a sign that belongs to the amplitude configuration and not to the noise level, while its
 coverage stays within 0.59 to 0.73. On the realistic sky of Table~\ref{tab:flat} it was within 0.11
 standard deviations except in one class at four times the real noise ($-0.30$; \exref{E036}). A scale
 map in place of a single scale reduces it there. We therefore take the profile likelihood with the
 debiased sandwich as the estimator of record and report the zero-mean prior beside it. What the
-prior offers in exchange is a proper posterior, which a hierarchical model of an index field needs.
+prior offers in exchange is a generative model for the amplitudes, which a hierarchical model of an
+index field needs.
 
 \subsection{What each target is good for}
 

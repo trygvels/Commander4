@@ -1,8 +1,8 @@
 \section{Score, curvature and sandwich for the profile likelihood}
 \label{app:sandwich}
 
-Let $\mathsf{H} = \M\A^{-1}\M\T\Ni$ be the projector onto the model space, so that
-$\Pm = \Ni(1 - \mathsf{H})$, $\Pm\M = 0$ and $\chimin = d\T\Pm d$. With $\M_r = \partial\M/\partial\beta_r$
+Let $\Pi = \M\A^{-1}\M\T\Ni$ be the projector onto the model space, so that
+$\Pm = \Ni(1 - \Pi)$, $\Pm\M = 0$ and $\chimin = d\T\Pm d$. With $\M_r = \partial\M/\partial\beta_r$
 and $\Pm_r = \partial\Pm/\partial\beta_r$, differentiating $\Pm\M = 0$ gives $\Pm_r\M = -\Pm\M_r$. The
 score is $s_r = -\tfrac12 d\T\Pm_r d$. For $d = \M a + n$:
 \begin{equation}
@@ -10,21 +10,21 @@ score is $s_r = -\tfrac12 d\T\Pm_r d$. For $d = \M a + n$:
       = (\M_r a)\T\Pm\, n - \tfrac12 n\T\Pm_r n ,
 \end{equation}
 because $\M\T\Pm_r\M = -\M\T\Pm\M_r = 0$. The first term has zero mean. The second has mean
-$-\tfrac12\tr(\Pm_r\mathsf{N}) = \tfrac12\,\partial\,\tr(\mathsf{H})/\partial\beta_r = 0$, since
-$\tr\mathsf{H} = k$ for every $\beta$. So $\E[s_r] = 0$ for any true amplitudes: the profile score is
+$-\tfrac12\tr(\Pm_r\mathsf{N}) = \tfrac12\,\partial\,\tr(\Pi)/\partial\beta_r = 0$, since
+$\tr\Pi = k$ for every $\beta$. So $\E[s_r] = 0$ for any true amplitudes: the profile score is
 unbiased.
 
 The variance of the first term is $(\M_r a)\T\Pm\mathsf{N}\Pm(\M_{r'}a) = (\M_r a)\T\Pm(\M_{r'}a) =
 \J_{rr'}$, using $\Pm\mathsf{N}\Pm = \Pm$. The second term is a quadratic form in Gaussian noise,
 uncorrelated with the first, with covariance $\tfrac12\tr(\Pm_r\mathsf{N}\Pm_{r'}\mathsf{N}) =
-\tfrac12\tr(\mathsf{H}_r\mathsf{H}_{r'})$. Writing $\mathsf{G} = \A^{-1}\M\T\Ni$,
+\tfrac12\tr(\Pi_r\Pi_{r'})$. Writing $\mathsf{G} = \A^{-1}\M\T\Ni$,
 \begin{equation}
-  \mathsf{H}_r = (1 - \mathsf{H})\M_r\mathsf{G} + \M\A^{-1}\M_r\T\Ni(1 - \mathsf{H}) ,
+  \Pi_r = (1 - \Pi)\M_r\mathsf{G} + \M\A^{-1}\M_r\T\Ni(1 - \Pi) ,
 \end{equation}
-and since $\mathsf{G}(1-\mathsf{H}) = 0$ and $(1-\mathsf{H})\M = 0$ the two squared terms vanish in the
+and since $\mathsf{G}(1-\Pi) = 0$ and $(1-\Pi)\M = 0$ the two squared terms vanish in the
 trace and the cross terms give
 \begin{equation}
-  \tfrac12\tr(\mathsf{H}_r\mathsf{H}_{r'}) = \tr\!\big(\A^{-1}\M_r\T\Pm\,\M_{r'}\big) = \Tm_{rr'} .
+  \tfrac12\tr(\Pi_r\Pi_{r'}) = \tr\!\big(\A^{-1}\M_r\T\Pm\,\M_{r'}\big) = \Tm_{rr'} .
 \end{equation}
 The expected curvature follows from differentiating the score once more:
 $\E[\partial^2(\tfrac12\chimin)/\partial\beta_r\partial\beta_{r'}] = \J_{rr'}$. The estimator
@@ -38,9 +38,11 @@ $\mathsf{N} + \mathsf{C}\,\Lambda^{-1}\mathsf{C}\T$, with $\mathsf{C}$ the colum
 $\Lambda$ its prior precision. Everything above then holds in expectation over noise and over skies
 of that component drawn from the prior, with its sample variance counted in $\J + \Tm$. It does not
 hold for a prior variance that differs from the true one. If the true variance is $\kappa^2$ times
-the prior variance, the expected score is $(\kappa^2 - 1)\,t$ with
-$t_r = \tr(\Lambda\A^{-1}\M_r\T\mathsf{B}\T)$, $\mathsf{B} = \A^{-1}\M\T\Ni$, and the optimum is biased by
-$-(\kappa^2-1)\,\J^{-1}t$ to first order. Because $t_r$ is a sum over elements of one sign, the bias
+the prior variance, the expected gradient of $\tfrac12\chimin$ is $(\kappa^2 - 1)\,t$ (the expected
+score is minus that) with $t_r = \tr(\Lambda\A^{-1}\M_r\T\mathsf{B}\T)$, $\mathsf{B} = \A^{-1}\M\T\Ni$,
+$\A$ containing the prior precision, and the optimum is biased by $-(\kappa^2-1)\,\J^{-1}t$ to first
+order. A single factor $\kappa^2$ describes a prior that is wrong in size; a prior that is wrong in
+shape, as a white prior is for the CMB, needs the calculation mode by mode. Because $t_r$ is a sum over elements of one sign, the bias
 in units of the standard deviation grows as the square root of the number of elements. We print this
 sensitivity with every fit that uses such a prior.
 

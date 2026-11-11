@@ -10,7 +10,8 @@ path in the development version of Commander4 that we started from (option
   \item propose $\beta'$ from a symmetric random walk;
   \item draw new amplitudes from their conditional at the proposed index,
         $a' \sim \mathcal{N}\!\big(\hat a(\beta'), \A(\beta')^{-1}\big)$;
-  \item accept $(\beta', a')$ with probability $\min\{1, \exp[-(\chi^2(\beta',a') - \chi^2(\beta,a))/2]\}$.
+  \item accept $(\beta', a')$ with probability $\min\{1, \exp[-(\chi^2(\beta',a') - \chi^2(\beta,a))/2]\,
+        p(\beta')/p(\beta)\}$, with $p$ the index prior.
 \end{enumerate}
 The Gibbs sweep then continues with the amplitude group, which redraws
 $a \sim \mathcal{N}(\hat a(\beta), \A(\beta)^{-1})$, and possibly repeats the index move $n$ times before
@@ -46,7 +47,8 @@ amplitude draw, both the current and the proposed estimate are fresh at every in
 composite is Monte Carlo within Metropolis in the terminology of \citet{andrieu2009}, following
 \citet{oneill2000} and \citet{beaumont2003}. \citet{andrieu2009} note that the target is typically
 not the invariant density of such a chain and that the existence of an invariant distribution is not
-obvious in general. Here it can be written down.
+obvious in general; later work bounds the distance between the noisy and the exact chain without
+giving the stationary law \citep{alquier2016,medina2016}. Here it can be written down in the limit of small proposal steps.
 
 \subsection{The stationary law: a tempered profile posterior}
 
@@ -64,8 +66,10 @@ diffusion coefficient proportional to $\alpha(0)$, and its stationary density is
   c_k = \E\big[e^{-Z/2};\, Z > 0\big] = 2^{-(k+1)} \binom{k}{k/2} .
   \label{eq:Tk}
 \end{equation}
-The formula is exact for every $k$ and every shape of $\chimin$ in the small-step limit; $T(0) = 1$
-recovers Metropolis. For large $k$,
+The formula is exact for every $k$ and every shape of $\chimin$ under four conditions: the amplitude
+draws are exact conditional draws; the $k$ amplitudes redrawn by the Gibbs step are the ones that
+enter the acceptance; the proposal is symmetric with a fixed covariance; and the proposal steps are
+small against the stationary width. $T(0) = 1$ recovers Metropolis. For large $k$,
 \begin{equation}
   T = \sqrt{\frac{\pi k}{8}} + \frac12 + O(k^{-1/2}) ,
   \label{eq:Tlarge}
@@ -74,8 +78,8 @@ so the index posterior is the profile posterior with its width multiplied by
 $\sqrt{T} \simeq 0.79\, k^{1/4}$. The stationary acceptance rate is $\tfrac12 + c_k$, close to one half
 and independent of the step size, which is why such a chain looks healthy.
 
-Equation~(\ref{eq:Tk}) does not need $\chi^2_k$ noise. For any symmetric acceptance noise $Z$ with
-density $f_Z$, $T \simeq \tfrac12 + 1/(8 f_Z(0))$, and for Gaussian noise
+Equation~(\ref{eq:Tk}) does not need $\chi^2_k$ noise. For any symmetric acceptance noise $Z$ whose
+density $f_Z$ is flat over a few units around zero, $T \simeq \tfrac12 + 1/(8 f_Z(0))$, and for Gaussian noise
 \begin{equation}
   T \simeq \frac12 + \sqrt{\frac{\pi}{8}}\; \sigma_E , \qquad \sigma_E = \tfrac12\,\mathrm{sd}(Z) ,
   \label{eq:Tsigma}
@@ -83,8 +87,10 @@ density $f_Z$, $T \simeq \tfrac12 + 1/(8 f_Z(0))$, and for Gaussian noise
 with $\sigma_E$ the standard deviation of the noise in the estimated energy difference, equal to
 $1/\sqrt2$ times the standard deviation of the $\chi^2$ at a fresh amplitude draw. The leading term
 is the effective temperature that \citet{ball2003} derived for the sign rule (accept if and only if
-the noisy energy difference is negative; their Eq.~7), and that \citet{bardenet2017} recover without
-assuming Gaussian noise (their Sect.~6.3). The Metropolis rule on the same noisy difference adds the
+the noisy energy difference is negative; their Eq.~7), and \citet{bardenet2017} obtain, without assuming Gaussian noise, a
+temperature proportional to the noise with a slightly different constant (their Sect.~6.3). That a
+Metropolis chain on a noisy energy difference is over-dispersed is noted by \citet{nicholls2012}, and
+\citet{ceperley1999} give the exact correction for Gaussian noise of known variance. The Metropolis rule on the same noisy difference adds the
 $\tfrac12$. Equation~(\ref{eq:Tsigma}) is the form to use when the stored amplitudes are not the drawn
 ones, as below.
 
@@ -102,7 +108,8 @@ where $H_n$ is the harmonic number, $\varphi$ and $\Phi$ are the standard normal
 function, and $N_\varphi(n)$ is the sum over proposals of the expected density at the running minimum.
 $R_2 = 5/6$ exactly, and numerically
 $R_n = 0.833$, $0.647$, $0.543$, $0.467$ and $0.357$ for $n = 2$, 5, 10, 20 and 100: more index
-moves narrow the law only as $(\ln n)^{-1/4}$ in width, and the $k^{1/4}$ scaling is untouched.
+moves narrow the law only slowly, asymptotically as $(\ln n)^{-1/4}$ in width, and the $k^{1/4}$
+scaling is untouched.
 
 \paragraph{The repair that is exact and useless.} Redrawing the amplitudes with half their covariance,
 $a \sim \mathcal{N}(\hat a, (2\A)^{-1})$, is the conditional of Eq.~(\ref{eq:extended}) and makes the
@@ -145,8 +152,8 @@ the algorithm and not our derivation. The two derivations agree, the reviewer's 
 calculation reproduces every row of our own toy within 1.4 standard errors, and the controls return
 the profile posterior exactly, so the excess is caused by the full-covariance redraw and by nothing
 else. For proposal steps that are not small the kernel is no longer reversible with respect to a
-power of the profile posterior, but the variance stays within 8 percent of $T$ at any step size
-(0.918 $T$ for steps of four stationary widths or more).
+power of the profile posterior, but for $k \ge 10^4$ the variance stays within 8 percent of $T$ at any
+step size (0.918 $T$ for steps of four stationary widths or more; 0.907 $T$ at $k = 100$).
 
 The same toy reproduces, within 5 percent, four earlier measurements of the width of chains run with
 this move on simulated maps, with $k$ from 450 to 3072 and one or four moves per amplitude draw
@@ -154,20 +161,26 @@ this move on simulated maps, with $k$ from 450 to 3072 and one or four moves per
 \exref{E005}).
 
 \paragraph{Real maps.} On nside-64 intensity maps (17 bands from Haslam to Planck 857 GHz, 38\,165
-unmasked pixels, five components, so $k = 190\,825$; 20 index moves per amplitude draw) two chains
-gave widths of 17.0 and 16.4 profile widths for the synchrotron index and 16.4 and 16.6 for the dust
-index (\exref{E014}). The law with exact stored draws predicts 13.1 to 13.6 at these settings. The
-difference has a specific cause. This code path stores the per-pixel amplitudes as spherical-harmonic
-coefficients to $\ell_{\max} = 3 N_{\rm side} - 1$, and the $\chi^2$ in the acceptance is evaluated
-on the round-tripped maps. The round trip is not exact on the HEALPix grid, so the stored amplitudes
-differ from the drawn ones. The log of the run records the log acceptance ratio of every proposal,
-and at the first move of each iteration both amplitude sets are fresh: the scatter of those 3200
-values is $682 \pm 9$ where exact draws give $\sqrt{k} = 437$, a factor $2.44 \pm 0.06$ in variance. With
-that one measured number in Eq.~(\ref{eq:Tsigma}) the toy gives widths of 15.9 and 16.6 and an
-acceptance rate of 0.075, against the measured 0.074 and 0.077. The storage residual also has a
-gradient in the dust index, which predicts a shift of the chain mean of $+3.1$ profile widths where
-$+3.0 \pm 0.5$ was measured. A run of the same configuration with the amplitudes stored as maps is
-predicted to give 13.1 and 13.6 widths and no shift; \pend{that run is not yet done}.
+unmasked pixels, five components, so $k = 190\,825$) a chain with 20 index moves per amplitude draw,
+proposing the synchrotron and dust indices jointly with steps of 5.6 and 93 profile widths, was run
+twice. The widths were 17.0 and 16.4 profile widths for the synchrotron index (about 8 percent error
+each) and 16.4 and 16.6 for the dust index (2 percent each) (\exref{E014}). For small steps
+Eq.~(\ref{eq:Rn}) gives $\sqrt{R_{20}T_1} = 11.3$; a toy chain with two indices and the recorded step
+sizes gives 13.1 and 13.6. The measured widths are 20 to 30 percent above that. We can account for the
+excess after the fact, and say so plainly: the account uses one number measured from the log of the
+same chain. This code path stores the per-pixel amplitudes as spherical-harmonic coefficients to
+$\ell_{\max} = 3 N_{\rm side} - 1$ and evaluates the $\chi^2$ of the acceptance on the round-tripped
+maps. The round trip is not exact on the HEALPix grid, so the stored amplitudes differ from the drawn
+ones. The log records the log acceptance ratio of every proposal, and at the first move of each
+iteration both amplitude sets are fresh: the scatter of those 3200 values is $682 \pm 9$ where exact
+draws give $\sqrt{k} = 437$, a factor $2.44 \pm 0.06$ in variance, and a direct calculation of the
+round-trip residual on the same inputs gives $2.69 \pm 0.18$. With the factor 2.44 in
+Eq.~(\ref{eq:Tsigma}) the toy gives widths of 15.9 and 16.6 and an acceptance rate of 0.075 against
+the measured 0.074 and 0.077. The same storage residual has a gradient in the indices that predicts
+shifts of the chain means of $+3.1$ profile widths for the dust index and $-0.1$ for the synchrotron
+index, where $+3.0 \pm 0.5$ and $-2.7 \pm 2.0$ were measured. The forward test, a run of the same
+configuration with the amplitudes stored as maps, predicted to give 13.1 and 13.6 widths and no
+shift, has not been made.
 
 \begin{figure}
 \centering
@@ -185,7 +198,10 @@ law of Eq.~(\ref{eq:Rn}) (line) and the toy at $k = 10^4$ and $10^5$ (points).}
 A chain run with this move reports index uncertainties that are too wide by $\sqrt{T}$, a factor of
 order ten at map-level $k$, with a mean close to the profile posterior. It does not sample the
 flat-prior joint posterior that the rest of the Gibbs sweep assumes. The statement applies to the
-move as defined in steps 1 to 3 with exact conditional draws. Samplers that propose the index and
-then solve for the conditional mean, or that evaluate a marginal likelihood in the acceptance, are
-different algorithms. Commander3's index samplers are of the latter kinds (we read the code and did
-not run it).
+move as defined in steps 1 to 3 with exact conditional draws. We met it in the development version
+of Commander4. In Commander3 we read the code and did not run it: the index samplers used for the
+BeyondPlanck analysis hold the amplitudes fixed during the Metropolis step, which is a valid
+conditional update and not this move, while a later module (\texttt{sample\_specind\_mh}) proposes an
+index, re-solves the amplitudes by conjugate gradients and accepts on $\chi^2$, which has the
+structure analysed here (\exref{E009}). We do not know which published results, if any, were made
+with that module.

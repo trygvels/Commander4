@@ -21,13 +21,14 @@ component. This prior passes simulation-based calibration on data drawn from its
 replicates, \exref{E016}) and gives calibrated index fields down to index-pixel signal-to-noise
 ratios below one. It is exact only for its own template-error law. A template error of the same
 size with a different conditional law, such as a template that is the true amplitude divided by a
-30 percent scatter, shifts the faint-sky dust index by 0.11 at four stated standard deviations
-(\exref{E021}): regressing amplitudes on a noisy template is itself an errors-in-variables problem.
+30 percent scatter, shifts the faint-sky dust index by 0.11 in the exact target and by 0.13, four
+posterior standard deviations, in the chain (\exref{E021}): regressing amplitudes on a noisy template is itself an errors-in-variables problem.
 At high signal to noise with a template built from the data and a sky outside the model class
 (PySM \texttt{d1s1}), the posterior runs away: the index removes the component from all bands but
 one because that lowers the prior cost by more than it raises $\chi^2$ (\exref{E020}). At the
 white-noise depth of the WMAP and LFI intensity maps with a 30 percent template error the field mean
-is recovered ($-3.017$ against $-3.000$), but the inferred field does not beat a constant index in
+is within 0.02 of the truth ($-3.017$ against $-3.000$, five posterior standard deviations), but the
+inferred field does not beat a constant index in
 pixel error on that sky, and the field hyperparameters fail a four-chain split-$\hat R$ criterion
 (1.11 to 1.42) although every chain passes its own convergence check (\exref{E032}).
 
@@ -35,4 +36,5 @@ pixel error on that sky, and the field hyperparameters fail a four-chain split-$
 conclusion for this one is narrower: where the question is one index per region and the region is
 measured, use the profile likelihood with the debiased sandwich; do not use a flat amplitude prior
 unless the reference frequency is the pivot; and do not share one amplitude scale across index
-regions on a template.
+regions on a template. None of this makes the index right if the model of the sky or of the
+instrument is wrong, which is the subject of the last part of Sect.~\ref{sec:data}.
