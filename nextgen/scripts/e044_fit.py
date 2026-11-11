@@ -56,6 +56,7 @@ def main():
     ap.add_argument("--no-mask", action="store_true")
     ap.add_argument("--tau-a-only", action="store_true", help="mask the disc around Tau A but not the brightest 5 percent")
     ap.add_argument("--bright-fraction", type=float, default=0.05, help="fraction of pixels masked by polarized amplitude (referee read 3: 0.03 and 0.10 as arms)")
+    ap.add_argument("--mask-extra", default="", help="npy file, one boolean per nside-16 pixel in NESTED order, True for pixels to mask in addition (H16)")
     ap.add_argument("--beta0", type=float, default=-3.1)
     ap.add_argument("--nside", type=int, default=16, choices=[8, 16])
     ap.add_argument("--out", default="")
@@ -73,6 +74,11 @@ def main():
             _, keep, _ = named_regions(16, bright_fraction=(0.0 if a.tau_a_only else a.bright_fraction))
         block = np.tile(np.arange(region.size // 2) // 64, 2)
         names = BPXV_NAMES
+    if a.mask_extra:
+        assert ns == 16
+        extra = np.load(a.mask_extra)
+        assert extra.dtype == bool and extra.size == keep.size // 2
+        keep = keep & ~np.tile(extra, 2)
     WM16 = WindowMatcher(16, target_arcmin=60.0)
     WMn = WM16 if ns == 16 else WindowMatcher(ns, target_arcmin=60.0)
     lp = a.lowpass > 0
@@ -133,6 +139,7 @@ def main():
     print(f"# E044 nside {ns}, geometry {a.geometry}, mask {'none' if a.no_mask else ('Tau A disc' if a.tau_a_only else f'brightest {100 * a.bright_fraction:g} percent and Tau A disc')} "
           f"({int(keep.sum())} of {keep.size} elements kept), bands {a.bands}, CMB prior {a.prior}"
           + (f" (floor {a.floor_uk} uK)" if a.prior == "lcdm" else (f" ({a.white_sd} uK)" if a.prior == "white" else ""))
+          + (f", extra mask {os.path.basename(a.mask_extra)}" if a.mask_extra else "")
           + f", dust beta {a.dust_beta}, 353 bandpass {a.bp353}, {'delta bands' if a.delta_bands else 'band-averaged spectra'}, "
           f"drift correction {not a.no_drift}, low-pass {a.lowpass if lp else 'none'}")
     print(f"# profile fit: {res.nit} iterations, {res.nfev} evaluations, converged {res.success}; chi2_min {chi2:.1f}; nominal dof {dof} "

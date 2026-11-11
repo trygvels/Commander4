@@ -166,6 +166,24 @@ and seen; nothing at nside 16.
     that region's block error is outside the null and "agree" is withdrawn for it. Calibration: mean z within
     +-0.4 and sd of z between 0.78 and 1.22 in every region.
 
+- **H16, the Plane's excess along the CMB spectrum (written 2026-11-11 13:34, after the look described here and
+  before any fit with the extra mask).** The third referee split the chi-square by region and direction: along the
+  CMB spectrum (LCDM-prior fit minus flat-prior fit) the Plane has 993 for 862 (+3.1 sd). I located it from the
+  saved residuals of the two fits with diagonal noise weights (which reproduce the regional totals: 1021 for 870
+  in the Plane): the twelve Plane pixels with the largest contributions, of 435, carry about 142 of the excess of
+  151, and the largest are (l, b) = (47.8, 0.0) with 32.6 where 2 is expected, (81.6, +4.8), (261.6, 0.0),
+  (81.6, 0.0), (309.4, +2.4), (30.9, 0.0). These hold W51, Cygnus X and W43: in the DR1 free-free intensity model
+  at nside 16 they are ranks 24, 38, 59, 6, 63 and 3 of 3072. So the excess sits on the brightest thermal sources
+  of the plane, which are bright in intensity and not in polarized synchrotron, and which the mask (a threshold
+  on polarized amplitude) does not remove. Reading: leakage of intensity into polarization, or polarized emission
+  of those sources with another spectrum. This look was made after the fact and chose nothing by an index.
+  Test: the present mask plus the brightest 2 percent of pixels in the DR1 free-free model (61 pixels, 34 already
+  masked, 27 new, all in the Plane; `E044/mask_ff02.npy`), LCDM-prior and flat-prior fits. Expected if the
+  reading is right: the Plane's ratio along the CMB spectrum falls from 1.153 to between 0.92 and 1.08 (408
+  pixels); the other three regions stay within 0.02 of 0.970, 0.927, 1.012; the Plane index moves by less than
+  0.02; the total chi-square stays low (0.965 to 0.980 with the LCDM prior). If the Plane stays above 1.10, the
+  thermal sources are not the cause.
+
 ## Command
 
 ```bash

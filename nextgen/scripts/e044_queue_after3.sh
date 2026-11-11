@@ -1,11 +1,14 @@
 #!/bin/sh
-# E044 after the third referee read (H12, H13, H15), behind e044_queue_after.sh. One heavy job at a time.
+# E044 after the third referee read (H12, H13, H15, H16), behind e044_queue_after.sh. One heavy job at a time.
 #   the present regions without the mask (all scales with block errors; l <= 20); mask thresholds of 3 and 10 percent;
-#   the chi-square null at nside 16 (e044_queue_after2.sh); forty realizations at nside 16 with block errors.
+#   the brightest 2 percent in free-free masked as well (LCDM and flat CMB prior); the chi-square null at nside 16
+#   (e044_queue_after2.sh); forty realizations at nside 16 with block errors.
 E=nextgen/experiments/E044
 C=$HOME/data/c4_tools/libcanary.dylib
 P=".venv/bin/python -I nextgen/scripts/e044_fit.py"
 run() { tag=$1; shift; [ -s $E/$tag.txt ] && grep -q "^Plane" $E/$tag.txt && return 0; DYLD_INSERT_LIBRARIES=$C $P "$@" --out $E/$tag.npz > $E/$tag.txt 2> $E/$tag.err; }
+run ffmask_lcdm --prior lcdm --mask-extra $E/mask_ff02.npy --block
+run ffmask_flat --prior flat --mask-extra $E/mask_ff02.npy
 run nomask      --prior lcdm --no-mask --block
 run nomask_lp20 --prior lcdm --no-mask --lowpass 20
 run bright03    --prior lcdm --bright-fraction 0.03
