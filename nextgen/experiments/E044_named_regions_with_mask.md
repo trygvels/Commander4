@@ -96,6 +96,17 @@ and seen; nothing at nside 16.
   High Latitude than in the Plane. Delta bandpasses: steeper by 0.05 to 0.08. No drift correction: 0.002 or less.
   K and Ka alone: within 2.5 nested sd of the four-band index in every region.
 
+- **H9, the zero-mean prior at nside 16 (added 2026-11-11 10:13, after R1 and the nside-8 simulation were read,
+  before any nside-16 simulation exists).** The nside-8 simulation gives zero-mean minus profile of -1.05, -0.54,
+  -0.44, -0.22 sandwich errors; the maps at nside 16 give -3.6, -1.6, -1.5, -0.2. If the difference on the maps
+  is the bias of the estimator at this configuration (more and fainter amplitudes at nside 16), two simulated
+  realizations at nside 16 give -2.5 to -4.5 at High Latitude, -1.0 to -2.2 in the Spur, -1.0 to -2.0 at
+  Intermediate latitude and -0.1 to -0.5 in the Plane, the same in both realizations to 0.1. If they give about
+  -1 as at nside 8, then two thirds of the difference on the maps is something the simulated sky (the DR1 model
+  smoothed to 5 degrees, a Gaussian CMB, the released noise) does not have, and the paper must say that the
+  simulated bias explains only a third of it. Run: `nextgen/scripts/e044_queue_sim16b.sh`, behind the other
+  nside-16 simulations.
+
 ## Command
 
 ```bash
