@@ -1,0 +1,14 @@
+# E040 nside-16 simulation, stage blocknull: truth [-3.15 -3.25 -2.85 -2.95]; 6 realizations; setup 9 s
+real 0 blocknull -3.1208 -3.2347 -2.8481 -2.9657 sd 0.0295 0.0267 0.0199 0.0175 | CR3own/sd 1.45 0.72 1.14 0.87 | CR3/sd 1.49 0.85 1.21 0.90 | CR0/sd 1.39 0.73 1.11 0.82 | n_eff 12.1 3.6 13.0 10.9 | neg D 1 cross 0.287 sumD/Jc 1.00 1.00 1.00 1.00 | conv True [444 s]
+real 1 blocknull -3.1631 -3.2915 -2.8513 -2.9332 sd 0.0298 0.0272 0.0198 0.0173 | CR3own/sd 1.32 1.75 1.41 1.09 | CR3/sd 1.44 1.83 1.53 1.17 | CR0/sd 1.35 1.49 1.41 1.04 | n_eff 12.9 3.4 13.0 11.1 | neg D 0 cross 0.285 sumD/Jc 1.01 1.01 1.00 1.00 | conv True [777 s]
+real 2 blocknull -3.1506 -3.2701 -2.8320 -2.9395 sd 0.0299 0.0268 0.0199 0.0174 | CR3own/sd 1.20 1.63 1.12 0.96 | CR3/sd 1.29 1.64 1.19 1.00 | CR0/sd 1.24 1.43 1.12 0.92 | n_eff 13.0 3.5 13.1 11.1 | neg D 1 cross 0.287 sumD/Jc 1.00 1.00 1.00 1.00 | conv True [1120 s]
+real 3 blocknull -3.1524 -3.1977 -2.8192 -2.9586 sd 0.0300 0.0261 0.0196 0.0174 | CR3own/sd 1.54 1.51 1.16 0.97 | CR3/sd 1.52 1.49 1.17 0.98 | CR0/sd 1.38 1.01 1.06 0.93 | n_eff 11.9 3.5 13.4 11.0 | neg D 1 cross 0.289 sumD/Jc 0.99 1.01 0.99 1.00 | conv True [1455 s]
+real 4 blocknull -3.1722 -3.2671 -2.8301 -2.9608 sd 0.0302 0.0268 0.0198 0.0174 | CR3own/sd 1.80 0.87 1.17 0.78 | CR3/sd 1.82 1.00 1.28 0.85 | CR0/sd 1.69 0.74 1.18 0.80 | n_eff 13.3 3.4 13.0 10.9 | neg D 4 cross 0.286 sumD/Jc 1.01 1.00 1.00 1.00 | conv True [1780 s]
+real 5 blocknull -3.2143 -3.2908 -2.8397 -2.9191 sd 0.0308 0.0273 0.0199 0.0172 | CR3own/sd 1.48 2.04 0.96 1.04 | CR3/sd 1.54 2.04 0.94 1.06 | CR0/sd 1.41 1.61 0.87 0.96 | n_eff 11.1 3.4 12.9 11.0 | neg D 3 cross 0.282 sumD/Jc 0.99 1.01 1.00 1.00 | conv True [2093 s]
+## blocknull, 6 realizations: mean estimate - truth -0.0122 -0.0087 +0.0133 +0.0038; pooled mean z +0.050 +- 0.204, sd z 1.072, coverage of 1 sd 0.708; median error 0.0299 0.0268 0.0198 0.0174
+## block error over sandwich error under the model, per region: median, maximum
+   CR0: High Latitude 1.38 1.69; Spur 1.22 1.61; Intermediate 1.12 1.41; Plane 0.93 1.04
+   CR2: High Latitude 1.44 1.75; Spur 1.37 1.80; Intermediate 1.16 1.47; Plane 0.96 1.10
+   CR3: High Latitude 1.50 1.82; Spur 1.57 2.04; Intermediate 1.20 1.53; Plane 0.99 1.17
+   CR3_own: High Latitude 1.47 1.80; Spur 1.57 2.04; Intermediate 1.15 1.41; Plane 0.97 1.09
+   effective number of blocks, median: 12.5 3.5 13.0 11.0; blocks with negative information, total 10; cross-region share, largest 0.289

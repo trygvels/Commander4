@@ -4,9 +4,12 @@
 This section does one thing: it applies the estimators of Sects.~\ref{sec:flat} and \ref{sec:profile}
 to the same real maps, with the same regions, mask, bands and noise model, so that the difference
 between their answers is the difference between the estimators and nothing else. It does not deliver
-a polarized synchrotron index. Sect.~\ref{sec:moves} shows why not: at the statistical precision these
-maps offer, analysis choices that are independent of the estimator move the index by as much as its
-error or more.
+a measurement of the polarized synchrotron index. The model with one power law per region passes the
+tests that we could set it (Sect.~\ref{sec:moves}), but it is fitted on one set of regions with a mask
+that we varied only a little; the fit has features that we do not understand (a $\chi^2$ that is low
+in total and high along the CMB spectrum in the Plane, and two estimators that differ by more than
+three standard deviations at high latitude); and an earlier version of the analysis, on other
+regions, failed in ways that its own checks did not show.
 
 \subsection{Data and model}
 
@@ -17,8 +20,7 @@ transmission-imbalance modes \citep{jarosik2007,jarosik2011}. We checked them as
 (\exref{E038}): symmetric to $10^{-9}$, positive definite with no null space, a pixel noise of 2.0
 to 2.2 $\muK$ in brightness temperature, and a few modes at multipoles 2 to 6 whose variance is 65 to
 164 times the median. \citet{watts2023} argue from a joint reprocessing that these matrices do not
-fully describe the large-scale uncertainty of the nine-year maps; we use them as released and test
-the sensitivity to the modes they flag.
+fully describe the large-scale uncertainty of the nine-year maps; we use them as released.
 
 \paragraph{Planck.} The PR4 map at 353 GHz \citep{npipe} as the dust tracer. For it the per-pixel $Q/U$ covariance of the map file is combined over the
 sub-pixels of each $N_{\rm side}=16$ pixel, and the map is the corresponding weighted average.
@@ -41,7 +43,7 @@ through its own Gaussian beam, gives region indices biased flat by 0.005 to 0.01
 (\exref{E038}). We therefore bring every band to a common $1^\circ$ window with an invertible
 operator on the $N_{\rm side}=16$ grid, $\mathsf{S}_b = 1 + \mathsf{Y}\,\mathrm{diag}(f_\ell - 1)\,
 \mathsf{Y}^{+}$ with $f_\ell$ the ratio of the beam windows to multipole 47, transforming the data and
-the covariance together. In the simulation the residual bias is below 0.0025, and on the real maps
+the covariance together (what the pixel average holds above multipole 47 is left as it is). In the simulation the residual bias is below 0.0025, and on the real maps
 the correction moves the four indices by 0.0068, 0.0025, 0.0085 and 0.0035 where the simulation
 predicted 0.0070, 0.0030, 0.0088 and 0.0041 (measured with the white CMB prior, on an earlier set of
 four regions and without a mask; \exref{E040}).
@@ -62,14 +64,21 @@ gives its Spur value, which covers the North Polar Spur. A processing mask remov
 pixels with the largest polarized amplitude in the Cosmoglobe DR1 synchrotron model at 30 GHz smoothed
 to $5^\circ$, which are the inner plane, the Fan region and the base of the Spur, and a disc of
 $7.5^\circ$ around Tau A: \N{nkept} of \N{ntot} elements are kept, \N{nper.list} in the four regions.
-\citet{svalheim2023} describe a mask of this kind for their index sampling (the strongest 5 percent of
-the signal, and strong sources such as Tau A); ours follows that description and is not their file.
-Masked elements are removed exactly: the kept elements enter with the inverse of their own block of
-each covariance, the Schur complement of the full inverse covariance, formed after the window
-matching. An earlier version of this analysis used four regions reconstructed from the released
-index map without a mask; an independent referee showed that its ``High Latitude'' region held the
-inner Galactic plane and that Tau A dominated the misfit of its ``Plane'' (Sect.~\ref{sec:moves}), and
-those regions are not used for any statement below except where named.
+The Plane keeps 435 of its 576 pixels, so it is the plane outside its brightest quarter, and the
+threshold (28.6 $\muK$) passes through the Spur, whose kept pixels have a median amplitude of 22
+$\muK$. The threshold is set on a $5^\circ$ average of a model, at a signal-to-noise ratio of order
+one hundred, so it does not select on the noise of the maps that are fitted, and no definition uses a
+fitted index. \citet{svalheim2023} describe a mask for their index sampling that starts in the same
+way (the strongest 5 percent of the smoothed signal) and has further steps that rest on the $\chi^2$
+of their own fit, among them the one that removes strong sources such as Tau A; ours has the first
+step, on another model, and a disc in place of the others, and is not their file. Sect.~\ref{sec:moves}
+varies the threshold. Masked elements are removed exactly: the kept elements enter with the inverse
+of their own block of each covariance, the Schur complement of the full inverse covariance, formed
+after the window matching, as \citet{jarosik2011} do for their masks. An earlier version of this
+analysis used four regions reconstructed from the released index map, without a mask; an internal
+review showed that its ``High Latitude'' region held the inner Galactic plane and that Tau A
+dominated the misfit of its ``Plane'' (Sect.~\ref{sec:same}), and those regions are not used for any
+statement below except where named.
 
 \paragraph{Model.} Synchrotron as a power law with one index per region and one amplitude per
 element (pixel and Stokes parameter); dust as the modified blackbody above with one amplitude per
@@ -79,8 +88,8 @@ amplitudes is the $\Lambda$CDM covariance of $E$ and $B$ modes on the grid: spec
 through the working window and the pixel window, for multipoles 2 to 47, the span of the harmonic
 basis of the grid, plus a white floor of 0.01 $\muK$. The pixel average of a $\Lambda$CDM sky has a
 further 0.11 $\muK$ per element from higher multipoles, nearly white, which this prior does not
-describe (independent review, \exref{E040}); with the floor raised to that value the four indices
-change by 0.0006 or less and their errors by 0.3 percent. Two other choices
+describe (\exref{E040}); with the floor raised to that value the four indices
+change by \N{floor011.move.abs.max} or less and their errors by 0.3 percent (Table~\ref{tab:moves}). Two other choices
 are shown beside it, because the choice matters both for the index and for the pivot of
 Sect.~\ref{sec:flat}: a white Gaussian prior of 0.2 $\muK$ per element, which we used first, and a
 flat prior, for which the profile score is unbiased whatever the CMB is. The white prior has nearly
@@ -89,14 +98,22 @@ understates the $\Lambda$CDM $E$-mode variance by a factor of 200 at the quadrup
 above multipole 10. With the mask, the prior on the kept elements is the kept block of that
 covariance.
 
-\paragraph{Expectations.} Expectations for every fit of this section were written down, with numbers,
-before the fit was run, and the simulations of the next subsection were read before any real map
-(\exref{E039}, \exref{E040}, \exref{E044}). The fits on the present regions were not the first look at
-these maps: they follow a round on the earlier regions whose results we had seen, and the choice of
-the $\Lambda$CDM prior over the white one was made by a rule written three minutes before the first
-$\Lambda$CDM fit, after a referee had shown the white prior wrong in shape. The records mark what was
-written when, and record the expectations that failed; several did, and the text says so where it
-matters.
+\paragraph{What was planned and what was not.} Expectations for the fits of this section were written
+down, with numbers, before each fit was run, and the simulations of the next subsection were read
+before any real map (\exref{E039}, \exref{E040}, \exref{E044}). The fits on the present regions were
+not the first look at these maps: they follow a round on the earlier regions whose results we had
+seen, and the choice of the $\Lambda$CDM prior over the white one was made by a rule written three
+minutes before the first $\Lambda$CDM fit, after a review had shown the white prior wrong in shape.
+Several expectations failed. Those that bear on a conclusion: we expected the block errors of the
+Intermediate and Plane regions to exceed the model errors by factors of 1.5 to 4, and they do not
+(1.4 and 1.3, inside the null); we expected the first-order prediction of the reference shift to hold
+to 15 percent for moves below 0.3, and it is 16 and 19 percent high for two of them; our expectation
+for the Spur's shift was a third of what was found; and we expected the Plane's index to stay steeper
+when read from large scales, and it does not. Not everything below was planned. The significance of
+the total $\chi^2$ and its split by region and direction, the sequence of the index with the prior
+on the CMB, the disagreement of the zero-mean prior, and the dust index were found on reading the
+results. The tests added after that (the scan of Fig.~\ref{fig:scan}, further simulations, the mask
+as a variable) were again written down before they were run. The records mark what was written when.
 
 \subsection{Validation on simulations with the real covariances}
 
@@ -145,8 +162,8 @@ sky is constant inside each pixel by construction. The profile optimum is unbias
 deviations, its sandwich error is right to 6 percent, the 68 percent intervals cover the truth 69
 percent of the time, and the reduced $\chi^2$ at the optimum is $1.0006$ with a scatter of 0.022. A
 spot check at the working resolution, $N_{\rm side}=16$, with 12 realizations gives a pooled
-standardized error of mean $+0.03$ and standard deviation 0.99 and a reduced $\chi^2$ of $0.998 \pm
-0.009$. The zero-mean prior lands within 0.06 standard deviations of the profile optimum on these
+standardized error of mean $+0.03$ and standard deviation 0.99 and a reduced $\chi^2$ of 0.998 with a
+scatter of 0.009. The zero-mean prior lands within 0.06 standard deviations of the profile optimum on these
 regions; on the fainter regions of the map fit it does not (Sect.~\ref{sec:same}). For this
 band set with the white CMB prior the pivot sits at 23 GHz: a flat prior stated there is neutral, and
 the same prior stated at 30 GHz moves the High Latitude index by 4.5 standard deviations. The
@@ -169,8 +186,8 @@ Table~\ref{tab:e039} and in this paragraph was reproduced to the last printed di
 
 \begin{table}
 \centering
-\caption{The polarized synchrotron index of the WMAP nine-year K, Ka, Q and V maps (with Planck PR4
-353 GHz for dust) in the four regions of Fig.~\ref{fig:regions}, at $N_{\rm side}=16$ with the dense
+\caption{The index of the one-power-law model fitted to the WMAP nine-year K, Ka, Q and V polarization
+maps (with Planck PR4 353 GHz for dust) in the four regions of Fig.~\ref{fig:regions}, at $N_{\rm side}=16$ with the dense
 noise covariances, all bands brought to a common window, the mask applied, and the $\Lambda$CDM
 covariance as the prior on the CMB (\exref{E044}). Top: the profile optimum with two errors, the
 debiased sandwich error, which assumes one index per region, and a block error from the scatter of
@@ -190,21 +207,9 @@ Table~\ref{tab:same} is the result of this section. The numbers in each column c
 maps, the same regions and mask, the same bands, bandpasses and noise covariances. They differ only
 in how the amplitudes are removed.
 
-No region is misfitted: the $\chi^2$ per element and band is \N{chi.list} in the four regions against
-an expectation of \N{chi.exp} (sampling errors \N{chi.se.list}). In total it is low. The minimum
-$\chi^2$, with the penalty of the CMB prior inside it, is \N{chi.total} for \N{chi.dof} degrees of
-freedom, \N{chi.nsig} standard deviations below its expectation, and the deficit is in the two faint
-regions; \N{chinull.n} simulations of this fit at $N_{\rm side}=8$ give a ratio of $\N{chinull.mean}
-\pm \N{chinull.se}$. A fluctuation of that size has a probability of about one percent, and with a
-flat prior on the CMB, where the count of degrees of freedom is exact, the deficit is larger (below).
-The other reading is that the released covariances overstate the noise away from the plane, by
-\N{chi.noisepercent} to \N{flat.chi.noisepercent} percent in rms if it is spread evenly, which would
-make every error below too large by that factor. We found no statement of the accuracy of the
-normalization of these matrices at this resolution in the WMAP papers, and no published claim that
-they overstate the noise; two analyses that fit templates to the same nine-year maps with the same
-matrices print reduced $\chi^2$ values of 0.96 to 0.98 for V band, and near or above one for Ka and
-Q, without comment \citep[their Table~1 and Table~12]{lattanzi2017,planck2018v}. We use the
-covariances as released and do not rescale.
+No region has a $\chi^2$ above its expectation (\N{chi.list} per element and band against
+\N{chi.exp}), and the total is \N{chi.nsig} standard deviations low. Split by direction the fit is
+less clean than that, in the Plane; the paragraph on goodness of fit below gives the account.
 
 \paragraph{The reference frequency.} Under flat amplitude priors the answer depends on where the
 amplitudes are defined. For this band set with a $\Lambda$CDM prior on the CMB the pivot lies just
@@ -224,22 +229,27 @@ prediction that needs no flat-prior fit at all, it is \N{ratioJ.list}. Both pred
 every region, by more where the move is larger: the curvature of the marginal grows away from its
 optimum, and a first-order statement cannot know that. For moves below 0.1 it is good to 10
 percent; at High Latitude, where the move is half a unit of index, it is \N{ratioH.percentHL} percent
-high. We had written these expectations down before the fit; the one for the Spur was too small by
-a factor of three, because it left out the coupling to the High Latitude region through the shared
-noise (\exref{E044}).
+high. We had written expectations for these numbers before the fit. The one for the Spur was too
+small by a factor of three, because it left out the coupling to the High Latitude region through the
+shared noise, and the accuracy we expected of the first-order form (15 percent for moves below 0.3)
+is met in the Plane only: the predictions are \N{predH.over.list} percent high (\exref{E044}).
 
 \paragraph{The zero-mean prior.} With a free scale per region it does not agree with the profile
 optimum on these regions: it is steeper, by \N{zmm.abs.list}, that is \N{zmsd.abs.list} sandwich
-errors. For
-one component and a common noise pattern the two are the same estimator (Sect.~\ref{sec:profile});
-here there are three components, the noise pattern differs from band to band, and at High Latitude
-the amplitudes are faint. In \N{zmsim.n} simulations with these regions, this mask and this prior at
-$N_{\rm side}=8$, in which the profile optimum is unbiased, the zero-mean optimum of each realization is
-steeper than its profile optimum by \N{zmsim.paired.abs.list} sandwich errors, the same from one noise
-realization to the next (scatter \N{zmsim.pairedscatter.range}). So it is the zero-mean prior that is biased
-here, by an amount set by the sky and the noise pattern; the maps at $N_{\rm side}=16$ show the same sign
-and order across the regions, about three times larger in index (\exref{E044}). \pend{Two simulated
-realizations at $N_{\rm side}=16$, to see whether the simulated bias reaches the size on the maps.}
+errors. For one component and a common noise pattern the two are the same estimator
+(Sect.~\ref{sec:profile}); here there are three components, the noise pattern differs from band to
+band, and at High Latitude the amplitudes are faint. In \N{zmsim.n} simulations with these regions,
+this mask and this prior at $N_{\rm side}=8$, half the resolution of the map fit, in which the profile
+optimum is unbiased (below), the zero-mean optimum of each realization is steeper than its profile
+optimum by \N{zmsim.paired.abs.list} sandwich errors, the same from one noise realization to the next
+(scatter \N{zmsim.pairedscatter.range}). So in simulations it is the zero-mean prior that is biased,
+by an amount set by the simulated sky (the DR1 model smoothed to $5^\circ$) and the noise pattern. On
+the maps the difference has the same sign and the same order across the regions, and in three of them
+it is about three times larger in index (\exref{E044}). \pend{Two simulated realizations at
+$N_{\rm side}=16$ decide how much of the difference on the maps is this bias (H9). If they give about
+three standard deviations at High Latitude, all of it is. If they stay near one, two thirds of the
+difference between the two estimators on the maps is something the simulated sky does not have, and it
+counts against the model at High Latitude whichever estimator is used.}
 
 \begin{table}
 \centering
@@ -267,21 +277,24 @@ that the optimum has a bias and a covariance
   \label{eq:mismatch}
 \end{equation}
 with $\mathsf{q}$ the response of the scores to a CMB amplitude through the residual-forming
-operator of the fit. A unit test with 1500 simulated fits reproduces both (scatter 0.113 and 0.089
-predicted 0.113 and 0.091 where the matched formula gives 0.090 and 0.083; bias $+0.016 \pm 0.003$ and
-$+0.021 \pm 0.002$ predicted $+0.021$ and $+0.020$). Evaluated for the white-prior fit of these maps
+operator of the fit. The formula is first order in the mismatch and drops two terms of relative
+order $\Tm/\J$ (App.~\ref{app:sandwich}). In 1500 simulated fits at the configuration of its unit test
+it reproduces both (scatter 0.113 and 0.089 predicted 0.113 and 0.091 where the matched formula gives
+0.090 and 0.083; bias $+0.016 \pm 0.003$ and $+0.020 \pm 0.002$ predicted $+0.021$ and $+0.020$). Evaluated for the white-prior fit of these maps
 with $\mathsf{S}_{\rm t}$ the $\Lambda$CDM covariance: the bias is \N{mm.bias.list}
 (\N{mm.biassd.list} of the quoted error), and the true error is \N{mm.ratio.list} times the quoted
 one. The white-prior fit quotes an error \N{mm.quotedbelow.percent.range} percent smaller than the
 $\Lambda$CDM fit does, and on a $\Lambda$CDM sky its true error is \N{mm.overlcdm.percent.range} percent
 larger: it looks better and is worse. A white prior of nearly the right total variance is therefore not a harmless stand-in for a
-$\Lambda$CDM sky, in the direction of an error bar that is too small by \N{mm.percent.range} percent
-here; in other configurations the sign can be the other (an independent review found errors too
-large in one), which is the point of computing it. The same calculation gives the expected
-difference between the two fits of one sky, a standard deviation of \N{mm.pairsd.list}: the measured
-moves, less the bias, are \N{mm.movepair.list} of it. Two of the four are near two and have the same
-sign; those two indices are correlated at \N{mm.corr.HLInt}, and we read the four as consistent with
-the calculation and no more. An earlier simulation at $N_{\rm side}=8$ on other regions
+$\Lambda$CDM sky: here the true error is \N{mm.percent.range} percent larger than the quoted one. In
+other configurations the sign can be the other (a review found quoted errors too large in one),
+which is the point of computing it. The truth assumed is the $\Lambda$CDM covariance of the central
+fit. The same calculation gives the expected
+difference between the two fits of one sky, a standard deviation of \N{mm.pairsd.list} (the square
+root of the difference of the two variances, a rule that holds to relative order $\Tm/\J$): the
+measured moves, less the bias, are \N{mm.movepair.list} of it. Two of the four are near two and have
+the same sign; those two indices are correlated at \N{mm.corr.HLInt}, and we read the four as
+consistent with the calculation and no more. An earlier simulation at $N_{\rm side}=8$ on other regions
 agrees in kind: there the matched prior was calibrated and the white-prior error too small by about a
 fifth in three of four regions (\exref{E040}).
 
@@ -293,39 +306,41 @@ fit and a more efficient fit of the same data. Two regions are again near two, t
 the white prior and with the other sign: at High and at Intermediate latitude the index is steeper
 the more tightly the CMB amplitude is held (\N{white.prof.HL}, \N{prof.HL} and \N{flat.prof.HL} at High
 Latitude for the white, the $\Lambda$CDM and the flat prior; \N{white.prof.Int}, \N{prof.Int} and
-\N{flat.prof.Int} at Intermediate latitude). Each step is at the edge of what its calculation allows,
-the three fits share their data, and we have no cause to offer; we report it. The $\chi^2$ of the
-flat-prior fit, which has exactly two degrees of freedom per element and no prior penalty, is
-\N{flat.chi.ratio} of its expectation, \N{flat.chi.nsig} standard deviations low: the deficit of the
-central fit is not made by the CMB prior, and as a fluctuation it is now one in a thousand. Nor is
-it spread evenly over the combinations of bands. The degrees of freedom that the $\Lambda$CDM fit has
-beyond the flat-prior fit, one per element in the direction of a CMB spectrum, carry
-$\N{chi.cmbdir.ratio} \pm \N{chi.cmbdir.se}$ of their expectation where the other two per element carry
-$\N{flat.chi.ratio} \pm \N{flat.chi.se}$. A noise model that is uniformly too large would lower both;
-what we see is a deficit in the directions that the three amplitudes do not span and none along the
-CMB spectrum, or a deficit everywhere with an excess of that spectrum on top. That may be the same
-thing as the sequence in the CMB prior above. We leave it as an observation.
+\N{flat.prof.Int} at Intermediate latitude). Each step is 1.7 to 1.95 of the standard deviation
+expected for it, the three fits share their data, and we have no cause to offer. We return to it in
+Sect.~\ref{sec:moves}.
 
 A free CMB amplitude does more to the flat-prior marginal than move its pivot
 (Sect.~\ref{sec:flat}). With flat priors on all three amplitudes the High Latitude index has no
 optimum inside the allowed range: for a reference of 23 GHz and of 30 GHz alike the fit ends at its
 upper edge, $-1.6$, where the profile likelihood of the same model gives \N{flat.prof.HL} $\pm$
-\N{flat.sd.HL} (Table~\ref{tab:cmbprior}). At the profile optimum the curvature of the flat-prior
-marginal is negative in that direction (\N{flat.Hdiag.HL} against an information $\J$ of
-\N{flat.Jdiag.HL}): the volume term outweighs the data, which is the case that Sect.~\ref{sec:flat}
-describes for further free amplitudes. The index variance carried by one amplitude, $n\sigma_\beta^2$,
-is \N{flat.nsig2.HL} in this region against \N{nsig2.HL} with the $\Lambda$CDM prior, so that a
-reference a tenth in $\ln\nu$ from the pivot is already a shift of order one. A scan shows that this
-is the shape of the function and not the path of an optimizer (Fig.~\ref{fig:scan}; the test was
-written down before it was run). With the other three indices held at the profile optimum, the
-flat-prior marginal rises monotonically over the whole allowed range, and between the profile optimum
-and the upper edge it gains \N{scan.flat.rise23} in $\ln\mathcal{L}$ for a reference of 23 GHz and
-\N{scan.flat.rise30} for 30 GHz, while the profile likelihood loses \N{scan.flat.proffall}. With the
-$\Lambda$CDM prior the same scan has its maxima inside the range, near \N{scan.lcdm.vertex23} and
+\N{flat.sd.HL} (Table~\ref{tab:cmbprior}). A scan shows that this is the shape of the function and
+not the path of an optimizer (Fig.~\ref{fig:scan}; the test was written down before it was run). With
+the other three indices held at the profile optimum, the flat-prior marginal rises at every step of
+the scan over the whole allowed range, and between the profile optimum and the upper edge it gains
+\N{scan.flat.rise23} in $\ln\mathcal{L}$ for a reference of 23 GHz and \N{scan.flat.rise30} for 30
+GHz, while the profile likelihood loses \N{scan.flat.proffall}. The edge is where the allowed range
+ends and nothing else: the marginal is still rising there.
+
+The cause is a near-degeneracy of two columns. Over the K to V bands a power law with an index near
+$-0.1$ has the spectrum of the CMB. There the determinant of the amplitude matrix nearly vanishes, and
+the volume term $-\tfrac12\ln\det\A$, which a flat prior adds to the log-likelihood once for every
+element, rises toward that index. \citet{dunkley2009} describe this volume, of models with a flatter
+spectrum and large CMB and synchrotron amplitudes of opposite sign, and met its mild form with a few
+tens of amplitudes per index. Here the region has \N{nper.HL}. At the profile optimum the slope of
+the volume term is $+\N{scan.flat.volslope}$ per unit of index (\N{scan.flat.volslope.per} per
+amplitude, which is a pivot of \N{scan.flat.pivot} GHz, below the lowest band), against a curvature of
+the data of \N{flat.Jc.HL}; the marginal is still concave there (curvature \N{scan.flat.curv23}), but
+its stationary point would lie several units of index away, where a quadratic form no longer
+describes it. One element with delta bands and equal weights reproduces the slope, the pivot and the
+gain to 15 percent, and puts the maximum of the volume term at an index of $-0.08$, 3.8 per amplitude
+above its value at $-3.04$. With the $\Lambda$CDM prior the CMB amplitude is held, the degeneracy is
+gone, and the same scan has its maxima inside the range, near \N{scan.lcdm.vertex23} and
 \N{scan.lcdm.vertex30}. The 30 GHz curves follow from the 23 GHz ones by Eq.~(\ref{eq:tilt}), which a
-direct evaluation at 30 GHz confirms to $10^{-8}$. The other three flat-prior optima are interior and are
-\N{flat.f23m.abs.range} flatter than the profile optimum for 23 GHz, but they are conditional on a
-neighbour at the edge. No first-order prediction applies to this row.
+direct evaluation at 30 GHz confirms to $10^{-8}$. The other three flat-prior optima of
+Table~\ref{tab:cmbprior} are interior and are \N{flat.f23m.inner.range} flatter than the profile
+optimum for 23 GHz, but they are conditional on a neighbour at the edge, and no first-order
+prediction applies to that row.
 
 \begin{figure}
 \centering
@@ -340,6 +355,63 @@ with the $\Lambda$CDM prior (where the black and the blue curve nearly coincide)
 of the allowed range (grey lines) when the CMB amplitude is free.}
 \label{fig:scan}
 \end{figure}
+
+\begin{table}
+\centering
+\caption{The $\chi^2$ of the fit of Table~\ref{tab:same}, split by region and by direction
+(\exref{E044}). First block: the residual $\chi^2$ of the central fit per element and band. Second
+block: the fit with a flat prior on the CMB, whose residual has exactly two degrees of freedom per
+element in the directions that the three amplitudes do not span, and the difference between the two
+nested fits, which has one degree of freedom per element in the direction of a CMB spectrum (the
+fitted CMB amplitude against its noise and its prior). Third block: the fit to K, Ka and 353 GHz
+alone, with one degree of freedom per element. The errors are sampling errors under the model.
+Every entry of the last three rows has an expectation of one.}
+\label{tab:chi}
+\small
+\resizebox{\textwidth}{!}{\input{gen_tab_chi}}
+\end{table}
+
+\paragraph{Goodness of fit.} The minimum $\chi^2$ of the central fit, with the penalty of the CMB
+prior inside it, is \N{chi.total} for \N{chi.dof} degrees of freedom, \N{chi.nsig} standard deviations
+below its expectation (two-sided probability 0.012). With a flat prior on the CMB, where there are
+exactly two degrees of freedom per element and no penalty, it is \N{flat.chi.ratio} of its
+expectation, \N{flat.chi.nsig} standard deviations low (0.0008). In \N{chinull.n} simulations of the
+central fit at $N_{\rm side}=8$ the ratio is $\N{chinull.mean} \pm \N{chinull.se}$, so the count is
+right. This test was not planned: our expectation was written for the $\chi^2$ per element and band,
+with a tolerance that a deficit of this size passes.
+
+Table~\ref{tab:chi} splits it. In the two directions per element that the amplitudes do not span,
+three regions are low and one is at its expectation. Along the CMB spectrum three regions are at their
+expectation and the Plane is \N{chi.dir.Plane.percent} percent high: \N{chi.dir.Plane.obs} where
+\N{chi.dir.Plane.exp} are expected, \N{chi.dir.Plane.absz} standard deviations. \pend{The sampling
+error of this split in simulations (H14).} From K, Ka and 353 GHz alone the Plane is at its
+expectation. So in the Plane the Q and V maps hold something with a spectrum close to that of the CMB
+that the model does not have, against the power law that K and Ka define: an index that varies from
+pixel to pixel, a spectrum that steepens with frequency, and leakage of intensity into polarization
+would each do it. The block errors below do not see it, and in Table~\ref{tab:moves} it appears as an
+index from K and Ka that is flatter by \N{KKa.move.Plane}. All that the totals show is that no region
+has a $\chi^2$ above its expectation; the model does not fit the Plane in every direction.
+
+The deficit has two readings. As a fluctuation it has the probabilities above. As a statement about
+the released covariances it is a noise that is overstated, by \N{chi.noisepercent} to
+\N{flat.chi.noisepercent} percent in rms if it were spread evenly, which it is not: by region and
+direction the entries of Table~\ref{tab:chi} run from 0.93 to 1.15, and the direction of the CMB
+spectrum as a whole is at $\N{chi.cmbdir.ratio} \pm \N{chi.cmbdir.se}$ where the other two are at
+$\N{flat.chi.ratio} \pm \N{flat.chi.se}$ (\N{chi.dir.diffsig} standard deviations apart). We found
+no statement of the accuracy of the normalization of these matrices at this resolution, and what the
+literature has points both ways. \citet{jarosik2007} say that the noise of the degraded maps is not
+precisely described by the matrices and, for the three-year data, measure a noise at this resolution
+that is 1.5 to 5.7 percent above the high-resolution value: the other sign. \citet{hinshaw2009} note
+a slight tendency of the errors built on the five-year matrices to be overestimated at multipoles of
+six and above. Two analyses that fit templates to these nine-year maps with these matrices, one of
+them after smoothing both, print reduced $\chi^2$ values of 0.96 to 0.98 for V band and of 0.98 to
+1.05 for Ka and Q, and call them consistent with unity \citep{lattanzi2017,planck2018v}. And
+\citet{svalheim2023} saw a uniform, slightly negative offset of the $\chi^2$ at high latitude in a
+fit that includes these maps, and put it down to their count of degrees of freedom. A test without a
+sky model, on differences between years or between differencing assemblies with the single-year
+matrices, would settle it, and we have not made it. We use the covariances as released and do not
+rescale; if the noise reading is right, every error in this section is too large by one or two
+percent.
 
 \paragraph{Errors that do not assume the model.} The sandwich error is the error of the estimator if
 each region has one index and the noise model is right. An error that does not lean on that comes
@@ -361,10 +433,10 @@ jackknife variance up to a factor $G/(G-1)$ for $G$ clusters and is biased high 
 $\sum_B h_B/(1-h_B)$ \citep{bell2002,cameron2015}. Our estimator is not linear, so the correspondence
 is to first order. We use each region's own scores. The joint form, with the full matrix
 $\J_{\rm c}^{-1}$ on both sides of the outer products of all regions' scores, lets a region inherit
-the scatter of a neighbour to which its index is coupled; an independent referee showed that this,
-and not the region itself, made the largest block error of an earlier version of this analysis.
+the scatter of a neighbour to which its index is coupled; this, and not the region itself, made the
+largest block error of an earlier version of this analysis.
 
-What a block error means needs care (independent review and referee, \exref{E040}, \exref{E044}). It
+What a block error means needs care (\exref{E040}, \exref{E044}). It
 is the error of the estimate as a measurement of the mean index of a population of exchangeable
 patches; for the information-weighted mean index of the region as realized on this sky, the sandwich
 error is the right one. It is too small if the index varies coherently over several patches. It is
@@ -382,40 +454,42 @@ clusters of \citealt{carter2017}), is \N{neff.list} here.
 \centering
 \includegraphics[width=\textwidth]{figures/fig_blocks.pdf}
 \caption{What the block errors of Table~\ref{tab:same} are made of. For each patch of sky (a pixel of the
-$N_{\rm side}=2$ grid) that carries information on the index of a region: the index that the patch alone
-would move to in one Newton step from the fitted index of the region, with the error it would have under
-the model, against the share of the region's information that the patch carries. Patches with a one-step
-error above 0.12 are not drawn, and an arrow marks a value outside the frame. Dark band: the sandwich error
-of the region's index. Light band: its block error (none for the Spur). The fitted index of the region is
-given beside its name. The one-step values are first-order and for display; the block error is computed
-from the scores, Eq.~(\ref{eq:block}) (\exref{E044}).}
+$N_{\rm side}=2$ grid) that carries information on the index of a region: the score of the patch in units of
+the error it has under the model, $z_B = -G_B/\sqrt{D_B}$ (positive if the patch alone would move to a flatter
+index), against the share $h_B$ of the region's information that the patch carries. The band is one standard
+deviation under the model and the dashed lines are two; an arrow marks a value outside the frame. The squared
+ratio of the block error to the model error is the information-weighted mean of $z_B^2/(1-h_B)^2$, so a
+patch counts by its height and by its position to the right. The fitted index of the region is given beside
+its name (\exref{E044}).}
 \label{fig:blocks}
 \end{figure}
 
-On the maps the block error is \N{cr3ownratio.list} times the sandwich error in the four regions
-(Fig.~\ref{fig:blocks}).
-Under the model, in \N{nullall.n} simulations at $N_{\rm side}=8$ with these regions, this mask and
-the $\Lambda$CDM prior (synchrotron from the DR1 model smoothed to $5^\circ$, noise from the
-window-matched covariances, a $\Lambda$CDM CMB, one index per region), the ratio has a median of
-\N{nullall.median.list} and a 97.5th percentile of \N{nullall.p975.list}; \N{nullall.above.list} of
-the simulations lie above the map values. In the same simulations the profile optimum and its
-sandwich error are calibrated: the standardized errors have means of \N{nullall.meanz.list}, each
-known to \N{nullall.se}, and standard deviations of \N{nullall.sdz.list}, each known to
-\N{nullall.sdz.se}, and the intervals of one standard deviation cover the truth in
-\N{nullall.cover.list} of the realizations. The Spur, with 66 pixels at this resolution, is the least
-clean of the four, at two standard errors in both. (The first 120 realizations had given 1.11 at High
-Latitude; a further 240, run to decide whether that was real, gave 0.98.)
-\pend{The same at $N_{\rm side}=16$, a few realizations.} So with the mask
-the block scores give no evidence that any of these regions is more than one index at the precision
-of these maps, and the two errors in Table~\ref{tab:same} tell the same story within what a block
-error from a dozen patches can tell.
+On the maps the block error is \N{cr3ownratio.HL}, \N{cr3ownratio.Int} and \N{cr3ownratio.Plane} times the
+sandwich error at High Latitude, at Intermediate latitude and in the Plane (Fig.~\ref{fig:blocks}); for
+the Spur, where 3.5 effective patches carry the information, the ratio is \N{cr3ownratio.Spur} and we do
+not tabulate an error. Under the model, in \N{nullall.n} simulations at $N_{\rm side}=8$ with these
+regions, this mask and the $\Lambda$CDM prior (synchrotron from the DR1 model smoothed to $5^\circ$,
+noise from the window-matched covariances, a $\Lambda$CDM CMB, one index per region), the ratio has a
+median of \N{nullall.median.list} and a 97.5th percentile of \N{nullall.p975.list};
+\N{nullall.above.list} of the simulations lie above the map values. In the same simulations the profile
+optimum and its sandwich error are calibrated: the standardized errors have means of
+\N{nullall.meanz.list}, each known to \N{nullall.se}, and standard deviations of
+\N{nullall.sdz.list}, each known to \N{nullall.sdz.se}, and the intervals of one standard deviation
+cover the truth in \N{nullall.cover.list} of the realizations. The Spur, with 30 pixels at this
+resolution, is the least clean of the four, at two standard errors in both. (The first 120
+realizations had given 1.11 at High Latitude; a further 240, run to decide whether that was real,
+gave 0.98.) \pend{Forty-six realizations at $N_{\rm side}=16$, the resolution of the map fit: the
+null of the ratio, where the map values lie in it, and the calibration (H15).} So with the mask the
+block scores give no evidence at half the resolution that any of these regions is more than one
+index, within what a block error from a dozen patches can tell. They are not the sharpest test
+here: they pass the Plane, which the split of the $\chi^2$ by direction does not.
 
 That was not so before the mask. On the four regions of the earlier version, unmasked, the
 joint block errors were 2.3 to 9 times the sandwich errors and the $\chi^2$ per element and band was
 1.78 and 0.77 in its Galactic Center and Plane. With nothing but the disc around Tau A masked on
 those regions, the index of its Plane moves from \N{old.prof.Plane} to \N{tauA.prof.Plane}, six of its
-statistical errors, and its $\chi^2$ falls to \N{tauA.chi.Plane}; we had predicted both before the fit, the
-referee's first-order estimate of the move being $-0.07$ (\exref{E044}). The misfit and
+statistical errors, and its $\chi^2$ falls to \N{tauA.chi.Plane}; we had predicted both before the fit, from a
+first-order estimate of $-0.07$ made on the saved products of the unmasked fit (\exref{E044}). The misfit and
 the scatter of those fits sat in the emission that the mask removes, and one source carried most of
 it in one region.
 
@@ -444,51 +518,69 @@ rows are of two kinds, and they have to be read differently.
 
 \paragraph{Less of the same data.} An arm that drops information and keeps the model gives, if the
 model is right, an estimate that differs from the full one by noise of a known size,
-$(\sigma_{\rm arm}^2 - \sigma_{\rm base}^2)^{1/2}$; for the estimator that reads the index from large
-scales this was checked on simulations (\exref{E039}; \pend{and at $N_{\rm side}=16$ with these
-regions}). Such an arm is a test of the model with no free choice in it, and Table~\ref{tab:moves}
-gives each change in those units. With the index read from multipoles up to 30, 20 and 12 only, the
-largest change in any region is \N{lp30.nest.max}, \N{lp20.nest.max} and \N{lp12.nest.max} of them.
-From K and Ka alone the four indices change by \N{KKa.nest.list}, and by \N{lp20KKa.nest.list} when
-both fits are read from multipoles up to 20. With a flat prior on the CMB they change by
-\N{flat.movenest.list} (above). The largest of all these is \N{arms.nest.max}, in one region of one
-arm, and the arms share their data. Two patterns are visible and neither is significant: the
-sequence in the CMB prior described above, and an index from K and Ka alone that is flatter at
-Intermediate latitude and in the Plane by \N{KKa.move.Int} and \N{KKa.move.Plane}, the sign of a
-spectrum that steepens with frequency.
+$(\sigma_{\rm arm}^2 - \sigma_{\rm base}^2)^{1/2}$. The rule holds to relative order $\Tm/\J$ and takes
+the base fit, with the $\Lambda$CDM covariance as the truth for the CMB, as the efficient one. For
+the estimator that reads the index from large scales it was checked on simulations: at
+$N_{\rm side}=8$ (\exref{E039}), and at $N_{\rm side}=16$ with these regions and this mask for
+$\ell \le 20$, where \N{lp16.nvals} differences in these units have a mean of \N{lp16.paired.mean} and
+an rms of \N{lp16.paired.rms} (\exref{E044}). Such an arm tests the model with no free choice in it,
+and Table~\ref{tab:moves} gives each change in those units.
 
-That is not the picture before the mask. On the earlier regions the index from $\ell \le 20$ was
-steeper than the index from all scales by \N{old.lp20.move.abs.range} in the four regions,
-\N{old.lp20.nest.abs.range} of the expected scatter, and we could not say why. We had written before
-the present fits that if compact bright emission was the cause the mask would shrink the largest of
-them, \N{old.lp20.move.absPlane} in the old Plane, to between 0.01 and 0.04; in the new Plane the change
-is \N{lp20.move.Plane}, with the other sign and inside its noise. The dependence on angular scale went
-away with the emission that the mask removes.
+With the index read from multipoles up to 30, 20 and 12 only, the largest change in any region is
+\N{lp30.nest.max}, \N{lp20.nest.max} and \N{lp12.nest.max} of them. The test is not a sharp one: at
+$\ell \le 20$ two such standard deviations are \N{lp20.twonest.list} in the four regions. From K and
+Ka alone the four indices change by \N{KKa.nest.list}, and by \N{lp20KKa.nest.list} when both fits
+are read from multipoles up to 20; with a flat prior on the CMB by \N{flat.movenest.list} (above).
+The largest of these 24 numbers is \N{arms.nest.max}, and they share their data. One pattern runs
+through them. The index is flatter when Q and V carry less weight: from K and Ka alone by
+\N{KKa.move.Int} and \N{KKa.move.Plane} at Intermediate latitude and in the Plane (\N{KKa.nest.Int}
+and \N{KKa.nest.Plane} expected standard deviations), and with a flat prior on the CMB, which leaves
+the index to the K to Ka lever arm, by \N{flat.move.HL} and \N{flat.move.Int} at High and at
+Intermediate latitude (\N{flat.movenest.HL} and \N{flat.movenest.Int}). These are one observation and
+not two tests, at about two standard deviations in two regions each. It has the sign of a spectrum
+that steepens with frequency.
+
+On the earlier regions, without a mask, the index from $\ell \le 20$ was steeper than the index
+from all scales by \N{old.lp20.move.abs.range} in the four regions, \N{old.lp20.nest.abs.range} of the
+scatter expected there (\N{old.lp20.nestsd.list}; those regions were brighter). With the present
+regions and mask the changes are \N{lp20.move.list}. The change in the Plane is gone. Those in the
+Spur and at Intermediate latitude are as large as before and of the same sign, and lie inside a
+noise that is three to five times larger than it was, so for them the test says little either way.
+\pend{The present regions without the mask, from all scales and from $\ell \le 20$, to separate the
+mask from the regions (H12).}
 
 \paragraph{A different model.} The other rows change an assumption. Their changes have no sampling
-error and say what the assumption is worth. A dust index of 1.48 or 1.58 in place of 1.53 moves
-the synchrotron index by \N{dust.move.list}, most in the Plane, where it is \N{dust.movesd.Plane}
-statistical errors. The three fits also say what dust index these maps prefer: $\chi^2_{\min}$ is
-higher by \N{dust.dchi148} at 1.48 and lower by \N{dust.dchi158.abs} at 1.58, and a parabola through
-the three values has its minimum at $\N{dust.best} \pm \N{dust.bestsd}$, against $1.53 \pm 0.02$ from
-the Planck bands alone \citep{planck2018xi}; at that uncertainty the dust index is worth
-\N{dust.at002.range} in the synchrotron index. This reading of the dust index was not planned and is
-a by-product. Delta bands at the nominal WMAP frequencies in place of the measured bandpasses
-steepen every region, by \N{delta.move.abs.range}, which is \N{delta.movesd.abs.range} statistical
-errors: the largest model effect in the table, and the one with no excuse, because the bandpasses
-are measured. The correction for the drift of the band centres is worth \N{nodrift.move.abs.max} at
-most, the choice between the polarization-sensitive and all bolometers for the 353 GHz bandpass
-\N{bp353full.move.abs.max}, and the floor of the CMB prior \N{floor011.move.abs.max}.
+error and say what the assumption is worth. \pend{The mask: thresholds of 3 and 10 percent in place
+of 5, no mask, and the brightest thermal sources masked as well (H12, H13, H16).} A dust index of
+1.48 or 1.58 in place of 1.53 moves the synchrotron index by \N{dust.move.list}, most in the Plane,
+where it is \N{dust.movesd.Plane} statistical errors. The three fits also say what dust index these
+maps prefer: $\chi^2_{\min}$ is higher by \N{dust.dchi148} at 1.48 and lower by \N{dust.dchi158.abs}
+at 1.58, and a parabola through the three values has its minimum at
+$\N{dust.best} \pm \N{dust.bestsd}$, against $1.53 \pm 0.02$ from the Planck bands alone
+\citep{planck2018xi}. The error is the half-width at which $\chi^2$ rises by one, from three values,
+at a fixed dust temperature of 19.6 K and with a power-law synchrotron spectrum; this reading was
+not planned and is a by-product. At an uncertainty of 0.02 the dust index is worth
+\N{dust.at002.range} in the synchrotron index. Delta bands at the nominal WMAP frequencies in place
+of the measured bandpasses steepen every region, by \N{delta.move.abs.range}, which is
+\N{delta.movesd.abs.range} statistical errors: the largest model effect in the table, and the one with
+no excuse, because the bandpasses are measured. The correction for the drift of the band centres is
+worth \N{nodrift.move.abs.max} at most, the choice between the polarization-sensitive and all
+bolometers for the 353 GHz bandpass \N{bp353full.move.abs.max}, and the floor of the CMB prior
+\N{floor011.move.abs.max}. Two things were not varied. Everything here leans on K band, which sets the
+pivot and has the largest known systematics of the four; the arm with K and Ka alone keeps it. And
+the regions themselves were not varied.
 
-\paragraph{Taken together.} For these maps, regions and mask the profile index of the simple model is
-\N{prof2.list} at High Latitude, in the Spur, at Intermediate latitude and in the Plane, with
-statistical errors of \N{sd.range}. With the mask it does not depend on the angular scale that
-informs it or on the band subset beyond what the noise allows; it moves by up to
-\N{flat.move.abs.max} with the prior on the CMB and by 0.05 if the bandpasses are ignored; and under
-flat amplitude priors it moves by \N{d3023two.range} with a convention. We give these numbers as the
-answer of this model on these regions, with what they are sensitive to, and not as a recommended
-value of the polarized synchrotron index. An earlier set of regions, without a mask, gave
-\N{old.prof.HL} to \N{old.prof.Plane} with errors of 0.01 for regions that turned out to be mislabelled
-and misfitted, and it took an independent referee to see it; the choice of regions and mask is
-itself a model, the spectrum here has no curvature, and the leakage of intensity into polarization
-is not modelled.
+\paragraph{Taken together.} For these maps, regions and mask the profile index of the model with one
+power law per region is \N{prof2.list} at High Latitude, in the Spur, at Intermediate latitude and in
+the Plane, with statistical errors of \N{sd.range}. The tests that use less of the same data do not
+reject the model at a sensitivity of 0.04 to 0.07 in the index, with one pattern at two standard
+deviations: the index from the K to Ka lever arm is flatter. The assumptions that we varied are
+worth 0.05 (the bandpasses, if ignored) and 0.02 (the dust index, in the Plane). Under flat
+amplitude priors the same fit moves by \N{d3023two.range} with a convention. We give these numbers as
+the answer of this model on these regions and not as a measurement of the polarized synchrotron
+index, and the reason is not the size of any entry of Table~\ref{tab:moves}. It is that the regions
+and the mask are one choice; that in the Plane the model fails along the CMB spectrum
+(Table~\ref{tab:chi}); that two estimators which agree when the model holds differ by
+\N{zmsd.abs.HL} standard deviations at High Latitude; and that the $\chi^2$ against the released
+covariances is not understood. An earlier set of regions, without a mask, gave \N{old.prof.HL} to
+\N{old.prof.Plane} with errors of 0.01 and passed the checks we then had.

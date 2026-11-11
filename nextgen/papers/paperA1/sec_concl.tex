@@ -13,40 +13,47 @@ not depend on the index, state the sensitivity of the index to that prior.
 \paragraph{What the real maps show.} On the WMAP K to V polarization maps, with regions defined by
 geometry and the brightest emission masked, changing nothing but the frequency at which a flat
 amplitude prior is stated, from 23 to 30 GHz, moves the index by \N{d3023two.range} in the four
-regions: \N{d3023sd.range} times its statistical error. With a flat prior on the CMB as well the
-flat-prior marginal has no optimum at high latitude in either convention: the index runs to the edge
-of the allowed range, $-1.6$, where the profile likelihood of the same model gives \N{flat.prof2.HL}
-$\pm$ \N{flat.sd2.HL}. The identity behind this is exact. Its first-order form
-predicts every move that we could check and is always too high, by \N{predH.over.range} percent with
-the curvature of the fitted marginal and by \N{predJ.over.range} percent with the information of the
-profile fit alone. The profile likelihood does not depend on the convention. That comparison is
-differential and does not rest on the sky model being right. Two further results are specific to
-this configuration. The zero-mean prior with a free scale, which is the same estimator as the profile
-likelihood for one component and uniform noise, is not here: it lands \N{zmsd.abs.list} standard
-deviations from the profile optimum in the four regions, and in simulations it is the one that is
-biased. And the prior on the CMB matters beyond the pivot: a white prior of nearly the right total
-variance in place of the $\Lambda$CDM covariance understates the error of the index by
-\N{mm.percent.range} percent on these maps, by a first-order calculation that needs no simulation
-(Eq.~\ref{eq:mismatch}).
+regions: \N{d3023sd.range} times its statistical error. The identity behind this is exact. Its
+first-order form gives the size of every move and is always too high, by \N{predH.over.range} percent
+with the curvature of the fitted marginal and by \N{predJ.over.range} percent with the information of
+the profile fit alone. With a flat prior on the CMB as well, the flat-prior marginal has no optimum
+inside the allowed range at high latitude in either convention: it is pulled toward the index at
+which the synchrotron and CMB spectra are degenerate, where the profile likelihood of the same model
+gives \N{flat.prof2.HL} $\pm$ \N{flat.sd2.HL}. The profile likelihood does not depend on the
+convention. These comparisons are differential and do not rest on the sky model being right. Two
+further results are specific to this configuration. The zero-mean prior with a free scale, which is
+the same estimator as the profile likelihood for one component and uniform noise, is not here: it
+lands \N{zmsd.abs.list} standard deviations from the profile optimum in the four regions, and in
+simulations at half the resolution of the fit it is the one that is biased, by a third of that.
+\pend{H9.} And the prior on the CMB matters beyond the pivot: with a white prior of nearly the right
+total variance in place of the $\Lambda$CDM covariance the fit quotes a smaller error and has a larger
+one, \N{mm.percent.range} percent above the quoted value on these maps, by a first-order calculation
+that needs no simulation (Eq.~\ref{eq:mismatch}).
 
 \paragraph{What they do not show.} We have not measured the polarized synchrotron index. The profile
-index of the simple model is \N{prof2.list} at high latitude, in the Spur, at intermediate latitude
-and in the plane, with statistical errors of \N{sd.range}; with the mask no region is misfitted (the
-total $\chi^2$ is \N{chi.nsig} standard deviations below its expectation), and errors from the scatter of the score over patches of sky agree with the model's within
-what a dozen patches can say. With the mask the index does not depend on the angular scales or the
-band subset that inform it beyond the noise (the largest change is \N{arms.nest.max} of its expected
-standard deviations); it moves by up to \N{flat.move.abs.max2} with the prior on the CMB, by
-\N{dust.move.Plane} in the plane with a dust index 0.05 away, and by 0.05 if the bandpasses are
-ignored. These are the answers of one model on one set of regions, and the route to them is itself
-a caution. An earlier version of this analysis used four regions reconstructed from a published
-index map and no mask. Its tables were internally consistent and passed our own checks; its
-``High Latitude'' region was mostly inner Galactic plane, its misfit was the brightest emission, and
-one source, Tau A, moved the index of one region by \N{tauA.absmove.Plane}, six of its statistical
-errors. An independent referee found this from the saved fit products, by asking where on the sky the
-misfit sat. A $\chi^2$ that is too large is a question about the sky before it is a statement about a
-model, and a region is a choice that has to be shown. The spread of published values for this sky,
-$-2.9$ to $-3.3$, is of the size of these effects and of the convention effect together, not of the
-statistical errors.
+index of the model with one power law per region is \N{prof2.list} at high latitude, in the Spur, at
+intermediate latitude and in the plane, with statistical errors of \N{sd.range}. The model passes
+the tests that use less of the same data: read from large angular scales only, from K and Ka only,
+or with a free CMB amplitude, the index differs from the full one by at most \N{arms.nest.max} of the
+standard deviations expected for the difference, and the block errors from the scatter of the score
+over patches of sky are inside their simulated null. It does not pass everything. In the plane the
+$\chi^2$ along the CMB spectrum is \N{chi.dir.Plane.percent} percent above its expectation
+(\N{chi.dir.Plane.absz} standard deviations). \pend{H16.} Two estimators that agree when the model
+holds differ by \N{zmsd.abs.HL} standard deviations at high latitude. The index from the K to Ka
+lever arm is flatter than the index from four bands, at two standard deviations in two regions. And
+the total $\chi^2$ is \N{chi.nsig} to \N{flat.chi.nsig} standard deviations below its expectation,
+which if it is the noise is an overstatement of one to two percent in the released covariances, not
+uniform over regions or band combinations, and which we have not tested without a sky model.
+
+The route to these numbers is itself a caution. An earlier version of this analysis used four
+regions reconstructed from a published index map and no mask. Its tables were internally consistent
+and passed our own checks; its ``High Latitude'' region was mostly inner Galactic plane, its misfit
+was the brightest emission, and one source, Tau A, moved the index of one region by
+\N{tauA.absmove.Plane}, six of its statistical errors. That was found from the saved fit products,
+by asking where on the sky the misfit sat. A $\chi^2$ that is too large, or too small, is a question
+about the sky and the noise before it is a statement about a model, and a region is a choice that
+has to be shown. The spread of published values for this sky, $-2.9$ to $-3.3$, is of the size of the
+convention effect and of these effects, not of the statistical errors.
 
 \paragraph{What we did not do.} All results are for maps, at low resolution, with one index per
 region and Gaussian noise of known covariance. We did not treat time-ordered data, gain or bandpass
@@ -60,8 +67,9 @@ nothing about what it does with whatever makes real maps depend on scale. The bl
 patches of sky as exchangeable and independent, rest on a dozen effective patches or fewer, are too
 small if the index varies coherently over several patches, and have to be read against simulations
 with the covariances of the fit. The $\Lambda$CDM prior describes multipoles up to 47. The mask
-follows a published description and is not a published file; the Spur region rests on a published
-index map. We did not use the Planck LFI bands: at this precision the official 30 GHz polarization
+follows the first step of a published description and is not the published file, and it was varied
+only in its threshold; the regions were not varied, and the Spur region rests on a published index
+map. We made no test of the released noise covariances that is free of a sky model. We did not use the Planck LFI bands: at this precision the official 30 GHz polarization
 maps do not fit one power law with WMAP K band in our hands, which is the subject of other work.
 
 \paragraph{Reproducibility.} Every number in this paper comes from a script in the repository and an

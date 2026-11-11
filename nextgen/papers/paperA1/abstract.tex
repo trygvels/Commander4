@@ -3,43 +3,33 @@
 In pixel-based Bayesian component separation a few spectral indices share the data with a very large
 number of per-pixel amplitudes. We study what three common ways of removing the amplitudes do to
 the index. (1) A Metropolis move that proposes an index, redraws the amplitudes and accepts on the
-$\chi^2$ of the new pair is, on its own, a pseudo-marginal kernel for the profile posterior; inside a
-Gibbs sweep that also redraws the amplitudes it becomes Monte Carlo within Metropolis and, for small
-steps, converges to the profile posterior raised to the power $1/T$, with $T = \tfrac12 + 1/(4c_k)
-\simeq \sqrt{\pi k/8} + \tfrac12$ for $k$ amplitudes. The index error from such a chain is too wide by
-$0.79\,k^{1/4}$. We derive the law and its form for several moves per amplitude draw and for inexact
-stored amplitudes, and confirm it against an exact-kernel calculation and simulated chains within
-their Monte Carlo errors of 0.4 percent. (2) Moving the frequency at which a flat amplitude prior is
-stated multiplies the index prior by an exponential with rate $n\ln(\nu_{\rm ref}'/\nu_{\rm ref})$,
-$n$ the number of amplitudes. For one component the index is shifted by
+$\chi^2$ of the new pair, used inside a Gibbs sweep, converges for small steps to the profile
+posterior raised to the power $1/T$, with $T = \tfrac12 + 1/(4c_k) \simeq \sqrt{\pi k/8} + \tfrac12$
+for $k$ amplitudes: the index error from such a chain is too wide by $0.79\,k^{1/4}$. (2) Moving the
+frequency at which a flat amplitude prior is stated multiplies the index prior by an exponential
+with rate $n\ln(\nu_{\rm ref}'/\nu_{\rm ref})$ for $n$ amplitudes. The index is shifted by
 $\ln(\nu_{\rm ref}/\nu_{\rm piv})$ times the index variance carried by one amplitude, a shift that
-does not average down over pixels, changes sign across a pivot frequency set by the bands and by the
-prior on the CMB, and, when the CMB amplitude is constrained, has opposite signs for references of 23
-and 30 GHz with the WMAP and Planck LFI bands. (3) The profile likelihood has an exactly unbiased score, but its curvature is too sharp
-by $\sqrt{1+\Tm/\J}$, where $\Tm/\J$ is the inverse mean squared signal-to-noise ratio of the amplitudes;
-the natural plug-in sandwich correction is biased the wrong way, and a debiased form gives nominal
-coverage over four decades of $\Tm/\J$. For one component and a uniform noise pattern a zero-mean
-amplitude prior with a free scale is the same estimator; otherwise it is biased, by up to 0.6 standard
-deviations in controlled tests and by one standard deviation in simulations of the configuration below.
-We then apply the estimators side by side to the WMAP nine-year K to V polarization maps with their
-dense noise covariances, a $\Lambda$CDM prior on the CMB, four regions defined by geometry, and the
-brightest emission and Tau A masked. On the same maps, regions and noise model the polarized
-synchrotron index at $|b| > 30^\circ$ is \N{prof2.HL} with the profile likelihood, \N{f23two.HL} with
-a flat amplitude prior stated at 23 GHz and \N{f30two.HL} with the same prior stated at 30 GHz. The
-change of convention moves the index by \N{d3023two.range} in the four regions, \N{d3023sd.range}
-statistical standard deviations, and the first-order form of the identity predicts every move, too
-high by \N{predH.over.range} percent. With a free CMB amplitude the flat-prior marginal has no
-optimum at high latitude in either convention: the index runs to the edge of the allowed range,
-$-1.6$, where the profile likelihood gives \N{flat.prof2.HL}. The zero-mean prior lands \N{zmsd.abs.HL} standard deviations from the profile
-optimum at high latitude. A white prior on the CMB in place of the $\Lambda$CDM covariance, with nearly
-the same total variance, makes the error bar too small by \N{mm.percent.range} percent, by an exact
-first-order calculation that we give. With the mask no region is misfitted, errors from the scatter
-of the score over patches of sky agree with the model's, and the index does not depend on the angular
-scales or the band subset that inform it beyond the noise; it moves by up to \N{flat.move.abs.max2}
-with the prior on the CMB and by 0.05 if the measured bandpasses are ignored. The $\chi^2$ is
-\N{chi.nsig} to \N{flat.chi.nsig} standard deviations low, which as a statement about the released
-covariances is noise overstated by \N{chi.noisepercent} to \N{flat.chi.noisepercent} percent. An
-earlier version of this analysis, on regions reconstructed from a published index map and without a
-mask, had regions that did not fit, an index that depended on angular scale, and one region whose
-index a single source, Tau A, moved by \N{tauA.absmove.Plane}, six of its statistical errors.
+does not average down over pixels and changes sign across a pivot frequency set by the bands and by
+the prior on the CMB. (3) The profile likelihood has an unbiased score and a curvature that is too
+sharp by $\sqrt{1+\Tm/\J}$, with $\Tm/\J$ the inverse mean squared signal-to-noise ratio of the
+amplitudes; a debiased sandwich error gives nominal coverage over four decades of $\Tm/\J$. A
+zero-mean amplitude prior with a free scale is the same estimator for one component with uniform
+noise, and is biased otherwise.
+We apply the estimators to the WMAP nine-year K to V polarization maps with their dense noise
+covariances, on four regions defined by geometry with the brightest emission and Tau A masked. On
+identical maps the index of a single power law at $|b| > 30^\circ$ outside the North Polar Spur is
+\N{prof2.HL} with the profile likelihood, \N{f23two.HL} with a flat amplitude prior stated at 23 GHz
+and \N{f30two.HL} with the same prior stated at 30 GHz; the change of convention moves the four
+regions by \N{d3023two.range}, which is \N{d3023sd.range} statistical standard deviations. With a
+free CMB amplitude the flat-prior marginal has no optimum in the allowed range at high latitude:
+it is pulled toward the index at which the synchrotron and CMB spectra are degenerate. A white prior
+on the CMB in place of the $\Lambda$CDM covariance quotes a smaller error and, to first order, has a
+larger one. The fit passes the tests that use less of the same data (large angular scales only, K and
+Ka only, the scatter of the score between 48 patches of sky) within about two of the standard
+deviations expected for them. It fails in specific ways: along the CMB spectrum the Galactic plane
+has \N{chi.dir.Plane.percent} percent more $\chi^2$ than expected, \pend{H16}; the zero-mean prior
+and the profile likelihood differ by \N{zmsd.abs.HL} standard deviations at high latitude,
+\pend{H9}; and the total $\chi^2$ is \N{chi.nsig} to \N{flat.chi.nsig} standard deviations below its
+expectation. We therefore give the indices as the answer of one model on one set of regions, and not
+as a measurement.
 \end{abstract}

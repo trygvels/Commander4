@@ -1,0 +1,1 @@
+# drew 6 realizations at nside 16 into /Users/trygvels/data/c4_tools/sim_n16_named; low-pass cut 20 (874 of 4600 modes, |Y_k^+ Y_k - 1| 3.8e-14)
