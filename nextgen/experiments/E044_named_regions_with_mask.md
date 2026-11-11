@@ -119,6 +119,19 @@ and seen; nothing at nside 16.
   cause is looked for; below, the pooled value of 360 realizations is reported with its error. The other three
   regions are read the same way and none is expected to move.
 
+- **H11, the flat-prior marginal with a free CMB amplitude at High Latitude (added 2026-11-11 10:56, after R5
+  was read, before any scan).** In R5 the optimizer ends at the upper bound (-1.6) for High Latitude in both
+  conventions, and the curvature of the marginal at the profile optimum is negative there. A scan along the
+  High Latitude index (`e044_flat_scan.py`, step 0.1 from -3.6 to -1.6) tests whether that is the shape of the
+  function or an artefact of a coupled optimizer started where the curvature is negative. Expected with the
+  flat CMB prior: no interior maximum above the profile optimum; ln L_flat rises monotonically from -3.04 to
+  -1.6 for 23 GHz and for 30 GHz, by more than 10 (in units of ln L) for 30 GHz, in both slices (others at
+  the profile optimum; others at the flat-prior optimum). Expected with the LCDM prior: an interior maximum
+  within 0.05 of the fitted flat-prior optima (-3.174 at 23 GHz, -2.696 at 30 GHz) in the slice with the
+  others at the profile optimum, shifted by the coupling. The direct evaluation at 30 GHz equals the 23 GHz
+  value plus sum_r n_r beta_r ln(30/23) to 1e-6 relative. If the flat-CMB scan has an interior maximum, the
+  statement "no interior optimum" is withdrawn and the bound hit is reported as an optimizer result only.
+
 ## Command
 
 ```bash
@@ -293,6 +306,48 @@ regions, mask and prior of the fit): chi2_min / dof = 1.0019 +- 0.0027, scatter 
 - Not checked: whether the deficit is in particular modes of the covariances (the transmission-imbalance
   modes, the large-scale modes with 65 to 164 times the median variance found in E038). That is a question for
   Paper B.
+
+### R5, a flat prior on the CMB (read 2026-11-11 10:53)
+
+`E044/flat.txt` (one free CMB amplitude per element; profile and flat estimators; canary, no OVERFLOW line;
+converged). chi2_min 11101.4 for 11612 degrees of freedom: ratio 0.956, **3.35 standard deviations low** (here
+chi2_min has no prior penalty and exactly two degrees of freedom per element). Per element and band 0.385, 0.408,
+0.372, 0.385 against 0.4: -2.0, +0.3, -2.9 and -1.1 sampling errors.
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| profile index, flat CMB prior | -3.0406 | -3.1219 | -3.0167 | -3.0384 |
+| sandwich error | 0.0618 | 0.0599 | 0.0444 | 0.0353 |
+| the same over the LCDM fit's error | 2.12 | 2.18 | 2.29 | 2.36 |
+| flat minus LCDM optimum | +0.1063 | +0.0174 | +0.0744 | +0.0006 |
+| in units of sqrt(sd_flat^2 - sd_lcdm^2) | +1.95 | +0.33 | +1.86 | +0.02 |
+| T / J_c | 0.083 | 0.008 | 0.027 | 0.009 |
+| n sd^2 (index variance carried by one amplitude) | 11.4 | 0.96 | 3.35 | 1.08 |
+| flat amplitude priors at 23 GHz | -1.600 (bound) | -2.778 | -2.414 | -2.809 |
+| flat amplitude priors at 30 GHz | -1.600 (bound) | -2.577 | -1.737 | -2.519 |
+| curvature of the marginal at the profile optimum (diagonal) | -366 | +340 | +646 | +920 |
+| J (diagonal) | 316 | 288 | 549 | 832 |
+
+- **H5 holds for the flat prior by its letter**: errors 2.1 to 2.4 times larger (written: 2 to 2.5); the optimum
+  within two nested sd in every region (written: within two). But two regions are at +1.95 and +1.86, the same
+  two that were at -1.74 and -1.87 for the white prior, with opposite sign. Read together: the more tightly the
+  CMB amplitude is held, the steeper the index at High and Intermediate latitude (-3.173, -3.147, -3.041 at
+  High Latitude for white, LCDM, flat; -3.104, -3.091, -3.017 at Intermediate), by an amount at the edge of
+  what the calculation allows in each step. The three fits share the data, so these are not three tests. I
+  do not have a cause and the paper says what was measured.
+- **Not expected in this form: with a free CMB amplitude and flat priors on all amplitudes the High Latitude
+  optimum is at the upper bound of the allowed range (-1.6) in both conventions.** I had written "the move at
+  high latitude" as a number in the abstract template; there is no interior optimum to move. The curvature of
+  the flat-prior marginal at the profile optimum is negative for High Latitude (the volume term's curvature is
+  negative and larger than J: -366 against J = 316; smallest eigenvalue of the 4 by 4 matrix -376). Sect. 4 of
+  the paper says this can happen with further free amplitudes; E040 stage 3 saw it on the old regions for a
+  band set without K band. Here it is with K band, on |b| > 30 degrees, masked. The index variance carried by
+  one amplitude is 11 at High Latitude, so any offset of the reference from the pivot by a tenth in ln nu is a
+  shift of order one. The other three optima are interior but conditional on a neighbour at the bound, and are
+  0.2 to 1.3 flatter than the profile optimum. A scan along the High Latitude index is pre-registered as H11.
+- The chi-square is low again, more so than with the LCDM prior (R4): 3.35 sd with two residual degrees of
+  freedom per element. A fluctuation of that size is one in 1200. This strengthens the second reading of R4:
+  the released covariances overstate the noise of the residual of this fit by about 2 percent in rms.
 
 ## Negative control
 

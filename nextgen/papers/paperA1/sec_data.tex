@@ -236,7 +236,10 @@ and order across the regions, about three times larger in index (\exref{E044}).
 \begin{table}
 \centering
 \caption{The fit of Table~\ref{tab:same} under three priors on the CMB amplitudes: the
-$\Lambda$CDM covariance, a white prior of 0.2 $\muK$ per element, and a flat prior (\exref{E044}).}
+$\Lambda$CDM covariance, a white prior of 0.2 $\muK$ per element, and a flat prior (\exref{E044}). The
+index of each region with the profile likelihood, and with flat priors on the synchrotron and dust
+amplitudes for the two reference frequencies. $\dagger$: the optimum is at the upper edge of the
+allowed range, $-4.6$ to $-1.6$; the other three flat-prior optima of that row are conditional on it.}
 \label{tab:cmbprior}
 \small
 \IfFileExists{gen_tab_cmbprior.tex}{\input{gen_tab_cmbprior}}{\pend{table pending}}
@@ -278,13 +281,29 @@ With a flat prior on the CMB the profile score is unbiased whatever the CMB is, 
 \N{flat.sdratio.range} times larger; the indices are then \N{flat.prof.list}, which is
 \N{flat.movenest.list} from the $\Lambda$CDM version in units of
 $(\sigma_{\rm flat}^2 - \sigma_{\Lambda}^2)^{1/2}$, the standard deviation of the difference between a
-fit and a more efficient fit of the same data. A free CMB amplitude also moves the pivot of
-Sect.~\ref{sec:flat}, and with it the size of the convention effect: with a flat CMB prior and flat
-priors on the other amplitudes the High Latitude optimum of these four WMAP bands is at
-\N{flat.f23.HL} when the synchrotron amplitude is defined at 23 GHz and at \N{flat.f30.HL} when it is
-defined at 30 GHz, where the profile likelihood of the same fit says \N{flat.prof.HL} $\pm$
-\N{flat.sd.HL}. The pivot is then at \N{flat.pivot.range} GHz to first order, below the lowest band,
-and both conventions pull the same way.
+fit and a more efficient fit of the same data. Two regions are again near two, the same two as for
+the white prior and with the other sign: at High and at Intermediate latitude the index is steeper
+the more tightly the CMB amplitude is held (\N{white.prof.HL}, \N{prof.HL} and \N{flat.prof.HL} at High
+Latitude for the white, the $\Lambda$CDM and the flat prior; \N{white.prof.Int}, \N{prof.Int} and
+\N{flat.prof.Int} at Intermediate latitude). Each step is at the edge of what its calculation allows,
+the three fits share their data, and we have no cause to offer; we report it. The $\chi^2$ of the
+flat-prior fit, which has exactly two degrees of freedom per element and no prior penalty, is
+\N{flat.chi.ratio} of its expectation, \N{flat.chi.nsig} standard deviations low: the deficit of the
+central fit is not made by the CMB prior, and as a fluctuation it is now one in a thousand.
+
+A free CMB amplitude does more to the flat-prior marginal than move its pivot
+(Sect.~\ref{sec:flat}). With flat priors on all three amplitudes the High Latitude index has no
+optimum inside the allowed range: for a reference of 23 GHz and of 30 GHz alike the fit ends at its
+upper edge, $-1.6$, where the profile likelihood of the same model gives \N{flat.prof.HL} $\pm$
+\N{flat.sd.HL} (Table~\ref{tab:cmbprior}). At the profile optimum the curvature of the flat-prior
+marginal is negative in that direction (\N{flat.Hdiag.HL} against an information $\J$ of
+\N{flat.Jdiag.HL}): the volume term outweighs the data, which is the case that Sect.~\ref{sec:flat}
+describes for further free amplitudes. The index variance carried by one amplitude, $n\sigma_\beta^2$,
+is \N{flat.nsig2.HL} in this region against \N{nsig2.HL} with the $\Lambda$CDM prior, so that a
+reference a tenth in $\ln\nu$ from the pivot is already a shift of order one. \pend{Scan along the
+High Latitude index (H11).} The other three flat-prior optima are interior and are
+\N{flat.f23m.abs.range} flatter than the profile optimum for 23 GHz, but they are conditional on a
+neighbour at the edge. No first-order prediction applies to this row.
 
 \paragraph{Errors that do not assume the model.} The sandwich error is the error of the estimator if
 each region has one index and the noise model is right. An error that does not lean on that comes

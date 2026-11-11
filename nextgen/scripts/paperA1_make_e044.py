@@ -90,17 +90,26 @@ def tab_same(z):
     return t + FOOT
 
 
+UPPER = -1.6                                                 # upper bound of the index in lowres.fit
+
+
+def at_bound(x):
+    return abs(float(x) - UPPER) < 1e-6
+
+
 def tab_cmbprior(R):
+    """Absolute indices under three CMB priors; an optimum at the upper bound of the allowed range is marked."""
+    mark = lambda x: f"${x:.3f}$" + (r"$^\dagger$" if at_bound(x) else "")
     t = HEAD + "\\multicolumn{5}{l}{\\emph{profile likelihood, with the sandwich error}} \\\\\n"
     for k, z in R.items():
         t += LAB[k] + " & " + " & ".join(f"${b:.3f} \\pm {e:.3f}$" for b, e in zip(z["beta"], z["sd_sand"])) + " \\\\\n"
-    t += "\\multicolumn{5}{l}{\\emph{flat amplitude prior at 23 GHz, minus profile}} \\\\\n"
+    t += "\\multicolumn{5}{l}{\\emph{flat amplitude priors, synchrotron amplitude defined at 23 GHz}} \\\\\n"
     for k, z in R.items():
-        t += row(LAB[k], z["flat23"] - z["beta"], sgn)
-    t += "\\multicolumn{5}{l}{\\emph{flat amplitude prior at 30 GHz minus at 23 GHz: measured (first order, curvature of the marginal)}} \\\\\n"
+        t += row(LAB[k], z["flat23"], mark)
+    t += "\\multicolumn{5}{l}{\\emph{flat amplitude priors, synchrotron amplitude defined at 30 GHz}} \\\\\n"
     for k, z in R.items():
-        t += LAB[k] + " & " + " & ".join(f"${a:+.3f}$ (${p:+.3f}$)" for a, p in zip(z["flat30"] - z["flat23"], z["pred_marg"])) + " \\\\\n"
-    t += "\\multicolumn{5}{l}{\\emph{$\\chi^2$ per element and band (expectation 0.6, 0.6 and 0.4)}} \\\\\n"
+        t += row(LAB[k], z["flat30"], mark)
+    t += "\\multicolumn{5}{l}{\\emph{$\\chi^2$ per element and band (expectation 0.60, 0.60 and 0.40)}} \\\\\n"
     for k, z in R.items():
         t += row(LAB[k], z["chi2_region"], lambda x: f"{x:.3f}")
     return t + FOOT
@@ -135,6 +144,7 @@ def main():
     put("tj.max", float(tj.max()))
     put4("tj", tj)
     put4("snr2", 1.0 / tj, "{:.0f}")
+    put4("nsig2", z["nper"] * s0 ** 2, "{:.1f}")
     if "flat23" in z.files:
         d23, d30, dd = z["flat23"] - b0, z["flat30"] - b0, z["flat30"] - z["flat23"]
         put4("f23", z["flat23"]); put4("f30", z["flat30"]); put4("f23m", d23, "{:+.3f}"); put4("f30m", d30, "{:+.3f}"); put4("d3023", dd, "{:+.3f}")
@@ -165,21 +175,30 @@ def main():
         if zz is not None and "flat23" in zz.files:
             R[k] = zz
             put4(f"{k}.prof", zz["beta"]); put4(f"{k}.sd", zz["sd_sand"]); put4(f"{k}.move", zz["beta"] - b0, "{:+.3f}")
+            put4(f"{k}.prof2", zz["beta"], "{:.2f}"); put4(f"{k}.sd2", zz["sd_sand"], "{:.2f}")
             put4(f"{k}.movesd", (zz["beta"] - b0) / s0, "{:+.1f}"); put4(f"{k}.sdratio", zz["sd_sand"] / s0, "{:.2f}")
             put4(f"{k}.d3023", zz["flat30"] - zz["flat23"], "{:+.3f}"); put4(f"{k}.f23m", zz["flat23"] - zz["beta"], "{:+.3f}")
             put4(f"{k}.d3023two", zz["flat30"] - zz["flat23"], "{:.2f}")
             put4(f"{k}.f30", zz["flat30"]); put4(f"{k}.f23", zz["flat23"]); put4(f"{k}.ratioH", (zz["flat30"] - zz["flat23"]) / zz["pred_marg"], "{:.2f}")
             put4(f"{k}.ratioJ", (zz["flat30"] - zz["flat23"]) / zz["pred_jc"], "{:.2f}"); put4(f"{k}.chi", zz["chi2_region"])
             nest = np.sqrt(np.abs(zz["sd_sand"] ** 2 - s0 ** 2))
-            put4(f"{k}.movenest", (zz["beta"] - b0) / nest, "{:+.1f}")
+            put4(f"{k}.movenest", (zz["beta"] - b0) / nest, "{:+.2f}")
             hn = zz["pred_marg"] / np.log(30 / 23)
-            put4(f"{k}.pivot", 23.0 / np.exp((zz["flat23"] - zz["beta"]) / hn), "{:.1f}")
+            with np.errstate(over="ignore", invalid="ignore"):
+                put4(f"{k}.pivot", 23.0 / np.exp((zz["flat23"] - zz["beta"]) / hn), "{:.1f}")
+            put4(f"{k}.nsig2", zz["nper"] * zz["sd_sand"] ** 2, "{:.1f}")
+            put4(f"{k}.f23m.abs", np.abs(zz["flat23"] - zz["beta"]), "{:.2f}"); put4(f"{k}.f30m.abs", np.abs(zz["flat30"] - zz["beta"]), "{:.2f}")
+            put(f"{k}.nbound23", int(sum(at_bound(x) for x in zz["flat23"])), "{:d}"); put(f"{k}.nbound30", int(sum(at_bound(x) for x in zz["flat30"])), "{:d}")
+            put(f"{k}.Hmin", float(np.linalg.eigvalsh(zz["Hmarg"]).min()), "{:.0f}"); put4(f"{k}.Hdiag", np.diag(zz["Hmarg"]), "{:.0f}"); put4(f"{k}.Jdiag", np.diag(zz["J"]), "{:.0f}")
+            c2, df = float(zz["chi2"]), int(zz["dof"])
+            put(f"{k}.chi.total", c2, "{:.0f}"); put(f"{k}.chi.dof", df, "{:d}"); put(f"{k}.chi.ratio", c2 / df); put(f"{k}.chi.nsig", abs(c2 - df) / np.sqrt(2.0 * df), "{:.1f}")
+            put(f"{k}.chi.noisepercent", 100 * (1 - np.sqrt(c2 / df)), "{:.1f}")
         if zz is not None and "mm_bias" in zz.files:
             sdt = np.sqrt(np.diag(zz["mm_cov_true"]))
             put4("mm.bias", zz["mm_bias"], "{:+.4f}"); put4("mm.biassd", zz["mm_bias"] / zz["sd_sand"], "{:+.2f}"); put4("mm.sdtrue", sdt)
             put4("mm.ratio", sdt / zz["sd_sand"], "{:.2f}"); put4("mm.percent", 100 * (sdt / zz["sd_sand"] - 1), "{:.0f}")
             pair = np.sqrt(np.clip(sdt ** 2 - s0 ** 2, 1e-30, None))
-            put4("mm.pairsd", pair); put4("mm.movepair", (zz["beta"] - b0 - zz["mm_bias"]) / pair, "{:+.1f}")
+            put4("mm.pairsd", pair); put4("mm.movepair", (zz["beta"] - b0 - zz["mm_bias"]) / pair, "{:+.2f}")
             put4("mm.overlcdm.percent", 100 * (sdt / s0 - 1), "{:.0f}"); put4("mm.quotedbelow.percent", 100 * (1 - zz["sd_sand"] / s0), "{:.0f}")
             put("mm.corr.HLInt", float(zz["mm_cov_true"][0, 2] / (sdt[0] * sdt[2])), "{:.1f}")
     if len(R) == 3:
