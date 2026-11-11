@@ -82,6 +82,7 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F58 | A for the calculation and the scan, B for its truth model | Pre-registered (H5, H11); first order in the mismatch; the LCDM covariance of the paper taken as the truth |
 | F59 | B | Pre-registered (H7, H8); one data set; 24 correlated comparisons, largest 2.4 expected sd |
 | F60 | B for the deficit, C for its reading | Not pre-registered (found on reading R1 again); a simulated null; the literature has no statement either way |
+| F61 | A for the test, B for the cause | The look was after the fact (third referee's split, localization from saved residuals); the test was pre-registered (H16) and held |
 
 ## 1. Sampler correctness
 
@@ -1456,4 +1457,18 @@ calibrated: sd of z 1.02, 1.06, 0.97, 0.98 (+- 0.04), mean of z +0.05, -0.11, 0.
   -1.05, -0.54, -0.44, -0.22). Pre-registered as H9. The difference on the maps is the bias of the zero-mean
   prior with a free scale per region at this configuration; it grows fourfold from nside 8 to nside 16. F56
   moves from grade B to A for the statement that the estimator is biased here.
+
+**F61. In the Plane the fit fails along the CMB spectrum, and the failure sits on the brightest thermal
+sources** (E044 R9, R11; H14, H16; added 14:22). Splitting the difference of the two nested fits (LCDM prior
+minus flat CMB prior) by region gives 0.970, 0.927, 1.012 and 1.153 +- 0.048 of expectation: the Plane has
+993 for 862, 3.0 sd with the sampling error of the split simulated (40 realizations at nside 8). From the saved
+residuals with diagonal weights, twelve of the Plane's 435 pixels carry about 142 of an excess of 151, and the
+largest hold W51, Cygnus X and W43 (ranks 24, 6 and 38, 3 of 3072 in the DR1 free-free model). Test, written
+before the fits: with the brightest 2 percent of pixels in free-free masked as well (27 more, all in the Plane)
+the Plane's ratio falls to 1.062 +- 0.050 (predicted 0.92 to 1.08), the other regions do not move, and the
+Plane index goes from -3.039 to -3.060 (3.2 times what a random removal of that much data would give; I had
+predicted less than 0.02). Reading: leakage of intensity into polarization at the brightest thermal sources,
+or polarized emission of those sources with a flatter spectrum; not separated. Consequences: a mask set on
+polarized amplitude is not enough for the plane; the block errors did not see this (ratio 1.28, inside the
+null); the chi-square by direction did. Grade A for the test, B for the cause.
 

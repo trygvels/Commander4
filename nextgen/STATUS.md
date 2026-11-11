@@ -2,6 +2,37 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-11 (Mac mini, 14:22): third referee read of Paper A1: no fatal objection. The stopping criterion of D030 is met in its letter; twelve major items are being answered, and two of them turned into results (the zero-mean prior's bias explains its 3.6 sd; the Plane's misfit sits on the brightest thermal sources)
+
+**Learned**
+- **Third independent referee** (`reviews/2026-11-11_referee_report_paperA1_draft4.md`): "Fatal objection: no."
+  The headline numbers reproduce to every digit and the derivations it redid hold. Twelve major items, the
+  hardest three: my explanation of why the flat-prior marginal runs away was false (the curvature I quoted was
+  the one at the bound); "no region is misfitted" hid a 3 sd excess in the Plane along the CMB spectrum; and
+  "the scale dependence went with the mask" was shown for the Plane only. Response:
+  `reviews/2026-11-11_response_to_referee_draft4.md`.
+- **Why the flat-prior marginal has no optimum with a free CMB amplitude** (corrected): over K to V a power law
+  of index -0.08 has the spectrum of the CMB; the volume term rises toward that degeneracy with a slope of +399
+  per unit index for the 2974 amplitudes at high latitude (a pivot of 20 GHz). One element reproduces it.
+- **The zero-mean prior (H9, pre-registered)**: at nside 16 its simulated bias is -4.1, -2.2, -1.8, -0.7 sd, as
+  large as the difference on the maps (-3.6, -1.6, -1.5, -0.2). The gap is the estimator, not the sky model.
+- **The Plane (H16, pre-registered; F61)**: the excess along the CMB spectrum sits on W51, Cygnus X, W43 and
+  their like. With the brightest 2 percent in free-free masked as well it falls from 1.153 to 1.062 +- 0.050
+  and the Plane index moves from -3.039 to -3.060. A mask on polarized amplitude is not enough in the plane.
+- The sampling error of the chi-square split is confirmed by simulation (H14); the low-pass yardstick is right
+  at nside 16 (16 values, rms 1.00).
+
+**Running** (one heavy job at a time, about five hours in all)
+- The present regions without the mask, all scales and l <= 20 (H12); mask thresholds of 3 and 10 percent
+  (H13); the chi-square null at nside 16; forty realizations at nside 16 for the block-error null (H15).
+
+**Next**
+- Fill the last red items of draft 5; a fourth, narrower referee read of the revisions; then the draft is yours.
+
+**Needs Trygve**
+- Unchanged: the BeyondPlanck XV region and mask files; reporting the Accelerate fault upstream; wording about
+  the legacy move and Commander3; whether to chase the chi-square deficit with the single-year WMAP files.
+
 ## 2026-11-11 (Mac mini, 12:39): E044 complete at nside 16. With the mask the one-index model passes every test, the scale dependence is gone, and three results are new: no flat-prior optimum at all with a free CMB amplitude, a white CMB prior that looks better and is worse, and a chi-square that is 2.5 to 3.4 sd low. Draft 4 of Paper A1 is with a third referee
 
 **Learned** (E044 R3 to R8; F58 to F60; D036)
