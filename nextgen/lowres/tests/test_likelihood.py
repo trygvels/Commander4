@@ -1,8 +1,12 @@
 """Exact-target checks of the dense region likelihood (L0/L1). Run: pytest -q nextgen/lowres/tests"""
 import os
+import shutil
+import subprocess
 import sys
+import warnings
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from lowres.fit import fit_profile, sandwich, sandwich_plugin  # noqa: E402
@@ -177,3 +181,45 @@ def test_reference_frequency_shift_of_flat_marginal():
     # ln det A(ref') = ln det A(ref) - 2 sum_p beta_p ln(ref'/ref)  ->  (1/2) ln det shifts by -sum beta ln(30/23)
     assert np.isclose(L30.marginal(beta) - L23.marginal(beta), -np.sum(nper * beta) * np.log(30.0 / 23.0), rtol=1e-9)
     assert np.isclose(L30.profile(beta), L23.profile(beta), rtol=1e-11)
+
+
+CANARY_SRC = os.path.join(os.path.dirname(__file__), "..", "..", "tools", "malloc_canary.c")
+CANARY_CODE = """
+import os, sys
+sys.path.insert(0, {tests!r}); sys.path.insert(0, os.path.join({tests!r}, "..", ".."))
+import numpy as np
+from test_likelihood import make
+from lowres.likelihood import RegionLikelihood
+build, region, _ = make(n=1536, nreg=4, dense=(0,), seed=5)
+L = RegionLikelihood(build(), region, cmb_prior_sd=0.3)
+beta = np.array([-3.0, -3.2, -2.9, -3.15])
+f, g = L.profile(beta, grad=True)
+m, gm = L.marginal(beta, grad=True)
+J, T, sol = L.information(beta)
+print("ok", repr(float(f)), repr(float(m)), repr(float(np.trace(J))))
+"""
+
+
+def test_solve_does_not_write_past_lapack_buffers(tmp_path):
+    """E043. On macOS 27.0 Accelerate's dpotrf with uplo = "U" overflows an internal buffer for orders of about
+    1500 to 6000. The normal matrix of an nside-8 fit has order 4608. Under the malloc canary the default
+    Cholesky path of the likelihood must not write past any large heap block, and it must give the same
+    numbers as the old path (which is run too, and reported if it overflows on this system)."""
+    if sys.platform != "darwin" or shutil.which("cc") is None:
+        pytest.skip("the malloc canary is built with cc and injected with DYLD_INSERT_LIBRARIES (macOS only)")
+    lib = str(tmp_path / "libcanary.dylib")
+    assert subprocess.run(["cc", "-O1", "-dynamiclib", "-o", lib, CANARY_SRC], capture_output=True).returncode == 0
+    code = CANARY_CODE.format(tests=os.path.dirname(os.path.abspath(__file__)))
+    out = {}
+    for unsafe in ("0", "1"):
+        env = dict(os.environ, DYLD_INSERT_LIBRARIES=lib, LOWRES_CHOLESKY_UPLO_U=unsafe)
+        out[unsafe] = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True, timeout=900)
+    safe, old = out["0"], out["1"]
+    assert safe.returncode == 0 and safe.stdout.startswith("ok"), safe.stderr[-2000:]
+    assert "OVERFLOW" not in safe.stderr, safe.stderr[-2000:]
+    if "OVERFLOW" in old.stderr:
+        warnings.warn("LAPACK dpotrf with uplo = 'U' writes past a heap block on this system (E043): "
+                      + [ln for ln in old.stderr.splitlines() if "OVERFLOW" in ln][0][:160])
+    if old.returncode == 0 and old.stdout.startswith("ok"):
+        a, b = [float(x) for x in safe.stdout.split()[1:]], [float(x) for x in old.stdout.split()[1:]]
+        assert np.allclose(a, b, rtol=1e-10), (a, b)

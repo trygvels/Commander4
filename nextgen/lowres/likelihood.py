@@ -37,8 +37,17 @@ kappa^2 times the prior variance, the expected score is (kappa^2 - 1) t with
 and the optimum is biased by -(kappa^2 - 1) J^-1 t to first order (2026-11-10 stats review, checked by
 Monte Carlo). `information` returns t in `sol["t_cmb"]` so that the sensitivity can be quoted.
 """
+import os
+
 import numpy as np
 import scipy.linalg as sl
+
+# Which triangle the Cholesky factor of the (C-ordered) normal matrix uses. On macOS 27.0 (build 26A5388g)
+# Accelerate's dpotrf with uplo = "U" writes up to 768 kB past an internal buffer for orders of about 1500 to
+# 6000 (E043). scipy maps a C-ordered array with lower=True to uplo = "U", so the factor is taken with
+# lower=False (uplo = "L"), which does not overflow, costs the same and gives the same numbers. The
+# environment variable restores the old path, for reproducing the overflow under the canary only.
+CHO_LOWER = os.environ.get("LOWRES_CHOLESKY_UPLO_U", "0") == "1"
 
 
 class BandData:
@@ -128,7 +137,7 @@ class RegionLikelihood:
 
     def solve(self, beta, log_tau=None, need_inverse=False):
         A, rhs, s, ds = self.assemble(beta, log_tau)
-        c = sl.cho_factor(A, lower=True, overwrite_a=True, check_finite=False)
+        c = sl.cho_factor(A, lower=CHO_LOWER, overwrite_a=True, check_finite=False)
         x = sl.cho_solve(c, rhs, check_finite=False)
         logdet = 2.0 * float(np.sum(np.log(np.diag(c[0]))))
         chi2 = self.dNd - float(rhs @ x)

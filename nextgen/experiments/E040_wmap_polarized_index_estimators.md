@@ -362,6 +362,32 @@ Reduced chi-square 1.18; by region 0.58, 0.59, 2.13, 1.03. T / J_c 0.07 at high 
   N(-3.3, 0.1^2). Whether it is what happened in their chains needs their chains: the maps, the
   pixelization, the CMB treatment and the mixing differ.
 
+### Stage 5, pre-registered 2026-11-11 03:20: errors that do not assume the model fits (referee item 8)
+
+The sandwich error assumes that the model is right inside each region: one index, the stated noise. The
+per-region chi-square says it is close to right at high latitude and in the Spur (0.97 and 0.99 of the
+nominal three degrees of freedom per element), less so in the Plane (1.29) and not in the Galactic
+Center (3.0). `nextgen/scripts/e040d_block_errors.py` computes a block-robust error for the baseline fit:
+the per-element score terms g_p = -sum_b (N_b^-1 r_b)_p (ds_b a_s)_p at the optimum are summed over the
+48 nside-2 pixels (Q and U of a pixel in the same block), K_block = sum_B G_B G_B^T, and the covariance is
+J_c^-1 K_block J_c^-1. Blocks are treated as independent and no small-sample factor n_B / (n_B - 1) is
+applied (under 5 percent on the error for ten blocks or more).
+
+Expectations, written before the script has run on the maps:
+
+- D1. On simulations where the model is true the ratio of the block error to the sandwich error is 1,
+  with scatter about 1 / sqrt(2 (n_B - 1)) for n_B blocks. Checked first, on the E039 nside-8 simulations
+  (`e040e_block_errors_sim.py`); if the ratio is not 1 there the estimator is wrong and is not used.
+- D2. On the maps I expect the ratio to exceed 1 in every region, because the index varies inside the
+  regions: for a spread of 0.05 to 0.1 between blocks and the measured information per block, 1.2 to 2
+  at High Latitude, 1 to 2 in the Spur, 1.5 to 3 in the Plane. For the Galactic Center (three or four
+  blocks) no block error is quoted, whatever the number.
+- D3. If the ratio is above 1.5 anywhere, the central table of Paper A1 carries both errors and says
+  which statement each supports: the sandwich error is the error of the estimator under the model, the
+  block error is the error of "the index of this region" when the region is not one index.
+- This is the error of the estimate under misfit. It does not make a misfitting model right, and it is
+  not a measurement of the spread of the index.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies.

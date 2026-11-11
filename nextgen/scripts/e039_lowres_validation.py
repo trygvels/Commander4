@@ -43,6 +43,8 @@ def main():
     ap.add_argument("--full", type=int, default=0, help="realizations that also get the marginal fits")
     ap.add_argument("--seed", type=int, default=39)
     ap.add_argument("--first", type=int, default=0, help="index of the first realization (for parallel runs)")
+    ap.add_argument("--no-drift", action="store_true",
+                    help="WMAP bands without the nine-year frequency drift (the band model of the runs before 2026-11-10 22:04)")
     a = ap.parse_args()
     ns, n = a.nside, 2 * hp.nside2npix(a.nside)
     names = ["K", "Ka", "Q", "V"]
@@ -51,7 +53,7 @@ def main():
         d, ninv = load_wmap(b)
         if ns != 16:
             d, ninv = degrade(d, ninv, 16, ns)
-        raw.append((f"WMAP_{b}", wmap_band(b, WMAP_BANDPASS), d, ninv))
+        raw.append((f"WMAP_{b}", wmap_band(b, WMAP_BANDPASS, drift=not a.no_drift), d, ninv))
     d3, n3 = load_planck_qu(PR4_353, ns)
     raw.append(("Planck_353", Band.delta("Planck_353", 353.0), d3, n3))
     if a.regions == "bpxv":
@@ -73,7 +75,7 @@ def main():
     a_d = d3 * g_rj(353.0)                                   # 353 GHz data as the dust amplitude, uK_RJ
     rng_c = np.random.default_rng([a.seed, 1])
     fd = [B.mbb(DUST_BETA, DUST_T, DUST_REF) for _, B, _, _ in raw]
-    chol = [sl.cholesky(ninv, lower=True) for *_, ninv in raw]   # N^-1 = L L^T; noise = L^-T xi
+    chol = [np.linalg.cholesky(ninv) for *_, ninv in raw]   # N^-1 = L L^T; noise = L^-T xi
 
     def bands_for(dvecs, nu_ref):
         return [BandData(nm, dv, ninv, (lambda be, B=B: B.power_law(be, nu_ref)), f)

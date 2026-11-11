@@ -8,9 +8,9 @@ S=nextgen/scripts/e040_wmap_region_indices.py
 E=nextgen/experiments/E040
 P=".venv/bin/python -I"
 run() { tag=$1; shift; [ -s $E/$tag.txt ] && grep -q "^High Latitude\|^0 \|^region" $E/$tag.txt && return 0; $P $S "$@" --out $E/$tag.npz > $E/$tag.txt 2> $E/$tag.err; }
-# baseline with every estimator, as pre-registered (no window matching) and window-matched (E038 c2)
-run bpxv_n16            --regions bpxv --estimators profile flat zm
+# baseline with every estimator, window-matched (E038 c2, rule D6); the unmatched fit is an arm
 run bpxv_n16_wm         --regions bpxv --estimators profile flat zm --match-window 60
+run bpxv_n16            --regions bpxv
 # profile-only arms, window-matched unless the arm is about the window
 for W in "" "_wm"; do
   if [ -z "$W" ]; then M=""; else M="--match-window 60"; fi

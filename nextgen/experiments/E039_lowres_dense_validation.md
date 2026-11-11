@@ -186,6 +186,34 @@ correct with caveats. Objectives, gradients and the LFI noise model agree with b
 **The four-region configuration is cleared for the real maps.** The 48-region configuration is
 not, until its simulation and the plug-in addendum are read.
 
+### Addendum A1 result (plug-in errors, four regions), read 2026-11-11 02:46
+
+`E039/plugin_n8_bpxv.txt`, 40 realizations, 160 region-realizations, T / J at the truth below 0.02 in all
+four regions: sd of z 0.974 (curvature), 0.974 (plain plug-in sandwich), 0.973 (debiased sandwich);
+coverage of one sd 0.700 for all three; mean z of the debiased version +0.015 +- 0.077. **A1 holds**: at
+this signal-to-noise the three error estimates are the same and all are calibrated. The run is one of
+those exposed to the Cholesky overflow of E043 and is rerun there (V4).
+
+### Addendum B, pre-registered 2026-11-11 03:20: the estimator that reads the index from large scales only
+
+Referee item 2 on Paper A1 draft 1: the low-pass arm of E042 was run on the maps without a simulation
+test. `nextgen/scripts/e039c_lowpass_sim.py`: the E039 nside-8 simulations (same truth, noise and seeds;
+current band model), K band and 353 GHz at all scales, Ka, Q and V through their harmonic coefficients at
+multipoles 2 to 12 with their covariance (330 of 1144 modes), profile optimum and debiased sandwich error,
+100 realizations, next to the all-scales fit of the same realizations.
+
+- B1. Unbiased: mean z within 2 standard errors of zero in each region (se 0.1), pooled within 0.1.
+- B2. Calibrated: sd of z within 0.85 to 1.15 per region, coverage of one sd within 0.58 to 0.78.
+- B3. Less precise than the all-scales fit, by the information removed: I expect the error to grow by 10
+  to 40 percent (the real-map fits went from 0.012 to 0.018 at High Latitude between all scales and
+  multipole 12).
+- B4. The difference between the two estimates of one realization has zero mean and a spread consistent
+  with sqrt(sd_low^2 - sd_all^2) (the all-scales fit uses a superset of the data and is efficient).
+- If B1 or B2 fails the estimator is not used on the maps anywhere in Paper A1 or B until understood.
+- What this cannot show: that the estimator removes the pixel-scale bias of the real maps. The simulations
+  have none (signal smooth at 5 degrees, no beam mismatch). It shows only that the estimator is unbiased
+  and calibrated when the model is true.
+
 ## Negative control
 
 The flat-prior marginal (V4) is the known-biased target.
