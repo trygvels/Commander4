@@ -567,8 +567,22 @@ scatter expected there (\N{old.lp20.nestsd.list}; those regions were brighter). 
 regions and mask the changes are \N{lp20.move.list}. The change in the Plane is gone. Those in the
 Spur and at Intermediate latitude are as large as before and of the same sign, and lie inside a
 noise that is three to five times larger than it was, so for them the test says little either way.
-\pend{The present regions without the mask, from all scales and from $\ell \le 20$, to separate the
-mask from the regions (H12).}
+
+The present regions without the mask separate the two changes that were made together. Without it
+the Plane has a $\chi^2$ per element and band of \N{nomask.chi.Plane} and a block error of
+\N{nomask.cr3ownratio.Plane} sandwich errors, and its index from $\ell \le 20$ is steeper than from all
+scales by \N{nomask.lp20.move.abs.Plane}, which is \N{nomask.lp20.nest.abs.Plane} expected standard
+deviations; each as we had written before the fit. In the Plane, then, the mask is what removed the
+dependence on angular scale, together with the misfit. At Intermediate latitude it is otherwise.
+Without the mask the index from $\ell \le 20$ is steeper by \N{nomask.lp20.move.abs.Int}, at
+\N{nomask.lp20.nest.abs.Int} standard deviations; with the mask the change is as large and no longer
+significant, because a low-pass fit of a map with holes has lost information (its expected standard
+deviation is \N{lp20.nestsd.Int} against \N{nomask.lp20.nestsd.Int}). There the mask did not remove a
+dependence on scale; it removed the sensitivity to one, and a change of about $-0.04$ at large scales
+is neither confirmed nor excluded. The unmasked fit shows one more thing, which we had not
+expected: the index of the High Latitude region, which has no masked pixel, moves by
+\N{nomask.move.HL} when the mask is taken off. The indices are coupled through the dense covariances,
+and a misfitted region reaches its neighbours.
 
 \paragraph{A different model.} The other rows change an assumption. Their changes have no sampling
 error and say what the assumption is worth. \pend{The mask: thresholds of 3 and 10 percent in place

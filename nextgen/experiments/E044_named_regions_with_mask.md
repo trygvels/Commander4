@@ -648,6 +648,44 @@ chi2_min / dof: 0.9677 (LCDM prior), 0.9546 (flat prior). Along the CMB spectrum
 - The look that led here was after the fact (the split was the third referee's; the localization mine, from
   saved residuals). The test was written down before the two fits.
 
+### R12, the present regions without the mask (H12; read 2026-11-11 14:41)
+
+`E044/nomask.txt` (all scales, block errors) and `nomask_lp20.txt`. Canary, no OVERFLOW line; converged.
+chi2_min / dof without the mask: 1.0750.
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| elements, no mask | 2974 | 296 | 1722 | 1152 |
+| profile index, no mask | -3.1241 | -3.1460 | -3.0814 | -3.0459 |
+| sandwich error, no mask | 0.0285 | 0.0241 | 0.0180 | 0.0071 |
+| change against the masked fit | +0.0228 | -0.0067 | +0.0098 | -0.0068 |
+| chi-square per element and band, no mask | 0.578 | 0.589 | 0.574 | 0.924 |
+| own-score block error over sandwich, no mask | 1.89 | 1.54 | 1.57 | 6.29 |
+| index from l <= 20 minus all scales, no mask | +0.0003 | +0.0015 | -0.0370 | -0.0565 |
+| expected sd of that difference, no mask | 0.0117 | 0.0093 | 0.0114 | 0.0050 |
+| in those units, no mask | +0.02 | +0.17 | -3.23 | -11.39 |
+| the same with the mask (R6): change | +0.0036 | -0.0283 | -0.0468 | +0.0106 |
+| the same with the mask: expected sd | 0.0181 | 0.0294 | 0.0344 | 0.0315 |
+| the same with the mask: in those units | +0.20 | -0.96 | -1.36 | +0.33 |
+
+- **H12 holds for the Plane, in every clause.** Without the mask its chi-square per element and band is 0.924
+  (written: above 0.75), its index -3.046 (written: -3.06 to -2.95), its block error 6.3 sandwich errors (written:
+  above 2.5), and its index from l <= 20 is steeper than from all scales by 0.057, 11 expected sd (written: more
+  than 0.04 and more than 3). With the mask that change is +0.011 (+0.3). The mask, on the same region, is what
+  removed the Plane's scale dependence and its misfit. The sentence stands for the Plane.
+- **H12 fails for High Latitude.** I wrote that its index would move by less than 0.01, since it has no masked
+  pixel. It moves by +0.023 (0.8 of its error): through the coupling of the indices in the dense covariances, the
+  misfit of the unmasked Plane reaches a region that shares no pixel with it. Its own chi-square does not move
+  (0.578).
+- **H12 fails for Intermediate latitude in the chi-square** (0.574 where I wrote above 0.60) and shows something
+  I had not written down: without the mask its index from l <= 20 is steeper by 0.037, 3.2 expected sd. With the
+  mask the change is -0.047, as large, and 1.4 expected sd, because the masked low-pass fit has lost information
+  (expected sd 0.034 against 0.012). So for Intermediate latitude the mask did not remove a scale dependence; it
+  removed the sensitivity to one. A change of about -0.04 at large scales is there without the mask at 3 sd and
+  is neither confirmed nor excluded with it. The referee's objection to "went away with the mask" was right for
+  this region.
+- The Spur without the mask: no change with scale (+0.002, +0.2 sd).
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).

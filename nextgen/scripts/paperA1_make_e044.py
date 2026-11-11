@@ -351,6 +351,7 @@ def main():
         dn = znl["beta"] - zn["beta"]
         nn = np.sqrt(np.clip(znl["sd_sand"] ** 2 - zn["sd_sand"] ** 2, 1e-30, None))
         put4("nomask.lp20.move", dn, "{:+.3f}"); put4("nomask.lp20.nest", dn / nn, "{:+.1f}"); put4("nomask.lp20.nest.abs", np.abs(dn / nn), "{:.1f}"); put4("nomask.lp20.nestsd", nn)
+        put4("nomask.lp20.move.abs", np.abs(dn), "{:.3f}")
         put("nomask.lp20.conv", "yes" if bool(znl["converged"]) else "NO", "{}")
     bd = [load("bd148"), load("bd158")]
     if all(x is not None for x in bd):
