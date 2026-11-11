@@ -1,0 +1,52 @@
+# E039 nside 8, regions bpxv (4), bands ['WMAP_K', 'WMAP_Ka', 'WMAP_Q', 'WMAP_V', 'Planck_353'], CMB prior sd 0.2 uK
+# truth amplitudes at 23 GHz: median |a_s| 8.20 uK_RJ; white-noise sd per element (K) 0.94 uK
+# region  n_el  beta_true  sd_naive  sd_sandwich  ratio
+#   0   1124 -3.150    0.0152    0.0152  1.003
+#   1    212 -3.250    0.0166    0.0166  1.001
+#   2     50 -2.850    0.0107    0.0107  1.000
+#   3    150 -2.950    0.0145    0.0145  1.000
+real 0 nok 4 z_deb +0.01 -0.67 -0.78 -0.32 [21 s]
+real 1 nok 4 z_deb -0.94 -0.78 -0.92 -0.95 [41 s]
+real 2 nok 4 z_deb -0.73 +0.62 -0.02 +0.57 [65 s]
+real 3 nok 4 z_deb +0.25 -1.80 -0.30 -0.50 [110 s]
+real 4 nok 4 z_deb -0.82 +0.75 +1.11 -2.02 [149 s]
+real 5 nok 4 z_deb -1.08 -0.49 -0.23 -1.00 [188 s]
+real 6 nok 4 z_deb -0.30 -0.13 +1.18 -0.99 [215 s]
+real 7 nok 4 z_deb +0.39 +1.33 +1.38 -0.88 [236 s]
+real 8 nok 4 z_deb -0.14 +0.84 +0.22 +1.41 [268 s]
+real 9 nok 4 z_deb +1.79 -0.04 +1.11 +0.39 [289 s]
+real 10 nok 4 z_deb -1.54 -0.67 +0.33 -0.65 [307 s]
+real 11 nok 4 z_deb +0.69 +1.03 -1.02 +0.99 [325 s]
+real 12 nok 4 z_deb +0.09 -0.20 +1.10 -0.19 [346 s]
+real 13 nok 4 z_deb -0.09 -0.69 +1.03 +0.17 [367 s]
+real 14 nok 4 z_deb +0.65 +0.02 -0.38 -0.29 [387 s]
+real 15 nok 4 z_deb +0.57 +0.47 -0.39 +0.77 [411 s]
+real 16 nok 4 z_deb -0.43 +0.79 -0.69 +0.24 [433 s]
+real 17 nok 4 z_deb -0.53 -0.99 +0.75 -1.11 [450 s]
+real 18 nok 4 z_deb -1.59 +0.32 -0.73 -0.54 [468 s]
+real 19 nok 4 z_deb -0.65 -2.11 -0.27 -0.86 [493 s]
+real 20 nok 4 z_deb +0.45 -0.09 +1.04 +0.73 [513 s]
+real 21 nok 4 z_deb +2.06 +1.93 +0.45 -0.76 [533 s]
+real 22 nok 4 z_deb +2.03 +0.79 +1.02 +0.17 [553 s]
+real 23 nok 4 z_deb +0.59 +0.17 +1.68 +0.70 [573 s]
+real 24 nok 4 z_deb -1.57 -0.53 -0.06 +0.01 [602 s]
+real 25 nok 4 z_deb +1.31 +1.00 +1.69 -0.73 [624 s]
+real 26 nok 4 z_deb -0.08 +1.55 -1.57 -0.08 [704 s]
+real 27 nok 4 z_deb -1.35 -1.55 -0.88 +0.34 [722 s]
+real 28 nok 4 z_deb -0.17 +1.03 -0.74 +1.51 [745 s]
+real 29 nok 4 z_deb +0.46 -1.83 -0.90 -0.39 [778 s]
+real 30 nok 4 z_deb +1.09 +0.85 -0.54 -0.57 [802 s]
+real 31 nok 4 z_deb -1.68 +1.20 -0.63 -0.53 [822 s]
+real 32 nok 4 z_deb -1.87 +1.41 -0.17 +1.55 [841 s]
+real 33 nok 4 z_deb +0.21 -0.33 +0.10 -0.31 [880 s]
+real 34 nok 4 z_deb +0.30 +1.72 +0.29 +2.60 [899 s]
+real 35 nok 4 z_deb -1.52 -0.92 +0.33 -0.06 [918 s]
+real 36 nok 4 z_deb +0.80 -0.81 -0.14 +0.43 [955 s]
+real 37 nok 4 z_deb +0.56 -1.40 -0.60 -0.71 [986 s]
+real 38 nok 4 z_deb +0.72 +1.59 -0.42 -0.60 [1004 s]
+real 39 nok 4 z_deb -1.85 +0.84 +0.14 +2.01 [1023 s]
+
+## plug-in errors over 40 realizations; T/J at the truth: min 0.0002, median 0.0010, max 0.0051; regions with sandwich sd < 0.25 at the truth: 4 of 4; realizations with every region measured: 40
+class of T/J at truth | regions | sd z: curvature, plain plug-in sandwich, debiased sandwich | coverage of +-1 sd: the same three | mean z debiased
+0 to 0.02 | 4 | 0.974 0.974 0.973 | 0.700 0.700 0.700 | +0.015 +- 0.077 (n = 160)
+all measured regions: sd z curvature 0.974, debiased 0.973; coverage curvature 0.700, debiased 0.700; mean z debiased +0.015; n = 160

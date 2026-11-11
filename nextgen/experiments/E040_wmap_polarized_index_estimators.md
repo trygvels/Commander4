@@ -362,6 +362,65 @@ Reduced chi-square 1.18; by region 0.58, 0.59, 2.13, 1.03. T / J_c 0.07 at high 
   N(-3.3, 0.1^2). Whether it is what happened in their chains needs their chains: the maps, the
   pixelization, the CMB treatment and the mixing differ.
 
+### Stage 4 result (i): LCDM CMB prior, read 2026-11-11 03:24
+
+`E040/s4_bpxv_n16_wm_lcdm.txt` (K, Ka, Q, V, 353, window-matched, nside 16, every estimator; chi2_min 19767.7
+against 19792.7 with the white prior, ratio to the nominal degrees of freedom 1.0727; T / J_c at most 0.014).
+The run started at 02:46 on the Cholesky path that E043 later found faulty at smaller orders; order 18432 is
+not exposed (E043, V1 and V2 check this fit's baseline directly).
+
+| Region | Profile, white 0.2 uK | Profile, LCDM | Move | In sd | flat23 - profile | flat30 - profile | 30 - 23 | Predicted (H) | zero-mean - profile |
+|---|---|---|---|---|---|---|---|---|---|
+| High Latitude | -3.0940 +- 0.0121 | -3.0825 +- 0.0125 | +0.0115 | 0.9 | -0.0098 | +0.1576 | +0.1674 | +0.1844 | -0.0077 |
+| Spur | -3.0965 +- 0.0149 | -3.0799 +- 0.0165 | +0.0166 | 1.0 | -0.0053 | +0.0896 | +0.0949 | +0.1016 | -0.0130 |
+| Galactic Center | -3.0867 +- 0.0088 | -3.0807 +- 0.0088 | +0.0060 | 0.7 | -0.0016 | +0.0272 | +0.0287 | +0.0304 | +0.0061 |
+| Plane | -2.9950 +- 0.0120 | -2.9641 +- 0.0133 | +0.0309 | 2.3 | -0.0032 | +0.0452 | +0.0485 | +0.0509 | -0.0079 |
+
+Against the expectations:
+
+- **C1 fails.** The Plane index moves by 2.3 sd and the Spur by 1.01 sd (limit 1 sd); the move between the
+  references changes by +6, +27, +13 and +33 percent (limit 15 percent). The white prior was shaping the
+  baseline, most where the CMB is least negligible against the noise per mode. As written in advance, the
+  LCDM version replaces the white-prior version in the paper's table, and the white-prior numbers are kept
+  as an arm.
+- C3 holds for this version: the move between the references is 5 to 9 percent below H^-1 (n ln(30 / 23))
+  in all four regions.
+- The direction: all four indices are flatter with the LCDM prior, by 0.006 to 0.031. A prior that allows
+  the CMB its large-scale E modes takes large-scale achromatic power out of what the white prior forced
+  into synchrotron and noise.
+- The zero-mean prior now sits below the profile in three regions (-0.008 to -0.013) where it sat above
+  with the white prior (+0.001 to +0.005): 0.5 to 0.8 sd. The noise patterns of the bands differ, so the
+  identity with the profile optimum does not apply (E041), and the sign is not predicted.
+- Every all-scales number quoted from the white-prior baseline (band pairs, sensitivity arms, E042
+  low-pass arms) is a white-prior number and is labelled so; the arms that enter the paper are repeated
+  with the LCDM prior where they are quoted as indices and kept as differences where they are quoted as
+  differences.
+
+### Stage 4, check C4, pre-registered 2026-11-11 03:45: is the move between the CMB priors what a LCDM sky does?
+
+C1 failed: with the LCDM prior the four indices are flatter than with the white prior by 0.012, 0.017, 0.006
+and 0.031. Two readings. (a) The sky has a LCDM CMB, the white prior has the wrong shape, and the white-prior
+fit is biased steep by about that much; then the LCDM version is the better number. (b) The LCDM prior
+gives large-scale achromatic power somewhere to go, and what it absorbs in the real maps is not CMB (the
+CMB E-mode signal at multipoles 2 to 6 is far below the WMAP noise per mode); then neither version is
+"right" and the difference is a size of a systematic. A simulation separates them:
+`nextgen/scripts/e039d_cmbprior_sim.py`, the E039 simulations with the CMB drawn from the LCDM covariance,
+fitted with the LCDM prior, the white prior and a flat prior; nside 8 first (60 realizations), then nside 16
+with a few realizations if the answer depends on resolution.
+
+- C4a. LCDM prior on LCDM skies: unbiased (mean z within 2 standard errors of zero per region) and calibrated
+  (sd of z 0.85 to 1.15).
+- C4b. Flat CMB prior: unbiased, errors 1.2 to 2.5 times larger (R7).
+- C4c. White prior on LCDM skies: I expect reading (b), held weakly: the LCDM E-mode power is small
+  against the noise per mode at these multipoles, so the paired difference between the white-prior and
+  LCDM-prior estimates should be below 0.003 in absolute value in every region, which is five to ten times
+  smaller than the move on the real maps. If instead the simulation shows the real-map move (white steeper
+  by 0.005 to 0.03), reading (a) holds.
+- Consequence for the paper: under (a) the LCDM version is the central table and the white version is a
+  cautionary arm. Under (b) the table shows both and the text says that the difference measures
+  large-scale achromatic structure in the maps that is not LCDM, by region, and that the index is uncertain
+  by that amount on top of everything else.
+
 ### Stage 5, pre-registered 2026-11-11 03:20: errors that do not assume the model fits (referee item 8)
 
 The sandwich error assumes that the model is right inside each region: one index, the stated noise. The

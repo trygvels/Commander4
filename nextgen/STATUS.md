@@ -2,6 +2,61 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-11 (Mac mini, 04:00): a memory bug in Apple's Cholesky was under every nside-8 fit. Fixed; every rerun so far reproduces the recorded numbers. Referee read of Paper A1 draft 1 found one fatal objection; draft 2 is reduced to the methods. LCDM CMB prior moves the Plane index by 2.3 sd
+
+**Learned**
+- **E043, a correctness gate.** Three Python processes crashed with corrupted heaps at 02:46 to 02:53.
+  Cause: on this machine's macOS 27.0 pre-release (26A5388g), Accelerate's `dpotrf` with the
+  upper-triangle option writes 245 kB to 768 kB past an internal buffer for matrix orders of about
+  1500 to 6000 (measured with a malloc canary, `nextgen/tools/malloc_canary.c`). scipy routes
+  `cho_factor(lower=True)` on ordinary arrays to that option. The factor it returns is correct; what
+  lies behind the buffer is overwritten.
+  - Exposed: every nside-8 fit (order 4608) and noise draw (order 1536): the E039 simulations that
+    validate the estimator, the nside-8 window checks, the nside-8 real-data arm.
+  - Not exposed: the nside-16 fits (orders 12288 and 18432; no overflow measured, and the baseline
+    rerun on the old path under the canary shows none and reproduces every printed digit).
+  - Fix: the likelihood factorizes the other triangle (same cost, same numbers), the simulation
+    scripts use `np.linalg.cholesky`, and a regression test runs the likelihood under the canary.
+  - Verification by rerun under the canary, numbers compared as printed: plug-in addendum 40 of 40
+    realizations identical; nside-8 window checks identical; nside-8 real-data arm identical; E039
+    stage 1 identical in the 17 of 200 realizations done so far. The rest is running.
+- **Referee read of Paper A1 draft 1** (`reviews/2026-11-11_referee_report_paperA1_draft1.md`): the
+  methods (Sects. 3 to 5) were re-derived and reproduced. One fatal objection: indices from the
+  low-pass arm were quoted as results without a simulation test and against my own criterion. Ten
+  major items. Draft 2 is reduced to the methods and the estimator comparison on real maps and quotes
+  no index; the K band against 30 GHz anatomy and the BeyondPlanck reading move to Paper B.
+- **E040 stage 4, LCDM covariance as the CMB prior** (the referee showed that the white 0.2 uK prior
+  understates the LCDM E-mode variance 200 times at the quadrupole): the four profile indices become
+  -3.083 +- 0.013, -3.080 +- 0.017, -3.081 +- 0.009, -2.964 +- 0.013, flatter than with the white
+  prior by 0.012, 0.017, 0.006, 0.031 (0.9, 1.0, 0.7 and 2.3 sd). My expectation (within 1 sd)
+  failed for the Spur and the Plane, so the LCDM version becomes the paper's central table. The
+  flat-prior reference shift holds in this version too: +0.167, +0.095, +0.029, +0.049 from 23 to 30
+  GHz against +0.184, +0.102, +0.030, +0.051 predicted.
+- **E040 stage 5, errors that do not assume one index per region** (first numbers, estimator not
+  yet validated in the bright regions): the scatter of the score over 48 sky blocks gives errors of
+  0.032 (High Latitude), 0.025 (Spur) and 0.07 (Plane) where the model errors are 0.012, 0.015 and
+  0.012. On simulations where the model is true the plain block error is right at High Latitude and
+  in the Spur and too small by about half in the Plane, where four blocks carry the information.
+
+**Running** (all on the sound path under the canary)
+- E043 reruns: E039 stage 1 (200 realizations), E039 stage 2 (48 regions, 200 realizations).
+- E040: flat CMB prior version of the central table, six sensitivity arms, the no-K band set with the
+  white prior; block errors with leverage corrections on simulations; a simulation of the three CMB
+  priors on LCDM skies (does a LCDM sky explain the move between priors, or is it the maps?).
+- E039 addendum B: the large-scale-only estimator on simulations with known truth.
+
+**Next**
+- Fill the paper's pending table and rows, add the E043 note, second independent referee read.
+
+**Needs Trygve**
+- **The Accelerate bug is worth reporting** (Apple Feedback, and a note to SciPy that
+  `cholesky(lower=True)` returns an uncleared triangle on this OS). That is contact with outside
+  developers, so it is yours to decide. A minimal reproducer is in the E043 record.
+- Upstream Commander4 calls `cho_factor(lower=True)` in `standalone_tools/constrained_cmb_realizations.py`.
+  On this OS that hits the same bug if the low-multipole matrix has order 1500 to 6000. Not changed.
+- Unchanged from before: nothing has been sent to anyone; the wording about the `resolve_chisq` move,
+  the Commander3 module and the BeyondPlanck configuration in the paper is yours to decide.
+
 ## 2026-11-10 (Mac mini, 23:00): first real-data results. Same WMAP maps, High Latitude index -3.094 (profile), -3.102 (flat prior at 23 GHz), -2.944 (flat prior at 30 GHz); K band with Planck 30 GHz gives -3.43 where K with Ka gives -3.06
 
 **Learned** (E040, all at nside 16, four BP XV regions, dense WMAP covariances, window-matched)

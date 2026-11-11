@@ -1,0 +1,8 @@
+# E040 block-robust errors: bands ['K', 'Ka', 'Q', 'V', '353'], CMB prior sd 0.2; 594 s
+# sum of the score over all elements per region (should be zero): +1.956e-04 -1.306e-04 -9.580e-05 +1.381e-04
+# score variance: model J(a_hat) diagonal 7368.6 4620.3 13448.1 7019.0; from blocks 24374.2 9934.8 441263.4 256043.5
+region           blocks     index  sd model sd blocks  ratio
+High Latitude        46   -3.0940    0.0121    0.0322   2.66
+Spur                 29   -3.0965    0.0149    0.0245   1.64
+Galactic Center       4   -3.0867    0.0088    0.0531   6.04
+Plane                16   -2.9950    0.0120    0.0732   6.08

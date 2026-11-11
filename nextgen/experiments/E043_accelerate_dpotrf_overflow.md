@@ -131,7 +131,36 @@ python -I nextgen/scripts/e043_compare.py ORIGINAL RERUN
 
 ## Result
 
-(to be filled)
+**V1 holds (read 2026-11-11 03:31).** The nside-16 baseline on the old path under the canary
+(`E043/bpxv_n16_wm_oldpath.txt`): no OVERFLOW line in the whole run (window operators, covariance
+inversions, every factorization at order 18432), and the recorded output of 2026-11-10
+(`E040/bpxv_n16_wm.txt`) reproduced in every printed digit: chi2_min 19792.7, chi-square per band 0.140,
+1.010, 1.057, 0.991, 0.000, per region 0.581, 0.591, 1.815, 0.776, indices -3.0940, -3.0965, -3.0867,
+-2.9950 with errors 0.0121, 0.0149, 0.0088, 0.0120, T / J_c 0.0129, 0.0044, 0.0003, 0.0022. The nside-16 fits
+were not exposed.
+
+**V2 holds (03:42).** The same fit on the sound path under the canary (`E043/bpxv_n16_wm_newpath.txt`): no
+OVERFLOW line, and the output is identical to the old-path output in every character apart from the timings.
+
+**V4 holds (03:42, 25 of 40 realizations read; completed below).** The plug-in addendum of E039 rerun with the
+band model it was first run with: every per-realization line identical as printed. A first rerun was made with
+`--no-drift` by mistake (the addendum was first run after the drift correction, unlike stage 1); it is kept as
+`E043/plugin_n8_bpxv_nodrift.txt` and differs from the original by one unit of the last printed digit of z in
+3 of 40 realizations, which is the size of the change in the band model.
+
+**V6, window checks (03:42).** `window_control_n8` and `window_wmap_matched_n8` rerun: biases +0.0149, -0.0146,
++0.2248, -0.0168 and +0.0055, -0.0183, +0.2168, -0.0185, chi2_min 2083.79 and 2087.08, all identical to the
+recorded values. No OVERFLOW line.
+
+**V4 complete (03:57).** All 40 realizations identical as printed (160 numbers), and the summary with them:
+sd of z 0.974, 0.974, 0.973, coverage 0.700, mean z +0.015 +- 0.077.
+
+**V6 complete (03:57).** The nside-8 real-data arm (`E043/bpxv_n8_wm_all_rerun.txt`) is identical to the
+recorded output in every character apart from the timings.
+
+No OVERFLOW line in any run made since the fix (all run under the canary).
+
+(V3 and V5 to be filled)
 
 ## Conclusion
 
