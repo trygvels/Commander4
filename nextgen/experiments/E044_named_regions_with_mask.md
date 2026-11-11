@@ -446,6 +446,11 @@ the two marginals run from -684.5 and -1567.5 at -4.6 to +593.4 and +2081.1 at -
   sum_r n_r beta_r ln(30/23) to 4e-9 at both test points (written: 1e-6 relative).
 - So "no optimum inside the allowed range" is a property of the flat-prior marginal with a free CMB amplitude on
   this region, and not an optimizer result.
+- **LCDM prior (`E044/scan_lcdm.txt`, read 12:35): H11 holds.** With the others at the profile optimum the 23 GHz
+  marginal has its grid maximum at -3.10 (parabola vertex -3.17; fitted joint optimum -3.174) and the 30 GHz
+  marginal at -2.80 with +160.9 (vertex -2.74; fitted joint optimum -2.696, shifted by the coupling, 0.046 away
+  where I wrote within 0.05). Both fall by thousands toward either edge. Identity check: 4e-9 and 8e-12.
+- Figure: `papers/paperA1/figures/fig_scan.pdf` (`paperA1_fig_scan.py`).
 
 ## Negative control
 

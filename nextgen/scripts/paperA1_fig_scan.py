@@ -26,7 +26,7 @@ def main():
     ap.add_argument("--lcdm", required=True)
     ap.add_argument("--flat", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--ymin", type=float, default=-400.0)
+    ap.add_argument("--ymin", type=float, default=-700.0)
     ap.add_argument("--ymax", type=float, default=0.0, help="0: from the data")
     a = ap.parse_args()
     panels = [(r"$\Lambda$CDM prior on the CMB", np.load(a.lcdm)), ("flat prior on the CMB", np.load(a.flat))]
@@ -59,7 +59,9 @@ def main():
         for sp in ("left", "bottom"):
             ax.spines[sp].set_color(MUTED)
             ax.spines[sp].set_linewidth(0.6)
-        ax.text(b0, a.ymin + 0.03 * (top - a.ymin), " profile optimum", fontsize=7.5, color=MUTED, ha="left", va="bottom")
+        ax.text(b0 - 0.04, 0.60 * top, "profile optimum", fontsize=7.5, color=MUTED, ha="right", va="center")
+        for edge in (float(x.min()), float(x.max())):        # the allowed range of the index in the fits
+            ax.axvline(edge, color=GRID, lw=1.0, zorder=0)
     axs[0].set_ylabel(r"$\ln\mathcal{L}$ minus its value at the profile optimum", fontsize=8.5, color=INK)
     axs[0].legend(loc="upper left", fontsize=7.5, frameon=False, handlelength=1.6, labelcolor=INK, borderaxespad=0.2)
     fig.tight_layout(w_pad=1.6)
