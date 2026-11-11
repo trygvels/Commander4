@@ -23,12 +23,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--max-err", type=float, default=0.25, help="patches with a larger one-step error are not drawn")
-    ap.add_argument("--ylim", type=float, default=0.45)
+    ap.add_argument("--max-err", type=float, default=0.12, help="patches with a larger one-step error are not drawn")
+    ap.add_argument("--ylim", type=float, default=0.42)
     a = ap.parse_args()
     z = np.load(a.data)
     G, D, beta, sd, cr3, neff = z["G"], z["D"], z["beta"], z["sd_model"], z["CR3"], z["neff"]
-    fig, axes = plt.subplots(1, 4, figsize=(12.0, 3.5), sharey=True)
+    fig, axes = plt.subplots(1, 4, figsize=(12.0, 3.7), sharey=True)
     for r, ax in enumerate(axes):
         d, g = D[:, r], G[:, r]
         pos = d > 0
@@ -48,13 +48,13 @@ def main():
             ax.annotate("", xy=(xx, np.sign(dd) * a.ylim * 0.98), xytext=(xx, np.sign(dd) * a.ylim * 0.86),
                         arrowprops=dict(arrowstyle="-|>", color=POINT, lw=1.0))
         ax.set_xscale("log")
-        ax.set_xlim(0.3, 60)
+        ax.set_xlim(0.5, 60)
         ax.set_ylim(-a.ylim, a.ylim)
         ax.set_xticks([1, 3, 10, 30])
         ax.set_xticklabels(["1", "3", "10", "30"])
-        ax.set_title(f"{NAMES[r]}   {beta[r]:.2f}", fontsize=10, color=INK, loc="left")
-        ax.text(0.03, 0.04, f"{int(sel.sum())} of {int(pos.sum())} patches drawn\neffective number {neff[r]:.1f}", transform=ax.transAxes,
-                fontsize=8, color=MUTED, va="bottom")
+        ax.set_title(f"{NAMES[r]}   {beta[r]:.2f}".replace("-", "\u2212"), fontsize=10, color=INK, loc="left", pad=16)
+        ax.text(0.0, 1.02, f"{int(sel.sum())} of {int(pos.sum())} patches drawn, effective number {neff[r]:.1f}", transform=ax.transAxes,
+                fontsize=8, color=MUTED, ha="left", va="bottom")
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
         for s in ("left", "bottom"):
@@ -63,9 +63,9 @@ def main():
         ax.set_xlabel("share of the region's information (percent)", fontsize=9, color=INK)
     axes[0].set_ylabel("index of the patch minus index of the region", fontsize=9, color=INK)
     # direct labels for the two bands, once, in the first panel
-    axes[0].annotate("error if the region\nhas one index", xy=(40, sd[0]), xytext=(4.0, 0.33), fontsize=8, color=INK,
+    axes[0].annotate("error if the region\nhas one index", xy=(45, sd[0]), xytext=(7.0, 0.33), fontsize=8, color=INK,
                      arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6), va="center")
-    axes[0].annotate("block error", xy=(40, -cr3[0] * 0.92), xytext=(7.0, -0.30), fontsize=8, color=INK,
+    axes[0].annotate("block error", xy=(45, -cr3[0] * 0.92), xytext=(10.0, -0.30), fontsize=8, color=INK,
                      arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6), va="center")
     fig.tight_layout()
     fig.savefig(a.out)

@@ -266,9 +266,23 @@ added in quadrature to the sandwich error. The rule for choosing between this fo
 closest to one in both tests and in doubt the more conservative, was written before either test was
 read; the three forms differ by 15 to 45 percent on the maps and all are in the record.
 
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/fig_blocks.pdf}
+\caption{What the block errors of Table~\ref{tab:e040} are made of. For each patch of sky (a pixel of the
+$N_{\rm side}=2$ grid) that carries information on the index of a region: the index that the patch alone
+would move to in one Newton step from the fitted index of the region, with the error it would have under
+the model, against the share of the region's information that the patch carries. Patches with a one-step
+error above 0.12 are not drawn, and arrows mark values outside the frame. Dark band: the sandwich error of
+the region's index. Light band: its block error (none for the Galactic Center). The fitted index of the
+region is given beside its name. The one-step values are first-order and for display; the block error
+is computed from the scores, Eq.~(\ref{eq:block}) (\exref{E040}).}
+\label{fig:blocks}
+\end{figure}
+
 On the maps the block error is 3.5, 2.3 and 7.5 times the sandwich error at High Latitude, in the
-Spur and in the Plane (Table~\ref{tab:e040}): 0.04, 0.04 and 0.10 where the model gives 0.012, 0.016
-and 0.013. Under the model, with the window-matched covariances and the $\Lambda$CDM prior of the fit, the ratio is
+Spur and in the Plane (Table~\ref{tab:e040}, Fig.~\ref{fig:blocks}): 0.04, 0.04 and 0.10 where the
+model gives 0.012, 0.016 and 0.013. Under the model, with the window-matched covariances and the $\Lambda$CDM prior of the fit, the ratio is
 not one: in 60 simulations at $N_{\rm side}=8$ its median is 1.28, 1.21 and 1.32 and its largest value
 2.8, 2.4 and 2.8, because that prior couples the patches (with the white prior the medians are 1.25,
 1.03 and 1.07). Against that reference the maps are outside the range at High Latitude and in the
