@@ -233,3 +233,80 @@ def test_lowpass_projection_identities():
     assert np.isclose(q1, q2, rtol=1e-10)
     # the pseudo-inverse of the kept columns alone is not blind to the columns above the cut
     assert np.abs(np.linalg.pinv(Yk) @ Y[:, k:]).max() > 1e-3
+
+
+def test_masking_is_the_schur_complement_and_matches_the_kept_block():
+    from lowres.mask import marginalize, restrict_prior
+    rng = np.random.default_rng(31)
+    n = 40
+    X = rng.standard_normal((n, n))
+    N = X @ X.T / n + np.eye(n)
+    keep = np.ones(n, dtype=bool)
+    keep[[2, 5, 17, 30, 31]] = False
+    d = rng.standard_normal(n)
+    dk, nk = marginalize(d, np.linalg.inv(N), keep)
+    assert np.allclose(dk, d[keep]) and np.allclose(nk, np.linalg.inv(N[np.ix_(keep, keep)]), rtol=1e-9, atol=1e-12)
+    assert np.allclose(restrict_prior(N, keep), nk, rtol=1e-9, atol=1e-12)
+    # a singular inverse covariance (a band known only through 8 linear combinations): the pseudo-inverse form leaves
+    # a positive semidefinite matrix whose range lies in the kept elements' part of those combinations
+    L = rng.standard_normal((8, n))
+    low = L.T @ np.linalg.inv(L @ N @ L.T) @ L
+    _, lk = marginalize(d, low, keep, pinv=True)
+    w = np.linalg.eigvalsh(lk)
+    assert w.min() > -1e-9 * w.max() and (w > 1e-9 * w.max()).sum() <= 8
+
+
+def test_own_score_block_error_ignores_a_misfitting_neighbour():
+    """Two regions coupled through dense noise; region 1 is given a strong index spread between blocks. The joint
+    block error of region 0 inherits it through the off-diagonal of J_c^-1, the own-score block error does not."""
+    n = 192
+    region, a_s, a_d, specs = setup(n, 2, seed=11, noise=0.6, dense=(0, 1, 2, 3, 4))
+    block = np.arange(n) // 16                                    # 12 blocks, each holding both regions
+    rng = np.random.default_rng(12)
+    joint, own, mod = [], [], []
+    for _ in range(40):
+        off = 0.5 * rng.standard_normal(12)[block] * (region == 1)
+        L = RegionLikelihood(draw(specs, a_s, a_d, 0.2 * rng.standard_normal(n), -3.1 + off, rng), region, cmb_prior_sd=0.2)
+        bh, _ = fit_profile(L, np.full(2, -3.1))
+        out = block_errors(L, bh, block, 12)
+        joint.append(out["CR3"]); own.append(out["CR3_own"]); mod.append(out["sd_model"])
+    joint, own, mod = np.median(joint, axis=0), np.median(own, axis=0), np.median(mod, axis=0)
+    assert own[1] > 3 * mod[1]                                    # the region with the spread is far from its model error
+    assert own[0] <= joint[0] + 1e-12                             # and its neighbour's own-score error is the smaller one
+    assert own[0] < 2.5 * mod[0], (own, joint, mod)
+
+
+def test_cmb_prior_mismatch_predicts_bias_and_scatter():
+    """A white prior fitted to skies whose CMB has a dense covariance with strong modes: the first-order bias and
+    covariance of `lowres.mismatch.cmb_prior_mismatch` against 500 simulated fits; and no change when the prior
+    is the truth."""
+    from lowres.mismatch import cmb_prior_mismatch
+    n, sd = 96, 0.3
+    region, a_s, a_d, specs = setup(n, 2, seed=13, noise=1.0, amp=6.0, dense=(0,))
+    rng = np.random.default_rng(14)
+    X = rng.standard_normal((n, 5))
+    S_true = 0.6 * X @ X.T / 5 + 0.02 * np.eye(n)                 # five strong modes, total variance well above the prior's in them
+    root = np.linalg.cholesky(S_true)
+    truth = np.array([-3.1, -3.0])
+    est = []
+    for _ in range(500):
+        L = RegionLikelihood(draw(specs, a_s, a_d, root @ rng.standard_normal(n), truth[region], rng), region, cmb_prior_sd=sd)
+        est.append(fit_profile(L, truth)[0])
+    est = np.array(est)
+    # prediction at the truth, from a noise-free data set with no CMB (so that the fitted amplitudes are the true ones)
+    clean = [BandData(B.name, B.power_law(truth[region], 23.0)[0] * a_s + dust * a_d, ninv, (lambda b, B=B: B.power_law(b, 23.0)), dust)
+             for B, dust, ninv, _ in specs]
+    Lc = RegionLikelihood(clean, region, cmb_prior_sd=sd)
+    out = cmb_prior_mismatch(Lc, truth, 1.0 / sd ** 2, S_true - sd ** 2 * np.eye(n))
+    sd_true, sd_matched = np.sqrt(np.diag(out["cov_true"])), np.sqrt(np.diag(out["cov_matched"]))
+    emp = est.std(axis=0, ddof=1)
+    assert np.max(sd_true / sd_matched) > 1.2, (sd_true, sd_matched)            # the configuration makes the effect visible
+    assert np.all(np.abs(emp / sd_true - 1.0) < 0.15), (emp, sd_true, sd_matched)
+    assert np.all(np.abs(est.mean(axis=0) - truth - out["bias"]) < 4 * emp / np.sqrt(len(est)) + 0.15 * np.abs(out["bias"])), (est.mean(0) - truth, out["bias"])
+    same = cmb_prior_mismatch(Lc, truth, 1.0 / sd ** 2, np.zeros((n, n)))
+    assert np.allclose(same["bias"], 0.0) and np.allclose(same["cov_true"], np.linalg.inv(same_J(Lc, truth)), rtol=0.2)
+
+
+def same_J(like, beta):
+    J, T, _ = like.information(beta)
+    return J

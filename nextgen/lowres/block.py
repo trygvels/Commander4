@@ -58,6 +58,7 @@ def block_errors(like, beta_hat, block, nblk, h=2e-3, h_max=0.9):
     Returns a dict with
       sd_model (nreg,)       debiased sandwich error
       CR0, CR2, CR3 (nreg,)  block errors (nan where not defined)
+      CR0_own, CR2_own, CR3_own (nreg,)  the same from each region's own block scores only
       neff (nreg,)           effective number of blocks, (sum D)^2 / sum D^2 over the positive D
       lev_max (nreg,)        largest leverage
       n_neg (nreg,)          number of blocks with negative information D_B (set to zero in the leverages)
@@ -103,4 +104,11 @@ def block_errors(like, beta_hat, block, nblk, h=2e-3, h_max=0.9):
         if kind != "CR0":
             sd[lev_max > h_max] = np.nan
         out[kind] = sd
+        # the same with each region's own scores only: the other regions enter through J_c^-1 above, so that a
+        # region tied to a misfitting neighbour inherits its scatter (second referee of Paper A1, 2026-11-11)
+        own = np.sqrt(np.clip(np.diag(Ji) ** 2 * np.sum(Gk ** 2, axis=0), 0.0, None))
+        own[~good] = np.nan
+        if kind != "CR0":
+            own[lev_max > h_max] = np.nan
+        out[kind + "_own"] = own
     return out
