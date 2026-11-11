@@ -159,7 +159,7 @@ def main():
         put("flatconv", "yes" if bool(np.all(z["flat_converged"])) else "NO", "{}")
     if "zm" in z.files:
         put4("zm", z["zm"]); put4("zmsd", (z["zm"] - b0) / s0, "{:+.1f}"); put4("zmm", z["zm"] - b0, "{:+.3f}")
-        put4("zmsd.abs", np.abs(z["zm"] - b0) / s0, "{:.1f}")
+        put4("zmsd.abs", np.abs(z["zm"] - b0) / s0, "{:.1f}"); put4("zmm.abs", np.abs(z["zm"] - b0), "{:.3f}")
     if "blk_CR3" in z.files:
         put4("cr3", z["blk_CR3"]); put4("cr3own", z["blk_CR3_own"]); put4("neff", z["blk_neff"], "{:.1f}"); put4("levmax", z["blk_lev_max"], "{:.2f}")
         put4("cr3ratio", z["blk_CR3"] / s0, "{:.1f}"); put4("cr3ownratio", z["blk_CR3_own"] / s0, "{:.1f}")
@@ -321,6 +321,7 @@ def main():
         put(f"{key}.n", int(m), "{:d}")
         put4(f"{key}.meanz", dz.mean(0), "{:+.2f}"); put4(f"{key}.profmeanz", dp.mean(0), "{:+.2f}")
         put4(f"{key}.paired", ((zs["b"] - zs["prof"]) / zs["s"]).mean(0), "{:+.2f}")
+        put4(f"{key}.paired.abs", np.abs(((zs["b"] - zs["prof"]) / zs["s"]).mean(0)), "{:.2f}")
         put4(f"{key}.pairedse", ((zs["b"] - zs["prof"]) / zs["s"]).std(0, ddof=1) / np.sqrt(m), "{:.2f}")
         put4(f"{key}.pairedscatter", ((zs["b"] - zs["prof"]) / zs["s"]).std(0, ddof=1), "{:.2f}")
         put4(f"{key}.pairedindex", (zs["b"] - zs["prof"]).mean(0), "{:+.3f}")
