@@ -411,14 +411,14 @@ standard deviation.
 - **H8, bandpasses: holds.** Delta bands steepen every region by 0.046 to 0.051 (written: 0.05 to 0.08; the Plane
   is just under). No drift correction: 0.0011 to 0.0014 (written: 0.002 or less). All bolometers for the 353 GHz
   bandpass: 0.0005 to 0.0026.
-- **H8, K and Ka alone: holds, near its limit.** +0.57, -0.22, +2.39 and +2.01 expected sd (written: within 2.5).
+- **H8, K and Ka alone: holds, near its limit.** +0.57, -0.22, +2.40 and +2.00 expected sd (written: within 2.5).
   Read from l <= 20 on both sides: +0.72, -0.21, +1.91, +0.52. The index from K and Ka alone is flatter at
   Intermediate latitude and in the Plane by 0.037 and 0.025; that is the sign of a spectrum that steepens with
   frequency, or of something at Q and V that the model lacks. Two regions at 2 sd in one arm, not a detection.
   Its chi2_min is 0.962 of its expectation (2.1 sd low; one residual degree of freedom per element).
 - Floor of the LCDM prior at 0.11 uK: 0.0004 to 0.0020. As on the old regions (0.0006), no effect.
 - Over all arms that test the model (flat CMB prior, three low-pass cuts, K and Ka, K and Ka at l <= 20: 24
-  numbers that share their data) the largest is 2.39. No arm rejects the model on these regions with this mask.
+  numbers that share their data) the largest is 2.40. No arm rejects the model on these regions with this mask.
 
 ## Negative control
 

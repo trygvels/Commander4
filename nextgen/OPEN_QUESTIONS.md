@@ -563,6 +563,9 @@ one sentence of Paper A.
 
 ## Q24. How much does the polarized synchrotron index vary inside the four regions, and what model fits? (new 2026-11-11, F54)
 
+Update 2026-11-11 after E044 (F57): with regions by geometry and the mask, the block scores give no evidence that any
+region is more than one index. The question stands for finer regions and for the masked emission itself.
+
 Why it matters: the block errors of E040 stage 5 are 2.3 to 7.5 times the model errors, and half a dozen
 30-degree patches carry each region's information. Until the variation is modelled, "the index of the High
 Latitude region" has an error of 0.04, not 0.012, and the region boundaries decide the answer.
@@ -575,7 +578,12 @@ fit come out as observed.
 What it decides: the central result of Paper B, and whether the four-region tables of the literature can
 be compared at all.
 
-## Q25. Where does the scale dependence of the index come from? (new 2026-11-11, F49 as amended)
+## Q25. Where does the scale dependence of the index come from? (new 2026-11-11, F49 as amended; ANSWERED at the level of E044, F59)
+
+Answer 2026-11-11 (E044 R6): it came from the emission that the mask removes. With the brightest 5 percent and Tau A
+masked, the index from multipoles up to 30, 20 and 12 differs from the all-scale index by at most 1.4 of the standard
+deviation that the model predicts; without the mask it was 2.8 to 10.4. Which of the candidates below acts inside the
+masked emission (beams on compact structure, or a different spectrum) was not separated.
 
 Why it matters: with the index informed by multipoles up to 12 to 30 only, the four-band index steepens by
 0.01 to 0.09, and the stability criterion fails in the Plane and the Galactic Center. Candidates: sub-pixel
@@ -604,3 +612,37 @@ What it decides: whether Paper B can use LFI at all.
   SciPy. A reproducer is in the E043 record.
 - Upstream Commander4's `standalone_tools/constrained_cmb_realizations.py` uses `cho_factor(lower=True)`;
   on this OS it is exposed for low-multipole matrices of order 1500 to 6000. Not changed (upstream code).
+
+## Q28. Do the released WMAP nine-year low-resolution covariances overstate the noise? (new 2026-11-11, E044 R4 and R5, F60)
+
+Why it matters: the chi-square of the masked fit is 0.973 of its expectation with the LCDM prior (2.5 sd) and 0.956
+with a flat CMB prior (3.4 sd; exact count of degrees of freedom); a simulated null gives 1.002 +- 0.003. Every error
+bar from these matrices scales with the answer. The deficit is not uniform over band combinations: the one degree of
+freedom per element along the CMB spectrum carries 1.008 +- 0.019. No WMAP document gives the accuracy of the
+normalization at this resolution; two published template fits print 0.96 to 0.98 for V band without comment.
+How to answer, without a sky model (`research/2026-11-11_wmap_lowres_covariance_normalization.md`, Sect. 6): year
+differences and DA differences at r4 with the single-year maps and matrices (LAMBDA `maps_da_r4_qu_1yr`,
+`maps_da_r4_quninv_1yr`; small downloads, not on disk); the band-file convention (sum of single-year matrices against
+the band matrix); the imbalance templates against the band matrices. With a sky model: the chi-square per band and per
+multipole of the residual of the masked fit, against the per-band null (`e044_chi2_null.py`, queued at nside 16).
+What it decides: whether Paper B rescales the covariances, per band or per mode, and whether the excess along the CMB
+spectrum is a signal.
+
+## Q29. Why does the index steepen the more tightly the CMB amplitude is held? (new 2026-11-11, E044 R3 and R5)
+
+At High and Intermediate latitude: -3.173, -3.147, -3.041 and -3.104, -3.091, -3.017 for a white prior of 0.2 uK, the
+LCDM covariance and a flat prior. Each step is 1.7 to 1.95 of the standard deviation the model predicts for it; the
+fits share their data. Candidates: a fluctuation; a component with a CMB-like spectrum beyond the LCDM prior (Q28
+has the matching chi-square pattern); a synchrotron spectrum that is not one power law (the K and Ka only fit is
+flatter by 0.037 and 0.025 at Intermediate latitude and in the Plane, 2.4 and 2.0 sd); leakage of intensity into
+polarization, which has the CMB spectrum where the CMB dominates the intensity.
+How to answer: a curvature parameter per region with the profile machinery; the fitted CMB amplitude map of the
+flat-prior fit against the LCDM expectation per multipole; a template for intensity leakage per band.
+What it decides: the systematic error of a measured index in Paper B, and whether the model needs curvature.
+
+## Q30. How large is the bias of the zero-mean prior at nside 16, and what sets it? (new 2026-11-11, F56, H9)
+
+The nside-8 simulation gives 1.05 sd at High Latitude; the maps at nside 16 give 3.6. H9 (two realizations at nside
+16, queued) tests whether the simulated bias reaches the map value. If it does not, the remainder is something the
+simulated sky lacks. A scale map in place of one scale per region is the remedy suggested by F44; untested here.
+
