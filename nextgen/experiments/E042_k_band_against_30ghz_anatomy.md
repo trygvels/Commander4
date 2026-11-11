@@ -312,6 +312,40 @@ all scales, every other band through multipoles 2 to 20 only; T / J_c at most 0.
 - Within WMAP, K with Ka is still flatter than the four bands together, by 0.021, 0.027, 0.032
   and 0.019 (1.9, 2.0, 3.6 and 1.7 nested sd).
 
+**Low-pass arm at L = 12 and 30, 2026-11-11 02:04 to 02:42** (`E042/lowpass12.txt`, `lowpass30.txt`).
+
+| bands | L | High Latitude | Spur | Galactic Center | Plane |
+|---|---|---|---|---|---|
+| K, Ka, Q, V | all scales | -3.094 +- 0.012 | -3.097 +- 0.015 | -3.087 +- 0.009 | -2.995 +- 0.012 |
+| | 30 | -3.108 +- 0.013 | -3.105 +- 0.016 | -3.130 +- 0.010 | -3.038 +- 0.013 |
+| | 20 | -3.113 +- 0.014 | -3.112 +- 0.017 | -3.140 +- 0.011 | -3.061 +- 0.014 |
+| | 12 | -3.142 +- 0.018 | -3.108 +- 0.018 | -3.180 +- 0.013 | -3.081 +- 0.015 |
+| K, Ka | 30 | -3.079 +- 0.017 | -3.079 +- 0.021 | -3.098 +- 0.013 | -3.020 +- 0.017 |
+| | 20 | -3.092 +- 0.018 | -3.085 +- 0.022 | -3.109 +- 0.014 | -3.042 +- 0.018 |
+| | 12 | -3.119 +- 0.023 | -3.082 +- 0.023 | -3.149 +- 0.017 | -3.056 +- 0.019 |
+| K, 30 (PR4) | 30 | -3.515 +- 0.021 | -3.232 +- 0.026 | -3.474 +- 0.015 | -3.133 +- 0.023 |
+| | 20 | -3.590 +- 0.023 | -3.244 +- 0.028 | -3.553 +- 0.017 | -3.217 +- 0.025 |
+| | 12 | -3.749 +- 0.029 | -3.228 +- 0.031 | -3.715 +- 0.022 | -3.302 +- 0.028 |
+| 30 (PR4), Ka | 30 | -2.397 +- 0.051 | -2.801 +- 0.062 | -2.424 +- 0.035 | -2.723 +- 0.054 |
+| | 20 | -2.312 +- 0.055 | -2.787 +- 0.066 | -2.321 +- 0.040 | -2.683 +- 0.057 |
+| | 12 | -2.158 +- 0.069 | -2.771 +- 0.072 | -2.214 +- 0.050 | -2.604 +- 0.061 |
+
+- **Z4 holds for the Spur and, barely, for the High Latitude region; it fails for the Galactic
+  Center and the Plane.** K, Ka, Q, V between L = 30 and L = 12, in units of the L = 12 error:
+  1.9 (High Latitude), 0.2 (Spur), 3.8 (Galactic Center), 3.0 (Plane). The Spur is at -3.105 to
+  -3.112 at every cut. The High Latitude region is at -3.108 and -3.113 for L = 30 and 20 and
+  -3.142 for L = 12. The Plane goes -2.995, -3.038, -3.061, -3.081 and the Galactic Center
+  -3.087, -3.130, -3.140, -3.180 from all scales to L = 12, without settling.
+- By the rule written before the run: for the Plane and the Galactic Center there is no index
+  that is independent of the scale cut at this precision, and the paper says so. For the High
+  Latitude region and the Spur, L = 20 is the baseline, with a scale systematic of +0.005 / -0.03
+  and +-0.005.
+- The gap between K band and PR4 30 GHz grows toward large scales: at high latitude -3.43 (all
+  scales), -3.59 (L = 20), -3.75 (L = 12).
+- The (K, Ka, L = 12) fit stopped with `converged False` after a long line search; by the
+  independent review's check such stops sit at the optimum, and its values line up with L = 20
+  and 30.
+
 **(f) PR3 with a fitted noise model, 2026-11-11 01:56 to 02:04** (`E042/pr3_arm.txt`; all scales,
 window-matched). The PR3 ring-half difference has a chi-square per element of 1.60 against its
 white columns (PR4: 1.77); fitted model r = 1.35, A = 1.00, gamma = 1.44. PR3 against PR4 at nside

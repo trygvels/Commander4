@@ -5,3 +5,7 @@
 # WMAP_Q: loaded; low-passed copy to l <= 12 (330 modes); 38 s
 # WMAP_V: loaded; low-passed copy to l <= 12 (330 modes); 45 s
 # E042 low-pass arm: the first band of each set and 353 GHz keep all modes; the others enter through multipoles 2 to 12; profile index and debiased sandwich error (High Latitude, Spur, Galactic Center, Plane)
+K,Ka,Q,V,353     -3.1424 +- 0.0178  -3.1082 +- 0.0178  -3.1802 +- 0.0130  -3.0806 +- 0.0145 | chi2 1256.2 | T/J_c 0.002 0.001 0.000 0.000 | converged True | 323 s
+K,Ka,353         -3.1188 +- 0.0226  -3.0816 +- 0.0230  -3.1491 +- 0.0165  -3.0561 +- 0.0188 | chi2 512.1 | T/J_c 0.002 0.001 0.000 0.000 | converged False | 967 s
+K,30,353         -3.7493 +- 0.0294  -3.2284 +- 0.0313  -3.7152 +- 0.0220  -3.3020 +- 0.0275 | chi2 2407.8 | T/J_c 0.002 0.000 0.000 0.000 | converged True | 1155 s
+30,Ka,353        -2.1578 +- 0.0690  -2.7713 +- 0.0721  -2.2141 +- 0.0496  -2.6038 +- 0.0613 | chi2 1057.7 | T/J_c 0.005 0.001 0.000 0.001 | converged True | 1312 s

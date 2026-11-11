@@ -1,0 +1,11 @@
+# Planck_030: loaded; low-passed copy to l <= 30 (1914 modes); 11 s
+# Planck_353: loaded; low-passed copy to l <= 30 (1914 modes); 17 s
+# WMAP_K: loaded; low-passed copy to l <= 30 (1914 modes); 24 s
+# WMAP_Ka: loaded; low-passed copy to l <= 30 (1914 modes); 32 s
+# WMAP_Q: loaded; low-passed copy to l <= 30 (1914 modes); 39 s
+# WMAP_V: loaded; low-passed copy to l <= 30 (1914 modes); 47 s
+# E042 low-pass arm: the first band of each set and 353 GHz keep all modes; the others enter through multipoles 2 to 30; profile index and debiased sandwich error (High Latitude, Spur, Galactic Center, Plane)
+K,Ka,Q,V,353     -3.1079 +- 0.0132  -3.1048 +- 0.0158  -3.1299 +- 0.0099  -3.0383 +- 0.0130 | chi2 6245.4 | T/J_c 0.005 0.002 0.000 0.001 | converged True | 297 s
+K,Ka,353         -3.0785 +- 0.0169  -3.0793 +- 0.0205  -3.0982 +- 0.0127  -3.0203 +- 0.0171 | chi2 2240.4 | T/J_c 0.005 0.002 0.000 0.001 | converged True | 470 s
+K,30,353         -3.5154 +- 0.0207  -3.2323 +- 0.0259  -3.4738 +- 0.0149  -3.1334 +- 0.0231 | chi2 7531.4 | T/J_c 0.006 0.002 0.000 0.001 | converged True | 654 s
+30,Ka,353        -2.3967 +- 0.0505  -2.8006 +- 0.0621  -2.4242 +- 0.0352  -2.7229 +- 0.0539 | chi2 3591.7 | T/J_c 0.014 0.005 0.000 0.002 | converged True | 828 s
