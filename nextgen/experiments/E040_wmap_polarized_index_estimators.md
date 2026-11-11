@@ -837,6 +837,24 @@ The flat-prior marginal at two reference frequencies.
 
 ## Conclusion
 
-Pending.
+Written 2026-11-11 10:00, after the second referee read of Paper A1.
+
+**What E040 established and what it did not.** The comparison of estimators on identical maps stands as
+measured: under flat amplitude priors the optimum moves with the frequency at which the amplitudes are defined,
+by 0.03 to 0.17 with a constrained CMB and by up to 0.8 with a free one, and the first-order form of the
+identity predicts the moves, always too high (5 to 10 percent here). The LCDM covariance is the calibrated CMB
+prior and a white prior miscalibrates the error. The block-error machinery, the low-pass estimator and the
+prior-mismatch calculation were built and tested here.
+
+**Everything in this record that names a region is about the E022 surrogate regions without a mask, and those
+are not what they are named** (second referee; confirmed, see E044): "High Latitude" holds the inner plane,
+Tau A sits unmasked in "Plane", and the misfit, the block errors of 2 to 9 sandwich errors, and the differences
+between regions came from that. The claim that the High Latitude region is not one index is withdrawn. The
+indices, the misfit diagnostics and the arms are redone in E044 on regions defined by geometry with a
+processing mask; there the model fits in every region and the block errors agree with the model's.
+
+**For the record of method:** of the expectations written for this experiment, a good half failed, and the
+largest error of all (the regions) was not an expectation at all but an inherited assumption that no
+pre-registration covered. It was found by a reader with fresh eyes asking where on the sky the misfit sat.
 
 ## Follow-ups
