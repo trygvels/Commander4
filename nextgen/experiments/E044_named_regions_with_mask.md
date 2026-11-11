@@ -107,6 +107,18 @@ and seen; nothing at nside 16.
   simulated bias explains only a third of it. Run: `nextgen/scripts/e044_queue_sim16b.sh`, behind the other
   nside-16 simulations.
 
+- **H10, calibration of the sandwich error at High Latitude (added 2026-11-11 10:23, after both null sets were
+  read).** Both sets of 60 give a standard deviation of the standardized error of 1.11 and 1.12 at High Latitude
+  (pooled 1.104 +- 0.065, scatter of the estimates 0.0321 against a mean sandwich error of 0.0290; coverage 0.62
+  +- 0.04). The simulation is drawn from the model of the fit, so the expectation is 1. That is 1.6 standard
+  errors in one of four regions, which a fluctuation gives one time in three, but it is the faintest region and
+  the one the abstract quotes. A third, independent set of 240 realizations (seed 43) decides: if the sandwich
+  error is right its standard deviation of z at High Latitude is 1.00 +- 0.046 and lies below 1.09 with 97.5
+  percent probability; if the 10 percent is real it is 1.10 +- 0.05. Rule: above 1.09 in the new set alone, the
+  paper says that the sandwich error is about 10 percent low at High Latitude in this configuration and the
+  cause is looked for; below, the pooled value of 360 realizations is reported with its error. The other three
+  regions are read the same way and none is expected to move.
+
 ## Command
 
 ```bash

@@ -252,12 +252,16 @@ predicted 0.113 and 0.091 where the matched formula gives 0.090 and 0.083; bias 
 $+0.021 \pm 0.002$ predicted $+0.021$ and $+0.020$). Evaluated for the white-prior fit of these maps
 with $\mathsf{S}_{\rm t}$ the $\Lambda$CDM covariance: the bias is \N{mm.bias.list}
 (\N{mm.biassd.list} of the quoted error), and the true error is \N{mm.ratio.list} times the quoted
-one. A white prior of nearly the right total variance is therefore not a harmless stand-in for a
+one. The white-prior fit quotes an error \N{mm.quotedbelow.percent.range} percent smaller than the
+$\Lambda$CDM fit does, and on a $\Lambda$CDM sky its true error is \N{mm.overlcdm.percent.range} percent
+larger: it looks better and is worse. A white prior of nearly the right total variance is therefore not a harmless stand-in for a
 $\Lambda$CDM sky, in the direction of an error bar that is too small by \N{mm.percent.range} percent
 here; in other configurations the sign can be the other (an independent review found errors too
 large in one), which is the point of computing it. The same calculation gives the expected
 difference between the two fits of one sky, a standard deviation of \N{mm.pairsd.list}: the measured
-moves are \N{mm.movepair.list} of it. An earlier simulation at $N_{\rm side}=8$ on other regions
+moves, less the bias, are \N{mm.movepair.list} of it. Two of the four are near two and have the same
+sign; those two indices are correlated at \N{mm.corr.HLInt}, and we read the four as consistent with
+the calculation and no more. An earlier simulation at $N_{\rm side}=8$ on other regions
 agrees in kind: there the matched prior was calibrated and the white-prior error too small by about a
 fifth in three of four regions (\exref{E040}).
 
@@ -331,8 +335,8 @@ the $\Lambda$CDM prior (synchrotron from the DR1 model smoothed to $5^\circ$, no
 window-matched covariances, a $\Lambda$CDM CMB, one index per region), the ratio has a median of
 \N{nullall.median.list} and a 97.5th percentile of \N{nullall.p975.list}; \N{nullall.above.list} of
 the simulations lie above the map values. In the same simulations the sandwich error is calibrated
-(standardized errors of standard deviation \N{nullall.sdz.list}, coverage of one standard deviation
-\N{nullall.cover.list}). \pend{The same at $N_{\rm side}=16$, a few realizations.} So with the mask
+(standardized errors of standard deviation \N{nullall.sdz.list}, each known to
+\N{nullall.sdz.se}; coverage of one standard deviation \N{nullall.cover.list}). \pend{The same at $N_{\rm side}=16$, a few realizations.} So with the mask
 the block scores give no evidence that any of these regions is more than one index at the precision
 of these maps, and the two errors in Table~\ref{tab:same} tell the same story within what a block
 error from a dozen patches can tell.

@@ -27,3 +27,6 @@ real 24 zm -3.1888 -3.2790 -2.8512 -2.9524 sd 0.0293 0.0273 0.0214 0.0186 | prof
 real 25 zm -3.1520 -3.2891 -2.8590 -2.9367 sd 0.0288 0.0278 0.0212 0.0183 | profile -3.1215 -3.2741 -2.8492 -2.9332 | zm minus profile in sd -1.06 -0.54 -0.46 -0.19 | zm conv True | conv True [1490 s]
 real 26 zm -3.1775 -3.2656 -2.8427 -2.9656 sd 0.0288 0.0271 0.0212 0.0187 | profile -3.1476 -3.2509 -2.8338 -2.9616 | zm minus profile in sd -1.04 -0.54 -0.42 -0.21 | zm conv True | conv True [1551 s]
 real 27 zm -3.1488 -3.2860 -2.8435 -2.9408 sd 0.0288 0.0275 0.0212 0.0184 | profile -3.1181 -3.2709 -2.8341 -2.9366 | zm minus profile in sd -1.07 -0.55 -0.44 -0.23 | zm conv True | conv True [1618 s]
+real 28 zm -3.1836 -3.2436 -2.8471 -2.9343 sd 0.0292 0.0272 0.0214 0.0184 | profile -3.1527 -3.2290 -2.8372 -2.9304 | zm minus profile in sd -1.06 -0.54 -0.46 -0.21 | zm conv True | conv True [1686 s]
+real 29 zm -3.1567 -3.2827 -2.8793 -2.9794 sd 0.0286 0.0272 0.0213 0.0188 | profile -3.1270 -3.2678 -2.8687 -2.9753 | zm minus profile in sd -1.04 -0.55 -0.50 -0.21 | zm conv True | conv True [1744 s]
+## zm, 30 realizations: mean estimate - truth -0.0233 -0.0247 -0.0083 -0.0042; pooled mean z -0.571 +- 0.091, sd z 1.010, coverage of 1 sd 0.567; median error 0.0290 0.0274 0.0213 0.0185
