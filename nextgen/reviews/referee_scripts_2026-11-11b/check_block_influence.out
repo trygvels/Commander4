@@ -1,0 +1,44 @@
+
+High Latitude: index -3.082 +- 0.012 (sandwich). Patches by share of information:
+  block 18 centre (l,b)=(337.5, +0.0) share 0.371 (cum 0.37); pixels of the region in it  32, their |b| range  0.0 to 17.0, median  6.0; deleting it moves the index by -0.019 (-1.5 sandwich sd)
+  block 17 centre (l,b)=( 22.5, +0.0) share 0.143 (cum 0.51); pixels of the region in it  31, their |b| range  0.0 to 17.0, median  4.8; deleting it moves the index by +0.007 (+0.5 sandwich sd)
+  block 47 centre (l,b)=(315.0,-19.5) share 0.065 (cum 0.58); pixels of the region in it  64, their |b| range  2.4 to 38.7, median 19.5; deleting it moves the index by +0.004 (+0.3 sandwich sd)
+  block 22 centre (l,b)=( 67.5, +0.0) share 0.064 (cum 0.64); pixels of the region in it  36, their |b| range  0.0 to 17.0, median  6.0; deleting it moves the index by +0.006 (+0.5 sandwich sd)
+  block 12 centre (l,b)=(315.0,+19.5) share 0.042 (cum 0.68); pixels of the region in it  64, their |b| range  2.4 to 38.7, median 19.5; deleting it moves the index by -0.005 (-0.4 sandwich sd)
+  block  0 centre (l,b)=( 45.0,+19.5) share 0.041 (cum 0.73); pixels of the region in it  41, their |b| range  2.4 to 32.8, median 14.5; deleting it moves the index by +0.002 (+0.2 sandwich sd)
+  block 29 centre (l,b)=(292.5, +0.0) share 0.034 (cum 0.76); pixels of the region in it  25, their |b| range  0.0 to 17.0, median  4.8; deleting it moves the index by -0.003 (-0.2 sandwich sd)
+  block 35 centre (l,b)=( 45.0,-19.5) share 0.032 (cum 0.79); pixels of the region in it  64, their |b| range  2.4 to 38.7, median 19.5; deleting it moves the index by -0.001 (-0.1 sandwich sd)
+  share of the region's information in the eight patches centred on b = 0: 0.62; in patches centred at |b| = 19.5: 0.24; at |b| >= 41.8: 0.14
+  largest delete-one shifts: block 18 (338,+0): -0.019, block 15 (315,+66): +0.007, block 17 (22,+0): +0.007, block 22 (68,+0): +0.006
+
+Spur: index -3.080 +- 0.016 (sandwich). Patches by share of information:
+  block  2 centre (l,b)=( 22.5,+41.8) share 0.231 (cum 0.23); pixels of the region in it  64, their |b| range 22.0 to 63.4, median 41.8; deleting it moves the index by +0.009 (+0.5 sandwich sd)
+  block 16 centre (l,b)=(  0.0,-19.5) share 0.129 (cum 0.36); pixels of the region in it  53, their |b| range 12.0 to 38.7, median 22.0; deleting it moves the index by -0.010 (-0.6 sandwich sd)
+  block  0 centre (l,b)=( 45.0,+19.5) share 0.128 (cum 0.49); pixels of the region in it  23, their |b| range 17.0 to 38.7, median 24.6; deleting it moves the index by +0.021 (+1.3 sandwich sd)
+  block 19 centre (l,b)=(  0.0,+19.5) share 0.105 (cum 0.59); pixels of the region in it  43, their |b| range 17.0 to 38.7, median 22.0; deleting it moves the index by +0.009 (+0.5 sandwich sd)
+  block  3 centre (l,b)=( 45.0,+66.4) share 0.061 (cum 0.65); pixels of the region in it  21, their |b| range 45.0 to 72.4, median 63.4; deleting it moves the index by +0.001 (+0.1 sandwich sd)
+  block 45 centre (l,b)=(337.5,-41.8) share 0.057 (cum 0.71); pixels of the region in it  19, their |b| range 24.6 to 41.8, median 35.7; deleting it moves the index by -0.003 (-0.2 sandwich sd)
+  block  4 centre (l,b)=(135.0,+19.5) share 0.056 (cum 0.77); pixels of the region in it  16, their |b| range 14.5 to 22.0, median 19.5; deleting it moves the index by -0.008 (-0.5 sandwich sd)
+  block 22 centre (l,b)=( 67.5, +0.0) share 0.048 (cum 0.82); pixels of the region in it  17, their |b| range  0.0 to 12.0, median  7.2; deleting it moves the index by +0.000 (+0.0 sandwich sd)
+  share of the region's information in the eight patches centred on b = 0: 0.12; in patches centred at |b| = 19.5: 0.50; at |b| >= 41.8: 0.38
+  largest delete-one shifts: block 0 (45,+19): +0.021, block 16 (0,-19): -0.010, block 19 (0,+19): +0.009, block 2 (22,+42): +0.009
+
+Galactic Center: index -3.081 +- 0.009 (sandwich). Patches by share of information:
+  block 17 centre (l,b)=( 22.5, +0.0) share 0.479 (cum 0.48); pixels of the region in it  30, their |b| range  0.0 to 14.5, median  4.8; deleting it moves the index by -0.009 (-1.1 sandwich sd)
+  block 18 centre (l,b)=(337.5, +0.0) share 0.402 (cum 0.88); pixels of the region in it  30, their |b| range  0.0 to 14.5, median  4.8; deleting it moves the index by -0.064 (-7.3 sandwich sd)
+  block 19 centre (l,b)=(  0.0,+19.5) share 0.086 (cum 0.97); pixels of the region in it  21, their |b| range  2.4 to 14.5, median 12.0; deleting it moves the index by +0.023 (+2.6 sandwich sd)
+  block 16 centre (l,b)=(  0.0,-19.5) share 0.034 (cum 1.00); pixels of the region in it  10, their |b| range  2.4 to  9.6, median  7.2; deleting it moves the index by +0.023 (+2.6 sandwich sd)
+  share of the region's information in the eight patches centred on b = 0: 0.88; in patches centred at |b| = 19.5: 0.12; at |b| >= 41.8: 0.00
+  largest delete-one shifts: block 18 (338,+0): -0.064, block 19 (0,+19): +0.023, block 16 (0,-19): +0.023, block 17 (22,+0): -0.009
+
+Plane: index -2.964 +- 0.013 (sandwich). Patches by share of information:
+  block 21 centre (l,b)=(112.5, +0.0) share 0.356 (cum 0.36); pixels of the region in it  52, their |b| range  0.0 to 17.0, median  4.8; deleting it moves the index by +0.049 (+3.7 sandwich sd)
+  block 26 centre (l,b)=(157.5, +0.0) share 0.187 (cum 0.54); pixels of the region in it  54, their |b| range  0.0 to 14.5, median  4.8; deleting it moves the index by +0.017 (+1.3 sandwich sd)
+  block  4 centre (l,b)=(135.0,+19.5) share 0.147 (cum 0.69); pixels of the region in it  22, their |b| range  2.4 to 17.0, median 12.0; deleting it moves the index by +0.031 (+2.3 sandwich sd)
+  block 22 centre (l,b)=( 67.5, +0.0) share 0.054 (cum 0.74); pixels of the region in it  11, their |b| range  0.0 to  7.2, median  2.4; deleting it moves the index by -0.009 (-0.7 sandwich sd)
+  block 39 centre (l,b)=(135.0,-19.5) share 0.050 (cum 0.79); pixels of the region in it  14, their |b| range  2.4 to 14.5, median  9.6; deleting it moves the index by +0.010 (+0.8 sandwich sd)
+  block 24 centre (l,b)=(180.0,-19.5) share 0.046 (cum 0.84); pixels of the region in it  30, their |b| range  2.4 to 22.0, median 13.3; deleting it moves the index by -0.074 (-5.6 sandwich sd)
+  block 30 centre (l,b)=(247.5, +0.0) share 0.045 (cum 0.88); pixels of the region in it  34, their |b| range  0.0 to  7.2, median  2.4; deleting it moves the index by -0.006 (-0.4 sandwich sd)
+  block 25 centre (l,b)=(202.5, +0.0) share 0.043 (cum 0.93); pixels of the region in it  43, their |b| range  0.0 to 14.5, median  2.4; deleting it moves the index by -0.003 (-0.2 sandwich sd)
+  share of the region's information in the eight patches centred on b = 0: 0.71; in patches centred at |b| = 19.5: 0.29; at |b| >= 41.8: 0.00
+  largest delete-one shifts: block 24 (180,-19): -0.074, block 21 (112,+0): +0.049, block 4 (135,+19): +0.031, block 26 (158,+0): +0.017

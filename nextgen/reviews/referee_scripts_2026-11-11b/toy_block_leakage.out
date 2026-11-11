@@ -1,0 +1,9 @@
+one parameter: n_eff 6.2, max h 0.25
+  true variance 0.9878 (1/D = 1)
+  E[CR0] 0.8384  predicted 1 - sum h^2 = 0.8395
+  E[CR3] 1.2004  predicted sum h/(1-h) = 1.2018
+  CR3 / jackknife variance: 1.0256  predicted G/(G-1) = 1.0256
+rho 0.2, kappa    1: region A  model variance 1.042 | true variance of the estimate 1.043 | mean CR3 full 1.197, own-score 1.232 | median ratio of errors: full 1.01, own 1.02; 97.5th percentile of the own ratio 1.69
+rho 0.2, kappa   30: region A  model variance 1.042 | true variance of the estimate 1.881 | mean CR3 full 2.818, own-score 1.737 | median ratio of errors: full 1.53, own 1.13; 97.5th percentile of the own ratio 2.33
+rho 0.2, kappa   70: region A  model variance 1.042 | true variance of the estimate 3.336 | mean CR3 full 5.155, own-score 2.050 | median ratio of errors: full 2.04, own 1.22; 97.5th percentile of the own ratio 2.52
+rho 0.0, kappa   70: region A  model variance 1.000 | true variance of the estimate 1.003 | mean CR3 full 1.191, own-score 1.191 | median ratio of errors: full 1.00, own 1.00; 97.5th percentile of the own ratio 1.78

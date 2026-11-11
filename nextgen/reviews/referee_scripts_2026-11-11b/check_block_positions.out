@@ -1,0 +1,30 @@
+elements 6144 nside 16  block ids 0 47  Q and U share blocks: True
+block == nested parent of nested pixels: True ; == nested parent of ring pixels: False ; == ring parent of ring pixels: False
+  Tau A (Crab)         l  184.6 b   -5.8 -> block 24
+  Cen A                l  309.5 b  +19.4 -> block 12
+  Cyg A                l   76.2 b   +5.8 -> block 22
+  Cas A                l  111.7 b   -2.1 -> block 21
+  Galactic Center      l    0.0 b   +0.0 -> block 19
+  Fan region centre    l  140.0 b   +5.0 -> block 4
+  3C 273               l  289.9 b  +64.4 -> block 15
+  Vir A                l  283.8 b  +74.5 -> block 15
+  For A                l  240.2 b  -56.7 -> block 40
+  Orion A              l  209.0 b  -19.4 -> block 43
+  W51                  l   49.2 b   -0.7 -> block 22
+High Latitude    block 18 centre l  337.5 b   +0.0  elements of this region  64; elements by region [64, 4, 60, 0]; h 0.371; z -1.61
+High Latitude    block 15 centre l  315.0 b  +66.4  elements of this region 124; elements by region [124, 4, 0, 0]; h 0.012; z +5.63
+High Latitude    block 17 centre l   22.5 b   +0.0  elements of this region  62; elements by region [62, 6, 60, 0]; h 0.143; z +1.26
+High Latitude    block 22 centre l   67.5 b   +0.0  elements of this region  72; elements by region [72, 34, 0, 22]; h 0.064; z +1.90
+High Latitude    block 12 centre l  315.0 b  +19.5  elements of this region 128; elements by region [128, 0, 0, 0]; h 0.042; z -2.12
+Spur             block  0 centre l   45.0 b  +19.5  elements of this region  46; elements by region [82, 46, 0, 0]; h 0.128; z +3.16
+Spur             block 16 centre l    0.0 b  -19.5  elements of this region 106; elements by region [2, 106, 20, 0]; h 0.129; z -1.58
+Spur             block 19 centre l    0.0 b  +19.5  elements of this region  86; elements by region [0, 86, 42, 0]; h 0.105; z +1.51
+Spur             block  2 centre l   22.5 b  +41.8  elements of this region 128; elements by region [0, 128, 0, 0]; h 0.231; z +0.86
+Galactic Center  block 18 centre l  337.5 b   +0.0  elements of this region  60; elements by region [64, 4, 60, 0]; h 0.402; z -7.03
+Galactic Center  block 19 centre l    0.0 b  +19.5  elements of this region  42; elements by region [0, 86, 42, 0]; h 0.086; z +8.40
+Galactic Center  block 16 centre l    0.0 b  -19.5  elements of this region  20; elements by region [2, 106, 20, 0]; h 0.034; z +13.93
+Galactic Center  block 17 centre l   22.5 b   +0.0  elements of this region  60; elements by region [62, 6, 60, 0]; h 0.479; z -0.82
+Plane            block 24 centre l  180.0 b  -19.5  elements of this region  60; elements by region [28, 40, 0, 60]; h 0.046; z -25.27
+Plane            block 21 centre l  112.5 b   +0.0  elements of this region 104; elements by region [6, 18, 0, 104]; h 0.356; z +4.08
+Plane            block  4 centre l  135.0 b  +19.5  elements of this region  44; elements by region [52, 32, 0, 44]; h 0.147; z +5.24
+Plane            block 26 centre l  157.5 b   +0.0  elements of this region 108; elements by region [2, 18, 0, 108]; h 0.187; z +2.47

@@ -1,0 +1,87 @@
+J_c^-1 as correlations:
+ [[1.    0.13  0.204 0.066]
+ [0.13  1.    0.041 0.159]
+ [0.204 0.041 1.    0.003]
+ [0.066 0.159 0.003 1.   ]]
+sqrt(diag J_c^-1) [0.012 0.016 0.009 0.013]  1/sqrt(diag J_c) [0.012 0.016 0.009 0.013]  sandwich [0.012 0.016 0.009 0.013]
+
+CR0: middle matrix M = sum_B Gk_B Gk_B^T, as M_rs / sqrt(Jc_rr Jc_ss) (identity-like under the model):
+ [[ 2.488  0.282  4.057 -0.645]
+ [ 0.282  2.76  -0.386 -0.27 ]
+ [ 4.057 -0.386 33.087  0.   ]
+ [-0.645 -0.27   0.    41.741]]
+  High Latitude    block sd 0.0304 | own-score term only 0.0201 (0.44 of the variance) | other regions' scores replaced by their model covariance: 0.0199 | ratio to sandwich: full 2.43, own 1.61, model-others 1.59
+       contributions C[s,t]/total:
+ [[ 0.44   0.006  0.145 -0.007]
+ [ 0.006  0.008 -0.002 -0.   ]
+ [ 0.145 -0.002  0.238  0.   ]
+ [-0.007 -0.     0.     0.031]]
+  Spur             block sd 0.0330 | own-score term only 0.0278 (0.71 of the variance) | other regions' scores replaced by their model covariance: 0.0276 | ratio to sandwich: full 2.00, own 1.69, model-others 1.68
+       contributions C[s,t]/total:
+ [[ 0.011  0.01   0.006 -0.003]
+ [ 0.01   0.712 -0.004 -0.011]
+ [ 0.006 -0.004  0.014  0.   ]
+ [-0.003 -0.011  0.     0.27 ]]
+  Galactic Center  block sd 0.0533 | own-score term only 0.0520 (0.95 of the variance) | other regions' scores replaced by their model covariance: 0.0519 | ratio to sandwich: full 6.03, own 5.87, model-others 5.87
+       contributions C[s,t]/total:
+ [[ 0.003  0.     0.024 -0.   ]
+ [ 0.     0.    -0.    -0.   ]
+ [ 0.024 -0.     0.95   0.   ]
+ [-0.    -0.     0.     0.   ]]
+  Plane            block sd 0.0869 | own-score term only 0.0870 (1.00 of the variance) | other regions' scores replaced by their model covariance: 0.0870 | ratio to sandwich: full 6.54, own 6.54, model-others 6.54
+       contributions C[s,t]/total:
+ [[ 0.     0.     0.    -0.001]
+ [ 0.     0.002 -0.    -0.001]
+ [ 0.    -0.     0.     0.   ]
+ [-0.001 -0.001  0.     1.002]]
+
+CR3: middle matrix M = sum_B Gk_B Gk_B^T, as M_rs / sqrt(Jc_rr Jc_ss) (identity-like under the model):
+ [[ 4.129  0.332 11.013 -0.764]
+ [ 0.332  3.499 -0.505 -0.473]
+ [11.013 -0.505 71.56   0.   ]
+ [-0.764 -0.473  0.    55.223]]
+  High Latitude    block sd 0.0437 | own-score term only 0.0259 (0.35 of the variance) | other regions' scores replaced by their model covariance: 0.0258 | ratio to sandwich: full 3.51, own 2.08, model-others 2.06
+       contributions C[s,t]/total:
+ [[ 0.352  0.004  0.189 -0.004]
+ [ 0.004  0.005 -0.001 -0.   ]
+ [ 0.189 -0.001  0.249  0.   ]
+ [-0.004 -0.     0.     0.02 ]]
+  Spur             block sd 0.0377 | own-score term only 0.0314 (0.69 of the variance) | other regions' scores replaced by their model covariance: 0.0312 | ratio to sandwich: full 2.29, own 1.90, model-others 1.89
+       contributions C[s,t]/total:
+ [[ 0.014  0.009  0.012 -0.003]
+ [ 0.009  0.692 -0.004 -0.015]
+ [ 0.012 -0.004  0.023  0.   ]
+ [-0.003 -0.015  0.     0.274]]
+  Galactic Center  block sd 0.0789 | own-score term only 0.0764 (0.94 of the variance) | other regions' scores replaced by their model covariance: 0.0764 | ratio to sandwich: full 8.92, own 8.64, model-others 8.64
+       contributions C[s,t]/total:
+ [[ 0.002  0.     0.03  -0.   ]
+ [ 0.     0.    -0.    -0.   ]
+ [ 0.03  -0.     0.939  0.   ]
+ [-0.    -0.     0.     0.   ]]
+  Plane            block sd 0.0999 | own-score term only 0.1000 (1.00 of the variance) | other regions' scores replaced by their model covariance: 0.1000 | ratio to sandwich: full 7.52, own 7.53, model-others 7.52
+       contributions C[s,t]/total:
+ [[ 0.     0.     0.    -0.001]
+ [ 0.     0.002 -0.    -0.001]
+ [ 0.    -0.     0.     0.   ]
+ [-0.001 -0.001  0.     1.002]]
+
+High Latitude: blocks by contribution to the FULL CR3 variance (block, share, and which region's score in that block drives it)
+   block 18 share 0.80  terms Ji[r,s]*Gk[B,s] by region s: [-0.02   0.    -0.019  0.   ]  h_B by region [0.371 0.003 0.402 0.   ]
+   block 19 share 0.03  terms Ji[r,s]*Gk[B,s] by region s: [0.    0.001 0.007 0.   ]  h_B by region [0.    0.105 0.086 0.   ]
+   block 15 share 0.03  terms Ji[r,s]*Gk[B,s] by region s: [ 0.008 -0.     0.     0.   ]  h_B by region [0.012 0.002 0.    0.   ]
+   block 22 share 0.02  terms Ji[r,s]*Gk[B,s] by region s: [ 0.007  0.     0.    -0.001]  h_B by region [0.064 0.048 0.    0.054]
+   block 12 share 0.02  terms Ji[r,s]*Gk[B,s] by region s: [-0.006  0.     0.     0.   ]  h_B by region [0.042 0.    0.    0.   ]
+   block 24 share 0.02  terms Ji[r,s]*Gk[B,s] by region s: [-0.    -0.     0.    -0.005]  h_B by region [0.001 0.011 0.    0.046]
+
+Spur: blocks by contribution to the FULL CR3 variance (block, share, and which region's score in that block drives it)
+   block  0 share 0.35  terms Ji[r,s]*Gk[B,s] by region s: [0.    0.022 0.    0.   ]  h_B by region [0.041 0.128 0.    0.   ]
+   block 24 share 0.24  terms Ji[r,s]*Gk[B,s] by region s: [-0.    -0.003  0.    -0.015]  h_B by region [0.001 0.011 0.    0.046]
+   block 19 share 0.09  terms Ji[r,s]*Gk[B,s] by region s: [0.    0.009 0.002 0.   ]  h_B by region [0.    0.105 0.086 0.   ]
+   block 21 share 0.08  terms Ji[r,s]*Gk[B,s] by region s: [-0.     0.001  0.     0.01 ]  h_B by region [0.001 0.017 0.    0.356]
+   block 16 share 0.06  terms Ji[r,s]*Gk[B,s] by region s: [-0.    -0.011  0.002  0.   ]  h_B by region [0.    0.129 0.034 0.   ]
+   block  2 share 0.06  terms Ji[r,s]*Gk[B,s] by region s: [0.    0.009 0.    0.   ]  h_B by region [0.    0.231 0.    0.   ]
+
+own-score ratios on the maps: CR3 [2.079 1.904 8.638 7.525]  CR0 [1.614 1.691 5.874 6.542]
+null simulations (nside 8, LCDM prior, full-matrix form) above the own-score map ratio: CR3 [4 3 0 0]  CR0 [3 1 0 0] of 60
+null simulations above the full map ratio: CR3 [0 1 0 0]  CR0 [0 0 0 0]
+white-prior null (nside 8) above the own-score map ratio: CR3 [1 1 0 0]  CR0 [1 0 0 0] of 60

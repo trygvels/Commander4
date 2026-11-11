@@ -1,0 +1,77 @@
+column sums of G (should vanish at the optimum): [-0.0003 -0.      0.0006  0.0005]  largest |G_B|: [ 81.7823  70.4123 516.9807 412.8729]
+sum_B D_B / diag(J_c): [1.0009 1.003  1.0081 1.0017]
+n_eff [5.7407 8.8331 2.5066 5.1077]  max h [0.371  0.2309 0.4786 0.356 ]  blocks with D>0: [44 29  4 16]  with D != 0: [46 29  4 16]  D<0: [2 0 0 0]
+CR0: full-matrix [0.0304 0.033  0.0533 0.0869]  stored [0.0304 0.033  0.0533 0.0869]  scalar per region [0.019  0.0267 0.0498 0.0846]  bread sum D [0.0189 0.0267 0.0494 0.0844]
+CR2: full-matrix [0.0361 0.0351 0.0642 0.0926]  stored [0.0361 0.0351 0.0642 0.0926]  scalar per region [0.0213 0.0283 0.0598 0.0902]  bread sum D [0.0213 0.0283 0.0593 0.09  ]
+CR3: full-matrix [0.0437 0.0377 0.0789 0.0999]  stored [0.0437 0.0377 0.0789 0.0999]  scalar per region [0.0244 0.0301 0.0732 0.0973]  bread sum D [0.0244 0.03   0.0727 0.0971]
+CR3 / sandwich [3.5053 2.2876 8.9156 7.5159]
+expected inflation of CR3 under the model with independent blocks, sqrt(sum h/(1-h)): [1.1223 1.0659 1.3108 1.1306]
+expected deflation of CR0, sqrt(1 - sum h^2): [0.9087 0.9417 0.7753 0.8968]
+
+High Latitude: blocks by share of the CR3 variance (block, share of variance, leverage h, G_B/sqrt(D_B), one-step index offset -G/D)
+    block 18  share  0.59  h 0.371  z  -1.61  one-step +0.032
+    block 15  share  0.09  h 0.012  z  +5.63  one-step -0.620
+    block 17  share  0.07  h 0.143  z  +1.26  one-step -0.040
+    block 22  share  0.06  h 0.064  z  +1.90  one-step -0.090
+    block 12  share  0.05  h 0.042  z  -2.12  one-step +0.124
+    block 47  share  0.02  h 0.065  z  +1.14  one-step -0.054
+    CR3 without the top 1 term(s) of the sum: 0.0156 (full 0.0244, sandwich 0.0125)
+    CR3 without the top 2 term(s) of the sum: 0.0137 (full 0.0244, sandwich 0.0125)
+    sum_B G_B^2 / (D_B (1 - h_B)) = 130.0 for 44 blocks; median of the terms 1.32; terms above 9: 3
+Spur: blocks by share of the CR3 variance (block, share of variance, leverage h, G_B/sqrt(D_B), one-step index offset -G/D)
+    block  0  share  0.48  h 0.128  z  +3.16  one-step -0.142
+    block 16  share  0.12  h 0.129  z  -1.58  one-step +0.071
+    block 19  share  0.09  h 0.105  z  +1.51  one-step -0.075
+    block  2  share  0.08  h 0.231  z  +0.86  one-step -0.029
+    block  4  share  0.08  h 0.056  z  -2.08  one-step +0.141
+    block 39  share  0.05  h 0.030  z  -2.34  one-step +0.216
+    CR3 without the top 1 term(s) of the sum: 0.0217 (full 0.0301, sandwich 0.0165)
+    CR3 without the top 2 term(s) of the sum: 0.0189 (full 0.0301, sandwich 0.0165)
+    sum_B G_B^2 / (D_B (1 - h_B)) = 77.1 for 29 blocks; median of the terms 1.00; terms above 9: 3
+Galactic Center: blocks by share of the CR3 variance (block, share of variance, leverage h, G_B/sqrt(D_B), one-step index offset -G/D)
+    block 18  share  0.78  h 0.402  z  -7.03  one-step +0.096
+    block 19  share  0.10  h 0.086  z  +8.40  one-step -0.247
+    block 16  share  0.10  h 0.034  z +13.93  one-step -0.653
+    block 17  share  0.02  h 0.479  z  -0.82  one-step +0.010
+    block  0  share  0.00  h 0.000  z   +nan  one-step +nan
+    block 28  share  0.00  h 0.000  z   +nan  one-step +nan
+    CR3 without the top 1 term(s) of the sum: 0.0342 (full 0.0732, sandwich 0.0088)
+    CR3 without the top 2 term(s) of the sum: 0.0249 (full 0.0732, sandwich 0.0088)
+    sum_B G_B^2 / (D_B (1 - h_B)) = 362.1 for 4 blocks; median of the terms 79.94; terms above 9: 3
+Plane: blocks by share of the CR3 variance (block, share of variance, leverage h, G_B/sqrt(D_B), one-step index offset -G/D)
+    block 24  share  0.58  h 0.046  z -25.27  one-step +1.547
+    block 21  share  0.26  h 0.356  z  +4.08  one-step -0.089
+    block  4  share  0.10  h 0.147  z  +5.24  one-step -0.179
+    block 26  share  0.03  h 0.187  z  +2.47  one-step -0.075
+    block 39  share  0.01  h 0.050  z  +3.32  one-step -0.194
+    block 22  share  0.01  h 0.054  z  -2.76  one-step +0.156
+    CR3 without the top 1 term(s) of the sum: 0.0630 (full 0.0973, sandwich 0.0133)
+    CR3 without the top 2 term(s) of the sum: 0.0389 (full 0.0973, sandwich 0.0133)
+    sum_B G_B^2 / (D_B (1 - h_B)) = 773.8 for 16 blocks; median of the terms 3.42; terms above 9: 4
+
+== sim_n8_lcdm_blocknull.npz: 60 realizations
+   CR3/sandwich median [1.2834 1.2087 1.212  1.3155]  84th [1.5955 1.593  2.3097 1.9603]  97.5th [2.4712 2.0142 3.3124 2.5986]  max [2.8223 2.3618 3.862  2.8233]
+   CR0/sandwich median [1.1236 1.0301 0.7692 0.9714]  max [2.0495 1.8388 2.2684 2.056 ]
+   n_eff in the simulations: median [7.6791 7.9925 2.6146 4.2362]  min [7.3133 7.7303 2.5852 4.1685]  max [8.1214 8.2815 2.6465 4.3741]    maps: [5.7407 8.8331 2.5066 5.1077]
+   largest leverage: median [0.3175 0.2608 0.4609 0.3844]  max [0.3286 0.2714 0.4708 0.3945]   maps: [0.371  0.2309 0.4786 0.356 ]
+   blocks with negative information per realization (mean): [1.5667 0.     0.     0.0167]  cross share mean 0.25622703209716174
+   simulations with ratio above the map value [0 1 0 0] of 60
+   log-ratio: mean [0.2515 0.2241 0.1684 0.2638]  sd [0.2719 0.2149 0.6611 0.3838]  map value in sd of log-ratio: [3.6879 2.8084 3.0545 4.568 ]
+     High Latitude: correlation of ratio with n_eff -0.13
+     Spur: correlation of ratio with n_eff -0.22
+     Galactic Center: correlation of ratio with n_eff +0.11
+     Plane: correlation of ratio with n_eff +0.16
+   rms z with CR3 [0.8982 0.8304 0.9906 1.0432]  with sandwich [1.0774 0.9826 0.9279 1.1334]  with CR0 [1.0336 0.9541 1.4127 1.2478]
+   scatter of estimate [0.0172 0.0178 0.01   0.0184]  median sandwich [0.0158 0.0181 0.0108 0.0161]  median CR3 [0.0205 0.0219 0.0131 0.0212]  mean z [-0.0887 -0.145   0.1056  0.0632] sd z [1.0828 0.9801 0.9296 1.1412]
+== block_v2_sim_spread0_full.npz: 60 realizations
+   CR3/sandwich median [1.2502 1.0304 1.0541 1.0738]  84th [1.5386 1.4076 2.2099 1.4956]  97.5th [1.8148 1.8013 3.3371 2.1595]  max [2.7181 2.0332 3.8528 2.2977]
+   CR0/sandwich median [1.1145 0.8926 0.6908 0.8338]  max [2.0294 1.6115 2.177  1.6568]
+   n_eff in the simulations: median [8.3797 7.1846 2.6377 4.1826]  min [7.9988 6.9074 2.616  4.0762]  max [8.7716 7.4399 2.6691 4.2669]    maps: [5.7407 8.8331 2.5066 5.1077]
+   simulations with ratio above the map value [0 0 0 0] of 60
+   log-ratio: mean [0.2349 0.0337 0.0846 0.0297]  sd [0.2207 0.3118 0.6226 0.3978]  map value in sd of log-ratio: [4.6186 2.5455 3.378  4.9958]
+     High Latitude: correlation of ratio with n_eff +0.24
+     Spur: correlation of ratio with n_eff -0.11
+     Galactic Center: correlation of ratio with n_eff -0.02
+     Plane: correlation of ratio with n_eff -0.13
+   rms z with CR3 [0.8219 1.2035 1.0342 1.0188]  with sandwich [1.0379 1.1407 0.9077 0.92  ]  with CR0 [0.9173 1.3877 1.5001 1.2593]
+   scatter of estimate [0.0159 0.0192 0.0097 0.0134]  median sandwich [0.0152 0.0165 0.0107 0.0145]  median CR3 [0.0191 0.0171 0.0113 0.0156]  mean z [-0.0539  0.036   0.1512  0.0115] sd z [1.0452 1.1497 0.9026 0.9277]

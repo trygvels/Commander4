@@ -1,0 +1,8 @@
+Plane residual rms by band [0.99 2.31 2.27 2.55]  noise proxy [2.65 2.3  2.21 2.56]
+Tau A pixel 1591: share of the Plane's unweighted residual sum of squares 0.178; chi-square under the proxy 377
+neighbour 1597: share of the Plane's unweighted residual sum of squares 0.029; chi-square under the proxy 64
+Plane: 646 elements; printed chi2 per element and band 0.770 against 0.6: total 2487, expected 1938, excess 549
+High Latitude   : 5 brightest of 2194 pixels hold 0.00 of the unweighted residual sum of squares
+Spur            : 5 brightest of 464 pixels hold 0.02 of the unweighted residual sum of squares
+Galactic Center : 5 brightest of 91 pixels hold 0.11 of the unweighted residual sum of squares
+Plane           : 5 brightest of 323 pixels hold 0.19 of the unweighted residual sum of squares
