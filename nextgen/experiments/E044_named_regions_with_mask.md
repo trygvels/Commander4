@@ -466,7 +466,7 @@ the two marginals run from -684.5 and -1567.5 at -4.6 to +593.4 and +2081.1 at -
 | coverage of two sd, all 360 | 0.947 | 0.928 | 0.967 | 0.942 |
 | own-score block error over sandwich: median | 1.34 | 1.28 | 1.13 | 1.07 |
 | the same: 84th and 97.5th percentile | 1.60, 1.95 | 2.01, 3.04 | 1.41, 1.66 | 1.36, 1.74 |
-| simulations above the map value, of 360 | 51 | 244 | 51 | 78 |
+| simulations above the map value, of 360 | 51 | 244 | 50 | 78 |
 
 - **H10: the 1.11 at High Latitude was a fluctuation.** The new set alone gives 0.975 +- 0.046, below the 1.09
   of the rule; pooled over 360 the sandwich error is calibrated to 1.02 +- 0.04 there. By the rule the pooled

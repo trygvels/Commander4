@@ -1427,4 +1427,7 @@ replaced in its numbers by F55 and stands in kind. F49 (scale dependence) descri
 superseded by F59 for the masked ones: the effect was the masked emission. F53 (white CMB prior) is replaced by
 F58. F54 (block errors) is superseded by F57. F50 and F51 (Planck 30 GHz, the band set without K band) were not
 redone on the new regions and are Paper B material with the labels of the old regions.
+F57 with the third null set (E044 R8, 360 realizations at nside 8): ratio median 1.34, 1.28, 1.13, 1.07 and 97.5th
+percentile 1.95, 3.04, 1.66, 1.74; 51, 244, 50 and 78 of the 360 lie above the map values. The sandwich error is
+calibrated: sd of z 1.02, 1.06, 0.97, 0.98 (+- 0.04), mean of z +0.05, -0.11, 0.00, -0.05 (+- 0.05).
 
