@@ -420,6 +420,33 @@ standard deviation.
 - Over all arms that test the model (flat CMB prior, three low-pass cuts, K and Ka, K and Ka at l <= 20: 24
   numbers that share their data) the largest is 2.40. No arm rejects the model on these regions with this mask.
 
+### R7, scan of the flat-prior marginal along the High Latitude index (flat CMB prior read 2026-11-11 12:22)
+
+`E044/scan_flat.txt` (`e044_flat_scan.py --prior flat`; 21 values from -4.6 to -1.6; canary, no OVERFLOW line). ln L
+minus its value at the profile optimum (-3.0406):
+
+| High Latitude index | profile | flat prior, 23 GHz | flat prior, 30 GHz |
+|---|---|---|---|
+| -4.60 | -214.1 | -692.4 | -1924.7 |
+| -3.85 | -73.9 | -349.1 | -988.7 |
+| -3.10 | -0.5 | -23.8 | -70.7 |
+| -2.95 | -1.2 | +35.4 | +107.0 |
+| -2.35 | -85.5 | +242.7 | +788.4 |
+| -1.60 | -445.1 | +462.8 | +1601.2 |
+
+(others at the profile optimum; all 21 values are in the file.) With the others at the flat-prior optimum for 23 GHz
+the two marginals run from -684.5 and -1567.5 at -4.6 to +593.4 and +2081.1 at -1.6.
+
+- **H11 holds for the flat CMB prior.** Both marginals increase at every step of the grid in both slices: no
+  interior maximum; the value at the upper edge is the largest. Between the profile optimum and the upper edge
+  the marginal gains 463 (23 GHz) and 1601 (30 GHz) where the profile likelihood loses 445 (written: more than 10
+  for 30 GHz). My reasoning in H11 that a function convex at the profile optimum might also rise toward the
+  lower edge was wrong for this function: it is monotonic over the whole range.
+- The identity holds: ln L_flat at 30 GHz evaluated directly equals the 23 GHz value plus
+  sum_r n_r beta_r ln(30/23) to 4e-9 at both test points (written: 1e-6 relative).
+- So "no optimum inside the allowed range" is a property of the flat-prior marginal with a free CMB amplitude on
+  this region, and not an optimizer result.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).

@@ -79,6 +79,9 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F55 | A for the differences between estimators, B for the index values | Pre-registered (H1 to H3); regions by geometry with a mask; one data set; values depend on the choices of F58 |
 | F56 | B | 30 simulated realizations at nside 8 and one map fit at nside 16; the size on the maps is not predicted |
 | F57 | A for the Tau A test, B for the reading of the block errors | Pre-registered (H4, H6); null of 120 realizations at nside 8, the map fit at nside 16 |
+| F58 | A for the calculation and the scan, B for its truth model | Pre-registered (H5, H11); first order in the mismatch; the LCDM covariance of the paper taken as the truth |
+| F59 | B | Pre-registered (H7, H8); one data set; 24 correlated comparisons, largest 2.4 expected sd |
+| F60 | B for the deficit, C for its reading | Not pre-registered (found on reading R1 again); a simulated null; the literature has no statement either way |
 
 ## 1. Sampler correctness
 
@@ -1382,3 +1385,46 @@ model (120 simulations at nside 8 with the regions, mask, covariances and prior 
 has median 1.33, 1.30, 1.11, 1.12 and 97.5th percentile 2.02, 3.11, 1.69, 1.72; 15, 85, 12 and 31 of the
 120 lie above the map values. H4 (ratios of 1.5 to 4 for Intermediate and Plane) failed on the low side.
 This supersedes what was left of F54 for the regions. Grade A for the Tau A test, B for the reading.
+
+**F58. On the masked regions a white CMB prior makes the index error 9 to 22 percent too small while quoting
+a smaller error than the LCDM prior, and with a free CMB amplitude the flat-prior marginal has no optimum
+at high latitude** (E044 R3, R5, R7; pre-registered H5, H11). White prior of 0.2 uK judged under the LCDM
+covariance by the first-order formula of `lowres.mismatch` (tested against 1500 simulated fits): true over
+quoted error 1.22, 1.21, 1.09, 1.10; bias below 0.1 of the quoted error; quoted error 0.91 to 0.97 of the LCDM
+fit's, true error 1.05 to 1.10 of it. Flat CMB prior: profile index -3.041 +- 0.062, -3.122 +- 0.060,
+-3.017 +- 0.044, -3.038 +- 0.035 (errors 2.1 to 2.4 times larger); with flat priors on all three amplitudes the
+High Latitude optimum is at the upper bound (-1.6) for references of 23 and 30 GHz alike, and a scan shows the
+marginal rising monotonically over the whole range -4.6 to -1.6 (gain of 463 and 1601 in ln L between the
+profile optimum and the edge, where the profile likelihood loses 445). The index variance carried by one
+amplitude is 11 there. Unexplained and reported: the index at High and Intermediate latitude steepens the more
+tightly the CMB amplitude is held (white, LCDM, flat: -3.173, -3.147, -3.041 and -3.104, -3.091, -3.017), each
+step 1.7 to 1.95 of its expected standard deviation (Q29). This replaces F53. Grade A for the calculation and
+the scan, B for the truth model.
+
+**F59. With the mask no test rejects the one-index model, and the dependence on angular scale is gone** (E044
+R6; pre-registered H7, H8). Index from multipoles up to 30, 20, 12 only: at most 1.3, 1.4, 1.3 of the standard
+deviation that the model predicts for the change (without the mask, on the old regions: 2.8 to 10.4 at l <= 20).
+K and Ka alone: +0.6, -0.2, +2.4, +2.0. Model changes: dust index 0.05 away, 0.004 to 0.021 (most in the
+Plane); delta bandpasses, -0.046 to -0.051 everywhere; drift correction 0.001; 353 GHz bandpass choice 0.003 or
+less; floor of the CMB prior 0.002 or less. By-product: chi2_min at dust indices 1.48, 1.53, 1.58 puts the dust
+index of these maps at 1.57 +- 0.02 (Planck: 1.53 +- 0.02). This supersedes F49 for these regions and answers
+Q25 at the level of this experiment. Failed in the pre-registration: the sign of the Plane's change at large
+scales (H7) and where the dust index matters most (H8). Grade B.
+
+**F60. The chi-square of the masked fit against the released WMAP covariances is low, and not uniformly**
+(E044 R4, R5; not pre-registered). chi2_min over degrees of freedom: 0.973 with the LCDM prior (2.5 sd), 0.956
+with a flat CMB prior (3.4 sd; two residual degrees of freedom per element, exact count), 0.962 for K and Ka
+alone (2.1 sd); a simulated null of the LCDM fit gives 1.002 +- 0.003 (40 realizations at nside 8). The deficit
+is in the two faint regions. The one degree of freedom per element along the CMB spectrum (the difference of the
+two nested fits) carries 1.008 +- 0.019. Read as noise it is 1.3 to 2.2 percent in rms, and every error of E044
+would be too large by that. Literature (`research/2026-11-11_wmap_lowres_covariance_normalization.md`): no
+statement of the accuracy of the r4 normalization, no claim that the matrices overstate the noise, two
+uncommented published V-band values of 0.96 to 0.98 with the same matrices. Not rescaled. Q28. Grade B for the
+deficit, C for any reading of it.
+
+**Amendment of 2026-11-11 12:25: what E044 does to F48 to F54.** F48 (the reference shift on real maps) is
+replaced in its numbers by F55 and stands in kind. F49 (scale dependence) described the unmasked regions and is
+superseded by F59 for the masked ones: the effect was the masked emission. F53 (white CMB prior) is replaced by
+F58. F54 (block errors) is superseded by F57. F50 and F51 (Planck 30 GHz, the band set without K band) were not
+redone on the new regions and are Paper B material with the labels of the old regions.
+
