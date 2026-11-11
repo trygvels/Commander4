@@ -38,7 +38,7 @@ def main():
         G, D, beta, sd, cr3, neff = z["blk_G"], z["blk_D"], z["beta"], z["sd_sand"], z["blk_CR3_own"], z["blk_neff"]
     else:
         G, D, beta, sd, cr3, neff = z["G"], z["D"], z["beta"], z["sd_model"], z["CR3"], z["neff"]
-    fig, axs = plt.subplots(2, 2, figsize=(6.6, 5.4), sharey=True, sharex=True)
+    fig, axs = plt.subplots(2, 2, figsize=(7.0, 5.8), sharey=True, sharex=True)
     axes = axs.ravel()
     for r, ax in enumerate(axes):
         d, g = D[:, r], G[:, r]
@@ -54,17 +54,17 @@ def main():
         for xx, zz in zip(100 * share[~inside], zs[~inside]):  # a value outside the frame: an arrow at the edge, with the value
             ax.annotate("", xy=(xx, np.sign(zz) * a.ylim * 0.99), xytext=(xx, np.sign(zz) * a.ylim * 0.86),
                         arrowprops=dict(arrowstyle="-|>", color=POINT, lw=1.0))
-            ax.text(xx * 1.12, np.sign(zz) * a.ylim * 0.90, f"{zz:+.1f}".replace("-", "−"), fontsize=7, color=INK, va="center")
+            ax.text(xx * 1.3, np.sign(zz) * a.ylim * 0.91, f"{zz:+.1f}".replace("-", "−"), fontsize=7, color=INK, va="center")
         ax.set_xscale("log")
-        ax.set_xlim(0.02, 60)
+        ax.set_xlim(0.001, 60)
         ax.set_ylim(-a.ylim, a.ylim)
-        ax.set_xticks([0.1, 1, 10])
-        ax.set_xticklabels(["0.1", "1", "10"])
+        ax.set_xticks([0.01, 0.1, 1, 10])
+        ax.set_xticklabels(["0.01", "0.1", "1", "10"])
         ax.set_yticks([-4, -2, 0, 2, 4])
         ax.set_title(f"{NAMES[r]}   {beta[r]:.2f}".replace("-", "−"), fontsize=9, color=INK, loc="left", pad=13)
         ratio = cr3[r] / sd[r]
-        note = f"{int(pos.sum())} patches, effective number {neff[r]:.1f}; block error {ratio:.2f} times the model error"
-        ax.text(0.0, 1.02, note, transform=ax.transAxes, fontsize=7.2, color=MUTED, ha="left", va="bottom")
+        note = f"{int(pos.sum())} patches ({neff[r]:.1f} effective); error ratio {ratio:.2f}"
+        ax.text(0.0, 1.02, note, transform=ax.transAxes, fontsize=7.4, color=MUTED, ha="left", va="bottom")
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
         for s in ("left", "bottom"):
@@ -74,8 +74,7 @@ def main():
     for ax in axs[1]:
         ax.set_xlabel("share of the region's information (percent)", fontsize=8.5, color=INK)
     fig.supylabel("score of the patch in units of its error under the model", fontsize=8.5, color=INK)
-    axes[0].text(0.025, 1.0, "one standard deviation\nunder the model", fontsize=7.2, color=MUTED, ha="left", va="bottom")
-    fig.tight_layout()
+    fig.tight_layout(w_pad=2.0, h_pad=1.6)
     fig.savefig(a.out)
     print("wrote", a.out)
     for r in range(4):

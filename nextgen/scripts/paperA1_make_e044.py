@@ -281,7 +281,9 @@ def main():
     arms = [("white", r"CMB prior: white, 0.2 $\mu$K"), ("flat", "CMB prior: flat"), ("lp30", r"index from $\ell \le 30$"), ("lp20", r"index from $\ell \le 20$"),
             ("lp12", r"index from $\ell \le 12$"), ("KKa", "K and Ka only"), ("bd148", "dust index 1.48 in place of 1.53"), ("bd158", "dust index 1.58"),
             ("nodrift", "no bandpass drift correction"), ("bp353full", "353 GHz: all bolometers"), ("delta", "delta bandpasses, nominal frequencies"),
-            ("floor011", r"$\Lambda$CDM prior with a floor of 0.11 $\mu$K")]
+            ("floor011", r"$\Lambda$CDM prior with a floor of 0.11 $\mu$K"),
+            ("bright03", "mask: brightest 3 percent in place of 5"), ("bright10", "mask: brightest 10 percent"), ("nomask", "no mask"),
+            ("ffmask_lcdm", "mask: brightest thermal sources as well")]
     def with_units(label, d, u):
         """A row of moves, each followed in brackets by the move in units of its expected standard deviation."""
         z1 = lambda y: "0.0" if abs(y) < 0.05 else f"{y:+.1f}"
@@ -331,6 +333,25 @@ def main():
             t += row(label, d, sgn)
     if worst:
         put("arms.nest.max", max(worst), "{:.1f}")
+    # the mask arms: elements per region, goodness of fit, and the change in units of sqrt(|sd_arm^2 - sd_base^2|) where the data of a region differ
+    for tag in ("bright03", "bright10", "nomask", "ffmask_lcdm"):
+        zz = load(tag)
+        if zz is None:
+            continue
+        d = zz["beta"] - b0
+        put4(f"{tag}.nper", zz["nper"], "{:.0f}"); put4(f"{tag}.chi", zz["chi2_region"])
+        nest = np.sqrt(np.abs(zz["sd_sand"] ** 2 - s0 ** 2))
+        for j, sname in enumerate(SHORT):
+            if abs(float(zz["nper"][j]) - float(z["nper"][j])) >= 0.02 * float(z["nper"][j]):
+                put(f"{tag}.nest.{sname}", float(d[j] / nest[j]), "{:+.1f}"); put(f"{tag}.nest.abs.{sname}", abs(float(d[j] / nest[j])), "{:.1f}")
+        if "blk_CR3_own" in zz.files:
+            put4(f"{tag}.cr3ownratio", zz["blk_CR3_own"] / zz["sd_sand"], "{:.1f}")
+    zn, znl = load("nomask"), load("nomask_lp20")
+    if zn is not None and znl is not None:
+        dn = znl["beta"] - zn["beta"]
+        nn = np.sqrt(np.clip(znl["sd_sand"] ** 2 - zn["sd_sand"] ** 2, 1e-30, None))
+        put4("nomask.lp20.move", dn, "{:+.3f}"); put4("nomask.lp20.nest", dn / nn, "{:+.1f}"); put4("nomask.lp20.nest.abs", np.abs(dn / nn), "{:.1f}"); put4("nomask.lp20.nestsd", nn)
+        put("nomask.lp20.conv", "yes" if bool(znl["converged"]) else "NO", "{}")
     bd = [load("bd148"), load("bd158")]
     if all(x is not None for x in bd):
         dmove = 0.5 * (np.abs(bd[0]["beta"] - b0) + np.abs(bd[1]["beta"] - b0))
