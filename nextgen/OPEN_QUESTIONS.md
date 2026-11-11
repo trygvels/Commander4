@@ -3,6 +3,13 @@
 Ranked by how much the answer changes what we build next. Each entry: why it matters, how to answer
 it, and what the answer decides. Mark an entry RESOLVED with the experiment ID when answered.
 
+**Ranking (2026-11-11):** Paper A1 comes first: fill its last pending numbers (arms with the LCDM prior, the
+simulation checks at nside 16), second independent referee read, revise until no fatal objection (D030).
+For Paper B, in this order: Q24 (the spread of the index inside the regions, F54: it decides what "the
+index of a region" can mean and is the largest error term we have), Q25 (the origin of the scale
+dependence, F49), Q26 (K band against 30 GHz, F50). Q21 is answered for WMAP K to V with 353 GHz (E039,
+E040) and open for LFI (no dense PR4 covariance in hand). Q27 is housekeeping with one item for Trygve.
+
 **Ranking (2026-11-09):** Q16 (a) is answered by E030 (F37, F38) up to chain 2's reading of
 the width's share of the field roughness; the new Q18 (keeping the template-dominated regions
 from setting the field mean) takes its place at the top, because it decides what the hier prior
@@ -553,3 +560,47 @@ per-pixel amplitudes (F7), which adds acceptance noise; a width from a chain wit
 How to answer: the legacy mode in Commander4 at nside 16 with 1 and 20 steps per amplitude draw,
 with the amplitudes kept as maps and as alms. Needs cores, so after E032. Low priority: it changes
 one sentence of Paper A.
+
+## Q24. How much does the polarized synchrotron index vary inside the four regions, and what model fits? (new 2026-11-11, F54)
+
+Why it matters: the block errors of E040 stage 5 are 2.3 to 7.5 times the model errors, and half a dozen
+30-degree patches carry each region's information. Until the variation is modelled, "the index of the High
+Latitude region" has an error of 0.04, not 0.012, and the region boundaries decide the answer.
+How to answer: (a) the profile fit with one index per nside-2 pixel (48 regions; E039 stage 2 is its
+simulation gate) and a random-effects summary per large region: mean, spread, with the patch errors from
+the sandwich; (b) the same with nside-4 patches where the signal allows; (c) compare the spread with the
+scale dependence of Q25 (a spread between patches and an index that depends on multipole are two views of
+one thing); (d) a simulation with the measured spread to check that the block errors of the four-region
+fit come out as observed.
+What it decides: the central result of Paper B, and whether the four-region tables of the literature can
+be compared at all.
+
+## Q25. Where does the scale dependence of the index come from? (new 2026-11-11, F49 as amended)
+
+Why it matters: with the index informed by multipoles up to 12 to 30 only, the four-band index steepens by
+0.01 to 0.09, and the stability criterion fails in the Plane and the Galactic Center. Candidates: sub-pixel
+structure folded through different beams (instrumental), compact structure with a flatter spectrum (sky),
+the white CMB prior acting on the multipoles that the low-pass arm keeps (being checked with the LCDM
+prior, E040 stage 4b), a varying index (Q24).
+How to answer: the low-pass arm with the LCDM prior (running); a simulation with compact sources and the
+true WMAP beam profiles at high resolution, degraded as the maps are; the cross-spectrum amplitude ratio
+per multipole bin with errors; the nside-16 simulation spot check of the estimator (running).
+What it decides: whether Paper B quotes an index from large scales, from all scales, or a function.
+
+## Q26. What is wrong between WMAP K band and Planck 30 GHz in polarization? (new 2026-11-11, F50, E042)
+
+Why it matters: the two most sensitive synchrotron channels cannot be combined in one power law at the
+precision of either, and the sign of the disagreement differs between PR3 and PR4.
+How to answer: the nuisance fits of E042 that were not completed (one amplitude factor, per region; a
+polarization angle), the DR1 maps (`e040c_dr1_arm.py`), PR3 with its released nside-16 covariance
+(`e042d_pr3_ncvm.py`), and a dense PR4 covariance if one can be obtained.
+What it decides: whether Paper B can use LFI at all.
+
+## Q27. Housekeeping after E043 (new 2026-11-11)
+
+- Recheck after any OS update whether Accelerate's `dpotrf` with uplo = U still overflows (the lowres test
+  suite prints a warning when it does). Keep the canary on every dense run until then.
+- Needs Trygve: whether to report the bug to Apple and the uncleared triangle of `cholesky(lower=True)` to
+  SciPy. A reproducer is in the E043 record.
+- Upstream Commander4's `standalone_tools/constrained_cmb_realizations.py` uses `cho_factor(lower=True)`;
+  on this OS it is exposed for low-multipole matrices of order 1500 to 6000. Not changed (upstream code).

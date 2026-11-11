@@ -75,6 +75,7 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F51 | B for the numbers, D for the reading of published chains | Not their maps, pixelization or chains |
 | F52 | A | Measured with a guard allocator and a malloc canary; reruns compared digit by digit |
 | F53 | B | One data set; the white prior was the pre-registered baseline and the pre-registered criterion failed |
+| F54 | B | Estimator checked on simulations with and without a true spread (60 realizations each, nside 8); one data set; 5 to 9 effective patches per region |
 
 ## 1. Sampler correctness
 
@@ -1291,4 +1292,27 @@ sd). The pre-registered criterion (within 1 sd) failed, so the LCDM version is t
 the paper. The flat-prior reference shift holds in both versions (+0.167, +0.095, +0.029, +0.049 from
 23 to 30 GHz with the LCDM prior, 5 to 9 percent below the first-order prediction). Whether the move
 is what a LCDM sky does to a white-prior fit, or large-scale achromatic structure in the maps that the
-LCDM prior absorbs, is being tested on simulations (C4). Grade B.
+LCDM prior absorbs, was tested on simulations (C4, 60 skies with a LCDM CMB at nside 8): with the matched
+prior the estimate is unbiased and calibrated (sd of z 0.93 to 1.14); **with the white prior it is unbiased
+on average and over-confident**, its quoted error too small by 32, 24 and 30 percent at High Latitude, in the
+Spur and in the Plane (coverage of one sd 0.55, 0.48, 0.65), and it differs from the matched fit by a random
+0.007, 0.009, 0.003 and 0.007 per sky; with a flat prior it is unbiased and calibrated at 2.2 to 2.5 times
+the error. Against that scatter the moves on the maps are 1.6, 1.8 and 2.2 sd at High Latitude, in the Spur
+and in the Galactic Center (jointly unremarkable: 22 percent of simulated skies further out) and 4.4 sd in
+the Plane, which a LCDM sky does not do. With a flat CMB prior the map indices are -3.028 +- 0.029, -3.055 +-
+0.036, -3.008 +- 0.020 and -2.988 +- 0.030, and the flat-amplitude-prior optimum of the same four WMAP bands
+is at -2.51 (reference 23 GHz) and -1.71 (30 GHz) at High Latitude; the first-order prediction of the
+difference holds within 10 percent for every region and prior, for shifts from 0.03 to 0.8. Grade B.
+
+**F54. The four regions are not one index each: block errors are 2.3 to 7.5 times the model errors, and
+half a dozen sky patches carry the information of each region** (E040 stage 5). The scatter of the profile
+score over the 48 nside-2 pixels, with a leverage correction (first-order delete-one-patch jackknife), gives
+errors of 0.044 (High Latitude), 0.038 (Spur) and 0.100 (Plane) with the LCDM prior, where the sandwich
+errors are 0.012, 0.016 and 0.013; the effective number of patches is 5.7, 8.8, 2.5 (Galactic Center, no
+block error quoted) and 5.1, and one patch carries 37 percent of the High Latitude information. On
+simulations the estimator follows the true scatter with the model true (rms of z 0.82, 1.20, 1.02) and with
+an index spread of 0.1 between patches (0.59, 0.99, 0.91), where the uncorrected form is too small by up
+to 39 percent; the choice of form was made by a rule written before the tests were read. A spread of 0.1
+reproduces the High Latitude and Spur ratios of the maps; the Plane needs about twice that. With the block
+errors the four region indices (-3.08, -3.08, -3.08, -2.96) do not differ. Any misfit scatters the block
+scores, so "a spread of the index" is one reading, not a measurement. Grade B.
