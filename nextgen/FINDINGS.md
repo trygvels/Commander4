@@ -1451,4 +1451,9 @@ calibrated: sd of z 1.02, 1.06, 0.97, 0.98 (+- 0.04), mean of z +0.05, -0.11, 0.
 - F60: by region the deficit along the directions outside the model is 0.963, 1.020, 0.929, 0.963 (+- 0.018,
   0.061, 0.024, 0.034) and the direction of the CMB spectrum has 0.970, 0.927, 1.012, 1.153. The literature
   points both ways (Jarosik et al. 2007 measure the r4 noise above the r9 value).
+- F56 with the nside-16 simulation (E044 R10, added 14:06): two realizations at the resolution of the map fit give
+  zero-mean minus profile of -4.1, -2.2, -1.8, -0.7 sandwich errors (maps: -3.6, -1.6, -1.5, -0.2; nside 8:
+  -1.05, -0.54, -0.44, -0.22). Pre-registered as H9. The difference on the maps is the bias of the zero-mean
+  prior with a free scale per region at this configuration; it grows fourfold from nside 8 to nside 16. F56
+  moves from grade B to A for the statement that the estimator is biased here.
 
