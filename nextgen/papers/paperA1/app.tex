@@ -43,8 +43,31 @@ score is minus that) with $t_r = \tr(\Lambda\A^{-1}\M_r\T\mathsf{B}\T)$, $\maths
 $\A$ containing the prior precision, and the optimum is biased by $-(\kappa^2-1)\,\J^{-1}t$ to first
 order. A single factor $\kappa^2$ describes a prior that is wrong in size; a prior that is wrong in
 shape, as a white prior is for the CMB, needs the calculation mode by mode. Because $t_r$ is a sum over elements of one sign, the bias
-in units of the standard deviation grows as the square root of the number of elements. For a prior that
-is wrong in shape, Sect.~\ref{sec:data} computes the first-order bias and the error of the fit directly.
+in units of the standard deviation grows as the square root of the number of elements.
+
+For a prior that is wrong in shape the same calculation gives Eq.~(\ref{eq:mismatch}). Write
+$\mathsf{F} = [\M\ \mathsf{C}]$ for all columns, $\A = \mathsf{F}\T\Ni\mathsf{F}$ plus $\Lambda =
+\mathsf{S}_{\rm w}^{-1}$ on the block of the constrained component, $\hat a = \mathsf{G} d$ with
+$\mathsf{G} = \A^{-1}\mathsf{F}\T\Ni$, and $r = \mathsf{R} d$ with $\mathsf{R} = 1 - \mathsf{F}\mathsf{G}$
+for the residual. The gradient of $\tfrac12\chimin$ is $g_r = -(\mathsf{F}_r\hat a)\T\Ni r$ with
+$\mathsf{F}_r = \partial\mathsf{F}/\partial\beta_r$. With data $d = \M a + \epsilon$, $\epsilon = \mathsf{C} c + n$
+and $\mathrm{Cov}(c) = \mathsf{S}_{\rm t}$,
+\begin{equation}
+  g_r = -(\mathsf{F}_r a)\T\Ni\mathsf{R}\,\epsilon - \epsilon\T\mathsf{G}\T\mathsf{F}_r\T\Ni\mathsf{R}\,\epsilon .
+\end{equation}
+Both terms have the expectations of the matched case when $\mathsf{S}_{\rm t} = \mathsf{S}_{\rm w}$ (zero mean,
+variance $\J + \Tm$). The difference is linear in $\Delta = \mathsf{S}_{\rm t} - \mathsf{S}_{\rm w}$:
+\begin{equation}
+  \E[g_r] = -\tr\big[\Delta\,(\mathsf{F}_r\mathsf{Z})\T\,\Ni\mathsf{R}\mathsf{C}\big], \qquad
+  \mathrm{Cov}(g_r, g_{r'}) \simeq \J_{rr'} + \Tm_{rr'} + \mathsf{q}_r\T\Delta\,\mathsf{q}_{r'}, \qquad
+  \mathsf{q}_r = (\Ni\mathsf{R}\mathsf{C})\T\,\mathsf{F}_r a ,
+\end{equation}
+with $\mathsf{Z} = \mathsf{G}\mathsf{C} = \mathsf{E}_{\rm c} - \A^{-1}_{\cdot\,{\rm c}}\Lambda$ the response of the
+fitted amplitudes to a unit amplitude of the constrained component ($\mathsf{E}_{\rm c}$ selects its
+block). The mean is exact to the order of the sandwich; the covariance neglects the change of the
+noise-noise term under the mismatch. The optimum is then biased by $-\J^{-1}\E[g]$ and has covariance
+$\J^{-1}[\J + \Tm + \mathsf{q}\T\Delta\mathsf{q}]\J^{-1}$. Every matrix in these expressions is formed in the
+fit; on real data $\J$ is replaced by $\J_{\rm c}$ and $a$ by $\hat a$.
 
 For the fitted amplitudes $\hat a = a + e$ with $\mathrm{Cov}(e) = \A^{-1}$,
 $\E[(\M_r\hat a)\T\Pm(\M_{r'}\hat a)] = \J_{rr'} + \tr(\A^{-1}\M_r\T\Pm\M_{r'}) = \J_{rr'} + \Tm_{rr'}$,

@@ -109,7 +109,67 @@ DYLD_INSERT_LIBRARIES=$C $P --prior flat --estimators profile flat --out $E/flat
 
 ## Result
 
-(to be filled)
+### R1, the central fit (read 2026-11-11 09:43)
+
+`E044/lcdm_all.txt`: LCDM prior, all estimators, block errors; sound path, canary, no OVERFLOW line. chi2_min
+16953.8 for 17420 nominal degrees of freedom (0.973). Every fit converged.
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| elements kept | 2974 | 266 | 1698 | 870 |
+| rms fitted synchrotron amplitude at 23 GHz (uK) | 11.3 | 33.4 | 17.5 | 26.3 |
+| profile index | -3.1469 | -3.1393 | -3.0911 | -3.0390 |
+| sandwich error | 0.0291 | 0.0275 | 0.0194 | 0.0150 |
+| block error, joint (CR3) | 0.0480 | 0.0288 | 0.0292 | 0.0193 |
+| block error, own scores (CR3) | 0.0475 | 0.0274 | 0.0280 | 0.0192 |
+| own-score block error over sandwich | 1.63 | 1.00 | 1.44 | 1.28 |
+| effective number of patches; largest leverage | 12.9; 0.22 | 3.5; 0.46 | 13.2; 0.16 | 10.3; 0.18 |
+| flat prior at 23 GHz minus profile | -0.0275 | -0.0079 | -0.0112 | -0.0042 |
+| flat prior at 30 GHz minus profile | +0.4509 | +0.1459 | +0.1930 | +0.0683 |
+| flat 30 GHz minus flat 23 GHz | +0.4783 | +0.1538 | +0.2042 | +0.0725 |
+| the same in sandwich errors | 16.4 | 5.6 | 10.5 | 4.8 |
+| first order, curvature of the fitted marginal | +0.6382 | +0.1834 | +0.2377 | +0.0780 |
+| first order, J_c | +0.6921 | +0.1959 | +0.2505 | +0.0802 |
+| zero-mean prior minus profile | -0.1038 | -0.0429 | -0.0299 | -0.0035 |
+| chi-square per element and band | 0.577 | 0.591 | 0.572 | 0.614 |
+| T / J_c | 0.047 | 0.004 | 0.013 | 0.004 |
+
+Null for the block errors at nside 8 with these regions, this mask and the LCDM prior (`E044/sim_n8_blocknull.txt`, 60
+realizations, read 09:34): pooled mean z -0.08 +- 0.065, sd of z 1.05, coverage 0.65. Own-score CR3 over sandwich,
+median / 84th / 97.5th percentile / maximum: High Latitude 1.34 / 1.66 / 2.09 / 2.17; Spur 1.32 / 2.09 / 3.29 / 3.58;
+Intermediate 1.12 / 1.35 / 1.67 / 1.77; Plane 1.13 / 1.50 / 1.73 / 1.84. Effective number of patches 12.1, 3.1,
+11.7, 9.5. One thing I did not expect: the mean z of the Spur is -0.39 +- 0.13 (mean estimate minus truth -0.011);
+the other three are within 0.1. A second, independent set of 60 realizations is running to tell a fluctuation from
+a bias of this small region.
+
+Against the expectations:
+
+- **H3 holds, better than written.** Chi-square per element and band is 0.577, 0.591, 0.572, 0.614 against 0.6: every
+  region within 5 percent. On the old regions without a mask it was 0.58, 0.59, 1.78, 0.77. The misfit of the earlier
+  fits was the brightest emission and Tau A.
+- **H2 holds.** -3.147 +- 0.029, -3.139 +- 0.028, -3.091 +- 0.019, -3.039 +- 0.015, all inside the ranges written. The
+  Plane is at the value the referee's first-order calculation gave for the old Plane without the Tau A patch
+  (-3.04). The four indices now steepen with latitude; with these errors High Latitude and Plane differ by
+  0.108 +- 0.033.
+- **H4 fails on the low side for two regions.** Own-score block error over sandwich: 1.63, 1.00, 1.44, 1.28. I
+  wrote 1.5 to 3 for Intermediate and 2 to 4 for the Plane. Against the null, all four are inside: High Latitude
+  1.63 against an 84th percentile of 1.66; Intermediate 1.44 against a 97.5th of 1.67; Plane 1.28 against an
+  84th of 1.50. **With the mask there is no evidence in the block scores that any region is more than one index.**
+  The large block errors of E040 were the masked emission, as the second referee argued.
+- **H1.** The flat prior at 23 GHz is within one sandwich error of the profile optimum in every region (0.95, 0.29,
+  0.58, 0.28 sd), as written. At 30 GHz it is flatter in every region, by 0.478, 0.154, 0.204 and 0.073 against
+  the 23 GHz statement: 16.4, 5.6, 10.5 and 4.8 sandwich errors. Sizes: Plane and Intermediate inside the ranges
+  written, High Latitude "0.3 or more" (0.48); the Spur is 0.154 where I wrote 0.02 to 0.06 (I used an error of
+  0.02 for a region whose error is 0.028 and forgot the coupling to High Latitude). First order with the
+  curvature of the fitted marginal: measured over predicted 0.75, 0.84, 0.86, 0.93; within 15 percent only for
+  Intermediate and Plane, 16 percent for the Spur, and 25 percent high at High Latitude where the move is 0.48.
+  With J_c: 0.69, 0.79, 0.82, 0.90, worse by 4 to 8 points as expected, and beyond the 25 percent I wrote at
+  High Latitude. The first-order prediction is always high.
+- **Not expected: the zero-mean prior.** It is steeper than the profile optimum by 0.104, 0.043, 0.030 and 0.004:
+  3.6, 1.6, 1.5 and 0.2 sandwich errors. On the old regions it was within 0.8. At the low signal to noise of the
+  new High Latitude region (T / J_c 0.047) with the scan-modulated WMAP noise the two estimators part. A
+  simulation of the zero-mean prior at this configuration is running (`E044/sim_n8_zm.txt`); its first realization
+  has the same sign in all four regions.
 
 ## Negative control
 

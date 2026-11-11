@@ -169,179 +169,185 @@ Table~\ref{tab:e039} and in this paragraph was reproduced to the last printed di
 \begin{table}
 \centering
 \caption{The polarized synchrotron index of the WMAP nine-year K, Ka, Q and V maps (with Planck PR4
-353 GHz for dust) in the four regions of \citet{svalheim2023}, at $N_{\rm side}=16$ with the dense
-noise covariances, all bands brought to a common window, and the $\Lambda$CDM covariance as the prior
-on the CMB (\exref{E040}). Top: the profile optimum with two errors, the debiased sandwich error,
-which assumes one index per region (in parentheses for the Galactic Center, where that model does
-not fit), and a block error from the scatter of the score over patches of sky, which does not (see
-the text; none is quoted for the Galactic Center, where fewer than three patches carry the
-information). Then the answer when the same likelihood is instead marginalized over flat
-amplitude priors with the synchrotron amplitude defined at 23 or at 30 GHz, or under a zero-mean
-prior with a free scale. Middle: the difference between the two flat-prior answers against
-Eq.~(\ref{eq:coupled}). Bottom: goodness of fit, as $\chi^2$ per element and band, for which three
-free amplitudes on five bands leave an expectation of 0.6.}
-\label{tab:e040}
+353 GHz for dust) in the four regions of Fig.~\ref{fig:regions}, at $N_{\rm side}=16$ with the dense
+noise covariances, all bands brought to a common window, the mask applied, and the $\Lambda$CDM
+covariance as the prior on the CMB (\exref{E044}). Top: the profile optimum with two errors, the
+debiased sandwich error, which assumes one index per region, and a block error from the scatter of
+each region's own score over patches of sky, which does not (none is given for the Spur, where fewer
+than four patches carry the information); then the answer when the same likelihood is instead
+marginalized over flat amplitude priors with the synchrotron amplitude defined at 23 or at 30 GHz, or
+under a zero-mean prior with a free scale. Middle: the difference between the two flat-prior answers,
+with two first-order predictions of it. Bottom: goodness of fit as $\chi^2$ per element and band, for
+which two free amplitudes and a CMB amplitude held by its prior leave an expectation of 0.6 on five
+bands.}
+\label{tab:same}
 \small
-\input{gen_tab_e040}
+\input{gen_tab_same}
 \end{table}
 
-Table~\ref{tab:e040} is the result of this section. The numbers in each column come from the same
-maps, the same regions, the same bands, the same bandpasses and the same noise covariances. They
-differ only in how the amplitudes are removed.
+Table~\ref{tab:same} is the result of this section. The numbers in each column come from the same
+maps, the same regions and mask, the same bands, bandpasses and noise covariances. They differ only
+in how the amplitudes are removed. The model fits: the $\chi^2$ per element and band is \N{chi.list}
+in the four regions, against 0.6.
 
-Under flat amplitude priors the answer depends on where the amplitudes are defined. For this band set
-with a $\Lambda$CDM prior on the CMB the pivot lies just above 23 GHz (23.3 to 23.4 GHz for the four
-regions, to first order), and a flat prior stated at 23 GHz agrees with the profile optimum to 0.8
-standard deviations. The same prior stated at 30 GHz gives
-a High Latitude index of $-2.92$ instead of $-3.08$: flatter by 0.16, 12.6 standard deviations of
-the sandwich error, with no change in the data or the model. The Spur moves by 0.09 and the Plane by
-0.05. The difference between the two conventions is 0.91 to 0.95 of the first-order prediction,
-Eq.~(\ref{eq:coupled}), in all four regions, so the identity of Sect.~\ref{sec:flat} holds on real
-maps at the predicted size. The zero-mean prior with a free scale is within 0.8 standard deviations
-of the profile optimum in every region.
+\paragraph{The reference frequency.} Under flat amplitude priors the answer depends on where the
+amplitudes are defined. For this band set with a $\Lambda$CDM prior on the CMB the pivot lies just
+above 23 GHz (\N{pivot.range} GHz, to first order), and a flat prior stated at 23 GHz is within one
+standard deviation of the profile optimum in every region (\N{f23sd.list} sandwich errors). The same
+prior stated at 30 GHz gives a High Latitude index of \N{f30.HL} where the profile likelihood gives
+\N{prof.HL}. Between the two conventions the index moves by \N{d3023.list} in the four regions:
+\N{d3023sd.list} standard deviations of the sandwich error, with no change in the data or the model.
+The move is largest where the amplitudes are many and faint, as Eq.~(\ref{eq:shift}) says: the High
+Latitude region has \N{nper.HL} of them with a mean squared signal-to-noise ratio
+$\J_{\rm c}/\Tm$ of \N{snr2.HL}, the Plane \N{nper.Plane} with \N{snr2.Plane}.
+
+The identity of Sect.~\ref{sec:flat} is exact. What the maps test is its first-order consequence,
+Eq.~(\ref{eq:coupled}), in two versions (Table~\ref{tab:same}). With the curvature of the fitted
+marginal the measured move is \N{ratioH.list} of the prediction. With $\J_{\rm c}$ in its place, a
+prediction that needs no flat-prior fit at all, it is \N{ratioJ.list}. Both predictions are high in
+every region, by more where the move is larger: the curvature of the marginal grows away from its
+optimum, and a first-order statement cannot know that. For moves below 0.1 it is good to 10
+percent; at High Latitude, where the move is half a unit of index, it is \N{ratioH.percentHL} percent
+high. We had written these expectations down before the fit; the one for the Spur was too small by
+a factor of three, because it left out the coupling to the High Latitude region through the shared
+noise (\exref{E044}).
+
+\paragraph{The zero-mean prior.} With a free scale per region it does not agree with the profile
+optimum on these regions: it is steeper by \N{zmm.list}, that is \N{zmsd.list} sandwich errors. For
+one component and a common noise pattern the two are the same estimator (Sect.~\ref{sec:profile});
+here there are three components, the noise pattern differs from band to band, and at High Latitude
+the amplitudes are faint. \pend{Simulation of the zero-mean prior at this configuration: which of the
+two is biased, and by how much.}
 
 \begin{table}
 \centering
-\caption{The fit of Table~\ref{tab:e040} under three priors on the CMB amplitudes: the
-$\Lambda$CDM covariance, a white prior of 0.2 $\muK$ per element, and a flat prior (\exref{E040}).}
+\caption{The fit of Table~\ref{tab:same} under three priors on the CMB amplitudes: the
+$\Lambda$CDM covariance, a white prior of 0.2 $\muK$ per element, and a flat prior (\exref{E044}).}
 \label{tab:cmbprior}
 \small
-\input{gen_tab_cmbprior}
+\IfFileExists{gen_tab_cmbprior.tex}{\input{gen_tab_cmbprior}}{\pend{table pending}}
 \end{table}
 
 \paragraph{The prior on the CMB.} The CMB has one amplitude per element like the other components,
-and the index responds to what that amplitude is allowed to be (Table~\ref{tab:cmbprior}). We began
-with a white prior of 0.2 $\muK$ per element and had fixed in advance that the $\Lambda$CDM covariance
-would replace it if any index moved by more than one standard deviation between the two. The Plane
-moved by 2.3 and the Spur by 1.0: with the white prior all four indices are steeper, by 0.012, 0.017,
-0.006 and 0.031. A simulation says what to make of that (\exref{E040}): 60 skies with the synchrotron,
-dust and noise of the validation above and a CMB drawn from the $\Lambda$CDM covariance, each fitted
-with the three priors at $N_{\rm side}=8$. With the matched prior the estimate is unbiased and its
-error is calibrated (standardized errors with mean $-0.15$ to $+0.11$ and standard deviation 0.93 to
-1.14 by region). With the white prior it is unbiased on average, but the quoted error is too small by
-24 to 32 percent in three of the four regions, and the 68 percent intervals cover 48 to 65 percent of
-the time: the large-scale $E$ modes that a white prior does not allow move the estimate from sky to
-sky, by 0.007, 0.009, 0.003 and 0.007 relative to the matched fit. With a flat prior the estimate is
-unbiased and calibrated at 2.2 to 2.5 times the error. Measured against that sky-to-sky scatter and
-its correlation between regions, the moves seen on the real maps at High Latitude, in the Spur and in
-the Galactic Center are unremarkable (22 percent of the simulated skies lie further out), and the
-move in the Plane is 4.4 standard deviations, which a $\Lambda$CDM sky does not do.
-\pend{The same scatter at $N_{\rm side}=16$.} A white prior of the right total variance is therefore
-not a harmless stand-in: it leaves the index unbiased and makes its error bar too small by a quarter
-to a third before any misfit.
+and the index responds to what that amplitude is allowed to be (Table~\ref{tab:cmbprior}). With a
+white prior of 0.2 $\muK$ per element in place of the $\Lambda$CDM covariance the four indices move
+by \N{white.move.list}. What a wrong covariance for the CMB does to the estimate can be computed
+without a simulation. If the CMB amplitudes have covariance $\mathsf{S}_{\rm t}$ and the fit assumes
+$\mathsf{S}_{\rm w}$, then to first order the score keeps its form and acquires a mean and an extra
+variance that are linear in $\mathsf{S}_{\rm t} - \mathsf{S}_{\rm w}$ (App.~\ref{app:sandwich}), so
+that the optimum has a bias and a covariance
+\begin{equation}
+  \delta\beta = -\J^{-1}\,\E[g], \qquad
+  \mathrm{Cov}(\hat\beta) = \J^{-1}\big[\J + \Tm + \mathsf{q}\T(\mathsf{S}_{\rm t} - \mathsf{S}_{\rm w})\,\mathsf{q}\big]\J^{-1} ,
+  \label{eq:mismatch}
+\end{equation}
+with $\mathsf{q}$ the response of the scores to a CMB amplitude through the residual-forming
+operator of the fit. A unit test with 1500 simulated fits reproduces both (scatter 0.113 and 0.089
+predicted 0.113 and 0.091 where the matched formula gives 0.090 and 0.083; bias $+0.016 \pm 0.003$ and
+$+0.021 \pm 0.002$ predicted $+0.021$ and $+0.020$). Evaluated for the white-prior fit of these maps
+with $\mathsf{S}_{\rm t}$ the $\Lambda$CDM covariance: the bias is \N{mm.bias.list}
+(\N{mm.biassd.list} of the quoted error), and the true error is \N{mm.ratio.list} times the quoted
+one. A white prior of nearly the right total variance is therefore not a harmless stand-in for a
+$\Lambda$CDM sky, in the direction of an error bar that is too small by \N{mm.percent.range} percent
+here; in other configurations the sign can be the other (an independent review found errors too
+large in one), which is the point of computing it. The same calculation gives the expected
+difference between the two fits of one sky, a standard deviation of \N{mm.pairsd.list}: the measured
+moves are \N{mm.movepair.list} of it. An earlier simulation at $N_{\rm side}=8$ on other regions
+agrees in kind: there the matched prior was calibrated and the white-prior error too small by about a
+fifth in three of four regions (\exref{E040}).
 
 With a flat prior on the CMB the profile score is unbiased whatever the CMB is, at the price of errors
-2.2 to 2.3 times larger, and the indices are $-3.03 \pm 0.03$, $-3.06 \pm 0.04$, $-3.01 \pm 0.02$ and
-$-2.99 \pm 0.03$. Against the $\Lambda$CDM version, three regions are within the scatter that the
-simulation gives for that difference (1.8, 0.7 and $-0.7$ of it) and the Galactic Center is 3.4 away.
-The two regions whose index depends on the CMB prior by more than a $\Lambda$CDM sky allows are the
-two that do not fit.
-
-A free CMB amplitude also moves the pivot of Sect.~\ref{sec:flat}, and with it the size of the
-convention effect. With a flat CMB prior and flat priors on the other amplitudes, the High Latitude
-optimum of these same four WMAP bands is at $-2.51$ when the synchrotron amplitude is defined at 23
-GHz and at $-1.71$ when it is defined at 30 GHz, where the profile likelihood says $-3.03 \pm 0.03$:
-the pivot has moved below the K band (to 19.7 to 19.9 GHz, to first order), and both conventions
-are far from it. The simulated band set of Table~\ref{tab:flat}, which includes the LFI bands, has its
-pivots about 3 GHz higher in both cases and shows the same drop when the CMB is freed. The difference between
-them, 0.80, is 0.92 of the first-order prediction, and the prediction is within 10 percent in every
-region and for every prior in Table~\ref{tab:cmbprior}, for shifts between 0.03 and 0.8.
+\N{flat.sdratio.range} times larger; the indices are then \N{flat.prof.list}, which is
+\N{flat.movenest.list} from the $\Lambda$CDM version in units of
+$(\sigma_{\rm flat}^2 - \sigma_{\Lambda}^2)^{1/2}$, the standard deviation of the difference between a
+fit and a more efficient fit of the same data. A free CMB amplitude also moves the pivot of
+Sect.~\ref{sec:flat}, and with it the size of the convention effect: with a flat CMB prior and flat
+priors on the other amplitudes the High Latitude optimum of these four WMAP bands is at
+\N{flat.f23.HL} when the synchrotron amplitude is defined at 23 GHz and at \N{flat.f30.HL} when it is
+defined at 30 GHz, where the profile likelihood of the same fit says \N{flat.prof.HL} $\pm$
+\N{flat.sd.HL}. The pivot is then at \N{flat.pivot.range} GHz to first order, below the lowest band,
+and both conventions pull the same way.
 
 \paragraph{Errors that do not assume the model.} The sandwich error is the error of the estimator if
-each region has one index and the noise model is right. The $\chi^2$ per element and band says that
-this is close to true at High Latitude and in the Spur (0.58 and 0.59 against 0.6), 30 percent off in
-the Plane and wrong by a factor of three in the Galactic Center. An error that does not lean on it
-comes from the data: at the optimum the score of a region is a sum over elements, $\sum_p g_p = 0$,
-and under the model the covariance of that sum is $\J + \Tm$; if the index varies inside the region
-the partial sums over patches of sky scatter by more. With the 48 pixels of an $N_{\rm side}=2$ grid
-as patches, $G_B = \sum_{p \in B} g_p$, the block covariance is
+each region has one index and the noise model is right. An error that does not lean on that comes
+from the data: at the optimum the score of a region is a sum over elements, $\sum_p g_p = 0$, and
+under the model the covariance of that sum is $\J + \Tm$; if the model fails inside the region, the
+partial sums over patches of sky scatter by more. With the 48 pixels of an $N_{\rm side}=2$ grid as
+patches, $G_B = \sum_{p \in B} g_p$ for one region, the block variance of its index is
 \begin{equation}
-\widehat{\mathrm{Cov}}_{\rm block}(\hat\beta) = \J_{\rm c}^{-1}
-\Big[\sum_B \frac{G_B G_B\T}{(1-h_B)^2}\Big] \J_{\rm c}^{-1},
+\widehat{\mathrm{Var}}_{\rm block}(\hat\beta) = \big[(\J_{\rm c}^{-1})_{rr}\big]^2
+\sum_B \frac{G_B^2}{(1-h_B)^2},
 \qquad h_B = \frac{D_B}{\sum_{B'} D_{B'}},
 \label{eq:block}
 \end{equation}
-with $D_B = \partial G_B/\partial\beta$ the information carried by patch $B$. Without the factor
-$(1-h_B)^{-2}$ this is the cluster sandwich in common use \citep{liang1986}, which is biased low when
-a few clusters carry the information; with it, it is the leverage-corrected form that in linear
-regression equals the delete-one-cluster jackknife variance up to a factor $G/(G-1)$ for $G$ clusters
-\citep{bell2002,cameron2015}. Our estimator is not linear, so the correspondence holds to first
-order, and it is exact only where neither the noise covariance nor the prior on the CMB couples
-patches. Patches are treated as independent. The information is far from evenly spread: the number of
-patches that would carry it if all carried the same, $(\sum_B D_B)^2/\sum_B D_B^2$ (an analogue, in
-shares of the information, of the effective number of clusters of \citealt{carter2017}), is 6, 9, 3
-and 5 for the four regions on the maps, out of 46, 29, 4 and 16 patches with data. A block error from
-one sky is therefore itself uncertain by a third or so and should be read with the quantiles of a
-$t$ distribution with few degrees of freedom \citep{bell2002,cameron2015}; for the Galactic Center we
-quote none.
+with $D_B = \partial G_B/\partial\beta$ the information carried by patch $B$ (negative values, which
+occur for patches with almost none, are set to zero). Without the factor $(1-h_B)^{-2}$ this is the
+cluster sandwich in common use \citep{liang1986}, which is biased low when a few clusters carry the
+information; with it, it is the form that in linear regression equals the delete-one-cluster
+jackknife variance up to a factor $G/(G-1)$ for $G$ clusters and is biased high by
+$\sum_B h_B/(1-h_B)$ \citep{bell2002,cameron2015}. Our estimator is not linear, so the correspondence
+is to first order. We use each region's own scores. The joint form, with the full matrix
+$\J_{\rm c}^{-1}$ on both sides of the outer products of all regions' scores, lets a region inherit
+the scatter of a neighbour to which its index is coupled; an independent referee showed that this,
+and not the region itself, made the largest block error of an earlier version of this analysis.
 
-What a block error means needs care (independent review, \exref{E040}). It is the error of the
-estimate as a measurement of the mean index of a population of exchangeable patches. For the
-information-weighted mean index of the region as realized on this sky, the sandwich error is the
-right one. If the index varies coherently over several patches the block error is too small (0.6 to
-0.7 of the true scatter for a correlation length of two patches in a test by the reviewer). And if the
-noise covariance or the prior couples patches, the patch scores are anticorrelated and the block
-error is too large even when the model is true, so the ratio of block error to sandwich error under
-the model has to be taken from simulations with the covariances and the prior of the fit. With
-independent patches (white CMB prior, $N_{\rm side}=8$) the block error reproduces the scatter of the
-estimate: the root mean square of the standardized error is 0.82, 1.20 and 1.02 at High Latitude, in
-the Spur and in the Plane where 1.1 to 1.2 is expected, and the form without the leverage correction
-is too small (1.39 and 1.26 in the Spur and the Plane). When the same simulations are given a true
-spread of the index of 0.1 between patches, drawn anew for each realization, the sandwich error is too
-small by a factor of 2.4 to 3.1 and the block error follows the scatter of the estimate about the mean
-index of the region (0.59, 0.99 and 0.91). In that test the scatter of the estimate is, within 10
-percent, the spread between patches divided by the square root of the effective number of patches,
-added in quadrature to the sandwich error. The rule for choosing between this form and two others,
-closest to one in both tests and in doubt the more conservative, was written before either test was
-read; the three forms differ by 15 to 45 percent on the maps and all are in the record.
+What a block error means needs care (independent review and referee, \exref{E040}, \exref{E044}). It
+is the error of the estimate as a measurement of the mean index of a population of exchangeable
+patches; for the information-weighted mean index of the region as realized on this sky, the sandwich
+error is the right one. It is too small if the index varies coherently over several patches. It is
+too large, even when the model is true, if the noise covariance or the prior couples patches, because
+the patch scores are then anticorrelated; so its ratio to the sandwich error under the model has to
+be taken from simulations with the regions, mask, covariances and prior of the fit. A large ratio
+says that the model fails somewhere in the region and not how: an index that varies, a compact
+source with its own spectrum, large-scale noise that the covariance understates, dust that does not
+follow one spectrum, residuals of the window matching and leakage of intensity into polarization all
+scatter the patch scores. And it rests on few patches: the effective number,
+$(\sum_B D_B)^2/\sum_B D_B^2$ (an analogue, in shares of the information, of the effective number of
+clusters of \citealt{carter2017}), is \N{neff.list} here.
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figures/fig_blocks.pdf}
-\caption{What the block errors of Table~\ref{tab:e040} are made of. For each patch of sky (a pixel of the
-$N_{\rm side}=2$ grid) that carries information on the index of a region: the index that the patch alone
-would move to in one Newton step from the fitted index of the region, with the error it would have under
-the model, against the share of the region's information that the patch carries. Patches with a one-step
-error above 0.12 are not drawn, and arrows mark values outside the frame. Dark band: the sandwich error of
-the region's index. Light band: its block error (none for the Galactic Center). The fitted index of the
-region is given beside its name. The one-step values are first-order and for display; the block error
-is computed from the scores, Eq.~(\ref{eq:block}) (\exref{E040}).}
-\label{fig:blocks}
-\end{figure}
+On the maps the block error is \N{cr3ownratio.list} times the sandwich error in the four regions.
+Under the model, in \N{nullall.n} simulations at $N_{\rm side}=8$ with these regions, this mask and
+the $\Lambda$CDM prior (synchrotron from the DR1 model smoothed to $5^\circ$, noise from the
+window-matched covariances, a $\Lambda$CDM CMB, one index per region), the ratio has a median of
+\N{nullall.median.list} and a 97.5th percentile of \N{nullall.p975.list}; \N{nullall.above.list} of
+the simulations lie above the map values. In the same simulations the sandwich error is calibrated
+(standardized errors of standard deviation \N{nullall.sdz.list}, coverage of one standard deviation
+\N{nullall.cover.list}). \pend{The same at $N_{\rm side}=16$, a few realizations.} So with the mask
+the block scores give no evidence that any of these regions is more than one index at the precision
+of these maps, and the two errors in Table~\ref{tab:same} tell the same story within what a block
+error from a dozen patches can tell.
 
-On the maps the block error is 3.5, 2.3 and 7.5 times the sandwich error at High Latitude, in the
-Spur and in the Plane (Table~\ref{tab:e040}, Fig.~\ref{fig:blocks}): 0.04, 0.04 and 0.10 where the
-model gives 0.012, 0.016 and 0.013. Under the model, with the window-matched covariances and the $\Lambda$CDM prior of the fit, the ratio is
-not one: in 60 simulations at $N_{\rm side}=8$ its median is 1.28, 1.21 and 1.32 and its largest value
-2.8, 2.4 and 2.8, because that prior couples the patches (with the white prior the medians are 1.25,
-1.03 and 1.07). Against that reference the maps are outside the range at High Latitude and in the
-Plane, and the Spur is inside it: one simulation of 60 has a larger ratio. \pend{The same reference at
-$N_{\rm side}=16$.} So the High Latitude region and the Plane are not one index each; for the Spur the
-block error is an upper limit on the error and no evidence of misfit. In the simulation with a spread of 0.1 the median ratio is 3.8, 2.4 and 3.6. (That simulation has the
-white prior; a spread of that size is the scale of what the High Latitude ratio asks for, and the
-Plane asks for more.) What the fit of a region returns is the index of the half dozen patches that
-carry its information. With the block errors the four regions do not differ from each other.
-
-The comparison between the rows of Table~\ref{tab:e040} is differential. It does not need the model
-to be right, only to be the same in every row.
+That was not so before the mask. On the four regions of the earlier version, unmasked, the
+joint block errors were 2.3 to 9 times the sandwich errors and the $\chi^2$ per element and band was
+1.78 and 0.77 in its Galactic Center and Plane. \pend{With only the disc around Tau A masked on
+those regions: index of its Plane, its $\chi^2$, its block error (\exref{E044}, H6).} The misfit and
+the scatter of those fits sat in the emission that the mask removes, and one source carried most of
+it in one region.
 
 \subsection{What moves the index, and why we do not quote one}
 \label{sec:moves}
 
 \begin{table}
 \centering
-\caption{Changes of the profile index of the WMAP K to V fit of Table~\ref{tab:e040} under analysis
-choices that have nothing to do with the estimator (\exref{E040}, \exref{E042}). ``Index from $\ell \le
-L$'': K band and 353 GHz keep all their modes, which with the prior on the CMB fixes the amplitudes,
-and Ka, Q and V inform the
-index through their harmonic coefficients at multipoles 2 to $L$ only. The window row compares two fits
-with the white CMB prior, and the last row is the K, Ka fit minus the four-band fit when both are read
-from multipoles up to 20. The flat-prior row repeats Table~\ref{tab:e040}. The statistical error of the
-baseline is given for scale.}
+\caption{Changes of the profile index of Table~\ref{tab:same} under analysis choices that have nothing
+to do with the estimator (\exref{E044}). ``Index from $\ell \le L$'': K band and 353 GHz keep all
+their modes, which with the prior on the CMB fixes the amplitudes, and Ka, Q and V inform the index
+through their harmonic coefficients at multipoles 2 to $L$ only. The last row is the K, Ka fit minus
+the four-band fit when both are read from multipoles up to 20. The flat-prior row repeats
+Table~\ref{tab:same}. The statistical error of the baseline is given for scale.}
 \label{tab:moves}
 \small
 \input{gen_tab_moves}
 \end{table}
 
-\input{gen_moves_text}
+Table~\ref{tab:moves} lists what else moves the answer. \pend{Text from the arms: CMB prior, angular
+scale (and whether the mask removed the scale dependence, H7), band subset, dust index, bandpasses.}
 
+Taken together: for these maps, regions and mask the profile index of the simple model is
+\N{prof2.list} at High Latitude, in the Spur, at Intermediate latitude and in the Plane, with
+statistical errors of \N{sd.range}. \pend{Sizes of the moves.} We do not quote these as a measurement
+of the polarized synchrotron index. They are the answers of one model on one set of regions; an
+earlier set of regions, without a mask, gave \N{old.prof.HL} to \N{old.prof.Plane} with errors of 0.01
+for regions that turned out to be mislabelled and misfitted, and it took an independent referee to
+see it. A measurement needs the regions, the mask, the dust model and the scale dependence each
+justified on its own evidence, which is a separate piece of work.

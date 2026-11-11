@@ -1,0 +1,4 @@
+# E040 nside-8 simulation, stage zm: truth [-3.15 -3.25 -2.85 -2.95]; 30 realizations; setup 5 s
+real 0 zm -3.1631 -3.3126 -2.8394 -2.9801 sd 0.0288 0.0281 0.0213 0.0189 | profile -3.1340 -3.2972 -2.8300 -2.9754 | zm minus profile in sd -1.01 -0.55 -0.44 -0.25 | zm conv True | conv True [55 s]
+real 1 zm -3.1754 -3.2434 -2.8939 -2.9797 sd 0.0291 0.0271 0.0215 0.0188 | profile -3.1449 -3.2292 -2.8838 -2.9754 | zm minus profile in sd -1.05 -0.52 -0.47 -0.23 | zm conv True | conv True [116 s]
+real 2 zm -3.1825 -3.2393 -2.8460 -2.9678 sd 0.0289 0.0269 0.0212 0.0187 | profile -3.1513 -3.2249 -2.8361 -2.9639 | zm minus profile in sd -1.08 -0.54 -0.47 -0.21 | zm conv True | conv True [171 s]

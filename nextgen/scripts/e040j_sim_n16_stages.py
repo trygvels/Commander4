@@ -25,7 +25,7 @@ import scipy.linalg as sl
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from lowres import data as D  # noqa: E402
 from lowres.block import KINDS, block_errors  # noqa: E402
-from lowres.fit import fit_profile, sandwich_plugin  # noqa: E402
+from lowres.fit import fit_marginal, fit_profile, sandwich_plugin  # noqa: E402
 from lowres.likelihood import BandData, RegionLikelihood  # noqa: E402
 from lowres.mask import marginalize, restrict_prior  # noqa: E402
 from lowres.regions import named_regions  # noqa: E402
@@ -178,8 +178,19 @@ def fits(a):
         else:
             res_s = sandwich_plugin(L, bh)
             sd = np.sqrt(np.diag(res_s[1]))
+            a_fit = res_s[4]["x"][:region.size].copy()
             del res_s
             extra = ""
+            if a.mode == "zm":
+                # the zero-mean prior with a free scale per region, on the same data; stored as the estimate of this stage,
+                # with the profile optimum beside it
+                Lz = RegionLikelihood(bands_for(z, Bs, ninv, low, r_, keep), region, sync_prior=True, **kw)
+                lt0 = np.log(np.array([np.sqrt(np.mean(a_fit[region == k] ** 2)) for k in range(4)]))
+                bz, tz, rz = fit_marginal(Lz, bh, lt0)
+                del Lz
+                store.setdefault("prof", []).append(bh)
+                extra = " | profile " + " ".join(f"{x:+.4f}" for x in bh) + " | zm minus profile in sd " + " ".join(f"{x:+.2f}" for x in (bz - bh) / sd) + f" | zm conv {rz.success}"
+                bh = bz
         del L
         gc.collect()
         store["b"].append(bh); store["s"].append(sd)
@@ -203,7 +214,7 @@ def fits(a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["draw", "blocknull", "white", "lowpass"])
+    ap.add_argument("mode", choices=["draw", "blocknull", "white", "lowpass", "zm"])
     ap.add_argument("--dir", required=True)
     ap.add_argument("--nreal", type=int, default=12)
     ap.add_argument("--first", type=int, default=0)
