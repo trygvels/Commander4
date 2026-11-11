@@ -1,0 +1,1 @@
+# E040 nside-16 simulation, stage zm: truth [-3.15 -3.25 -2.85 -2.95]; 2 realizations; setup 10 s

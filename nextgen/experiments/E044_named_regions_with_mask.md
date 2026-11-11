@@ -565,6 +565,30 @@ Checked by me against the files before acting; the ones that concern this record
   at Intermediate latitude and in the Plane; found 1.44 and 1.28), of the accuracy clauses of H1, and that the
   chi-square total, its split, the CMB-prior sequence and the zero-mean disagreement were found after the fact.
 
+### R9, the sampling error of the chi-square split (H14; read 2026-11-11 13:40)
+
+`E044/sim_n8_chi2split.txt` (40 realizations of the first nside-8 set; LCDM-prior and flat-prior fit of each; canary,
+no OVERFLOW line).
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| difference of the two fits by region over its expectation: mean | 1.008 | 1.048 | 1.009 | 0.982 |
+| its standard deviation | 0.056 | 0.176 | 0.070 | 0.096 |
+| sqrt(2 / n_region) | 0.051 | 0.183 | 0.074 | 0.091 |
+| flat-fit chi-square by region over 2 n_region: mean | 0.996 | 0.986 | 1.009 | 0.997 |
+| its standard deviation | 0.044 | 0.126 | 0.056 | 0.066 |
+| sqrt(1 / n_region) | 0.036 | 0.129 | 0.052 | 0.065 |
+| correlation of the two parts | -0.50 | -0.17 | -0.02 | +0.02 |
+
+Total difference over n: 1.005 +- 0.006, scatter 0.038 against sqrt(2 / n) = 0.037.
+
+- **H14 holds.** Means within two standard errors of one; standard deviations within 25 percent of the formula
+  in every region (1.10, 0.96, 0.95, 1.05 for the difference; 1.22, 0.98, 1.08, 1.02 for the flat-fit part).
+  With the simulated error the Plane's excess on the maps is (1.153 - 1) / (0.048 x 1.05) = 3.0 sd.
+- Not expected: at High Latitude the two parts are anticorrelated at -0.5 (they are independent only in total),
+  and the flat-fit part scatters 22 percent more than the formula. So the High Latitude entries of the split
+  (0.963 and 0.970) are less independent than they look; the totals are unaffected.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).
