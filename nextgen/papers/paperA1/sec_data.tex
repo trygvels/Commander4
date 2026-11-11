@@ -2,11 +2,11 @@
 \label{sec:data}
 
 This section does one thing: it applies the estimators of Sects.~\ref{sec:flat} and \ref{sec:profile}
-to the same real maps, with the same regions, bands and noise model, so that the difference between
-their answers is the difference between the estimators and nothing else. It does not deliver a
-polarized synchrotron index. Sect.~\ref{sec:moves} shows why not: at the statistical precision these
-maps offer, several analysis choices that are independent of the estimator each move the index by
-more than its error.
+to the same real maps, with the same regions, mask, bands and noise model, so that the difference
+between their answers is the difference between the estimators and nothing else. It does not deliver
+a polarized synchrotron index. Sect.~\ref{sec:moves} shows why not: at the statistical precision these
+maps offer, analysis choices that are independent of the estimator move the index by as much as its
+error or more.
 
 \subsection{Data and model}
 
@@ -20,8 +20,7 @@ to 2.2 $\muK$ in brightness temperature, and a few modes at multipoles 2 to 6 wh
 fully describe the large-scale uncertainty of the nine-year maps; we use them as released and test
 the sensitivity to the modes they flag.
 
-\paragraph{Planck.} The PR4 maps \citep{npipe}: 353 GHz as the dust tracer, and 30 GHz in
-Sect.~\ref{sec:30}. For 353 GHz the per-pixel $Q/U$ covariance of the map file is combined over the
+\paragraph{Planck.} The PR4 map at 353 GHz \citep{npipe} as the dust tracer. For it the per-pixel $Q/U$ covariance of the map file is combined over the
 sub-pixels of each $N_{\rm side}=16$ pixel, and the map is the corresponding weighted average.
 
 \paragraph{Spectra.} Each band enters through its measured bandpass. For WMAP every detector is given
@@ -42,9 +41,35 @@ through its own Gaussian beam, gives region indices biased flat by 0.005 to 0.01
 (\exref{E038}). We therefore bring every band to a common $1^\circ$ window with an invertible
 operator on the $N_{\rm side}=16$ grid, $\mathsf{S}_b = 1 + \mathsf{Y}\,\mathrm{diag}(f_\ell - 1)\,
 \mathsf{Y}^{+}$ with $f_\ell$ the ratio of the beam windows to multipole 47, transforming the data and
-the covariance together. In the simulation the residual bias is 0.002 or less, and on the real maps
+the covariance together. In the simulation the residual bias is below 0.0025, and on the real maps
 the correction moves the four indices by 0.0068, 0.0025, 0.0085 and 0.0035 where the simulation
-predicted 0.0070, 0.0030, 0.0088 and 0.0041 (white CMB prior).
+predicted 0.0070, 0.0030, 0.0088 and 0.0041 (measured with the white CMB prior, on an earlier set of
+four regions and without a mask; \exref{E040}).
+
+\begin{figure}
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_regions.pdf}
+\caption{The four regions and the processing mask (\exref{E044}), in Galactic coordinates with the Galactic
+centre in the middle. An element is one Stokes parameter of one $N_{\rm side}=16$ pixel.}
+\label{fig:regions}
+\end{figure}
+
+\paragraph{Regions and mask.} Four regions defined by geometry (Fig.~\ref{fig:regions}): \emph{High
+Latitude}, $|b| > 30^\circ$; \emph{Intermediate}, $10^\circ \le |b| \le 30^\circ$; \emph{Plane},
+$|b| < 10^\circ$; and \emph{Spur}, cut out of the first two, the northern part ($b > 20^\circ$,
+$-45^\circ < l < 65^\circ$) of the pixels to which the released index map of \citet{svalheim2023}
+gives its Spur value, which covers the North Polar Spur. A processing mask removes the 5 percent of
+pixels with the largest polarized amplitude in the Cosmoglobe DR1 synchrotron model at 30 GHz smoothed
+to $5^\circ$, which are the inner plane, the Fan region and the base of the Spur, and a disc of
+$7.5^\circ$ around Tau A: \N{nkept} of \N{ntot} elements are kept, \N{nper.list} in the four regions.
+\citet{svalheim2023} describe a mask of this kind for their index sampling (the strongest 5 percent of
+the signal, and strong sources such as Tau A); ours follows that description and is not their file.
+Masked elements are removed exactly: the kept elements enter with the inverse of their own block of
+each covariance, the Schur complement of the full inverse covariance, formed after the window
+matching. An earlier version of this analysis used four regions reconstructed from the released
+index map without a mask; an independent referee showed that its ``High Latitude'' region held the
+inner Galactic plane and that Tau A dominated the misfit of its ``Plane'' (Sect.~\ref{sec:moves}), and
+those regions are not used for any statement below except where named.
 
 \paragraph{Model.} Synchrotron as a power law with one index per region and one amplitude per
 element (pixel and Stokes parameter); dust as the modified blackbody above with one amplitude per
@@ -61,16 +86,17 @@ Sect.~\ref{sec:flat}: a white Gaussian prior of 0.2 $\muK$ per element, which we
 flat prior, for which the profile score is unbiased whatever the CMB is. The white prior has nearly
 the right total variance (0.17 $\muK$ per element for $\Lambda$CDM) and the wrong shape: it
 understates the $\Lambda$CDM $E$-mode variance by a factor of 200 at the quadrupole and overstates it
-above multipole 10.
-Regions: the four of \citet{svalheim2023} (High Latitude, Spur, Galactic Center, Plane; 4388, 928,
-182 and 646 elements). No mask is applied.
+above multipole 10. With the mask, the prior on the kept elements is the kept block of that
+covariance.
 
-\paragraph{Expectations.} The expectations for the baseline fit and its estimator comparison were
-written down, with numbers, before the first fit to real data, and the simulations of the next
-subsection were read first (\exref{E039}, \exref{E040}). The fits of
-Sects.~\ref{sec:moves} to \ref{sec:bpset} were each preceded by written expectations too, but those
-were written after earlier real-data results had been seen; the records mark which is which, and
-record the expectations that failed.
+\paragraph{Expectations.} Expectations for every fit of this section were written down, with numbers,
+before the fit was run, and the simulations of the next subsection were read before any real map
+(\exref{E039}, \exref{E040}, \exref{E044}). The fits on the present regions were not the first look at
+these maps: they follow a round on the earlier regions whose results we had seen, and the choice of
+the $\Lambda$CDM prior over the white one was made by a rule written three minutes before the first
+$\Lambda$CDM fit, after a referee had shown the white prior wrong in shape. The records mark what was
+written when, and record the expectations that failed; several did, and the text says so where it
+matters.
 
 \subsection{Validation on simulations with the real covariances}
 
@@ -78,7 +104,9 @@ Before any fit to real data the chain was run on simulations with known indices:
 amplitudes from the Cosmoglobe DR1 polarized synchrotron map, dust amplitudes from the 353 GHz map,
 a CMB drawn from the white prior, one true index per region chosen away from the centre of the allowed
 range ($-3.15$, $-3.25$, $-2.85$, $-2.95$), and noise drawn from the real covariances
-(\exref{E039}). Six criteria were fixed in advance.
+(\exref{E039}). Six criteria were fixed in advance. The simulations use the four regions of the earlier
+version of this analysis as their geometry, and its names appear in Table~\ref{tab:e039} as labels
+only; nothing tested here depends on what the regions are.
 
 \begin{table}
 \centering
@@ -317,109 +345,3 @@ baseline is given for scale.}
 
 \input{gen_moves_text}
 
-\subsection{Planck 30 GHz}
-\label{sec:30}
-
-The WMAP K band and the Planck 30 GHz band are 0.22 apart in $\ln\nu$, and their polarization maps
-have been known to disagree on large scales since the 2015 Planck release. \citet{weiland2022} found
-a K to 30 GHz index of $-3.27$ in the Fan region against $-2.90$ from K to Ka with the 2018 map and
-set 30 GHz aside. \citet{watts2023} attribute the WMAP side to poorly measured modes of the K-band map
-and report that after a joint reprocessing of both data sets the two maps agree to within the noise at
-high latitude. We have only the official maps, and for them the question can be put in likelihood
-terms without a new claim about its cause.
-
-For the PR4 30 GHz map the white-noise covariance of the map file is not enough at this resolution:
-the half-ring difference, averaged to $N_{\rm side}=16$ with the same weights, has a $\chi^2$ per
-element of 1.77 against it, with an excess of 1.7 at the pixel scale rising to between 3 and 7 at
-multipoles 2 to 6 (\exref{E038}). We model the noise as $\mathsf{W}^{1/2}\mathsf{R}\mathsf{W}^{1/2}$,
-with $\mathsf{W}$ the white covariance and $\mathsf{R} = r\,\mathsf{1} + \mathsf{Y}\,
-\mathrm{diag}(A\,(\ell/10)^{-\gamma})\,\mathsf{Y}\T$, $(r, A, \gamma) = (1.46, 1.16, 1.27)$ fitted to the
-whitened half-ring difference, which then passes 22 sub-tests with none beyond $3\sigma$. The model
-is isotropic, fitted to one realization, and blind to anything common to the two halves. (The
-low-resolution covariance matrices described for PR4 by \citealt{npipe} were not retrievable from the
-public mirrors when this was done.)
-
-With this model, K band and PR4 30 GHz with 353 GHz do not fit one power law per region: the reduced
-$\chi^2$ is 2.6, against 1.1 for K with Ka, and the fitted index is $-3.42 \pm 0.02$ at high latitude
-where K with Ka gives $-3.06 \pm 0.02$. This does not rest on the noise model for 30 GHz: with the
-white-noise columns alone the reduced $\chi^2$ is 4.2 and the high-latitude index $-3.44$, and with the
-correlated term of the model doubled they are 2.3 and $-3.40$ (\exref{E040}). With the 2018 map in place of
-PR4, a noise model built the same way and the white CMB prior, the reduced $\chi^2$ is 6.0 and the
-fitted index is on the other side, $-2.92$. A fit this bad does not measure an index, and we do not
-interpret these numbers beyond their disagreement.
-
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figures/fig_resid30.pdf}
-\caption{Left: the PR4 30 GHz Stokes $Q$ and $U$ maps at $N_{\rm side}=16$. Centre: the same maps minus
-their prediction from a fit to WMAP K, Ka, Q, V and 353 GHz that uses no LFI band. Right: the same
-difference for WMAP Ka predicted from K, Q, V and 353 GHz, on the same colour scale (\exref{E042}).}
-\label{fig:resid30}
-\end{figure}
-
-A direct view needs no noise model for 30 GHz. We fit K, Ka, Q, V and 353 GHz (with the white CMB
-prior), predict the 30 GHz map from the fitted amplitudes and indices, and subtract (Fig.~\ref{fig:resid30}); the same exercise
-with Ka predicted from K, Q, V and 353 GHz is the control. The residual of the 30 GHz map has 16 to 43
-times the power of its noise model at multipoles 2 to 6, in $B$ as much as in $E$; the control has 2
-to 4 times its own, part of which is the noise of the prediction. A residual with as much $B$ as $E$
-that follows the inner Galactic plane and has large-scale structure at intermediate latitudes is
-map-level structure, not sky signal assigned to the wrong index. Removing the 20 poorly measured
-K-band modes changes the K, 30 index by 0.03. We conclude only this: at a statistical precision of
-0.01 to 0.02 in the index, the official 30 GHz polarization maps cannot be combined with the
-official WMAP K to V maps in one power-law fit, and an index from a band set that mixes them is set
-by that inconsistency. Further exploratory comparisons of the PR4 and 2018 maps are in the record
-(\exref{E042}).
-
-\subsection{A band set without K band at a 30 GHz reference}
-\label{sec:bpset}
-
-Sect.~\ref{sec:flat} says the volume term is largest when the reference frequency is far from the
-pivot, the amplitudes are many and other free amplitudes move the pivot. One configuration in use
-has all three: the band set 30, 44, 70 GHz, Ka, Q, V and 353 GHz without K band, a synchrotron
-amplitude defined at 30 GHz, and a CMB amplitude without a prior \citep{svalheim2023}. On the
-BeyondPlanck maps themselves an earlier experiment of ours found the flat-prior marginal of that band
-set shifted from the profile optimum by $+0.27$ in the Spur and $+0.13$ in the Plane at
-$N_{\rm side}=16$, and at the edge of its grid at high latitude (\exref{E022}).
-Table~\ref{tab:bpset} repeats the calculation on the PR4 and WMAP maps.
-
-\begin{table}
-\centering
-\caption{The band set 30, 44, 70 GHz (PR4), Ka, Q, V (WMAP) and 353 GHz, without K band, with flat
-priors on the synchrotron, dust and CMB amplitudes, at $N_{\rm side}=16$ in the four regions
-(\exref{E040}). The profile optimum, and the optimum of the flat-prior marginal with the
-synchrotron amplitude defined at 23 and at 30 GHz. The allowed range of the index is $[-4.6, -1.6]$.}
-\label{tab:bpset}
-\small
-\begin{tabular}{lrrrr}
-\toprule
- & High Latitude & Spur & Galactic Center & Plane \\
-\midrule
-profile likelihood & $-2.70 \pm 0.04$ & $-2.92 \pm 0.05$ & $-2.82 \pm 0.03$ & $-2.78 \pm 0.04$ \\
-flat priors, reference 23 GHz & $-4.04$ & $-3.43$ & $-2.89$ & $-3.00$ \\
-flat priors, reference 30 GHz & $-1.60$ (bound) & $-2.31$ & $-2.75$ & $-2.48$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-With flat priors on every amplitude and a 30 GHz reference, the optimum of the index marginal for the
-High Latitude region is at the upper edge of the allowed range, more than a unit of index flatter
-than the profile optimum of the same likelihood; the Spur sits at $-2.31$ and the Plane at $-2.48$.
-Defined at 23 GHz the same marginal puts the High Latitude region at $-4.04$. Nothing about the data
-changes between the three rows. \pend{With the white CMB prior: B2.}
-
-Two published analyses in this configuration constrain the high-latitude index with a prior
-$\mathcal{N}(-3.3, 0.1^2)$ instead of fitting it: \citet{svalheim2023} because of ``very strong
-degeneracies with respect to instrumental systematic effects'' there, and \citet{watts2023}, who
-report that when the polarized synchrotron amplitude and the calibration are both fitted freely the
-high-latitude index tends to ``unreasonably flat values'', $\beta_{\rm s} \lesssim -2.5$, which they
-attribute to unmodelled systematics. The volume term of this configuration has that sign and is
-large. We do not claim more. The published high-latitude values are prior draws, so there is no
-fitted number to compare with; the calibration is outside a maps-only calculation; and the same
-calculation predicts pulls of $+0.6$ and $+0.3$ in the Spur and the Plane on our maps, where the
-published values, fitted with the prior, are $-3.17 \pm 0.06$ and $-3.03 \pm 0.07$, so the volume
-term alone does not describe those chains. Their maps, pixelization, amplitude priors and mixing all
-differ from this calculation. The point for this paper is the size: in a configuration that is in
-use, the flat-prior convention moves a region index by tenths to more than a unit, and the profile
-likelihood on the same maps moves it by nothing. (The profile optimum of this band set is itself
-unstable, $-2.70$ with a flat CMB prior and $-2.99$ with the white one at high latitude, which is
-the inconsistency of Sect.~\ref{sec:30} seen from another side.)

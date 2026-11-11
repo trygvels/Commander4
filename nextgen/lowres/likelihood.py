@@ -143,7 +143,8 @@ class RegionLikelihood:
         chi2 = self.dNd - float(rhs @ x)
         out = {"x": x, "chi2": chi2, "logdet": logdet, "s": s, "ds": ds, "chol": c}
         if need_inverse:
-            out["Ainv"] = sl.cho_solve(c, np.eye(A.shape[0]), check_finite=False)
+            # the identity is made in Fortran order and overwritten, so that the inverse costs one matrix of memory, not two
+            out["Ainv"] = sl.cho_solve(c, np.eye(A.shape[0], order="F"), overwrite_b=True, check_finite=False)
         return out
 
     # ---- objectives and gradients ---------------------------------------------------------------
