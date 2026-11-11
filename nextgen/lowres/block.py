@@ -30,6 +30,8 @@ What the block error is and is not (independent statistical review, 2026-11-11,
 - No block error is returned for a region whose largest leverage exceeds `h_max` (CR2 and CR3 are not
   defined as h approaches one) or whose debiased information is not positive.
 """
+import gc
+
 import numpy as np
 
 from .fit import sandwich_plugin
@@ -63,7 +65,10 @@ def block_errors(like, beta_hat, block, nblk, h=2e-3, h_max=0.9):
       cross (float)          share of the off-diagonal terms |dG_{B,r} / dbeta_s|, r != s, in the block Jacobian
       G (nblk, nreg), D (nblk, nreg), ok (nreg,)
     """
-    _, cs, Jp, T, _, ok = sandwich_plugin(like, beta_hat)
+    res = sandwich_plugin(like, beta_hat)
+    cs, Jp, T, ok = res[1], res[2], res[3], res[5]
+    del res                                                  # the solution holds the factor and the inverse (2.7 GB each at nside 16)
+    gc.collect()
     nreg = like.nreg
     G = block_scores(like, beta_hat, block, nblk)
     Jac = np.zeros((nblk, nreg, nreg))                       # dG_{B,r} / dbeta_s
