@@ -1,0 +1,1 @@
+# E044 chi-square under the model, nside 16: 5808 elements kept, nominal dof 17420, sd of the ratio 0.0107

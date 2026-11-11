@@ -527,8 +527,8 @@ from $\ell \le 20$'' is the K, Ka fit minus the four-band fit when both are read
 20. The flat-prior row repeats Table~\ref{tab:same}. In brackets, for the arms that use less of the
 same data under the same model: the change in units of the standard deviation that the model
 predicts for it, $(\sigma_{\rm arm}^2 - \sigma_{\rm base}^2)^{1/2}$, and for the white prior in units
-of the first-order value of Eq.~(\ref{eq:mismatch}). The other arms change the model, and their
-change has no sampling error. The statistical error of the baseline is given for scale.}
+of the first-order value of Eq.~(\ref{eq:mismatch}). The other arms change the model, and their change has no sampling error; the last four change the
+mask (in the Plane the first, second and fourth of them change the data by 9, 12 and 6 percent). The statistical error of the baseline is given for scale.}
 \label{tab:moves}
 \small
 \input{gen_tab_moves}
@@ -585,8 +585,18 @@ expected: the index of the High Latitude region, which has no masked pixel, move
 and a misfitted region reaches its neighbours.
 
 \paragraph{A different model.} The other rows change an assumption. Their changes have no sampling
-error and say what the assumption is worth. \pend{The mask: thresholds of 3 and 10 percent in place
-of 5, no mask, and the brightest thermal sources masked as well (H12, H13, H16).} A dust index of
+error and say what the assumption is worth. The mask comes first, because it changed our result
+once. With the threshold on polarized amplitude at 10 percent in place of 5 the four indices change by
+\N{bright10.move.abs.max} at most, half of the standard deviation expected for the lost data. At 3
+percent the Plane, which then holds 40 more pixels of the inner plane, is steeper by
+\N{bright03.move.abs.Plane}: \N{bright03.nest.abs.Plane} expected standard deviations, at the limit we
+had set ourselves, and \N{bright03.movesd.abs.Plane} of its statistical error. With the brightest
+thermal sources masked as well it is steeper by \N{ff.move.Plane.abs} (above). With no mask at all
+its index is within \N{nomask.move.abs.Plane} of the masked one while its $\chi^2$ per element and band
+is \N{nomask.chi.Plane}: a region can be badly misfitted and keep its index. So the index of the Plane
+depends on the mask at the level of 0.02, somewhat more than its statistical error, with a cause that
+can be named at each end (steeper bright pixels of the inner plane; thermal sources that pull flat).
+The other three regions change by 0.005 or less with the threshold. A dust index of
 1.48 or 1.58 in place of 1.53 moves the synchrotron index by \N{dust.move.list}, most in the Plane,
 where it is \N{dust.movesd.Plane} statistical errors. The three fits also say what dust index these
 maps prefer: $\chi^2_{\min}$ is higher by \N{dust.dchi148} at 1.48 and lower by \N{dust.dchi158.abs}
@@ -610,7 +620,7 @@ power law per region is \N{prof2.list} at High Latitude, in the Spur, at Interme
 the Plane, with statistical errors of \N{sd.range}. The tests that use less of the same data do not
 reject the model at a sensitivity of 0.04 to 0.07 in the index, with one pattern at two standard
 deviations: the index from the K to Ka lever arm is flatter. The assumptions that we varied are
-worth 0.05 (the bandpasses, if ignored) and 0.02 (the dust index, in the Plane). Under flat
+worth 0.05 (the bandpasses, if ignored) and 0.02 (in the Plane: the dust index, and the mask). Under flat
 amplitude priors the same fit moves by \N{d3023two.range} with a convention. We give these numbers as
 the answer of this model on these regions and not as a measurement of the polarized synchrotron
 index, and the reason is not the size of any entry of Table~\ref{tab:moves}. It is that the regions

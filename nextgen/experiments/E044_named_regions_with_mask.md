@@ -686,6 +686,34 @@ chi2_min / dof without the mask: 1.0750.
   this region.
 - The Spur without the mask: no change with scale (+0.002, +0.2 sd).
 
+### R13, the threshold of the mask (H13; read 2026-11-11 14:56)
+
+`E044/bright03.txt`, `bright10.txt`: the brightest 3 and 10 percent in polarized amplitude masked in place of 5 (and
+the Tau A disc). Canary, no OVERFLOW line; converged.
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| elements at 3, 5, 10 percent | 2974, 2974, 2962 | 290, 266, 152 | 1716, 1698, 1628 | 950, 870, 764 |
+| index at 3 percent minus at 5 percent | +0.0051 | -0.0042 | -0.0003 | -0.0185 |
+| in units of sqrt(sd_5^2 - sd_3^2), where the data differ | | -0.38 | -0.06 | -2.54 |
+| index at 10 percent minus at 5 percent | -0.0044 | +0.0019 | +0.0018 | -0.0027 |
+| in units of sqrt(sd_10^2 - sd_5^2) | -0.49 | +0.07 | +0.18 | -0.24 |
+| chi-square per element and band at 3 percent | 0.577 | 0.587 | 0.573 | 0.628 |
+| chi-square per element and band at 10 percent | 0.578 | 0.574 | 0.572 | 0.608 |
+
+chi2_min / dof: 0.978 at 3 percent, 0.970 at 10 percent (0.973 at 5).
+
+- **H13 holds at 10 percent**: every index within half an expected sd of the 5 percent fit (written: within 2);
+  chi-square 0.57 to 0.61 (written: 0.56 to 0.62).
+- **H13 at 3 percent: the Plane is on the line and by the rule the paper says so.** Its index is steeper by 0.0185,
+  2.54 expected sd where I wrote "within 2.5"; its chi-square is 0.628 (written: at most 0.66). The 40 Plane
+  pixels between the two thresholds pull the index steeper. The other regions do not move.
+- The Plane index under the masks tried: no mask -3.046 (chi-square 0.92), 3 percent -3.058, 5 percent -3.039,
+  10 percent -3.042, 5 percent with the thermal sources masked -3.060. A spread of 0.02, 1.4 of its statistical
+  error, with an identified cause at each end (bright synchrotron pixels of the inner plane that are steeper;
+  thermal sources that pull flat). High Latitude, Spur and Intermediate change by 0.005 or less with the
+  threshold.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).
