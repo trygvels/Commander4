@@ -46,7 +46,7 @@ at 23 and at 30 GHz; zero-mean prior with a free scale per region.
   assigns to its Spur value; Intermediate, 10 to 30 degrees of latitude outside the Spur; Plane, |b| < 10
   degrees.
 - **Mask:** the 5 percent of pixels with the largest polarized amplitude in the Cosmoglobe DR1 synchrotron model
-  at 30 GHz smoothed to 5 degrees (154 pixels, threshold 28.6 uK_RJ; 141 of them within 10 degrees of the plane),
+  at 30 GHz smoothed to 5 degrees (154 pixels, threshold 28.6 uK_RJ; 128 of them within 10 degrees of the plane, corrected 13:37 from 141, which is the number of Plane pixels masked in all, 128 bright and 13 of the Tau A disc),
   and a disc of 7.5 degrees around Tau A (14 pixels). 168 of 3072 pixels. This follows the description of the
   processing mask of Svalheim et al. (2023) as the referee quoted it, not their file, which we do not have.
 - Masked elements are removed exactly: the inverse covariance of the kept elements is the Schur complement
@@ -121,7 +121,8 @@ and seen; nothing at nside 16.
 
 - **H11, the flat-prior marginal with a free CMB amplitude at High Latitude (added 2026-11-11 10:56, after R5
   was read, before any scan).** In R5 the optimizer ends at the upper bound (-1.6) for High Latitude in both
-  conventions, and the curvature of the marginal at the profile optimum is negative there. A scan along the
+  conventions, and the curvature of the marginal at the profile optimum is negative there (WRONG, see the
+  correction under R5, 13:37: the -366 is the curvature at the bound). A scan along the
   High Latitude index (`e044_flat_scan.py`, step 0.1 from -3.6 to -1.6) tests whether that is the shape of the
   function or an artefact of a coupled optimizer started where the curvature is negative. Expected with the
   flat CMB prior: no interior maximum above the profile optimum; ln L_flat rises monotonically from -3.04 to
@@ -377,7 +378,7 @@ chi2_min has no prior penalty and exactly two degrees of freedom per element). P
 | n sd^2 (index variance carried by one amplitude) | 11.4 | 0.96 | 3.35 | 1.08 |
 | flat amplitude priors at 23 GHz | -1.600 (bound) | -2.778 | -2.414 | -2.809 |
 | flat amplitude priors at 30 GHz | -1.600 (bound) | -2.577 | -1.737 | -2.519 |
-| curvature of the marginal at the profile optimum (diagonal) | -366 | +340 | +646 | +920 |
+| curvature of the marginal at the flat-prior optimum for 23 GHz, which is on the bound for High Latitude (mislabelled "at the profile optimum" until the third referee read) | -366 | +340 | +646 | +920 |
 | J (diagonal) | 316 | 288 | 549 | 832 |
 
 - **H5 holds for the flat prior by its letter**: errors 2.1 to 2.4 times larger (written: 2 to 2.5); the optimum
@@ -445,7 +446,7 @@ standard deviation that the model predicts for it.
 | the same over its expected sd | +0.72 | -0.22 | +1.91 | +0.52 | |
 
 For comparison, the low-pass arm on the old regions without a mask (E042 `lowpass20_lcdm` against E040
-`s4_bpxv_n16_wm_lcdm`): changes of -0.024, -0.031, -0.055, -0.084, which are 2.8, 3.3, 8.1 and 10.4 of the expected
+`s4_bpxv_n16_wm_lcdm`): changes of -0.024, -0.031, -0.055, -0.084, which are 2.8, 3.3, 8.2 and 10.4 of the expected
 standard deviation.
 
 - **H7 holds in its reading and fails in its number.** I wrote that the Plane would still steepen by 0.01 to 0.04 at
@@ -520,11 +521,49 @@ the two marginals run from -684.5 and -1567.5 at -4.6 to +593.4 and +2081.1 at -
 - **H10: the 1.11 at High Latitude was a fluctuation.** The new set alone gives 0.975 +- 0.046, below the 1.09
   of the rule; pooled over 360 the sandwich error is calibrated to 1.02 +- 0.04 there. By the rule the pooled
   values are what the paper reports.
-- The Spur is the least clean of the four: mean z -0.11 +- 0.05 and sd 1.06 +- 0.04 over 360 (66 pixels at
+- The Spur is the least clean of the four: mean z -0.11 +- 0.05 and sd 1.06 +- 0.04 over 360 (30 pixels, 60 elements, at
   this resolution, 3 effective patches). That is a bias of 0.003 in index and an error 6 percent small, each
   at about two standard errors. Reported as measured.
 - The block-error null with three times the realizations is unchanged: the map values (1.63, 1.00, 1.44, 1.28)
   are exceeded by 14, 68, 14 and 22 percent of the simulations.
+
+### Corrections after the third referee read (2026-11-11 13:37)
+
+`reviews/2026-11-11_referee_report_paperA1_draft4.md`: no fatal objection; twelve major and nineteen minor items.
+Checked by me against the files before acting; the ones that concern this record:
+
+- **R5 and H11 had a false statement, and R7 did not notice.** "The curvature of the flat-prior marginal at the
+  profile optimum is negative for High Latitude (-366 against J = 316)" is wrong. `e044_fit.py` evaluates
+  `marginal_hessian` at the flat-prior optimum for 23 GHz, which for this fit is on the bound. From the scan (R7)
+  the curvature of minus ln L_flat along the High Latitude index at the profile optimum is +109 to +123 (profile
+  +277 to +298, J_c = 292; the volume term contributes about -175). The marginal is concave there. What makes
+  it monotonic is the slope of the volume term, +399 per unit index at the profile optimum (0.134 per amplitude;
+  a pivot of 20.1 GHz), against a curvature that never exceeds 140: the stationary point would be several units
+  of index away. Mechanism (referee, reproduced by me with one element, delta bands, equal weights): over K to V
+  a power law of index -0.08 has the spectrum of the CMB, the two columns are nearly degenerate there, and the
+  volume term -(1/2) ln det A has its maximum at that index, 3.8 per amplitude above its value at -3.04; my toy
+  gives a slope of 0.114, a gain of 0.28 per amplitude between -3.04 and -1.6 (scan: 0.134 and 0.305) and a
+  pivot of 20.5 GHz. H11's expectations hold as written; its premise does not. The paper now gives the slope
+  and the degeneracy. The "pivot 16.9 to 40.2 GHz" that the generator printed for this fit came from the same
+  misuse and is gone.
+- **The Plane fails along the CMB spectrum, which R4 and R5 did not look at.** Splitting the difference of the
+  two nested fits by region (the stored per-region sums): 0.970 +- 0.026, 0.927 +- 0.087, 1.012 +- 0.034 and
+  1.153 +- 0.048 of expectation. The Plane has 993 for 862, +3.2 sd. "No region is misfitted" was true of the
+  totals only. From K, Ka and 353 GHz alone the same four are 0.957, 1.012, 0.941, 0.997. H14 simulates the
+  sampling error of the split; H16 tests the cause.
+- "The dependence on angular scale went away with the emission that the mask removes" (R6) was shown for the
+  Plane only. At l <= 20 two expected sd are 0.036, 0.059, 0.069, 0.063 on the present regions against 0.017,
+  0.019, 0.013, 0.016 on the old ones; the Spur and Intermediate changes (-0.028, -0.047) are as large as the
+  old ones and inside a larger noise. Regions and mask were changed together. H12 separates them.
+- The K and Ka arm and the flat-CMB arm are one pattern (the index from the K to Ka lever arm is flatter), not
+  two tests. R6's count of "24 numbers, largest 2.40" stands; its reading as "no arm rejects the model" does
+  not cover the chi-square split.
+- The first-order mismatch formula (R3) drops two terms that are linear in the mismatch, of relative order T/J;
+  "exact first order" was wrong wording. "Too small by 9 to 22 percent" was true over quoted minus one: the
+  true error is 9 to 22 percent larger than the quoted one, and the quoted one 8 to 18 percent too small.
+- Not reported in the paper until now: the failure of H4 (block errors expected 1.5 to 4 times the model error
+  at Intermediate latitude and in the Plane; found 1.44 and 1.28), of the accuracy clauses of H1, and that the
+  chi-square total, its split, the CMB-prior sequence and the zero-mean disagreement were found after the fact.
 
 ## Negative control
 
