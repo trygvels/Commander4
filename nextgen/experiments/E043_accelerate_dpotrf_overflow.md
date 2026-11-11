@@ -131,7 +131,10 @@ python -I nextgen/scripts/e043_compare.py ORIGINAL RERUN
 
 ## Result
 
-**V1 holds (read 2026-11-11 03:31).** The nside-16 baseline on the old path under the canary
+**V1 holds (read 2026-11-11 03:31).** (Correction, 08:10: the plan above says "several hundred factorizations"; a
+profile-only fit makes about a dozen: nine likelihood evaluations and the information. The statement is about those.)
+
+**V1, as read.** The nside-16 baseline on the old path under the canary
 (`E043/bpxv_n16_wm_oldpath.txt`): no OVERFLOW line in the whole run (window operators, covariance
 inversions, every factorization at order 18432), and the recorded output of 2026-11-10
 (`E040/bpxv_n16_wm.txt`) reproduced in every printed digit: chi2_min 19792.7, chi-square per band 0.140,
@@ -173,7 +176,14 @@ absolute difference 0.00 as printed (four decimals in the indices and in chi-squ
 summary line identical (mean z, sd of z, coverage, chi-square 1.0006 +- 0.0220, the flat-prior shifts and
 their predictions). No OVERFLOW line. The validation table of Paper A1 stands as recorded.
 
-(V5, the 48-region stage, to be filled; it is not used in the paper)
+**V5, interim (08:07; 29 of 95 realizations of the first part).** 1421 numbers compared: 93.3 percent identical as
+printed, 99.4 percent within 1e-4, largest difference 3e-4. Nine entries exceed the tolerance of 2e-4 that I
+wrote, in three realizations, all in regions whose sandwich error at the truth is 0.15 to 0.34 (regions that the
+data do not measure), where 2e-4 to 3e-4 is 0.0006 to 0.0014 of the error. Read as written, V5 fails for those
+entries. Read for what it tests, it does not: the optimizer stops where the objective is flat to its tolerance,
+the two Cholesky paths differ in the last bits, and a flat direction turns that into 1e-4 of index; no
+well-measured region differs. The tolerance should have been stated relative to the error. To be completed when
+the rerun finishes; the stage is not used in the paper.
 
 ## Conclusion
 

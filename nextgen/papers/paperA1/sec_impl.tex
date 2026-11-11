@@ -47,8 +47,10 @@ correct, so no test of values can see the fault; what lies behind the buffer in 
 overwritten. We found it with the system's guard allocator and measured it with a malloc canary that
 is now part of the repository, switched the module to the other triangle (same cost, same numbers),
 and added a test that runs the likelihood under the canary (\exref{E043}). The fits at
-$N_{\rm side} = 16$ (orders 12\,288 and 18\,432) were not exposed: none of several hundred
-factorizations of the baseline fit overran, and its output is reproduced in every printed digit. The
+$N_{\rm side} = 16$ (orders 12\,288 and 18\,432) were not exposed: test matrices of orders 6144 to
+18\,432 do not overrun, the baseline fit run again on the old path under the canary (about a dozen
+factorizations at order 18\,432) does not overrun, and its output is reproduced in every printed
+digit. The
 simulations at $N_{\rm side} = 8$ (orders 1536 and 4608) were exposed, and every one of them was run
 again on the sound path under the canary and compared with the original output as printed.
 For the 200 realizations of Table~\ref{tab:e039} all 1480 printed numbers agree to the last digit, as do the
