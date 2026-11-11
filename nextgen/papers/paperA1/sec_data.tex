@@ -384,7 +384,7 @@ referee's first-order estimate of the move being $-0.07$ (\exref{E044}). The mis
 the scatter of those fits sat in the emission that the mask removes, and one source carried most of
 it in one region.
 
-\subsection{What moves the index, and why we do not quote one}
+\subsection{What moves the index}
 \label{sec:moves}
 
 \begin{table}
@@ -404,14 +404,56 @@ change has no sampling error. The statistical error of the baseline is given for
 \input{gen_tab_moves}
 \end{table}
 
-Table~\ref{tab:moves} lists what else moves the answer. \pend{Text from the arms: CMB prior, angular
-scale (and whether the mask removed the scale dependence, H7), band subset, dust index, bandpasses.}
+Table~\ref{tab:moves} lists what else moves the answer, with the statistical error for scale. Its
+rows are of two kinds, and they have to be read differently.
 
-Taken together: for these maps, regions and mask the profile index of the simple model is
+\paragraph{Less of the same data.} An arm that drops information and keeps the model gives, if the
+model is right, an estimate that differs from the full one by noise of a known size,
+$(\sigma_{\rm arm}^2 - \sigma_{\rm base}^2)^{1/2}$; for the estimator that reads the index from large
+scales this was checked on simulations (\exref{E039}; \pend{and at $N_{\rm side}=16$ with these
+regions}). Such an arm is a test of the model with no free choice in it, and Table~\ref{tab:moves}
+gives each change in those units. With the index read from multipoles up to 30, 20 and 12 only, the
+largest change in any region is \N{lp30.nest.max}, \N{lp20.nest.max} and \N{lp12.nest.max} of them.
+From K and Ka alone the four indices change by \N{KKa.nest.list}, and by \N{lp20KKa.nest.list} when
+both fits are read from multipoles up to 20. With a flat prior on the CMB they change by
+\N{flat.movenest.list} (above). The largest of all these is \N{arms.nest.max}, in one region of one
+arm, and the arms share their data. Two patterns are visible and neither is significant: the
+sequence in the CMB prior described above, and an index from K and Ka alone that is flatter at
+Intermediate latitude and in the Plane by \N{KKa.move.Int} and \N{KKa.move.Plane}, the sign of a
+spectrum that steepens with frequency.
+
+That is not the picture before the mask. On the earlier regions the index from $\ell \le 20$ was
+steeper than the index from all scales by \N{old.lp20.move.abs.range} in the four regions,
+\N{old.lp20.nest.abs.range} of the expected scatter, and we could not say why. We had written before
+the present fits that if compact bright emission was the cause the mask would shrink the largest of
+them, \N{old.lp20.move.absPlane} in the old Plane, to between 0.01 and 0.04; in the new Plane the change
+is \N{lp20.move.Plane}, with the other sign and inside its noise. The dependence on angular scale went
+away with the emission that the mask removes.
+
+\paragraph{A different model.} The other rows change an assumption. Their changes have no sampling
+error and say what the assumption is worth. A dust index of 1.48 or 1.58 in place of 1.53 moves
+the synchrotron index by \N{dust.move.list}, most in the Plane, where it is \N{dust.movesd.Plane}
+statistical errors. The three fits also say what dust index these maps prefer: $\chi^2_{\min}$ is
+higher by \N{dust.dchi148} at 1.48 and lower by \N{dust.dchi158.abs} at 1.58, and a parabola through
+the three values has its minimum at $\N{dust.best} \pm \N{dust.bestsd}$, against $1.53 \pm 0.02$ from
+the Planck bands alone \citep{planck2018xi}; at that uncertainty the dust index is worth
+\N{dust.at002.range} in the synchrotron index. This reading of the dust index was not planned and is
+a by-product. Delta bands at the nominal WMAP frequencies in place of the measured bandpasses
+steepen every region, by \N{delta.move.abs.range}, which is \N{delta.movesd.abs.range} statistical
+errors: the largest model effect in the table, and the one with no excuse, because the bandpasses
+are measured. The correction for the drift of the band centres is worth \N{nodrift.move.abs.max} at
+most, the choice between the polarization-sensitive and all bolometers for the 353 GHz bandpass
+\N{bp353full.move.abs.max}, and the floor of the CMB prior \N{floor011.move.abs.max}.
+
+\paragraph{Taken together.} For these maps, regions and mask the profile index of the simple model is
 \N{prof2.list} at High Latitude, in the Spur, at Intermediate latitude and in the Plane, with
-statistical errors of \N{sd.range}. \pend{Sizes of the moves.} We do not quote these as a measurement
-of the polarized synchrotron index. They are the answers of one model on one set of regions; an
-earlier set of regions, without a mask, gave \N{old.prof.HL} to \N{old.prof.Plane} with errors of 0.01
-for regions that turned out to be mislabelled and misfitted, and it took an independent referee to
-see it. A measurement needs the regions, the mask, the dust model and the scale dependence each
-justified on its own evidence, which is a separate piece of work.
+statistical errors of \N{sd.range}. With the mask it does not depend on the angular scale that
+informs it or on the band subset beyond what the noise allows; it moves by up to
+\N{flat.move.abs.max} with the prior on the CMB and by 0.05 if the bandpasses are ignored; and under
+flat amplitude priors it moves by \N{d3023two.range} with a convention. We give these numbers as the
+answer of this model on these regions, with what they are sensitive to, and not as a recommended
+value of the polarized synchrotron index. An earlier set of regions, without a mask, gave
+\N{old.prof.HL} to \N{old.prof.Plane} with errors of 0.01 for regions that turned out to be mislabelled
+and misfitted, and it took an independent referee to see it; the choice of regions and mask is
+itself a model, the spectrum here has no curvature, and the leakage of intensity into polarization
+is not modelled.

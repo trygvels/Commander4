@@ -139,3 +139,21 @@ Missing for Paper B and the tau by-product (landscape report): 2610.31469 (QUIJO
 | Cameron and Miller 2015, J. Human Resources 50, 317 (doi 10.3368/jhr.50.2.317) | The names CR2 and CR3; "at a minimum use T(G - 1) critical values"; their CR3 carries the factor (G - 1) / G. |
 | Carter, Schnepel and Steigerwald 2017, Rev. Econ. Stat. 99, 698 (doi 10.1162/REST_a_00639) | Effective number of clusters G* = G / (1 + Gamma), in shares of the variance of the estimate (ours is in shares of the information; the two agree when the model holds). They do not recommend t with G* degrees of freedom. |
 | MacKinnon and White 1985, J. Econometrics 29, 305 | HC1 to HC3. Record verified, paper not read: not cited in Paper A1. |
+
+
+## Normalization of the WMAP nine-year low-resolution Q/U covariances, added 2026-11-11 for E044 R4 (read in `research/2026-11-11_wmap_lowres_covariance_normalization.md`)
+
+| Reference | Takeaway for us |
+|---|---|
+| Lattanzi et al. 2017, JCAP 02, 041 (arXiv:1611.01123; PDF read) | Template fits (K band and 353 GHz) to the raw nine-year r4 maps with the released matrices: chi2 / N_pix = 1.045, 1.004, 0.977 for Ka, Q, V with noise only; 1.026, 0.983, 0.963 with signal plus noise. V band is 2 to 4 percent low and is not discussed. |
+| Planck 2018 V, A&A 641, A5 (arXiv:1907.12875; HTML only, queried twice) | Table 12, same maps and matrices smoothed: reduced chi2 1.004, 1.048, 0.970 for Ka, Q, V on 73 percent of the sky. Not discussed. |
+| Jarosik et al. 2007 (astro-ph/0603452; PDF read), Sect. 4.3.2 and Table 5 | The only calibration of the r4 noise against the matrices (three-year): r4 noise 1.5 to 5.7 percent above the r9 sigma_0 of I. Opposite sign to our deficit. The matrices are stated approximations (stationary noise per year, grouped observations, maps degraded from r9). |
+| Jarosik et al. 2011 (arXiv:1001.4744; PDF read), Sect. 2.7 | Since seven-year the r4 matrices are a unit-normalized filter product divided by a sigma_0 measured on r9 maps; no r4 calibration is given. Masks are applied by marginalizing Sigma^-1 over the excluded pixels (Sect. 4.1.2), which is what `lowres.mask` does. |
+| Hinshaw et al. 2009 (arXiv:0803.0732; PDF read), Sect. 6.1 | "If anything, there is a slight tendency to overestimate the uncertainties at higher l" (five-year, cleaned maps, Fisher errors). The one team statement with the sign of our deficit. |
+| Svalheim et al. 2023 (BeyondPlanck XV), Sect. 5.1 footnote 5 (HTML only) | A uniform, slightly negative chi-square offset at high latitude, attributed to the count of degrees of freedom. |
+
+Not established by any source: that the nine-year matrices overstate the noise. Documentation conflict (Supplement:
+imbalance modes "projected out", matrices singular inside the processing mask; LAMBDA page: a 1-sigma term; our files:
+positive definite, E038). Model-free tests that would settle it are listed in Sect. 6 of the report (year and DA
+differences at r4 with the single-year matrices); they need files that are not on disk and belong to Paper B.
+
