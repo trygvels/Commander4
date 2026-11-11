@@ -221,6 +221,61 @@ band, shows only a small feature at the Galactic Center, which points at 30 GHz.
 there is no correlation with intensity, and the residual there anticorrelates with the predicted
 synchrotron (-0.37): the high-latitude deficit is a different thing from the plane residual.
 
+**Exploratory, not pre-registered: amplitude ratios by multipole and PR4 against PR3, 2026-11-11
+01:02 to 01:03** (`E042/cross_ratio.txt`, `E042/pr3_vs_pr4_direct.txt`). Prompted by the scale
+dependence of (a). Two model-light diagnostics on the window-matched nside-16 maps.
+
+(i) The amplitude ratio of two maps per multipole bin from cross spectra with a third map, which
+has no noise bias: R(x / K; ref) = sum c_x c_ref / sum c_K c_ref over the E and B coefficients.
+For an index of -3.06 the expected ratios are 0.505 (30 GHz over K) and 0.321 (Ka over K).
+
+| multipoles | PR4 30 / K, full sky | PR3 30 / K, full sky | Ka / K, full sky | PR4 30 / K, abs(b) > 20 | PR3 30 / K, abs(b) > 20 | PR4 30 / K, abs(b) < 20 | PR3 30 / K, abs(b) < 20 |
+|---|---|---|---|---|---|---|---|
+| 2 to 3 | 0.448 | 0.464 | 0.326 | 0.447 | 0.420 | 0.442 | 0.488 |
+| 4 to 6 | 0.450 | 0.493 | 0.321 | 0.483 | 0.482 | 0.444 | 0.489 |
+| 7 to 10 | 0.446 | 0.490 | 0.322 | 0.486 | 0.474 | 0.440 | 0.485 |
+| 11 to 16 | 0.454 | 0.492 | 0.326 | 0.500 | 0.495 | 0.455 | 0.493 |
+| 17 to 24 | 0.462 | 0.504 | 0.332 | 0.508 | 0.504 | 0.461 | 0.504 |
+| 25 to 34 | 0.470 | 0.507 | 0.331 | 0.505 | 0.492 | 0.469 | 0.508 |
+| 35 to 47 | 0.497 | 0.535 | 0.353 | 0.524 | 0.542 | 0.497 | 0.530 |
+
+(ii) Direct regression of the PR4 map on the PR3 map, and of each on K band, by zone (Q and U
+together, through the origin, unweighted):
+
+| zone | PR4 on PR3 | PR4 on K | PR3 on K | correlation PR4, PR3 |
+|---|---|---|---|---|
+| abs(b) < 5, inner Galaxy | 0.854 | 0.440 | 0.503 | 0.978 |
+| abs(b) < 5, outer Galaxy | 0.841 (Q 0.92, U 0.44) | 0.499 | 0.498 | 0.872 |
+| 5 to 20 | 0.955 | 0.486 | 0.484 | 0.968 |
+| 20 to 45 | 0.988 | 0.471 | 0.460 | 0.983 |
+| above 45 | 1.034 | 0.426 | 0.383 | 0.969 |
+| all sky | 0.886 | 0.456 | 0.490 | 0.966 |
+
+(The slopes on K band at high latitude are attenuated by the noise of K band; the cross-spectrum
+ratios of (i) are not.)
+
+What these say, as observations to be checked and not yet as results:
+
+- **Two different things are in the gap.** (A) In the Galactic plane the PR4 30 GHz polarization is
+  9 to 15 percent fainter than PR3, at all scales, and PR3 agrees with the K-band extrapolation
+  there (0.503 against 0.502 to 0.505 expected in the inner plane; 0.49 to 0.51 for abs(b) < 20
+  at multipoles 4 to 34). (B) At high latitude PR3 and PR4 agree with each other within 1 to 3
+  percent and both are fainter than the K-band extrapolation at multipoles below about 10 (by 4
+  to 17 percent), and consistent with it from 11 to 34.
+- (A) fits the leakage check above: the plane residual follows the intensity at 0.05 to 0.13
+  percent, and the polarized fraction in the inner plane at 30 GHz is of order one percent, so a
+  difference of 0.1 percent of intensity between the two releases' bandpass-leakage corrections is
+  a 10 percent difference in polarization there. WMAP K and Ka side with PR3.
+- (B) is the large-scale discrepancy that Planck 2018 II (App. A), Weiland et al. (2022) and
+  Watts et al. (2023) describe; this analysis does not say which map carries it.
+- The Ka over K ratio is flat at 0.32 to 0.33 to multipole 34: no scale dependence within WMAP.
+  In the last bin (35 to 47) every ratio to K band rises by 6 to 10 percent, Ka included, so K
+  band has less power at the pixel scale than the Gaussian 52.8 arcmin window gives it. That is a
+  limit of the window matching and it bears on every fit at the 0.01 level of E038 (c).
+- **X2 can now be answered in the form it should have had**: within WMAP the ratio does not depend
+  on scale, so the scale dependence of the K to 30 GHz index belongs to the 30 GHz maps or to the
+  pair, not to K band alone.
+
 ## Negative control
 
 The scale cut applied to Ka in the K, Ka, 353 fit: the index must not move by more than 2 sd of
