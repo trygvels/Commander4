@@ -76,6 +76,9 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F52 | A | Measured with a guard allocator and a malloc canary; reruns compared digit by digit |
 | F53 | B | One data set; the white prior was the pre-registered baseline and the pre-registered criterion failed |
 | F54 | B | Estimator checked on simulations with and without a true spread (60 realizations each, nside 8); one data set; 5 to 9 effective patches per region |
+| F55 | A for the differences between estimators, B for the index values | Pre-registered (H1 to H3); regions by geometry with a mask; one data set; values depend on the choices of F58 |
+| F56 | B | 30 simulated realizations at nside 8 and one map fit at nside 16; the size on the maps is not predicted |
+| F57 | A for the Tau A test, B for the reading of the block errors | Pre-registered (H4, H6); null of 120 realizations at nside 8, the map fit at nside 16 |
 
 ## 1. Sampler correctness
 
@@ -1343,3 +1346,39 @@ surrogate regions with no mask, and those are not what they are named:
   percent" is a first-order step with the curvature of the fitted marginal; the prediction that needs no
   flat-prior fit (J_c) is off by 11 percent, and 18 percent with a free CMB.
 - E044 redoes the real-data results on regions defined by geometry with a processing mask (D035).
+
+**F55. On regions defined by geometry with a processing mask the simple model fits the WMAP K to V
+polarization maps, and under flat amplitude priors the index still moves by 0.07 to 0.48 with the
+reference frequency** (E044 R1; pre-registered). Regions: High Latitude (|b| > 30), Spur, Intermediate
+(10 to 30), Plane (|b| < 10); mask: brightest 5 percent of the DR1 polarized synchrotron model and a 7.5
+degree disc around Tau A; LCDM covariance as the CMB prior; nside 16, dense covariances, window matching.
+Chi-square per element and band 0.577, 0.591, 0.572, 0.614 against 0.6 (the old regions without a mask
+gave 0.58, 0.59, 1.78, 0.77). Profile index -3.147 +- 0.029, -3.139 +- 0.028, -3.091 +- 0.019,
+-3.039 +- 0.015. Flat prior at 23 GHz: within one sandwich error of the profile optimum in every region
+(pivot 23.3 GHz). Flat prior at 30 GHz minus at 23 GHz: +0.478, +0.154, +0.204, +0.072, which is 16.4,
+5.6, 10.5 and 4.8 sandwich errors with no change of data or model. First-order predictions are always
+high: measured over predicted 0.75, 0.84, 0.86, 0.93 with the curvature of the fitted marginal and 0.69,
+0.79, 0.82, 0.90 with J_c. The index values are answers of one model on one set of regions and are not
+quoted as a measurement (F58 will list what moves them). Grade A for the differences, B for the values.
+
+**F56. The zero-mean amplitude prior with a free scale per region is biased steep at the configuration
+of the map fit** (E044 R1 and `sim_n8_zm`; not expected). In 30 simulated realizations at nside 8 with
+these regions, mask, covariances and prior, in which the profile optimum is unbiased (pooled mean z
+-0.05, -0.20, +0.02, +0.03 over 120 realizations, se 0.09), the zero-mean optimum is steeper than the
+profile optimum of the same realization by 1.05, 0.54, 0.44 and 0.22 sandwich errors, with a scatter of
+0.02 or less. On the maps at nside 16 the difference is -0.104, -0.043, -0.030, -0.004 (3.6, 1.6, 1.5,
+0.2 sandwich errors): same sign and order. F44 and F46 (e) had it as the same estimator for a common
+noise pattern and up to 0.6 sd off otherwise; with three components, dense noise and a faint region it
+is larger. Consequence: the zero-mean prior is not a substitute for the profile likelihood on these
+maps. Grade B.
+
+**F57. The misfit and the large block errors of the earlier real-data fits were the brightest emission
+and one source; with the mask the block scores give no evidence that any region is more than one index**
+(E044 R1, R2; pre-registered H4, H6). With only a 7.5 degree disc around Tau A masked on the old regions,
+the old Plane index moves from -2.964 to -3.048 +- 0.014 (predicted -0.05 to -0.10; the referee's
+first-order estimate -0.074) and its chi-square per element and band falls from 0.770 to 0.596. On the
+new regions the own-score block error (CR3) over the sandwich error is 1.63, 1.00, 1.44, 1.28; under the
+model (120 simulations at nside 8 with the regions, mask, covariances and prior of the fit) that ratio
+has median 1.33, 1.30, 1.11, 1.12 and 97.5th percentile 2.02, 3.11, 1.69, 1.72; 15, 85, 12 and 31 of the
+120 lie above the map values. H4 (ratios of 1.5 to 4 for Intermediate and Plane) failed on the low side.
+This supersedes what was left of F54 for the regions. Grade A for the Tau A test, B for the reading.

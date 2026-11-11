@@ -2,6 +2,46 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-11 (Mac mini, 10:11): E044 central fit read. With proper regions and a mask the model fits (chi-square 0.57 to 0.61 against 0.6); the reference frequency still moves the index by 0.07 to 0.48 (5 to 16 sd); the zero-mean prior turns out biased here
+
+**Learned** (E044, pre-registered H1 to H8; F55 to F57)
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| elements kept | 2974 | 266 | 1698 | 870 |
+| profile index | -3.147 | -3.139 | -3.091 | -3.039 |
+| sandwich error | 0.029 | 0.028 | 0.019 | 0.015 |
+| flat prior at 30 GHz minus at 23 GHz | +0.478 | +0.154 | +0.204 | +0.072 |
+| the same in sandwich errors | 16.4 | 5.6 | 10.5 | 4.8 |
+| zero-mean prior minus profile, in sd | -3.6 | -1.6 | -1.5 | -0.2 |
+| own-score block error over sandwich | 1.63 | 1.00 | 1.44 | 1.28 |
+| chi-square per element and band (0.6) | 0.577 | 0.591 | 0.572 | 0.614 |
+
+- **The model fits once the brightest 5 percent and Tau A are masked.** On the old regions the chi-square was
+  1.78 and 0.77 in two regions.
+- **Tau A alone**: masking a 7.5 degree disc on the old regions moves the old Plane from -2.964 to -3.048 and
+  its chi-square from 0.770 to 0.596. Predicted before the fit (H6). The referee was right.
+- **Block errors are inside the null in all four regions** (120 simulations at nside 8 with the regions, mask
+  and prior of the fit). No evidence that any region is more than one index. My expectation H4 (ratios 1.5 to
+  4) failed on the low side.
+- **The headline survives the redo and is larger**: same maps, same model, flat amplitude priors, 30 against 23
+  GHz moves the index by 5 to 16 sandwich errors. First-order predictions are high by 8 to 33 percent.
+- **Not expected: the zero-mean prior is biased steep here.** In 30 simulations in which the profile optimum is
+  unbiased, it sits 1.05, 0.54, 0.44, 0.22 sd below the profile optimum of the same realization. The paper's
+  recommendation changes: it is not a substitute for the profile likelihood on these maps.
+
+**Running**
+- E044 queue: white CMB prior with the exact mismatch calculation, then flat CMB prior, low-pass (20, 12, 30),
+  dust index, bandpasses, K and Ka only. About three hours. Then six simulations at nside 16.
+- The 48-region rerun of E043 is paused for memory.
+
+**Next**
+- Read the arms against H5, H7, H8; write "What moves the index"; third referee read of the draft.
+
+**Needs Trygve**
+- Unchanged: the BeyondPlanck XV region and mask files (contact with the collaboration); reporting the
+  Accelerate fault upstream; wording about the legacy move and Commander3.
+
 ## 2026-11-11 (Mac mini, 09:05): second referee read of Paper A1. Methods stand. One fatal objection to one claim, and the regions of the real-data section are not what they are named. The real-data section is being redone on proper regions with a mask (E044)
 
 **Learned**
