@@ -1,0 +1,14 @@
+# E040 stage 5 check: nside 8, blocks per region [44, 23, 4, 15], true index spread between blocks 0.0
+real 0 index -3.1498 -3.2613 -2.8584 -2.9547 | block / sandwich 1.10 1.06 0.27 0.84 [21 s]
+real 10 index -3.1738 -3.2611 -2.8464 -2.9595 | block / sandwich 1.23 0.88 0.58 0.41 [285 s]
+real 20 index -3.1432 -3.2515 -2.8390 -2.9393 | block / sandwich 1.03 0.87 0.51 0.48 [489 s]
+real 30 index -3.1336 -3.2360 -2.8559 -2.9582 | block / sandwich 1.04 1.05 0.39 0.38 [782 s]
+real 40 index -3.1676 -3.2290 -2.8525 -2.9567 | block / sandwich 1.15 0.66 0.58 1.02 [1021 s]
+real 50 index -3.1413 -3.3119 -2.8588 -2.9339 | block / sandwich 1.02 0.89 0.60 0.85 [1229 s]
+## over 60 realizations
+region           blocks  scatter  sandwich    block  block/sand median      16% - 84%  expected sd of ratio
+High Latitude        44   0.0159    0.0152   0.0170              1.115   0.95 - 1.32                  0.11
+Spur                 23   0.0192    0.0165   0.0148              0.893   0.67 - 1.20                  0.15
+Galactic Center       4   0.0097    0.0107   0.0074              0.691   0.42 - 1.28                  0.41
+Plane                15   0.0134    0.0145   0.0122              0.834   0.56 - 1.16                  0.19
+mean estimate minus region truth: -0.0009 +0.0004 +0.0016 +0.0001

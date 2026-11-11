@@ -37,3 +37,21 @@ of Sect.~\ref{sec:flat} (the curvature of the marginal in place of the profile i
 condition under which the profile score is unbiased when a component carries a prior
 (App.~\ref{app:sandwich}), and a docstring, and it measured the limits of the plug-in error quoted in
 Sect.~\ref{sec:profile} (\exref{E039}, independent review).
+
+\paragraph{A numerical hazard.} During this work three processes crashed with corrupted heaps. The
+cause was not in our code. On the machine used (Apple M4, macOS 27.0, a pre-release build) the
+Cholesky routine of the Accelerate framework, called with the upper-triangle option, writes between
+0.25 and 0.77 MB past an internal buffer for matrix orders of about 1500 to 6000, and SciPy maps
+\texttt{cho\_factor(lower=True)} on a row-ordered array to that option. The factor it returns is
+correct, so no test of values can see the fault; what lies behind the buffer in memory is
+overwritten. We found it with the system's guard allocator and measured it with a malloc canary that
+is now part of the repository, switched the module to the other triangle (same cost, same numbers),
+and added a test that runs the likelihood under the canary (\exref{E043}). The fits at
+$N_{\rm side} = 16$ (orders 12\,288 and 18\,432) were not exposed: none of several hundred
+factorizations of the baseline fit overran, and its output is reproduced in every printed digit. The
+simulations at $N_{\rm side} = 8$ (orders 1536 and 4608) were exposed, and every one of them was run
+again on the sound path under the canary and compared with the original output as printed.
+\pend{Outcome of the comparison for the 200 and the 48-region realizations of Table~\ref{tab:e039}.}
+We report this because the failure is silent, because dense low-resolution likelihoods of exactly
+this size are common in this field, and because a result that passes every statistical test can
+still have been computed next to an overwritten buffer.

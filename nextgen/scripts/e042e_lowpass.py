@@ -41,8 +41,13 @@ def main():
     ap.add_argument("--lmax", type=int, default=30)
     ap.add_argument("--sets", nargs="+", default=["K,Ka,Q,V,353", "K,Ka,353", "K,30,353", "30,Ka,353"])
     ap.add_argument("--out", default="")
+    ap.add_argument("--cmb-prior-lcdm", action="store_true", help="LCDM pixel covariance as the CMB prior instead of white 0.2 uK")
     a = ap.parse_args()
     WM = WindowMatcher(16, target_arcmin=60.0)
+    kw = dict(cmb_prior_sd=0.2)
+    if a.cmb_prior_lcdm:
+        from lowres.window import lcdm_cmb_precision
+        kw = dict(cmb_prior_sd=None, cmb_prior_prec=lcdm_cmb_precision(WM)[0])
     keep = WM.ell <= a.lmax
     Yk, Ypk = WM.Y[:, keep], WM.Yp[keep]
     region = D.bpxv_regions()
@@ -73,12 +78,13 @@ def main():
             gc.collect()
         print(f"# {B.name}: loaded; low-passed copy to l <= {a.lmax} ({int(keep.sum())} modes); {time.time() - T0:.0f} s", flush=True)
     store = {}
+    print(f"# CMB prior: {'LCDM covariance' if a.cmb_prior_lcdm else 'white 0.2 uK'}", flush=True)
     print(f"# E042 low-pass arm: the first band of each set and 353 GHz keep all modes; the others enter through multipoles 2 to {a.lmax}; "
           "profile index and debiased sandwich error (High Latitude, Spur, Galactic Center, Plane)", flush=True)
     for s in a.sets:
         bs = s.split(",")
         bands = [full[bs[0]]] + [low[b] if b != "353" else full[b] for b in bs[1:]]
-        L = RegionLikelihood(bands, region, cmb_prior_sd=0.2, use_dust=True)
+        L = RegionLikelihood(bands, region, use_dust=True, **kw)
         bh, res = fit_profile(L, np.full(4, -3.1))
         _, Sw, J, T, sol, ok = sandwich_plugin(L, bh)
         sd = np.sqrt(np.diag(Sw))

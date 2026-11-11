@@ -70,9 +70,11 @@ follow the referee report except where a later experiment changed them (F1, F38)
 | F46 | A for (a) to (d) in one dimension, B for (e) | Exact one-dimensional targets, 400 realizations per cell, pre-registered; the coupled dense case is E039 |
 | F47 | B | Deterministic input checks; the LFI noise model is empirical |
 | F48 | A for the shift, B for the values | Pre-registered; real maps; see F49 for the values |
-| F49 | B | Found through a failed control; stability across the cut pending |
+| F49 | B for the size of the scale dependence, W for "beam aliasing" as its cause | Amended 2026-11-11 after the referee read: cause not established, estimator not yet validated on simulations, stability criterion failed in two regions |
 | F50 | B, C for the leakage reading | Band pairs pre-registered; the PR4 against PR3 part is exploratory |
 | F51 | B for the numbers, D for the reading of published chains | Not their maps, pixelization or chains |
+| F52 | A | Measured with a guard allocator and a malloc canary; reruns compared digit by digit |
+| F53 | B | One data set; the white prior was the pre-registered baseline and the pre-registered criterion failed |
 
 ## 1. Sampler correctness
 
@@ -1245,3 +1247,48 @@ that size in this configuration. Grade B for the numbers, D for any statement ab
 chains, which were not examined. The profile index of this band set moves by 0.3 with the CMB
 prior, which is F50 from another side.
 
+
+**Amendments of 2026-11-11 to F48 to F51, after the independent referee read of Paper A1 draft 1
+(`reviews/2026-11-11_referee_report_paperA1_draft1.md`).**
+
+- F49: the heading says more than was shown. What is established is the size of the effect: with the
+  index informed by multipoles up to 30, 20 and 12 only, the four-band index moves by -0.014 to -0.048
+  (High Latitude), -0.008 to -0.015 (Spur), -0.043 to -0.093 (Galactic Center) and -0.043 to -0.086
+  (Plane), and the pre-registered stability criterion (Z4) holds for the Spur, barely for the High
+  Latitude region, and fails for the other two. "Beam aliasing" is one candidate cause; compact
+  structure with a flatter spectrum is another, and Fuskeland et al. (2014) match our all-scale value in
+  the plane, which favours the sky. The low-pass estimator had not been run on simulations when these
+  numbers were written (E039 addendum B does that). The low-pass indices are sizes of an effect, not
+  results, and Paper A1 quotes none of them as an index.
+- F50: stands as a description of these maps under this model. The statement that the two releases
+  differ "by 0.5" rests on PR3 with white-noise columns and a reduced chi-square of 6 and is not a
+  measurement of a difference between releases.
+- F51: the reading of the published analyses is reduced to what the numbers support: in this
+  configuration the flat-prior optimum depends on the reference by more than a unit of index at high
+  latitude. Whether that is what happened in any published chain is not claimed.
+- F48: see F53 for the dependence of the values on the CMB prior.
+
+**F52. On macOS 27.0 (build 26A5388g) Accelerate's Cholesky factorization with the upper-triangle
+option writes up to 768 kB past an internal buffer for matrix orders of about 1500 to 6000, and
+scipy's `cho_factor(lower=True)` and `cholesky(lower=True)` on C-ordered arrays take that path**
+(E043). Measured with Apple's guard allocator (a byte write one past a heap block inside
+`dpotrf$NEWLAPACK`, called with no scipy wrapper in between) and with a malloc canary
+(`nextgen/tools/malloc_canary.c`): 786432 bytes past a 524288-byte block at order 1536, 352000 bytes
+at 4608, none at 6144 to 18432, none ever with the lower-triangle option. The factor returned is
+correct; the damage is to neighbouring heap memory, and it showed as crashes in unrelated code. Every
+nside-8 dense fit and noise draw of E038 to E040 was exposed; the nside-16 fits were not (the baseline
+rerun on the old path under the canary shows no overflow and reproduces every printed digit). Fix: the
+other triangle, at the same cost. Reruns on the sound path under the canary reproduce the recorded
+outputs as printed: plug-in addendum (40 of 40 realizations), nside-8 window checks, nside-8 real-data
+arm; E039 stages 1 and 2 in progress at the time of writing (see the E043 record for the final count).
+Grade A.
+
+**F53. The profile index of the WMAP K to V fit depends on the shape of the CMB prior at the level
+of its statistical error** (E040 stage 4). With the LCDM pixel covariance as the prior in place of a
+white 0.2 uK prior of the same total variance, the four indices are -3.083 +- 0.013, -3.080 +- 0.017,
+-3.081 +- 0.009 and -2.964 +- 0.013: flatter by 0.012, 0.017, 0.006 and 0.031 (0.9, 1.0, 0.7 and 2.3
+sd). The pre-registered criterion (within 1 sd) failed, so the LCDM version is the central table of
+the paper. The flat-prior reference shift holds in both versions (+0.167, +0.095, +0.029, +0.049 from
+23 to 30 GHz with the LCDM prior, 5 to 9 percent below the first-order prediction). Whether the move
+is what a LCDM sky does to a white-prior fit, or large-scale achromatic structure in the maps that the
+LCDM prior absorbs, is being tested on simulations (C4). Grade B.

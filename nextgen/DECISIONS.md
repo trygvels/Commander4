@@ -563,3 +563,53 @@ beams unmatched and quoting a systematic (rejected by rule D6: the correction is
 0.001). Using nside 8 for the bulk of the arms because it is 100 times cheaper (rejected: biased).
 Using the white-noise columns for LFI (rejected: the ring-half difference contradicts them by
 1.2 to 1.8 in chi-square and by up to 10 at the largest scales).
+
+## D032 (2026-11-11 02:45): Paper A1 is reduced to the methods and the estimator comparison; the index, the 30 GHz anatomy and the reading of published analyses move to Paper B
+
+**Decision.** After the independent referee read of draft 1 (one fatal objection, ten major items),
+Paper A1 keeps Sects. 2 to 5 (the tempered legacy move, the reference frequency of a flat prior, the
+profile likelihood with a debiased sandwich error), the simulation validation, and one real-data
+section whose result is differential: the same maps under four ways of removing the amplitudes. It
+quotes no polarized synchrotron index as a measurement. The K band against 30 GHz anatomy (E042), the
+scale dependence of the index and the comparison with the BeyondPlanck configuration become Paper B.
+
+**Why.** The referee re-derived and reproduced the methods and found them sound. The fatal objection
+was against quoting low-pass indices as results: the estimator had no simulation test, my own
+stability criterion failed in two of four regions, and the cause of the scale dependence is not
+established. The differential comparison does not need the model to fit; an index does.
+
+**Alternatives considered.** Keeping the index with a larger systematic error (rejected: the
+systematic is not understood well enough to size). Dropping the real-data section (rejected: the
+reference shift on real maps at the predicted size is the paper's strongest demonstration).
+
+## D033 (2026-11-11 03:12): the dense Cholesky uses the lower-triangle LAPACK path, and every dense run on the Mac mini runs under the malloc canary until the OS bug is gone
+
+**Decision.** `nextgen/lowres/likelihood.py` factorizes with `lower=False` on its C-ordered matrix
+(LAPACK uplo L); scripts use `np.linalg.cholesky`. Every dense job on this machine is started with
+`DYLD_INSERT_LIBRARIES=~/data/c4_tools/libcanary.dylib` and its stderr is searched for OVERFLOW. Every
+number of E038 to E040 that came from an exposed order (1500 to 6000) is rerun on the sound path and
+compared as printed; a number that is not reproduced is replaced and the replacement is reported.
+Upstream code (`standalone_tools/constrained_cmb_realizations.py`) is not changed.
+
+**Why.** E043 (F52): the upper-triangle path of Accelerate's `dpotrf` on macOS 27.0 (26A5388g) writes
+up to 768 kB past a buffer. The returned factor is right, so tests of values cannot see it; only
+memory checks can. The lower path costs the same.
+
+**Alternatives considered.** Switching BLAS (OpenBLAS wheels): larger change, different threading on
+this machine, not needed. Trusting the nside-16 orders because no overflow was measured there, and
+leaving the path as it was: rejected, the thresholds are internal to a closed library and can change
+with the load. Reporting upstream: for Trygve to decide (contact with outside developers).
+
+## D034 (2026-11-11 03:25): the LCDM covariance is the CMB prior of the paper's central table
+
+**Decision.** By the rule written before the fit (E040 stage 4, C1), the central table of Paper A1 uses
+the LCDM pixel covariance as the CMB prior. The white 0.2 uK prior and the flat prior are shown beside
+it. Arms quoted as changes of the index are repeated with the LCDM prior.
+
+**Why.** C1 failed: the Plane index moved by 2.3 sd and the Spur by 1.0 sd between the two priors, and
+the reference shift changed by up to 33 percent. A white prior understates the LCDM E-mode variance by
+a factor of 200 at the quadrupole. No default in Commander4 is involved.
+
+**Alternatives considered.** Keeping the white prior as pre-registered baseline and reporting LCDM as
+an arm (rejected by the rule). A flat CMB prior as the central choice (unbiased for any CMB, but the
+errors double and the pivot of the flat amplitude prior moves; shown as a row).

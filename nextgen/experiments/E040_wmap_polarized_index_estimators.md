@@ -421,6 +421,24 @@ with a few realizations if the answer depends on resolution.
   large-scale achromatic structure in the maps that is not LCDM, by region, and that the index is uncertain
   by that amount on top of everything else.
 
+### Stage 4b, pre-registered 2026-11-11 03:58: the arms repeated with the LCDM prior
+
+Because C1 failed, the arms that the paper quotes as changes of the index are repeated with the LCDM
+prior (`nextgen/scripts/e043_queue10.sh`, outputs `E040/l_*.txt` and `E042/lowpass*_lcdm.txt`): no window
+matching, K and Ka only, no drift correction, dust index 1.48 and 1.58, the full 353 GHz band, a start at
+-2.7, delta bands, the index from multipoles up to 12, 20 and 30, and the no-K band set of stage 3.
+Expectations, before any of them has run:
+
+- E1. Each small arm changes the index by the same amount as with the white prior within 0.005
+  (drift, dust index, 353 GHz band, window matching, start value: the last one by less than 0.001).
+- E2. K and Ka only: flatter than the four bands by 0.015 to 0.045, as with the white prior.
+- E3. Index from large scales only: steeper than all scales, as with the white prior, but I expect the
+  size to change, because the LCDM prior acts on exactly the multipoles that the low-pass arm keeps. I
+  do not predict by how much. If the steepening halves or more, the scale dependence reported in E042
+  was partly the white prior, and the text says so.
+- E4. The no-K band set: the profile index with the LCDM prior lies between the white-prior value
+  (-2.994 at High Latitude) and the flat-prior value (-2.695).
+
 ### Stage 5, pre-registered 2026-11-11 03:20: errors that do not assume the model fits (referee item 8)
 
 The sandwich error assumes that the model is right inside each region: one index, the stated noise. The
@@ -446,6 +464,44 @@ Expectations, written before the script has run on the maps:
   block error is the error of "the index of this region" when the region is not one index.
 - This is the error of the estimate under misfit. It does not make a misfitting model right, and it is
   not a measurement of the spread of the index.
+
+### Stage 5 results, first part (read 2026-11-11 03:52 and 04:00)
+
+**Maps** (`E040/block_errors_bpxv_n16_wm.txt`; white CMB prior baseline; plain block error, no leverage
+correction):
+
+| Region | Blocks | Index | Sandwich error | Block error | Ratio |
+|---|---|---|---|---|---|
+| High Latitude | 46 | -3.0940 | 0.0121 | 0.0322 | 2.66 |
+| Spur | 29 | -3.0965 | 0.0149 | 0.0245 | 1.64 |
+| Galactic Center | 4 | -3.0867 | 0.0088 | 0.0531 | 6.04 |
+| Plane | 16 | -2.9950 | 0.0120 | 0.0732 | 6.08 |
+
+**Simulation check D1** (`E040/block_errors_sim_spread0.txt`; nside 8, the model is true, 60 realizations):
+
+| Region | Blocks | Scatter of the estimate | Sandwich | Block, median | Ratio, median | 16 to 84 percent |
+|---|---|---|---|---|---|---|
+| High Latitude | 44 | 0.0159 | 0.0152 | 0.0170 | 1.12 | 0.95 to 1.32 |
+| Spur | 23 | 0.0192 | 0.0165 | 0.0148 | 0.89 | 0.67 to 1.20 |
+| Galactic Center | 4 | 0.0097 | 0.0107 | 0.0074 | 0.69 | 0.42 to 1.28 |
+| Plane | 15 | 0.0134 | 0.0145 | 0.0122 | 0.83 | 0.56 to 1.16 |
+
+Against the expectations:
+
+- D1 holds in the median for the three regions with more than ten blocks (within 17 percent of one) and
+  fails in its scatter: I predicted 0.11 to 0.19 from the number of blocks and the measured spread of the
+  ratio is 0.2 to 0.3. The information is concentrated: the effective number of blocks, (sum D)^2 / sum
+  D^2 with D the information per block, is 8, 7, 3 and 4 for the four regions (first realizations of the
+  leverage-corrected script). A block error from one data set is itself uncertain by about 30 percent.
+- D2: the ratio on the maps is above one in every region, as expected, and larger than I wrote for the
+  High Latitude region (2.66 against 1.2 to 2) and for the Plane (6.1 against 1.5 to 3). Against the
+  spread under the model (84th percentile 1.32, 1.20 and 1.16) all three are well outside. The regions
+  are not one index each, the Plane least of all.
+- D3 applies: the paper's table carries both errors.
+- The leverage-corrected versions (`e040f_block_errors_v2.py`: CR2 and the first-order jackknife CR3) are
+  being checked on the same simulations, with and without a true spread of the index between blocks, and
+  the maps are rerun with them for both CMB priors. Which version is quoted is decided by those
+  simulations: the one whose rms of z is closest to one in both, and in doubt the more conservative.
 
 ## Negative control
 
