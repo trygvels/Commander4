@@ -642,3 +642,32 @@ called High Latitude that is mostly inner plane would not survive his first look
 rejected: the misfit diagnostics and every arm would still describe an unmasked sky with Tau A in it).
 Obtaining the BeyondPlanck region and mask files (not on disk; asking for them is contact with the
 collaboration, which is Trygve's call). A finer partition (48 patches): that is Paper B (Q24).
+
+## D036 (2026-11-11 12:39): Paper A1 gives the profile indices of the masked fit with their sensitivities, and no longer says "we do not quote an index"
+
+**Decision.**
+1. Sect. 6.4 is "What moves the index". The profile indices of E044 are given as the answer of the one-index
+   model on these regions and this mask, with a table of what they are sensitive to, and are stated not to be a
+   recommended value of the polarized synchrotron index.
+2. The abstract and the conclusions say what the arms show: with the mask the index does not depend on the
+   angular scale or the band subset beyond the noise, moves by up to 0.11 with the prior on the CMB and by 0.05
+   if the bandpasses are ignored.
+3. Things found on the way and not planned are in the paper as observations with their significance and without
+   a cause: the chi-square deficit against the released covariances (2.5 to 3.4 sd; absent along the CMB
+   spectrum), the index that steepens with the tightness of the CMB prior (1.7 to 1.95 expected sd per step), the
+   dust index preferred by the three fits (1.57 +- 0.02). Their follow-up is Paper B (Q28, Q29).
+4. Every test that could be pre-registered during the experiment was (H9 zero-mean prior at nside 16, H10
+   calibration at High Latitude, H11 the scan of the flat-prior marginal).
+
+**Why.** Drafts 1 to 3 declined to quote an index because it moved with the angular scale by several sigma
+and two regions did not fit. E044 R6 shows that both went with the emission that the mask removes: 24
+comparisons that test the model have a largest value of 2.4 expected standard deviations. Keeping "we do not
+quote one because it moves" would now be untrue. Quoting a measurement would also be wrong: one set of regions,
+a mask from a description and not a file, no curvature, no leakage model, and a referee history that says
+my judgement of when the real-data part is finished is not to be trusted without an independent read.
+
+**Alternatives considered.** Keeping the old framing (untrue after R6). Quoting the indices as a measurement
+with a systematic budget from the table (tempting and premature; that is Paper B, after Q28 and Q29 and with
+regions that Trygve accepts). Dropping the real-data section (it is where the methods are shown to matter:
+5 to 16 sd from a convention, no optimum at all with a free CMB amplitude).
+
