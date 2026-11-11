@@ -442,3 +442,14 @@ its enlarged error.
 Pending.
 
 ## Follow-ups
+
+
+### Correction, 2026-11-11 06:30 (found by the independent review of the low-pass construction)
+
+One stored fit of the low-pass arm did not converge: K, Ka, 353 at multipoles up to 12 with the white CMB
+prior (`E042/lowpass12.txt`, "converged False" after 967 s; the values -3.1188, -3.0816, -3.1491, -3.0561 that
+this record quotes for it). The record noted the flag when the fit was read (above); the summary lines and
+FINDINGS quoted the numbers without it. That set of four numbers is withdrawn; nothing in Paper A1 used it (the paper's band-subset comparison at large scales uses the cut at
+20, which converged, as did every other fit of the arm). The script stores non-converged fits like the
+others; that is to be changed when no queue uses it. The construction itself was found correct by the
+review (identities to 1e-13, 400 simulated realizations calibrated).

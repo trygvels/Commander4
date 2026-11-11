@@ -1,0 +1,24 @@
+# E039 low-pass addendum: nside 8, four BP XV regions, K and 353 at all scales, Ka, Q, V through multipoles 2 to 12 (330 modes of 1144); truth [-3.15 -3.25 -2.85 -2.95]
+real 0 all scales -3.1498 -3.2613 -2.8584 -2.9547 | low-pass -3.1326 -3.2713 -2.8589 -2.9460 [57 s]
+real 10 all scales -3.1738 -3.2611 -2.8464 -2.9595 | low-pass -3.1596 -3.2745 -2.8433 -2.9620 [516 s]
+real 20 all scales -3.1432 -3.2515 -2.8390 -2.9393 | low-pass -3.1393 -3.2612 -2.8327 -2.9336 [999 s]
+real 30 all scales -3.1336 -3.2360 -2.8559 -2.9582 | low-pass -3.1410 -3.2401 -2.8532 -2.9606 [1518 s]
+real 40 all scales -3.1676 -3.2290 -2.8525 -2.9567 | low-pass -3.1860 -3.2233 -2.8583 -2.9544 [2016 s]
+real 50 all scales -3.1413 -3.3119 -2.8588 -2.9339 | low-pass -3.1478 -3.3044 -2.8560 -2.9367 [2417 s]
+real 60 all scales -3.1434 -3.2447 -2.8520 -2.9534 | low-pass -3.1436 -3.2520 -2.8547 -2.9485 [2802 s]
+real 70 all scales -3.1830 -3.2647 -2.8681 -2.9363 | low-pass -3.1969 -3.2519 -2.8748 -2.9335 [3206 s]
+real 80 all scales -3.1638 -3.2485 -2.8342 -2.9749 | low-pass -3.1500 -3.2467 -2.8277 -2.9782 [3677 s]
+real 90 all scales -3.1663 -3.2520 -2.8614 -2.9722 | low-pass -3.1684 -3.2521 -2.8544 -2.9793 [4075 s]
+## all scales: over 100 realizations
+   mean shift          -0.0018 -0.0002 +0.0005 +0.0010
+   mean z +- se        -0.109 -0.005 +0.052 +0.075  (se 0.100)
+   sd of z             1.048 1.039 0.929 0.982
+   coverage of +-1 sd  0.650 0.670 0.690 0.760
+   median quoted error 0.0152 0.0166 0.0107 0.0145; scatter of the estimate 0.0160 0.0173 0.0099 0.0142
+## index from l <= 12: over 100 realizations
+   mean shift          -0.0018 -0.0008 +0.0004 +0.0007
+   mean z +- se        -0.089 -0.035 +0.037 +0.053  (se 0.100)
+   sd of z             0.954 1.026 0.954 0.990
+   coverage of +-1 sd  0.750 0.660 0.720 0.670
+   median quoted error 0.0184 0.0190 0.0123 0.0154; scatter of the estimate 0.0176 0.0195 0.0118 0.0152
+## low-pass minus all scales: mean -0.0000 -0.0006 -0.0001 -0.0003; sd 0.0092 0.0097 0.0057 0.0058

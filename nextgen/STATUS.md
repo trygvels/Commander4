@@ -2,6 +2,58 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-11 (Mac mini, 07:10): the Cholesky fault changed no number (all reruns identical); the regions are not one index each (block errors 0.04 to 0.10 against 0.012); a white CMB prior makes the error bar a quarter to a third too small; independent stats review of the three new pieces found no error
+
+**Learned**
+- **E043 closed for the paper.** E039 stage 1 rerun on the sound path: 200 of 200 realizations, 1480
+  numbers, identical as printed. Plug-in addendum 40 of 40, nside-8 window checks and real-data arm
+  identical. Under Apple's guard allocator the fixed path is clean for a whole fit and the old one
+  faults. No recorded number changed.
+- **CMB prior (E040 stage 4, F53).** The paper's central table now uses the LCDM covariance: profile
+  indices -3.082 +- 0.012, -3.080 +- 0.016, -3.081 +- 0.009, -2.964 +- 0.013. On 60 simulated LCDM
+  skies the matched prior is unbiased and calibrated; the white 0.2 uK prior is unbiased on average
+  and its error is 24 to 32 percent too small in three regions. The move between the two priors on
+  the maps is what a LCDM sky does in three regions and four times too large in the Plane. With a
+  flat CMB prior: -3.03 +- 0.03, -3.06 +- 0.04, -3.01 +- 0.02, -2.99 +- 0.03.
+- **Flat amplitude priors on WMAP alone with a free CMB:** the High Latitude optimum is -2.51 with the
+  amplitude defined at 23 GHz and -1.71 at 30 GHz, where the profile likelihood gives -3.03. The
+  first-order prediction of the move holds within 10 percent for every region and prior, for shifts
+  from 0.03 to 0.8.
+- **Block errors (E040 stage 5, F54).** From the scatter of the score over 48 sky patches, with a
+  leverage correction: 0.044 (High Latitude), 0.038 (Spur), 0.100 (Plane), where the model errors
+  are 0.012, 0.016, 0.013. Five to nine patches carry each region's information. A simulated index
+  spread of 0.1 between patches reproduces the High Latitude and Spur ratios.
+- **Independent stats review** (`reviews/2026-11-11_stats_review_prior_block_lowpass.md`): no error in
+  the LCDM prior, the block errors or the large-scale estimator. Conditions it measured and I had
+  not stated: block errors are inflated under the model when the covariance or the prior couples
+  patches, so the null has to come from the configuration of the map fit; they are too small if
+  the index varies coherently over several patches; the LCDM covariance stops at multipole 47 and
+  the pixel-averaged sky has a further 0.11 uK per element. With the LCDM-prior null at nside 8
+  (54 realizations so far) the High Latitude and Plane ratios are outside it and the **Spur is
+  inside** (2.3 against a largest value of 2.4).
+- **Large-scale estimator on simulations (E039 addendum B):** unbiased, sd of z 0.95 to 1.03, and its
+  difference from the all-scales fit scatters as predicted. On the maps the index from multipoles up
+  to 20 is steeper by 0.024, 0.031, 0.055 and 0.084 (LCDM prior), 3 to 10 times what the model
+  allows: the scale dependence is in the maps, not in the estimator or the CMB prior.
+- **Dust index:** 0.05 in the fixed dust index moves the synchrotron index by 0.012 (High Latitude)
+  and 0.026 (Plane), more than I predicted. Delta bandpasses: 0.05 to 0.08.
+- New code with tests: `nextgen/lowres/block.py`; 15 unit tests pass. The paper's three data tables
+  and one subsection of prose are generated from result files.
+
+**Running** (one heavy job at a time; the machine has 24 GB, not 26)
+- Last low-pass arm, then: block errors on the maps with diagnostics, the LCDM prior with the power
+  above the band limit, K band with 30 GHz and its noise arms, a 12-realization nside-16 simulation
+  at the configuration of the map fit (block null, prior difference, large-scale estimator), the
+  no-K band set. About until 13:00.
+- E039 stage 2 (48 regions) rerun and completion on the sound path.
+
+**Next**
+- Finish draft 3, second independent referee read, revise until no fatal objection.
+
+**Needs Trygve**
+- Unchanged: whether to report the Accelerate fault upstream; the wording about the legacy move,
+  Commander3 and BeyondPlanck in the paper. Nothing has been sent to anyone.
+
 ## 2026-11-11 (Mac mini, 04:00): a memory bug in Apple's Cholesky was under every nside-8 fit. Fixed; every rerun so far reproduces the recorded numbers. Referee read of Paper A1 draft 1 found one fatal objection; draft 2 is reduced to the methods. LCDM CMB prior moves the Plane index by 2.3 sd
 
 **Learned**

@@ -214,6 +214,35 @@ multipoles 2 to 12 with their covariance (330 of 1144 modes), profile optimum an
   have none (signal smooth at 5 degrees, no beam mismatch). It shows only that the estimator is unbiased
   and calibrated when the model is true.
 
+### Addendum B result at nside 8 (read 2026-11-11 06:56)
+
+`E039/lowpass_n8_l12.txt`: 100 realizations, sound Cholesky path, canary (no OVERFLOW line). Regions in the
+usual order.
+
+| Fit | Mean estimate minus truth | Mean z (se 0.10) | sd of z | Coverage of 1 sd | Median quoted error | Scatter of the estimate |
+|---|---|---|---|---|---|---|
+| all scales | -0.0018, -0.0002, +0.0005, +0.0010 | -0.11, -0.01, +0.05, +0.08 | 1.05, 1.04, 0.93, 0.98 | 0.65, 0.67, 0.69, 0.76 | 0.0152, 0.0166, 0.0107, 0.0145 | 0.0160, 0.0173, 0.0099, 0.0142 |
+| index from multipoles up to 12 | -0.0018, -0.0008, +0.0004, +0.0007 | -0.09, -0.04, +0.04, +0.05 | 0.95, 1.03, 0.95, 0.99 | 0.75, 0.66, 0.72, 0.67 | 0.0184, 0.0190, 0.0123, 0.0154 | 0.0176, 0.0195, 0.0118, 0.0152 |
+
+Low-pass minus all scales, same realization: mean -0.0000, -0.0006, -0.0001, -0.0003; sd 0.0092, 0.0097,
+0.0057, 0.0058, against sqrt(sd_low^2 - sd_all^2) = 0.0104, 0.0092, 0.0061, 0.0052.
+
+- B1 holds: mean z within one standard error of zero in every region.
+- B2 holds: sd of z 0.95 to 1.03, coverage 0.66 to 0.75.
+- B3 holds for three regions: the error grows by 21, 14 and 15 percent; in the Plane by 6 percent (written:
+  10 to 40).
+- B4 holds: the paired difference has zero mean and a spread of 0.89, 1.05, 0.94 and 1.12 of
+  sqrt(sd_low^2 - sd_all^2). So the difference between the low-pass and the all-scales fit of one data set can
+  be judged against that number.
+- The independent review of the construction (`reviews/2026-11-11_stats_review_prior_block_lowpass.md`)
+  confirms it algebraically (identities to 1e-13) and on 400 realizations at nside 4, and measured that
+  contamination of a low-passed band outside the kept multipoles moves the estimate by 1e-14 of its error.
+- What this gives for the maps (E042): with the LCDM prior the index from multipoles up to 20 is steeper
+  than the all-scales index by 0.024, 0.031, 0.055 and 0.084, which is 2.8, 3.3, 8.0 and 10.3 times
+  sqrt(sd_low^2 - sd_all^2). Under the model that difference has zero mean, so the scale dependence is a
+  departure from the model in every region, not a property of the estimator. Its cause stays open (Q25).
+- The spot check at nside 16 with the LCDM prior is part of `e040h_sim_n16.py` (queue 12).
+
 ## Negative control
 
 The flat-prior marginal (V4) is the known-biased target.

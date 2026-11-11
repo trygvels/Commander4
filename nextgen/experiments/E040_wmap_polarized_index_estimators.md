@@ -510,6 +510,42 @@ Expectations, before any of them has run:
 - E4. The no-K band set: the profile index with the LCDM prior lies between the white-prior value
   (-2.994 at High Latitude) and the flat-prior value (-2.695).
 
+### Stage 4b results: the arms with the LCDM prior (read 2026-11-11 05:42 to 06:29)
+
+`E040/l_*.txt`, all on the sound path under the canary (no OVERFLOW line). Baseline (LCDM prior):
+-3.0825, -3.0799, -3.0807, -2.9641 with sandwich errors 0.0125, 0.0165, 0.0088, 0.0133.
+
+| Arm | Indices | Change | In baseline sd |
+|---|---|---|---|
+| K and Ka only | -3.0583, -3.0683, -3.0431, -2.9664 | +0.0242, +0.0116, +0.0376, -0.0023 | +1.9, +0.7, +4.3, -0.2 |
+| no drift correction | -3.0837, -3.0810, -3.0819, -2.9655 | -0.0013, -0.0011, -0.0012, -0.0014 | -0.1, -0.1, -0.1, -0.1 |
+| dust index 1.48 | -3.0949, -3.0879, -3.0850, -2.9916 | -0.0124, -0.0080, -0.0042, -0.0274 | -1.0, -0.5, -0.5, -2.1 |
+| dust index 1.58 | -3.0713, -3.0726, -3.0769, -2.9395 | +0.0112, +0.0072, +0.0039, +0.0246 | +0.9, +0.4, +0.4, +1.9 |
+| 353 GHz, all bolometers | -3.0809, -3.0789, -3.0802, -2.9607 | +0.0016, +0.0010, +0.0006, +0.0035 | +0.1, +0.1, +0.1, +0.3 |
+| delta bands at the nominal WMAP frequencies | -3.1438, -3.1371, -3.1319, -3.0398 | -0.0613, -0.0573, -0.0511, -0.0756 | -4.9, -3.5, -5.8, -5.7 |
+| start at -2.7 | -3.0825, -3.0799, -3.0807, -2.9641 | -0.0000, -0.0000, -0.0000, +0.0000 | -0.0, -0.0, -0.0, +0.0 |
+
+Against the expectations:
+
+- **R9 fails in three regions** (written: a dust index change of 0.05 moves the Plane and Galactic Center by
+  less than 0.02 and the other two by less than 0.005). Measured: 0.012 at High Latitude, 0.008 in the Spur,
+  0.004 in the Galactic Center, 0.026 in the Plane, symmetric in sign: d(beta_s) / d(beta_d) = +0.24, +0.15,
+  +0.08 and +0.52. The fixed dust spectrum is a larger lever on the synchrotron index than I assumed, one
+  statistical sd at High Latitude and two in the Plane for 0.05 in the dust index. With the uncertainty of
+  the Planck value (1.53 +- 0.02) it is 0.005 and 0.010.
+- R11 holds: without the drift correction the indices change by -0.0011 to -0.0014 (written: below 0.004).
+- R6 holds in three regions: delta bands at the nominal frequencies steepen the index by 0.061, 0.057,
+  0.051 and 0.076 (written: 0.04 to 0.07; the Plane is 0.006 above).
+- The 353 GHz band of all bolometers in place of the polarization-sensitive ones: +0.0005 to +0.0034.
+- E1, last clause, holds: started at -2.7 the fit returns the same optimum to five decimals.
+- **E2 holds for two regions and fails for two** (written: K and Ka alone flatter than the four bands by
+  0.015 to 0.045). Measured: +0.0242, +0.0116, +0.0376, -0.0023; in units of sqrt(sd_sub^2 - sd_full^2): +2.5, +0.9, +5.2, -0.2. With the LCDM
+  prior the band-subset shift of the white-prior fits (+0.032, +0.023, +0.041, +0.015) is smaller in the
+  Spur and gone in the Plane; it stays at High Latitude and in the Galactic Center.
+- The arm without window matching cannot be run with the LCDM prior as coded (the prior is built on the
+  window operator; the job stopped on an assertion). The window row of the paper's table is the white-prior
+  pair, labelled so.
+
 ### Stage 4c, pre-registered 2026-11-11 05:44: K band with PR4 30 GHz under the LCDM prior, and its noise-model arms (referee item 9)
 
 `nextgen/scripts/e043_queue11.sh`: K, 30 GHz (PR4), 353 GHz, window-matched, LCDM CMB prior, with (i) the
