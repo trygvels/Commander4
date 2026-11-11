@@ -1,0 +1,8 @@
+# E044 nside 16, geometry named, mask brightest 5 percent and Tau A disc (5808 of 6144 elements kept), bands ['K', 'Ka', 'Q', 'V', '353'], CMB prior lcdm (floor 0.01 uK), dust beta 1.53, 353 bandpass psb, band-averaged spectra, drift correction True, low-pass 30
+# profile fit: 6 iterations, 12 evaluations, converged True; chi2_min 4502.5; nominal dof 17420 (a CMB prior counted as one constraint per element); ratio 0.2585; 391 s
+# T / J_c per region: High Latitude 0.0172  Spur 0.0015  Intermediate 0.0062  Plane 0.0023
+region             n_el  rms a_s   profile   sd sand
+High Latitude      2974    11.30   -3.1479    0.0307
+Spur                266    33.23   -3.1306    0.0309
+Intermediate       1698    17.51   -3.1115    0.0248
+Plane               870    26.29   -3.0235    0.0219

@@ -364,6 +364,62 @@ chi2_min has no prior penalty and exactly two degrees of freedom per element). P
   matrices overstate the noise, two uncommented V-band values of 0.96 to 0.98 with the same matrices, and
   model-free tests that need the single-year files).
 
+### R6, the arms (all read by 2026-11-11 12:08; written 12:08)
+
+Every fit converged; no OVERFLOW line in any error file. Baseline: R1 (LCDM prior, all scales, four WMAP bands and
+353 GHz). For the arms that use less of the same data under the same model, the change is also given in units of the
+standard deviation that the model predicts for it.
+
+| Arm | High Latitude | Spur | Intermediate | Plane | chi2_min / dof |
+|---|---|---|---|---|---|
+| baseline | -3.1469 | -3.1393 | -3.0911 | -3.0390 | 0.9732 |
+| sandwich error | 0.0291 | 0.0275 | 0.0194 | 0.0150 | |
+| index from l <= 30: change | -0.0009 | +0.0087 | -0.0204 | +0.0156 |  |
+| index from l <= 30: error | 0.0307 | 0.0309 | 0.0248 | 0.0219 | |
+| index from l <= 30: change over sqrt(sd_arm^2 - sd_base^2) | -0.10 | +0.62 | -1.31 | +0.97 | |
+| index from l <= 20: change | +0.0036 | -0.0283 | -0.0468 | +0.0106 |  |
+| index from l <= 20: error | 0.0343 | 0.0402 | 0.0395 | 0.0349 | |
+| index from l <= 20: change over sqrt(sd_arm^2 - sd_base^2) | +0.20 | -0.96 | -1.36 | +0.33 | |
+| index from l <= 12: change | +0.0263 | -0.1928 | -0.1927 | +0.1412 |  |
+| index from l <= 12: error | 0.0624 | 0.2216 | 0.1873 | 0.1086 | |
+| index from l <= 12: change over sqrt(sd_arm^2 - sd_base^2) | +0.48 | -0.88 | -1.03 | +1.31 | |
+| K and Ka only: change | +0.0124 | -0.0047 | +0.0366 | +0.0248 | 0.9619 |
+| K and Ka only: error | 0.0364 | 0.0346 | 0.0247 | 0.0194 | |
+| K and Ka only: change over sqrt(sd_arm^2 - sd_base^2) | +0.57 | -0.22 | +2.40 | +2.00 | |
+| dust index 1.48: change | -0.0039 | -0.0054 | -0.0060 | -0.0208 | 0.9746 |
+| dust index 1.58: change | +0.0036 | +0.0049 | +0.0055 | +0.0188 | 0.9730 |
+| no drift correction: change | -0.0011 | -0.0011 | -0.0011 | -0.0014 | 0.9733 |
+| 353 GHz, all bolometers: change | +0.0005 | +0.0007 | +0.0008 | +0.0027 | 0.9732 |
+| delta bandpasses: change | -0.0500 | -0.0505 | -0.0483 | -0.0464 | 0.9730 |
+| LCDM prior, floor 0.11 uK: change | -0.0020 | -0.0005 | -0.0008 | -0.0004 | 0.9712 |
+| K and Ka only minus four bands, both from l <= 20 | +0.0177 | -0.0066 | +0.0564 | +0.0153 | |
+| the same over its expected sd | +0.72 | -0.22 | +1.91 | +0.52 | |
+
+For comparison, the low-pass arm on the old regions without a mask (E042 `lowpass20_lcdm` against E040
+`s4_bpxv_n16_wm_lcdm`): changes of -0.024, -0.031, -0.055, -0.084, which are 2.8, 3.3, 8.1 and 10.4 of the expected
+standard deviation.
+
+- **H7 holds in its reading and fails in its number.** I wrote that the Plane would still steepen by 0.01 to 0.04 at
+  l <= 20; it changes by +0.011 (+0.33 expected sd), the other sign. High Latitude and Intermediate are within two
+  (+0.20, -1.36), as written. With the mask no region depends on the angular scale beyond the noise at l <= 30, 20
+  or 12 (largest 1.4). On the old regions it was 3 to 10. The scale dependence of F49 went with the masked emission.
+- **H8, dust index: holds in size, fails in pattern.** Changes of 0.004 to 0.021 for 0.05 in the dust index (written:
+  0.03 or less); the largest is in the Plane, not at High Latitude as I wrote (the dust is bright in the Plane).
+  By-product, not planned: chi2_min is 16977.1, 16953.8 and 16949.4 at 1.48, 1.53 and 1.58, and a parabola through
+  the three has its minimum at 1.567 +- 0.016. Planck 2018 XI has 1.53 +- 0.02 for polarization from the HFI bands.
+  Consistent at 1.4 sd; at an uncertainty of 0.02 the dust index is worth 0.002 to 0.008 in the synchrotron index.
+- **H8, bandpasses: holds.** Delta bands steepen every region by 0.046 to 0.051 (written: 0.05 to 0.08; the Plane
+  is just under). No drift correction: 0.0011 to 0.0014 (written: 0.002 or less). All bolometers for the 353 GHz
+  bandpass: 0.0005 to 0.0026.
+- **H8, K and Ka alone: holds, near its limit.** +0.57, -0.22, +2.39 and +2.01 expected sd (written: within 2.5).
+  Read from l <= 20 on both sides: +0.72, -0.21, +1.91, +0.52. The index from K and Ka alone is flatter at
+  Intermediate latitude and in the Plane by 0.037 and 0.025; that is the sign of a spectrum that steepens with
+  frequency, or of something at Q and V that the model lacks. Two regions at 2 sd in one arm, not a detection.
+  Its chi2_min is 0.962 of its expectation (2.1 sd low; one residual degree of freedom per element).
+- Floor of the LCDM prior at 0.11 uK: 0.0004 to 0.0020. As on the old regions (0.0006), no effect.
+- Over all arms that test the model (flat CMB prior, three low-pass cuts, K and Ka, K and Ka at l <= 20: 24
+  numbers that share their data) the largest is 2.39. No arm rejects the model on these regions with this mask.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).

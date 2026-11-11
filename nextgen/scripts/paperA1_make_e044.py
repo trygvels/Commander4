@@ -62,7 +62,7 @@ def val(x):
 
 
 def sgn(x):
-    return f"${x:+.3f}$"
+    return "$0.000$" if abs(x) < 0.0005 else f"${x:+.3f}$"
 
 
 def tab_same(z):
@@ -219,7 +219,19 @@ def main():
     def with_units(label, d, u):
         """A row of moves, each followed in brackets by the move in units of its expected standard deviation."""
         z1 = lambda y: "0.0" if abs(y) < 0.05 else f"{y:+.1f}"
-        return label + " & " + " & ".join(f"${x:+.3f}$ (${z1(y)}$)" for x, y in zip(d, u)) + " \\\\\n"
+        return label + " & " + " & ".join(f"{sgn(x)} (${z1(y)}$)" for x, y in zip(d, u)) + " \\\\\n"
+
+    def k_ka_lowpass():
+        """K and Ka only against the four bands, both read from multipoles up to 20: one row and its numbers."""
+        a, c = load("lp20_KKa"), load("lp20")
+        if a is None or c is None:
+            return ""
+        d = a["beta"] - c["beta"]
+        nest = np.sqrt(np.clip(a["sd_sand"] ** 2 - c["sd_sand"] ** 2, 1e-30, None))
+        put4("lp20KKa.move", d, "{:+.3f}"); put4("lp20KKa.nest", d / nest, "{:+.1f}"); put("lp20KKa.nest.max", float(np.abs(d / nest).max()), "{:.1f}")
+        put("lp20KKa.conv", "yes" if bool(a["converged"]) else "NO", "{}")
+        worst.append(float(np.abs(d / nest).max()))
+        return with_units(r"K and Ka only, both fits from $\ell \le 20$", d, d / nest)
 
     worst = []
     for tag, label in arms:
@@ -243,19 +255,14 @@ def main():
             put4(f"{tag}.nest.abs", np.abs(d / nest), "{:.1f}")
             worst.append(float(np.abs(d / nest).max()))
             t += with_units(label, d, d / nest)
+            if tag == "KKa":
+                t += k_ka_lowpass()
         elif tag == "white" and "mm_bias" in zz.files:
             sdt_ = np.sqrt(np.diag(zz["mm_cov_true"]))
             pair_ = np.sqrt(np.clip(sdt_ ** 2 - s0 ** 2, 1e-30, None))
             t += with_units(label, d, (d - zz["mm_bias"]) / pair_)
         else:
             t += row(label, d, sgn)
-    a, c = load("lp20_KKa"), load("lp20")
-    if a is not None and c is not None:
-        d = a["beta"] - c["beta"]
-        nest = np.sqrt(np.clip(a["sd_sand"] ** 2 - c["sd_sand"] ** 2, 1e-30, None))
-        t += with_units(r"K and Ka only, both fits from $\ell \le 20$", d, d / nest)
-        put4("lp20KKa.move", d, "{:+.3f}"); put4("lp20KKa.nest", d / nest, "{:+.1f}"); put("lp20KKa.nest.max", float(np.abs(d / nest).max()), "{:.1f}")
-        put("lp20KKa.conv", "yes" if bool(a["converged"]) else "NO", "{}")
     if worst:
         put("arms.nest.max", max(worst), "{:.1f}")
     bd = [load("bd148"), load("bd158")]
