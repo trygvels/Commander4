@@ -6,10 +6,10 @@ to the same real maps, with the same regions, mask, bands and noise model, so th
 between their answers is the difference between the estimators and nothing else. It does not deliver
 a measurement of the polarized synchrotron index. The model with one power law per region passes the
 tests that we could set it (Sect.~\ref{sec:moves}), but it is fitted on one set of regions with a mask
-that we varied only a little; the fit has features that we do not understand (a $\chi^2$ that is low
-in total and high along the CMB spectrum in the Plane, and two estimators that differ by more than
-three standard deviations at high latitude); and an earlier version of the analysis, on other
-regions, failed in ways that its own checks did not show.
+that we varied only a little; the fit has features that we do not fully understand (a $\chi^2$ that
+is low in total and high along the CMB spectrum in the Plane, and an index from the K to Ka lever arm
+that is flatter than from four bands); and an earlier version of the analysis, on other regions,
+failed in ways that its own checks did not show.
 
 \subsection{Data and model}
 
@@ -243,13 +243,15 @@ this mask and this prior at $N_{\rm side}=8$, half the resolution of the map fit
 optimum is unbiased (below), the zero-mean optimum of each realization is steeper than its profile
 optimum by \N{zmsim.paired.abs.list} sandwich errors, the same from one noise realization to the next
 (scatter \N{zmsim.pairedscatter.range}). So in simulations it is the zero-mean prior that is biased,
-by an amount set by the simulated sky (the DR1 model smoothed to $5^\circ$) and the noise pattern. On
-the maps the difference has the same sign and the same order across the regions, and in three of them
-it is about three times larger in index (\exref{E044}). \pend{Two simulated realizations at
-$N_{\rm side}=16$ decide how much of the difference on the maps is this bias (H9). If they give about
-three standard deviations at High Latitude, all of it is. If they stay near one, two thirds of the
-difference between the two estimators on the maps is something the simulated sky does not have, and it
-counts against the model at High Latitude whichever estimator is used.}
+by an amount set by the simulated sky (the DR1 model smoothed to $5^\circ$) and the noise pattern,
+and the bias grows with the number of amplitudes: in \N{zm16.n} simulated realizations at
+$N_{\rm side}=16$, the resolution of the map fit, it is \N{zm16.paired.abs.list} sandwich errors
+(\exref{E044}). That is as large as the difference on the maps, and somewhat larger. We had written
+down before those simulations that this outcome would make the difference on the maps the bias of
+the zero-mean prior, and that the other outcome, a simulated bias near one, would have left two
+thirds of it as evidence against the model. So the two estimators differ on these maps because one
+of them is biased at this configuration, by up to four of its own standard deviations at High
+Latitude.
 
 \begin{table}
 \centering
@@ -583,7 +585,6 @@ amplitude priors the same fit moves by \N{d3023two.range} with a convention. We 
 the answer of this model on these regions and not as a measurement of the polarized synchrotron
 index, and the reason is not the size of any entry of Table~\ref{tab:moves}. It is that the regions
 and the mask are one choice; that in the Plane the model fails along the CMB spectrum
-(Table~\ref{tab:chi}); that two estimators which agree when the model holds differ by
-\N{zmsd.abs.HL} standard deviations at High Latitude; and that the $\chi^2$ against the released
-covariances is not understood. An earlier set of regions, without a mask, gave \N{old.prof.HL} to
+(Table~\ref{tab:chi}); that the index from the K to Ka lever arm is flatter than from four bands; and
+that the $\chi^2$ against the released covariances is not understood. An earlier set of regions, without a mask, gave \N{old.prof.HL} to
 \N{old.prof.Plane} with errors of 0.01 and passed the checks we then had.

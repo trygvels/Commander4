@@ -1,1 +1,4 @@
 # E040 nside-16 simulation, stage zm: truth [-3.15 -3.25 -2.85 -2.95]; 2 realizations; setup 10 s
+real 0 zm -3.2448 -3.2921 -2.8832 -2.9793 sd 0.0295 0.0267 0.0199 0.0175 | profile -3.1208 -3.2347 -2.8481 -2.9657 | zm minus profile in sd -4.21 -2.15 -1.77 -0.77 | zm conv True | conv True [1172 s]
+real 1 zm -3.2841 -3.3510 -2.8856 -2.9455 sd 0.0298 0.0272 0.0198 0.0173 | profile -3.1631 -3.2915 -2.8513 -2.9332 | zm minus profile in sd -4.06 -2.19 -1.73 -0.71 | zm conv True | conv True [2073 s]
+## zm, 2 realizations: mean estimate - truth -0.1145 -0.0716 -0.0344 -0.0124; pooled mean z -2.235 +- 0.354, sd z 1.499, coverage of 1 sd 0.125; median error 0.0297 0.0269 0.0198 0.0174

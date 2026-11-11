@@ -589,6 +589,33 @@ Total difference over n: 1.005 +- 0.006, scatter 0.038 against sqrt(2 / n) = 0.0
   and the flat-fit part scatters 22 percent more than the formula. So the High Latitude entries of the split
   (0.963 and 0.970) are less independent than they look; the totals are unaffected.
 
+### R10, simulations at nside 16 with the regions, mask and prior of the fit (read 2026-11-11 14:05)
+
+Six realizations drawn (`sim_n16_draw.txt`, seed 39); canary, no OVERFLOW line in any of the four runs so far.
+
+**Zero-mean prior, two realizations (`sim_n16_zm.txt`; H9).** Zero-mean minus profile optimum of the same
+realization, in sandwich errors: -4.21, -2.15, -1.77, -0.77 and -4.06, -2.19, -1.73, -0.71. On the maps: -3.56,
+-1.56, -1.54, -0.24. At nside 8: -1.05, -0.54, -0.44, -0.22.
+
+- **H9 holds in what it was for.** High Latitude, Spur and Intermediate are inside the ranges written (-2.5 to
+  -4.5, -1.0 to -2.2, -1.0 to -2.0). The Plane is at -0.74 where I wrote -0.1 to -0.5, and the two realizations
+  agree to 0.15 at High Latitude where I wrote 0.1. The simulated bias at the resolution of the map fit is as
+  large as the difference on the maps, and a little larger (ratios 1.16, 1.39, 1.14, 3.1). So the difference
+  between the two estimators on the maps is the bias of the zero-mean prior with a free scale per region at
+  this configuration. It is not evidence against the model, and the paper must stop listing it as something
+  not understood. It grows fourfold from nside 8 to nside 16: more and fainter amplitudes.
+
+**Low-pass estimator, four realizations at l <= 20 (`sim_n16_lowpass.txt`).** Low-pass estimate against the
+truth: mean z +0.10 +- 0.25, rms 0.94. Low-pass minus all-scale estimate of the same realization over
+sqrt(sd_low^2 - sd_all^2), sixteen values: mean -0.06, rms 1.00, largest 1.78. The yardstick of the low-pass
+arms is right at the resolution and geometry of the map fit, as far as sixteen values can say (the referee's
+criterion: mean inside +-0.5, rms inside 0.66 to 1.34).
+
+**Block-error null, six realizations (`sim_n16_blocknull.txt`).** Own-score ratio: medians 1.47, 1.57, 1.15,
+0.97 (nside 8: 1.34, 1.28, 1.13, 1.07). Above the map values (1.63, 1.00, 1.44, 1.28): 1, 4, 0 and 0 of six.
+The Plane's six values lie between 0.78 and 1.09. Six cannot place the maps; H15 has forty more. Calibration of
+the profile optimum in the six: pooled mean z +0.05 +- 0.20, rms 1.05.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).
