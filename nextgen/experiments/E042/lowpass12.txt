@@ -1,0 +1,7 @@
+# Planck_030: loaded; low-passed copy to l <= 12 (330 modes); 10 s
+# Planck_353: loaded; low-passed copy to l <= 12 (330 modes); 17 s
+# WMAP_K: loaded; low-passed copy to l <= 12 (330 modes); 24 s
+# WMAP_Ka: loaded; low-passed copy to l <= 12 (330 modes); 31 s
+# WMAP_Q: loaded; low-passed copy to l <= 12 (330 modes); 38 s
+# WMAP_V: loaded; low-passed copy to l <= 12 (330 modes); 45 s
+# E042 low-pass arm: the first band of each set and 353 GHz keep all modes; the others enter through multipoles 2 to 12; profile index and debiased sandwich error (High Latitude, Spur, Galactic Center, Plane)

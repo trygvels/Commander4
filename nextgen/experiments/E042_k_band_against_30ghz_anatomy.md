@@ -312,6 +312,32 @@ all scales, every other band through multipoles 2 to 20 only; T / J_c at most 0.
 - Within WMAP, K with Ka is still flatter than the four bands together, by 0.021, 0.027, 0.032
   and 0.019 (1.9, 2.0, 3.6 and 1.7 nested sd).
 
+**(f) PR3 with a fitted noise model, 2026-11-11 01:56 to 02:04** (`E042/pr3_arm.txt`; all scales,
+window-matched). The PR3 ring-half difference has a chi-square per element of 1.60 against its
+white columns (PR4: 1.77); fitted model r = 1.35, A = 1.00, gamma = 1.44. PR3 against PR4 at nside
+16: correlation 0.966, rms difference 4.6 uK.
+
+| bands | High Latitude | Spur | Galactic Center | Plane | reduced chi-square |
+|---|---|---|---|---|---|
+| K, 30 (PR3) | -2.921 +- 0.018 | -2.799 +- 0.024 | -2.710 +- 0.013 | -2.706 +- 0.020 | 5.97 |
+| K, 30 (PR4) | -3.428 +- 0.019 | -3.180 +- 0.023 | -3.263 +- 0.013 | -3.035 +- 0.020 | 2.64 |
+| 30 (PR3), Ka | -3.529 +- 0.046 | -3.585 +- 0.061 | -3.426 +- 0.031 | -3.631 +- 0.050 | 2.35 |
+| 30 (PR4), Ka (low-pass) | -2.312 +- 0.055 | -2.787 +- 0.066 | -2.321 +- 0.040 | -2.683 +- 0.057 | |
+| K, Ka | -3.062 +- 0.016 | -3.074 +- 0.020 | -3.046 +- 0.011 | -2.980 +- 0.016 | 1.12 |
+
+- **Y2 is answered, and not in the way I framed it.** The PR3 map does not bring the K to 30 GHz
+  index to the K, Ka value. It puts it on the other side: -2.92 at high latitude where PR4 gives
+  -3.43, and 30 GHz to Ka at -3.5 where PR4 gives -2.3. Two official maps of the same 30 GHz data
+  give indices against K band that differ by 0.5, with K, Ka between them. The fit with PR3 is
+  far worse than with PR4 (30 GHz chi-square per element 4.0 against 1.8, K band 1.9 against
+  0.8): its residual is not an amplitude ratio at all but large-scale pattern, as the difference
+  maps of Planck 2018 II (App. A) and Watts et al. (2023, Fig. 46) show.
+- This qualifies the exploratory reading above that "PR3 agrees with the K-band extrapolation in
+  the plane": the amplitude ratio per multipole bin does, the maps pixel by pixel do not, and the
+  region fit weights the second.
+- Both fits here use all scales and so carry the pixel-scale aliasing bias (toward flat). The
+  like-for-like low-pass comparison is the arm with the released PR3 covariance.
+
 **Exploratory, not pre-registered: amplitude ratios by multipole and PR4 against PR3, 2026-11-11
 01:02 to 01:03** (`E042/cross_ratio.txt`, `E042/pr3_vs_pr4_direct.txt`). Prompted by the scale
 dependence of (a). Two model-light diagnostics on the window-matched nside-16 maps.
