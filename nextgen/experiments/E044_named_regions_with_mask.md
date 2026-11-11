@@ -452,6 +452,31 @@ the two marginals run from -684.5 and -1567.5 at -4.6 to +593.4 and +2081.1 at -
   where I wrote within 0.05). Both fall by thousands toward either edge. Identity check: 4e-9 and 8e-12.
 - Figure: `papers/paperA1/figures/fig_scan.pdf` (`paperA1_fig_scan.py`).
 
+### R8, the third null set at nside 8 (240 realizations, seed 43; read 2026-11-11 12:36)
+
+`E044/sim_n8_blocknull_c.txt` (canary, no OVERFLOW line).
+
+| | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| sd of z, new set of 240 (+- 0.046) | 0.975 | 1.082 | 0.945 | 0.982 |
+| mean of z, new set (+- 0.065) | +0.10 | -0.07 | 0.00 | -0.09 |
+| sd of z, all 360 (+- 0.037) | 1.022 | 1.063 | 0.965 | 0.981 |
+| mean of z, all 360 (+- 0.053) | +0.05 | -0.11 | 0.00 | -0.05 |
+| coverage of one sd, all 360 (+- 0.025) | 0.667 | 0.644 | 0.686 | 0.711 |
+| coverage of two sd, all 360 | 0.947 | 0.928 | 0.967 | 0.942 |
+| own-score block error over sandwich: median | 1.34 | 1.28 | 1.13 | 1.07 |
+| the same: 84th and 97.5th percentile | 1.60, 1.95 | 2.01, 3.04 | 1.41, 1.66 | 1.36, 1.74 |
+| simulations above the map value, of 360 | 51 | 244 | 51 | 78 |
+
+- **H10: the 1.11 at High Latitude was a fluctuation.** The new set alone gives 0.975 +- 0.046, below the 1.09
+  of the rule; pooled over 360 the sandwich error is calibrated to 1.02 +- 0.04 there. By the rule the pooled
+  values are what the paper reports.
+- The Spur is the least clean of the four: mean z -0.11 +- 0.05 and sd 1.06 +- 0.04 over 360 (66 pixels at
+  this resolution, 3 effective patches). That is a bias of 0.003 in index and an error 6 percent small, each
+  at about two standard errors. Reported as measured.
+- The block-error null with three times the realizations is unchanged: the map values (1.63, 1.00, 1.44, 1.28)
+  are exceeded by 14, 68, 14 and 22 percent of the simulations.
+
 ## Negative control
 
 The flat-prior marginal at two reference frequencies; and the old regions with only Tau A masked (H6).

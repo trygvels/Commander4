@@ -334,6 +334,7 @@ def main():
         put("nullall.n", int(zall.shape[0]), "{:d}")
         put4("nullall.meanz", zall.mean(0), "{:+.2f}"); put4("nullall.sdz", zall.std(0, ddof=1), "{:.2f}")
         put("nullall.se", 1.0 / np.sqrt(zall.shape[0]), "{:.2f}")
+        put4("nullall.cover2", np.mean(np.abs(zall) < 2, axis=0), "{:.2f}")
         put("nullall.sdz.se", 1.0 / np.sqrt(2.0 * (zall.shape[0] - 1)), "{:.2f}")
         put4("nullall.cover", np.mean(np.abs(zall) < 1, axis=0), "{:.2f}")
         put("nullall.cover.se", float(np.sqrt(0.683 * 0.317 / zall.shape[0])), "{:.2f}")

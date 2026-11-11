@@ -396,9 +396,14 @@ Under the model, in \N{nullall.n} simulations at $N_{\rm side}=8$ with these reg
 the $\Lambda$CDM prior (synchrotron from the DR1 model smoothed to $5^\circ$, noise from the
 window-matched covariances, a $\Lambda$CDM CMB, one index per region), the ratio has a median of
 \N{nullall.median.list} and a 97.5th percentile of \N{nullall.p975.list}; \N{nullall.above.list} of
-the simulations lie above the map values. In the same simulations the sandwich error is calibrated
-(standardized errors of standard deviation \N{nullall.sdz.list}, each known to
-\N{nullall.sdz.se}; coverage of one standard deviation \N{nullall.cover.list}). \pend{The same at $N_{\rm side}=16$, a few realizations.} So with the mask
+the simulations lie above the map values. In the same simulations the profile optimum and its
+sandwich error are calibrated: the standardized errors have means of \N{nullall.meanz.list}, each
+known to \N{nullall.se}, and standard deviations of \N{nullall.sdz.list}, each known to
+\N{nullall.sdz.se}, and the intervals of one standard deviation cover the truth in
+\N{nullall.cover.list} of the realizations. The Spur, with 66 pixels at this resolution, is the least
+clean of the four, at two standard errors in both. (The first 120 realizations had given 1.11 at High
+Latitude; a further 240, run to decide whether that was real, gave 0.98.)
+\pend{The same at $N_{\rm side}=16$, a few realizations.} So with the mask
 the block scores give no evidence that any of these regions is more than one index at the precision
 of these maps, and the two errors in Table~\ref{tab:same} tell the same story within what a block
 error from a dozen patches can tell.
