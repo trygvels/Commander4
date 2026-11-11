@@ -201,8 +201,8 @@ def moves_text():
     flat = prof(os.path.join(E40, "s4_bpxv_n16_wm_cmbflat.npz"))[0] - b0
 
     def rng(v, nd=3, signed=False):
-        lo, hi = float(np.min(np.abs(v))), float(np.max(np.abs(v)))
-        return f"{lo:.{nd}f} to {hi:.{nd}f}"
+        lo, hi = f"{float(np.min(np.abs(v))):.{nd}f}", f"{float(np.max(np.abs(v))):.{nd}f}"
+        return lo if lo == hi else f"{lo} to {hi}"
 
     def lst(v, nd=3, signed=True):
         f = (lambda x: f"${x:+.{nd}f}$") if signed else (lambda x: f"{x:.{nd}f}")
@@ -255,7 +255,7 @@ spectrum that steepens with frequency would do this, and so would a dust model t
 polarized dust at 41 and 61 GHz from 353 GHz.
 
 \paragraph{{Dust.}} The dust spectrum is fixed. Changing its index by 0.05 either way moves the
-synchrotron index by {lst(np.abs(bd[1]), 3, False)}, linearly ($\partial\beta_{{\rm s}}/\partial\beta_{{\rm d}} =
+synchrotron index by {lst(0.5 * (np.abs(bd[0]) + np.abs(bd[1])), 3, False)}, linearly ($\partial\beta_{{\rm s}}/\partial\beta_{{\rm d}} =
 {slope[0]:.2f}$, ${slope[1]:.2f}$, ${slope[2]:.2f}$ and ${slope[3]:.2f}$): one statistical standard deviation at High Latitude
 and two in the Plane, more than we had written down in advance for three of the four regions. With the
 uncertainty of the Planck value, 0.02,
@@ -264,7 +264,7 @@ it is 0.005 at High Latitude and 0.010 in the Plane.
 \paragraph{{Bandpasses.}} Leaving out the correction for the drift of the WMAP band centres changes the
 index by {rng(drift)}, and taking the 353 GHz band of all bolometers in place of the
 polarization-sensitive ones by {rng(b353)}. Replacing the measured bandpasses by delta functions at
-the nominal WMAP frequencies steepens it by {rng(delta)}, four to six statistical standard
+the nominal WMAP frequencies steepens it by {rng(delta)}, {rng(delta / s0, 1)} statistical standard
 deviations: the effective frequency of K band for a spectrum this steep is 22.4 GHz, not 22.8.
 
 \paragraph{{Poorly measured modes.}} The released K-band covariance has 20 eigenmodes with more than
@@ -276,7 +276,7 @@ Taken together: for these maps and regions the profile index of the simple model
 Latitude, in the Spur and in the Galactic Center and $-2.96$ in the Plane. Its error is 0.01 to 0.02
 if each region has one index and 0.04 to 0.10 from the scatter between patches. It moves by
 {rng(np.concatenate([white, flat]), 2)} with the prior on the CMB, by {rng(np.concatenate([d[30], d[20], d[12]]), 2)} with the angular scales that
-inform it, by up to {np.max(np.abs(dk)):.2f} with the band subset, by {rng(bd[1], 2)} for 0.05 in the dust index, and by
+inform it, by up to {np.max(np.abs(dk)):.2f} with the band subset, by {rng(0.5 * (np.abs(bd[0]) + np.abs(bd[1])))} for 0.05 in the dust index, and by
 {rng(delta, 2)} if the bands are taken at their nominal frequencies. A number with an error bar that
 means what it says needs a model in which a region is more than one index and the scale dependence
 understood. That is a separate piece of work, and we do not quote an index here.

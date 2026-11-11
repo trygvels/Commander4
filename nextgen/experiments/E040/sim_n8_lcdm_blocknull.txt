@@ -55,3 +55,13 @@ real 52 lcdm -3.1440 -3.2607 -2.8552 -2.9094 sd 0.0158 0.0181 0.0108 0.0158 | CR
 real 53 lcdm -3.1586 -3.2817 -2.8417 -2.9326 sd 0.0158 0.0183 0.0107 0.0160 | CR3/sd 1.08 1.02 1.04 2.04 | CR0/sd 1.01 0.88 0.65 1.45 | n_eff 7.6 7.8 2.6 4.2 | neg D 2 cross 0.256 sumD/Jc 1.00 1.00 1.00 1.00 | conv True [1987 s]
 real 54 lcdm -3.1518 -3.2417 -2.8537 -2.9499 sd 0.0158 0.0180 0.0108 0.0161 | CR3/sd 1.43 1.57 1.12 1.33 | CR0/sd 1.17 1.27 0.76 0.97 | n_eff 7.7 8.0 2.6 4.3 | neg D 1 cross 0.256 sumD/Jc 1.00 1.00 0.99 1.00 | conv True [2029 s]
 real 55 lcdm -3.1482 -3.3003 -2.8594 -2.9610 sd 0.0158 0.0185 0.0108 0.0162 | CR3/sd 1.11 1.24 2.34 1.96 | CR0/sd 1.06 1.13 1.33 1.52 | n_eff 7.5 7.9 2.6 4.2 | neg D 1 cross 0.256 sumD/Jc 1.00 1.01 1.00 1.00 | conv True [2058 s]
+real 56 lcdm -3.1925 -3.2901 -2.8535 -2.9402 sd 0.0161 0.0184 0.0108 0.0160 | CR3/sd 1.27 1.23 2.10 0.67 | CR0/sd 1.00 1.09 1.27 0.59 | n_eff 7.7 8.1 2.6 4.2 | neg D 1 cross 0.256 sumD/Jc 1.00 1.01 1.00 0.99 | conv True [2104 s]
+real 57 lcdm -3.1617 -3.2281 -2.8332 -2.9498 sd 0.0159 0.0180 0.0107 0.0162 | CR3/sd 2.09 0.82 3.86 1.32 | CR0/sd 1.50 0.72 2.27 0.97 | n_eff 7.4 8.1 2.6 4.2 | neg D 1 cross 0.254 sumD/Jc 1.00 1.00 1.00 1.00 | conv True [2134 s]
+real 58 lcdm -3.1254 -3.2519 -2.8615 -2.9576 sd 0.0157 0.0181 0.0108 0.0161 | CR3/sd 1.45 1.03 1.47 1.53 | CR0/sd 1.18 0.92 0.91 1.11 | n_eff 7.7 8.2 2.6 4.2 | neg D 1 cross 0.257 sumD/Jc 1.00 1.00 1.00 1.00 | conv True [2186 s]
+real 59 lcdm -3.1253 -3.2277 -2.8383 -2.9547 sd 0.0157 0.0180 0.0107 0.0161 | CR3/sd 1.28 1.20 2.99 0.95 | CR0/sd 1.19 1.07 1.72 0.84 | n_eff 7.6 8.0 2.6 4.2 | neg D 1 cross 0.257 sumD/Jc 1.00 1.00 1.00 1.00 | conv True [2221 s]
+## LCDM prior, all scales, 60 realizations: mean estimate - truth -0.0015 -0.0028 +0.0011 +0.0009; pooled mean z -0.016 +- 0.065, sd z 1.035, coverage of 1 sd 0.650
+## block error over sandwich error under the model, per region: median, maximum
+   CR0: High Latitude 1.12 2.05; Spur 1.03 1.84; Galactic Center 0.77 2.27; Plane 0.97 2.06
+   CR2: High Latitude 1.20 2.39; Spur 1.12 2.08; Galactic Center 0.95 2.95; Plane 1.13 2.40
+   CR3: High Latitude 1.28 2.82; Spur 1.21 2.36; Galactic Center 1.21 3.86; Plane 1.32 2.82
+   effective number of blocks, median: 7.7 8.0 2.6 4.2; blocks with negative information, total 95; cross-region share, largest 0.259

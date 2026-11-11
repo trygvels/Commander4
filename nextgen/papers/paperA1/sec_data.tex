@@ -268,11 +268,16 @@ read; the three forms differ by 15 to 45 percent on the maps and all are in the 
 
 On the maps the block error is 3.5, 2.3 and 7.5 times the sandwich error at High Latitude, in the
 Spur and in the Plane (Table~\ref{tab:e040}): 0.04, 0.04 and 0.10 where the model gives 0.012, 0.016
-and 0.013. \pend{The ratio under the model at the configuration of the map fit ($N_{\rm side}=16$,
-$\Lambda$CDM prior, the window-matched covariances): median and largest value; which regions are
-outside it.} In the simulation with a spread of 0.1 the median ratio is 3.8, 2.4 and 3.6. What the fit
-of a region returns is the index of the half dozen patches that carry its information. With the block
-errors the four regions do not differ from each other.
+and 0.013. Under the model, with the window-matched covariances and the $\Lambda$CDM prior of the fit, the ratio is
+not one: in 60 simulations at $N_{\rm side}=8$ its median is 1.28, 1.21 and 1.32 and its largest value
+2.8, 2.4 and 2.8, because that prior couples the patches (with the white prior the medians are 1.25,
+1.03 and 1.07). Against that reference the maps are outside the range at High Latitude and in the
+Plane, and the Spur is inside it: one simulation of 60 has a larger ratio. \pend{The same reference at
+$N_{\rm side}=16$.} So the High Latitude region and the Plane are not one index each; for the Spur the
+block error is an upper limit on the error and no evidence of misfit. In the simulation with a spread of 0.1 the median ratio is 3.8, 2.4 and 3.6. (That simulation has the
+white prior; a spread of that size is the scale of what the High Latitude ratio asks for, and the
+Plane asks for more.) What the fit of a region returns is the index of the half dozen patches that
+carry its information. With the block errors the four regions do not differ from each other.
 
 The comparison between the rows of Table~\ref{tab:e040} is differential. It does not need the model
 to be right, only to be the same in every row.
@@ -293,50 +298,7 @@ baseline is given for scale.}
 \input{gen_tab_moves}
 \end{table}
 
-Table~\ref{tab:moves} lists what else moves the answer. Three lines deserve comment.
-
-\paragraph{Angular scale.} To ask at which scales two bands disagree we marginalized the modes of one
-map at multipoles 2 to $L$ and refitted, with the same cut in the K, Ka fit as a control fixed in
-advance, where nothing should move. The control failed: the K, Ka index moved toward flat in every
-region, by $+0.08$, $+0.16$, $+0.11$ and $+0.37$ at $L = 20$ (\exref{E042}). Read from the other
-side, with the pixel scale excluded and the index informed by multipoles up to 30, 20 or 12, the
-four-band index steepens (Table~\ref{tab:moves}): by 0.01 to 0.02 in the Spur, where it is stable
-across the three cuts; by 0.01 to 0.05 at high latitude; and by 0.04 to 0.09 in the Plane and the
-Galactic Center, where it has not settled at the tightest cut. A criterion written before these
-fits, agreement of the three cuts within two standard deviations, holds for the Spur and, barely,
-for the High Latitude region, and fails for the other two. An amplitude ratio per multipole bin,
-estimated from cross spectra with a third map so that it carries no noise bias, shows the same
-thing directly: Ka over K band is 0.32 to 0.33 from multipole 2 to 34 and 0.35 from 35 to 47.
-
-We do not know the cause. One candidate is instrumental: the maps are pixel averages of skies that
-are not band-limited, structure below the pixel scale folds into it through each band's own beam,
-K band has the widest, and the window operator works to multipole 47 with Gaussian beams. Against it,
-the one simulation we have of sub-pixel structure leaves a residual of 0.002, though that sky had
-no compact sources. The other candidate is the sky: compact structure in the plane may be flatter
-than the diffuse emission, in which case an index from large scales and an index from all scales
-measure different things. \citet{fuskeland2014}, with maps smoothed to a common $1^\circ$ beam before
-any pixel averaging, find $-2.98 \pm 0.01$ in the plane, which is our all-scale K, Ka value
-($-2.980$) and not our large-scale one ($-3.04$); that favours the sky. The low-pass estimator has
-also not been run on simulations with known truth. For all these reasons the rows of
-Table~\ref{tab:moves} are sizes of an effect and not corrections.
-
-\paragraph{Band subset.} K and Ka alone give indices flatter than the four bands together by 0.02 to
-0.04, in either version of the fit. The two fits share K and Ka, so the standard deviation of their
-difference is $(\sigma_{\rm sub}^2 - \sigma_{\rm full}^2)^{1/2}$; with the index read from multipoles
-up to 20 the differences are 1.9, 2.0, 3.6 and 1.7 of it, all of one sign. A spectrum that steepens
-with frequency would do this, and so would a dust model that predicts too much polarized dust at 41
-and 61 GHz from 353 GHz.
-
-\paragraph{Poorly measured modes.} The released K-band covariance has 20 eigenmodes with more than
-ten times the median variance. Projecting all of them out moves the K, Ka index by 0.002 to 0.015.
-This tests the modes the matrix knows about, not the claim that it understates them.
-
-Taken together: for these maps and regions the profile index of the simple model is near $-3.1$ at
-high latitude and in the Spur and between $-3.0$ and $-3.1$ in the Plane, the statistical error is
-0.01 to 0.02, and choices of angular scale and band subset move it by 0.02 to 0.09. A number with an
-error bar that means what it says needs the scale dependence understood, errors that survive the
-misfit (from resampling of sky blocks, say), and a decision about the CMB prior. That is a separate
-piece of work, and we do not quote an index here.
+\input{gen_moves_text}
 
 \subsection{Planck 30 GHz}
 \label{sec:30}

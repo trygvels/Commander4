@@ -546,6 +546,26 @@ Against the expectations:
   window operator; the job stopped on an assertion). The window row of the paper's table is the white-prior
   pair, labelled so.
 
+### Stage 4b results: the index from large scales with the LCDM prior (read 2026-11-11 06:47 to 07:19)
+
+`E042/lowpass30_lcdm.txt`, `lowpass20_lcdm.txt`, `lowpass12_lcdm.txt` (all six fits converged; no OVERFLOW line).
+K band and 353 GHz at all scales, the other bands through multipoles 2 to L.
+
+| L | K, Ka, Q, V | Minus all scales | In units of sqrt(sd_low^2 - sd_all^2) | K, Ka |
+|---|---|---|---|---|
+| 30 | -3.0998 +- 0.0138, -3.0973 +- 0.0177, -3.1258 +- 0.0100, -3.0187 +- 0.0147 | -0.0173, -0.0174, -0.0450, -0.0546 | -3.0, -2.6, -9.6, -8.8 | -3.0771, -3.0781, -3.0962, -3.0130 |
+| 20 | -3.1062 +- 0.0151, -3.1106 +- 0.0190, -3.1354 +- 0.0111, -3.0483 +- 0.0156 | -0.0237, -0.0307, -0.0547, -0.0841 | -2.8, -3.3, -8.2, -10.4 | -3.0917, -3.0866, -3.1061, -3.0390 |
+| 12 | -3.1379 +- 0.0192, -3.1124 +- 0.0207, -3.1739 +- 0.0134, -3.0742 +- 0.0168 | -0.0554, -0.0325, -0.0932, -0.1101 | -3.8, -2.6, -9.3, -10.7 | -3.1225, -3.0859, -3.1465, -3.0567 |
+
+- **E3: the steepening does not shrink with the LCDM prior.** With the white prior the shifts were -0.014,
+  -0.008, -0.043, -0.043 (L = 30), -0.019, -0.015, -0.053, -0.066 (L = 20) and -0.048, -0.011, -0.093, -0.086
+  (L = 12). With the LCDM prior they are equal or larger, by up to 0.024. The scale dependence reported in
+  E042 was not the white prior. What did change: the large-scale indices themselves differ by 0.013 or less
+  between the two priors, less than the all-scale indices do (up to 0.031).
+- Against the nested-fit standard deviation (validated in E039 addendum B) the shifts at L = 20 are 2.8,
+  3.3, 8.2 and 10.4 sd: a departure from the model in every region.
+- The K, Ka fit at L = 12, which stopped unconverged with the white prior, converges here.
+
 ### Stage 4c, pre-registered 2026-11-11 05:44: K band with PR4 30 GHz under the LCDM prior, and its noise-model arms (referee item 9)
 
 `nextgen/scripts/e043_queue11.sh`: K, 30 GHz (PR4), 353 GHz, window-matched, LCDM CMB prior, with (i) the
@@ -748,6 +768,31 @@ script gave CR3 over sandwich of 1.0 to 2.3 and a cross-region share of 0.25, so
   (2.3) I expect it to be inside the null range.
 - G3. Consequence: a region whose map ratio is inside the null range is not called "more than one index" in
   the paper, and its block error is reported as an upper limit on the error, not as evidence of misfit.
+
+### Stage 5, the null with the LCDM prior at nside 8 (read 2026-11-11 07:18)
+
+`E040/sim_n8_lcdm_blocknull.txt` (`e040h_sim_n16.py --nside 8`: window-matched covariances degraded to nside 8,
+LCDM CMB and prior, the model true, 60 realizations; no OVERFLOW line). Pooled over regions the LCDM-prior fit
+has mean z -0.016 +- 0.065, sd of z 1.035, coverage 0.650.
+
+| Ratio to the sandwich error | High Latitude | Spur | Galactic Center | Plane |
+|---|---|---|---|---|
+| CR0: median / 84th / 97.5th percentile / maximum | 1.12 / 1.34 / 1.85 / 2.05 | 1.03 / 1.31 / 1.67 / 1.84 | 0.77 / 1.41 / 1.91 / 2.27 | 0.97 / 1.46 / 1.88 / 2.06 |
+| CR3: the same | 1.28 / 1.60 / 2.47 / 2.82 | 1.21 / 1.59 / 2.01 / 2.36 | 1.21 / 2.31 / 3.31 / 3.86 | 1.32 / 1.96 / 2.60 / 2.82 |
+| maps, CR3 (LCDM prior) | 3.51 | 2.29 | 8.92 | 7.52 |
+| simulations above the map value | 0 of 60 | 1 of 60 | 0 of 60 | 0 of 60 |
+
+rms of z under the model: sandwich 1.08, 0.98, 0.93, 1.13; CR3 0.90, 0.83, 0.99, 1.04. Cross-region share of the
+block Jacobian 0.26 (0.00 with the white prior and diagonal noise in the review's tests): the LCDM prior couples
+the regions and the blocks. Blocks with negative information: 1.6 per realization on average.
+
+- G1 holds: the medians under the model are 1.21 to 1.32, above the white-prior null (1.03 to 1.25).
+- G2 holds as written: the Plane is above every simulated value; the High Latitude ratio is above the largest
+  of 60; the Spur is inside the range of the null (1 of 60 above it).
+- G3 applies to the Spur: its block error (0.038) is reported, and the paper does not say that the Spur is
+  more than one index.
+- The nside-16 version (12 realizations) is in queue 12 and decides whether these statements hold at the
+  resolution of the map fit.
 
 ## Negative control
 
