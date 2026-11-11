@@ -193,6 +193,10 @@ def main():
             c2, df = float(zz["chi2"]), int(zz["dof"])
             put(f"{k}.chi.total", c2, "{:.0f}"); put(f"{k}.chi.dof", df, "{:d}"); put(f"{k}.chi.ratio", c2 / df); put(f"{k}.chi.nsig", abs(c2 - df) / np.sqrt(2.0 * df), "{:.1f}")
             put(f"{k}.chi.noisepercent", 100 * (1 - np.sqrt(c2 / df)), "{:.1f}")
+            if k == "flat":
+                # the degrees of freedom that the LCDM-prior fit has beyond the flat-prior fit: one per element, chi-square_n under the model
+                nel = int(z["keep"].sum())
+                put("chi.cmbdir.ratio", (float(z["chi2"]) - c2) / nel); put("chi.cmbdir.se", float(np.sqrt(2.0 / nel))); put("flat.chi.se", float(np.sqrt(2.0 / df)))
         if zz is not None and "mm_bias" in zz.files:
             sdt = np.sqrt(np.diag(zz["mm_cov_true"]))
             put4("mm.bias", zz["mm_bias"], "{:+.4f}"); put4("mm.biassd", zz["mm_bias"] / zz["sd_sand"], "{:+.2f}"); put4("mm.sdtrue", sdt)

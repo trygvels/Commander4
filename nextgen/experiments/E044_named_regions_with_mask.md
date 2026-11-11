@@ -351,6 +351,18 @@ chi2_min has no prior penalty and exactly two degrees of freedom per element). P
 - The chi-square is low again, more so than with the LCDM prior (R4): 3.35 sd with two residual degrees of
   freedom per element. A fluctuation of that size is one in 1200. This strengthens the second reading of R4:
   the released covariances overstate the noise of the residual of this fit by about 2 percent in rms.
+- **The deficit is not uniform over the combinations of bands (noted 11:40).** The LCDM-prior fit and the
+  flat-prior fit are nested, and under the model the difference of their chi2_min is chi-square with one degree
+  of freedom per element (the fitted CMB amplitude against its noise plus prior variance). It is 16953.8 -
+  11101.4 = 5852.4 for 5808: ratio 1.008 +- 0.019. The other two degrees of freedom per element have 0.956 +-
+  0.013. The two differ by 0.052 +- 0.023 (2.3 sd). A uniformly overstated noise would put both at 0.956. So
+  either the deficit is confined to the directions that the three amplitudes do not span, or it is everywhere
+  and the direction of the CMB spectrum carries an excess of about 5 percent of its noise variance beyond the
+  LCDM prior. The second would also give an index that depends on how tightly the CMB amplitude is held, which
+  is the pattern of R3 and R5. Not pursued here (Paper B; literature in
+  `research/2026-11-11_wmap_lowres_covariance_normalization.md`, which finds no published statement that the
+  matrices overstate the noise, two uncommented V-band values of 0.96 to 0.98 with the same matrices, and
+  model-free tests that need the single-year files).
 
 ## Negative control
 
