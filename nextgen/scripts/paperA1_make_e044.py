@@ -212,22 +212,42 @@ def main():
             ("lp12", r"index from $\ell \le 12$"), ("KKa", "K and Ka only"), ("bd148", "dust index 1.48 in place of 1.53"), ("bd158", "dust index 1.58"),
             ("nodrift", "no bandpass drift correction"), ("bp353full", "353 GHz: all bolometers"), ("delta", "delta bandpasses, nominal frequencies"),
             ("floor011", r"$\Lambda$CDM prior with a floor of 0.11 $\mu$K")]
+    def with_units(label, d, u):
+        """A row of moves, each followed in brackets by the move in units of its expected standard deviation."""
+        z1 = lambda y: "0.0" if abs(y) < 0.05 else f"{y:+.1f}"
+        return label + " & " + " & ".join(f"${x:+.3f}$ (${z1(y)}$)" for x, y in zip(d, u)) + " \\\\\n"
+
+    worst = []
     for tag, label in arms:
         zz = load(tag)
         if zz is None:
             continue
         d = zz["beta"] - b0
-        t += row(label, d, sgn)
         put4(f"{tag}.move", d, "{:+.3f}"); put4(f"{tag}.prof", zz["beta"]); put4(f"{tag}.sd", zz["sd_sand"]); put4(f"{tag}.movesd", d / s0, "{:+.1f}")
-        if tag.startswith("lp") or tag == "KKa":
-            nest = np.sqrt(np.clip(zz["sd_sand"] ** 2 - s0 ** 2, 1e-30, None))
-            put4(f"{tag}.nest", d / nest, "{:+.1f}")
+        put4(f"{tag}.move.abs", np.abs(d), "{:.3f}")
         put(f"{tag}.conv", "yes" if bool(zz["converged"]) else "NO", "{}")
+        if tag.startswith("lp") or tag in ("KKa", "flat"):
+            # the arm uses less information on the same data: the difference has variance sd_arm^2 - sd_base^2 under the model
+            nest = np.sqrt(np.clip(zz["sd_sand"] ** 2 - s0 ** 2, 1e-30, None))
+            put4(f"{tag}.nest", d / nest, "{:+.1f}"); put4(f"{tag}.nest2", d / nest, "{:+.2f}"); put4(f"{tag}.nestsd", nest)
+            put(f"{tag}.nest.max", float(np.abs(d / nest).max()), "{:.1f}")
+            worst.append(float(np.abs(d / nest).max()))
+            t += with_units(label, d, d / nest)
+        elif tag == "white" and "mm_bias" in zz.files:
+            sdt_ = np.sqrt(np.diag(zz["mm_cov_true"]))
+            pair_ = np.sqrt(np.clip(sdt_ ** 2 - s0 ** 2, 1e-30, None))
+            t += with_units(label, d, (d - zz["mm_bias"]) / pair_)
+        else:
+            t += row(label, d, sgn)
     a, c = load("lp20_KKa"), load("lp20")
     if a is not None and c is not None:
         d = a["beta"] - c["beta"]
-        t += row(r"K and Ka only, both fits from $\ell \le 20$", d, sgn)
-        put4("lp20KKa.move", d, "{:+.3f}"); put4("lp20KKa.nest", d / np.sqrt(np.clip(a["sd_sand"] ** 2 - c["sd_sand"] ** 2, 1e-30, None)), "{:+.1f}")
+        nest = np.sqrt(np.clip(a["sd_sand"] ** 2 - c["sd_sand"] ** 2, 1e-30, None))
+        t += with_units(r"K and Ka only, both fits from $\ell \le 20$", d, d / nest)
+        put4("lp20KKa.move", d, "{:+.3f}"); put4("lp20KKa.nest", d / nest, "{:+.1f}"); put("lp20KKa.nest.max", float(np.abs(d / nest).max()), "{:.1f}")
+        put("lp20KKa.conv", "yes" if bool(a["converged"]) else "NO", "{}")
+    if worst:
+        put("arms.nest.max", max(worst), "{:.1f}")
     bd = [load("bd148"), load("bd158")]
     if all(x is not None for x in bd):
         put4("dust.move", 0.5 * (np.abs(bd[0]["beta"] - b0) + np.abs(bd[1]["beta"] - b0))); put4("dust.slope", (bd[1]["beta"] - bd[0]["beta"]) / 0.10, "{:.2f}")
