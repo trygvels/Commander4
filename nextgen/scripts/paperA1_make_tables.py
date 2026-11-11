@@ -174,7 +174,7 @@ def moves_text():
         if not os.path.exists(path):
             return None
         z = np.load(path, allow_pickle=True)
-        lp[L] = {k: (np.asarray(z[k], float)[:4], np.asarray(z[k], float)[4:]) for k in z.files}
+        lp[L] = {k: (np.asarray(z[k], float)[:4], np.asarray(z[k], float)[4:]) for k in ("K_Ka_Q_V_353", "K_Ka_353")}
     four = {L: lp[L]["K_Ka_Q_V_353"] for L in lp}
     pair = {L: lp[L]["K_Ka_353"] for L in lp}
     d = {L: four[L][0] - b0 for L in lp}

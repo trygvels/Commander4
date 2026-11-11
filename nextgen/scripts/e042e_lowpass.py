@@ -50,6 +50,7 @@ def main():
         kw = dict(cmb_prior_sd=None, cmb_prior_prec=lcdm_cmb_precision(WM)[0])
     keep = WM.ell <= a.lmax
     Yk, Ypk = WM.Y[:, keep], WM.Yp[keep]
+    assert np.abs(Ypk @ Yk - np.eye(Yk.shape[1])).max() < 1e-8        # the construction is exact only if Y_k^+ Y_k = 1
     region = D.bpxv_regions()
     n = region.size
     need = sorted({b for s in a.sets for b in s.split(",")})
@@ -76,7 +77,7 @@ def main():
             low[b] = mk(Yk @ (Ypk @ d), 0.5 * (nlp + nlp.T))
             del cov, Cc, Cci, nlp
             gc.collect()
-        print(f"# {B.name}: loaded; low-passed copy to l <= {a.lmax} ({int(keep.sum())} modes); {time.time() - T0:.0f} s", flush=True)
+        print(f"# {B.name}: loaded" + ("" if b == "353" else f"; low-passed copy to l <= {a.lmax} ({int(keep.sum())} modes)") + f"; {time.time() - T0:.0f} s", flush=True)
     store = {}
     print(f"# CMB prior: {'LCDM covariance' if a.cmb_prior_lcdm else 'white 0.2 uK'}", flush=True)
     print(f"# E042 low-pass arm: the first band of each set and 353 GHz keep all modes; the others enter through multipoles 2 to {a.lmax}; "
@@ -91,6 +92,7 @@ def main():
         print(f"{s:16s} " + "  ".join(f"{x:+.4f} +- {e:.4f}" for x, e in zip(bh, sd)) + f" | chi2 {2 * res.fun:.1f} | T/J_c "
               + " ".join(f"{T[k, k] / max(J[k, k] - T[k, k], 1e-30):.3f}" for k in range(4)) + f" | converged {res.success} | {time.time() - T0:.0f} s", flush=True)
         store[s.replace(",", "_")] = np.concatenate([bh, sd])
+        store["converged_" + s.replace(",", "_")] = np.array(bool(res.success))    # a fit that did not converge is stored and flagged
         del L, sol
         gc.collect()
     if a.out:

@@ -104,3 +104,29 @@ threads, niced or not). One nside-16 fit with three components (18432 unknowns) 
 Three to four such jobs at once ran 3 to 5 times slower each, filled the 8 GB swap and left one
 job hung with no resident memory. `kill -STOP` had no effect on a job started through the
 harness. Run dense jobs one at a time and plan run times from single-job timings.
+
+Measured again 2026-11-11: an nside-16 fit holds 11 to 16 GB (16 GB for all estimators with a flat CMB
+prior) and an nside-8 simulation job 2 to 4.5 GB under the malloc canary. One nside-16 fit plus four nside-8
+jobs wanted 31 GB of the 24; the heavy job dropped to 1 GB resident, `top` showed it "stuck", and a 35-minute
+fit took 80. Rule: add the memory up first; jobs plus about 6 GB for the system must stay under 24 GB, so
+one nside-16 fit and at most one or two nside-8 jobs.
+
+### A memory fault in Accelerate's Cholesky on this OS build (E043, 2026-11-11)
+
+On macOS 27.0 (build 26A5388g, a pre-release) Accelerate's `dpotrf` with uplo = "U" writes 245 kB to 768 kB
+past an internal buffer for matrix orders of about 1500 to 6000 (none measured at 6144 to 18432, none with
+uplo = "L"). scipy maps `cho_factor(lower=True)` and `cholesky(lower=True)` on C-ordered arrays to uplo = "U".
+The factor returned is correct; neighbouring heap memory is overwritten, which showed as crashes in
+unrelated code and at interpreter exit.
+
+- Use `scipy.linalg.cho_factor(A, lower=False)` on C-ordered arrays, or `np.linalg.cholesky`.
+- Run every dense job under the canary and search its stderr:
+  `cc -O1 -dynamiclib -o ~/data/c4_tools/libcanary.dylib nextgen/tools/malloc_canary.c`, then
+  `DYLD_INSERT_LIBRARIES=~/data/c4_tools/libcanary.dylib .venv/bin/python -I script.py 2> run.err; grep OVERFLOW run.err`.
+  The canary sees blocks of 64 kB and more; `/usr/lib/libgmalloc.dylib` faults on the first bad byte of any
+  block and names the routine in the crash report, but is slow.
+- A process that printed its results can still have crashed at exit: look in
+  `~/Library/Logs/DiagnosticReports/` and its `Retired/` folder for `python3.13-*.ips`.
+- The lowres test suite runs the likelihood under the canary and warns when the old path overflows; when the
+  warning disappears after an OS update, the bug is gone.
+- Upstream Commander4 uses `cho_factor(lower=True)` in `standalone_tools/constrained_cmb_realizations.py`.

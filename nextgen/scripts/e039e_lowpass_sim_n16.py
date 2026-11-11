@@ -63,6 +63,7 @@ def main():
     del cov_c
     keep = WM.ell <= a.lmax
     Yk, Ypk = WM.Y[:, keep], WM.Yp[keep]
+    assert np.abs(Ypk @ Yk - np.eye(Yk.shape[1])).max() < 1e-8        # the construction is exact only if Y_k^+ Y_k = 1
     low_ninv = {}
     for (nm, B, _, ninv) in raw[1:4]:
         Cc = Ypk @ np.linalg.inv(ninv) @ Ypk.T

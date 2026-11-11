@@ -129,3 +129,13 @@ Missing for Paper B and the tau by-product (landscape report): 2610.31469 (QUIJO
 1103.2554, 1801.01226 (Weiland 2018), 1801.04945, 2005.05600, 1908.09856, 2103.14378, 2010.01139,
 1907.12875, 2205.10104 (BP XII), 2602.06115, 1801.01481.
 
+
+## Cluster-robust (block) errors, added 2026-11-11 for E040 stage 5 (verified in `research/2026-11-11_citation_verification_cluster_robust.md`)
+
+| Reference | Takeaway for us |
+|---|---|
+| Liang and Zeger 1986, Biometrika 73, 13 (doi 10.1093/biomet/73.1.13) | The cluster sandwich in common use is attributed to this paper (and to White for the heteroskedastic case); not its first appearance (Shah, Holt and Folsom 1977; Fuller 1975). Abstract only was read. |
+| Bell and McCaffrey 2002, Survey Methodology 28, 169 | With few clusters, or a coefficient that depends on few clusters, the plain estimator is biased low (Theorem 1; -10 to -33 percent in their Table 1 at 20 clusters); the jackknife is biased high; "bias-reduced linearization" (I - H)^(-1/2) is unbiased under iid errors. Satterthwaite degrees of freedom for the t reference. All for linear regression. |
+| Cameron and Miller 2015, J. Human Resources 50, 317 (doi 10.3368/jhr.50.2.317) | The names CR2 and CR3; "at a minimum use T(G - 1) critical values"; their CR3 carries the factor (G - 1) / G. |
+| Carter, Schnepel and Steigerwald 2017, Rev. Econ. Stat. 99, 698 (doi 10.1162/REST_a_00639) | Effective number of clusters G* = G / (1 + Gamma), in shares of the variance of the estimate (ours is in shares of the information; the two agree when the model holds). They do not recommend t with G* degrees of freedom. |
+| MacKinnon and White 1985, J. Econometrics 29, 305 | HC1 to HC3. Record verified, paper not read: not cited in Paper A1. |
