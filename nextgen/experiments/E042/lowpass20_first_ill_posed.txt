@@ -1,0 +1,8 @@
+# Planck_030: low-passed to l <= 20 (874 modes); 10 s
+# Planck_353: low-passed to l <= 20 (874 modes); 22 s
+# WMAP_K: low-passed to l <= 20 (874 modes); 29 s
+# WMAP_Ka: low-passed to l <= 20 (874 modes); 36 s
+# WMAP_Q: low-passed to l <= 20 (874 modes); 43 s
+# WMAP_V: low-passed to l <= 20 (874 modes); 50 s
+# E042 low-pass arm: every band restricted to multipoles 2 to 20; profile index and debiased sandwich error (High Latitude, Spur, Galactic Center, Plane)
+K,Ka,Q,V,353     -3.0971 +- 0.0426  -3.2383 +- 0.0761  -4.6000 +- inf  -1.6000 +- inf | chi2 1868.7 | T/J_c 1.648 3.178 8203913752049657691871809372160.000 61801354529713021884430194573312.000 | converged True | 451 s

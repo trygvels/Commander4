@@ -253,11 +253,28 @@ synchrotron (-0.37): the high-latitude deficit is a different thing from the pla
   index, largest where the sky is bright and structured. It has to be measured from the other
   side, with fits that do not use the pixel scale.
 
+**(c) Worst K-band modes, 01:17 to 01:26** (`E042/modes_ctrl.txt`). The released K-band covariance has 20
+eigenmodes with a variance above 10 times the median (the largest 93 times). With all 20 projected
+out: K, 30, 353 gives -3.394, -3.189, -3.172, -3.029 (moves of +0.034, -0.009, +0.091, +0.006);
+K, Ka, 353 gives -3.054, -3.072, -3.031, -2.976 (moves of at most 0.015). **X3 holds**: the High
+Latitude index moves by 0.034 of a 0.37 gap. The modes that the released covariance itself flags
+as poorly measured do not carry the disagreement with 30 GHz. (That does not test the claim of
+Watts et al. 2023 that the released covariance understates such modes; it tests the modes it
+knows about.)
+
 **Low-pass arm, expectations written 2026-11-11 01:17 before it is run** (`nextgen/scripts/e042e_lowpass.py`).
 Every band restricted to multipoles 2 to L by keeping its harmonic coefficients with their
 covariance; L = 20 first, then 12 and 30. Band sets K, Ka, Q, V; K, Ka; K, 30; 30, Ka (all with
 353).
 
+- *Implementation note, 2026-11-11 01:40, before any usable number.* The first version low-passed
+  every band and held the unconstrained amplitude directions with a weak prior. It was ill-posed:
+  per-pixel amplitudes have more freedom than band-limited data, so any index fits. Its one line
+  of output (K, Ka, Q, V at L = 20) had T / J_c of 1.6 and 3.2 in the High Latitude and Spur
+  regions and the other two on the bounds, which is the "no measurement" flag doing its job
+  (`E042/lowpass20_first_ill_posed.txt`). Reworked: the lowest band of each set and 353 GHz keep
+  all their modes and pin the amplitudes; every other band enters through its coefficients at
+  multipoles 2 to L only. The expectations below are unchanged.
 - Z1. At L = 20 the K, Ka, Q, V indices are steeper than the all-scale baseline by 0 to 0.04 at
   high latitude and by 0.02 to 0.12 in the Plane and the Spur.
 - Z2. At L = 20 the K, 30 (PR4) index is between -3.7 and -3.3 in the Plane and between -3.6 and

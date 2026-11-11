@@ -1,18 +1,22 @@
-"""E042, low-pass arm: region fits that use only the multipoles 2 to L of every band.
+"""E042, low-pass arm: region fits in which the index is read from multipoles 2 to L only.
 
 Motivation (E042 negative control, 2026-11-11): with large scales projected out, the K, Ka index of the
-bright regions flattens by up to 0.23, and every amplitude ratio to K band rises by 6 to 10 percent at
+bright regions flattens by up to 0.37, and every amplitude ratio to K band rises by 6 to 10 percent at
 multipoles 35 to 47. The pixel scale of the nside-16 maps is where the window matching cannot work
 (structure above multipole 47 aliases differently for different beams). This arm asks the opposite
-question: how much do the indices change when the pixel scale is not used at all?
+question: how much do the indices change when the pixel scale does not inform them?
 
-Each band (after window matching) is expanded in the spin-2 harmonics of the grid; the coefficients at
-multipoles 2 to L are kept with their covariance Y+ N Y+^T, and the band enters through d' = Y c and
-N'^-1 = Y+^T Cov(c)^-1 Y+, which gives no weight to anything else. The amplitude system is then rank
-deficient, so two fictitious bands with weight 1e-8 uK^-2 hold the unconstrained synchrotron and dust
-directions at zero; their effect on the constrained ones is of relative order 1e-8.
+One band of each set, the anchor (the lowest frequency), keeps all its modes, and so does 353 GHz: they pin
+the synchrotron and dust amplitudes in every pixel. Every other band is expanded in the spin-2 harmonics of
+the grid and enters only through its coefficients at multipoles 2 to L with their covariance Y+ N Y+^T:
+d' = Y c, N'^-1 = Y+^T Cov(c)^-1 Y+, which gives no weight to anything else. The index is then informed by
+those multipoles alone.
 
-    python -I nextgen/scripts/e042e_lowpass.py --lmax 30 --out nextgen/experiments/E042/lowpass30.npz
+A first version low-passed every band and held the unconstrained amplitude directions with a weak prior. It
+was ill-posed: with per-pixel amplitudes and band-limited data any index fits (T / J_c above 1.6 in every
+region, two regions on the bounds; kept as `lowpass20_first_ill_posed.txt`).
+
+    python -I nextgen/scripts/e042e_lowpass.py --lmax 20 --out nextgen/experiments/E042/lowpass20.npz
 """
 import argparse
 import gc
@@ -44,7 +48,7 @@ def main():
     region = D.bpxv_regions()
     n = region.size
     need = sorted({b for s in a.sets for b in s.split(",")})
-    raw = {}
+    full, low = {}, {}
     for b in need:
         if b == "353":
             d, ninv = D.load_planck_qu(D.PR4_353, 16)
@@ -56,25 +60,25 @@ def main():
             d, ninv = D.load_wmap(b)
             B = wmap_band(b, D.WMAP_BANDPASS)
         d, ninv = WM.apply(d, ninv, FWHM_ARCMIN[b])
-        cov = np.linalg.inv(ninv)
-        Cc = Ypk @ cov @ Ypk.T
-        Cci = np.linalg.inv(0.5 * (Cc + Cc.T))
-        nlp = Ypk.T @ Cci @ Ypk
-        raw[b] = BandData(B.name, Yk @ (Ypk @ d), 0.5 * (nlp + nlp.T), (lambda be, B=B: B.power_law(be, 23.0)),
-                          B.mbb(D.DUST_BETA, D.DUST_T, D.DUST_REF))
-        del cov, Cc, Cci, nlp
-        gc.collect()
-        print(f"# {B.name}: low-passed to l <= {a.lmax} ({int(keep.sum())} modes); {time.time() - T0:.0f} s", flush=True)
-    eps = 1e-8
-    zero = np.zeros(n)
-    fake_s = BandData("reg_sync", zero, np.full(n, eps), (lambda be: (np.ones(np.size(be)), np.zeros(np.size(be)))), 0.0, cmb=0.0)
-    fake_d = BandData("reg_dust", zero, np.full(n, eps), (lambda be: (np.zeros(np.size(be)), np.zeros(np.size(be)))), 1.0, cmb=0.0)
+        mk = lambda dd, ni, B=B: BandData(B.name, dd, ni, (lambda be, B=B: B.power_law(be, 23.0)),  # noqa: E731
+                                          B.mbb(D.DUST_BETA, D.DUST_T, D.DUST_REF))
+        full[b] = mk(d, ninv)
+        if b != "353":
+            cov = np.linalg.inv(ninv)
+            Cc = Ypk @ cov @ Ypk.T
+            Cci = np.linalg.inv(0.5 * (Cc + Cc.T))
+            nlp = Ypk.T @ Cci @ Ypk
+            low[b] = mk(Yk @ (Ypk @ d), 0.5 * (nlp + nlp.T))
+            del cov, Cc, Cci, nlp
+            gc.collect()
+        print(f"# {B.name}: loaded; low-passed copy to l <= {a.lmax} ({int(keep.sum())} modes); {time.time() - T0:.0f} s", flush=True)
     store = {}
-    print(f"# E042 low-pass arm: every band restricted to multipoles 2 to {a.lmax}; profile index and debiased sandwich error "
-          "(High Latitude, Spur, Galactic Center, Plane)", flush=True)
+    print(f"# E042 low-pass arm: the first band of each set and 353 GHz keep all modes; the others enter through multipoles 2 to {a.lmax}; "
+          "profile index and debiased sandwich error (High Latitude, Spur, Galactic Center, Plane)", flush=True)
     for s in a.sets:
         bs = s.split(",")
-        L = RegionLikelihood([raw[b] for b in bs] + [fake_s, fake_d], region, cmb_prior_sd=0.2, use_dust=True)
+        bands = [full[bs[0]]] + [low[b] if b != "353" else full[b] for b in bs[1:]]
+        L = RegionLikelihood(bands, region, cmb_prior_sd=0.2, use_dust=True)
         bh, res = fit_profile(L, np.full(4, -3.1))
         _, Sw, J, T, sol, ok = sandwich_plugin(L, bh)
         sd = np.sqrt(np.diag(Sw))
