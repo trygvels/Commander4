@@ -188,8 +188,17 @@ bands.}
 
 Table~\ref{tab:same} is the result of this section. The numbers in each column come from the same
 maps, the same regions and mask, the same bands, bandpasses and noise covariances. They differ only
-in how the amplitudes are removed. The model fits: the $\chi^2$ per element and band is \N{chi.list}
-in the four regions, against 0.6.
+in how the amplitudes are removed.
+
+No region is misfitted: the $\chi^2$ per element and band is \N{chi.list} in the four regions against
+an expectation of \N{chi.exp} (sampling errors \N{chi.se.list}). In total it is low. The minimum
+$\chi^2$, with the penalty of the CMB prior inside it, is \N{chi.total} for \N{chi.dof} degrees of
+freedom, \N{chi.nsig} standard deviations below its expectation, and the deficit is in the two faint
+regions; \N{chinull.n} simulations of this fit at $N_{\rm side}=8$ give a ratio of $\N{chinull.mean}
+\pm \N{chinull.se}$. A fluctuation of that size has a probability of about one percent. The other
+reading is that the released covariances overstate the noise away from the plane, by
+\N{chi.noisepercent} percent in rms if it is spread evenly, which would make every error below too
+large by that factor. We use the covariances as released and do not rescale.
 
 \paragraph{The reference frequency.} Under flat amplitude priors the answer depends on where the
 amplitudes are defined. For this band set with a $\Lambda$CDM prior on the CMB the pivot lies just

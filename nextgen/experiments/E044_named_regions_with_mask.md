@@ -221,9 +221,10 @@ Own-score block error over sandwich, pooled: median 1.33, 1.30, 1.11, 1.12; 97.5
 1.72. Of the 120 simulations 15, 85, 12 and 31 lie above the map values (1.63, 1.00, 1.44, 1.28). All four
 regions are inside the null.
 
-**The zero-mean prior** (`E044/sim_n8_zm.txt`, 24 of 30 realizations read): in the same simulated data the
-zero-mean optimum is steeper than the profile optimum by 1.05, 0.54, 0.44 and 0.22 sandwich errors (0.030, 0.015,
-0.009, 0.004 in index), with a scatter between realizations of 0.02 or less. The profile optimum is unbiased in
+**The zero-mean prior** (`E044/sim_n8_zm.txt`, 24 of 30 realizations read at 10:07; all 30 at 10:23, unchanged:
+zero-mean minus truth -0.023, -0.025, -0.008, -0.004 in index, pooled mean z -0.57 +- 0.09): in the same simulated
+data the zero-mean optimum is steeper than the profile optimum by 1.05, 0.54, 0.44 and 0.22 sandwich errors (0.030,
+0.015, 0.009, 0.004 in index), with a scatter between realizations of 0.02 or less. The profile optimum is unbiased in
 these simulations; so the zero-mean prior with a free scale per region is biased at this configuration, by an
 amount that does not depend on the noise draw. On the maps at nside 16 the difference is 0.104, 0.043, 0.030,
 0.004: the same sign and order, about three times larger in index. E041 had found up to 0.6 sd on its ladder
@@ -268,6 +269,30 @@ covariance as the truth; canary, no OVERFLOW line; every fit converged). chi2_mi
   with the LCDM prior in the Spur (0.154), where the white prior holds the small-scale CMB tighter.
 - Limits: the calculation is first order in the mismatch and takes the LCDM covariance of the paper (multipoles
   2 to 47, floor 0.01 uK) as the truth. Its unit test (1500 fits) is at a toy configuration.
+
+### R4, the chi-square of the central fit against its null (read 2026-11-11 10:39)
+
+A check I should have made when R1 was read. chi2_min of the central fit, with the penalty of the CMB prior
+inside it (55), is 16953.8 for 17420 degrees of freedom: ratio 0.9732, **2.50 standard deviations low** (sd of the
+ratio sqrt(2 / dof) = 0.0107). Per element and band the expectation is 0.598, not 0.6, and with sampling errors
+of 0.009, 0.030, 0.012, 0.017 the four regions are at -2.3, -0.2, -2.2 and +0.9 standard deviations. The deficit
+is in the two faint regions. Per band (residual chi-square per element): K 0.109, Ka 0.878, Q 0.954, V 0.969.
+
+Null (`nextgen/scripts/e044_chi2_null.py`, `E044/sim_n8_chi2null.txt`, 40 realizations of the first nside-8 set,
+regions, mask and prior of the fit): chi2_min / dof = 1.0019 +- 0.0027, scatter 0.0173 against sqrt(2 / dof) =
+0.0215; per element and band 0.597, 0.601, 0.602, 0.592. The expectation is right.
+
+- R1 said "H3 holds, better than written". H3 holds as written (every region within 5 percent of 0.6). But
+  "the model fits" needs the other half: nothing is misfitted high, and the total is low at 2.5 sd, which a
+  fluctuation gives one time in 80.
+- Readings: a fluctuation; or released WMAP covariances that overstate the noise at high latitude (1.3
+  percent in rms if spread evenly over the bands; Q and V carry most of the residual degrees of freedom). In
+  the second case every error of this experiment is too large by about that factor, which is small against
+  everything else here. Not rescaled. The white-prior fit has the same ratio (0.972), so the CMB prior is not
+  the cause, and the old regions had the same low values where they were faint (0.584, 0.592).
+- Not checked: whether the deficit is in particular modes of the covariances (the transmission-imbalance
+  modes, the large-scale modes with 65 to 164 times the median variance found in E038). That is a question for
+  Paper B.
 
 ## Negative control
 
