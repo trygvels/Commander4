@@ -2,6 +2,55 @@
 
 Newest entry on top. Keep each entry short: learned (with numbers), running, next, needs Trygve.
 
+## 2026-11-11 (Mac mini, 12:39): E044 complete at nside 16. With the mask the one-index model passes every test, the scale dependence is gone, and three results are new: no flat-prior optimum at all with a free CMB amplitude, a white CMB prior that looks better and is worse, and a chi-square that is 2.5 to 3.4 sd low. Draft 4 of Paper A1 is with a third referee
+
+**Learned** (E044 R3 to R8; F58 to F60; D036)
+
+| Profile index, change against the baseline | High Latitude | Spur | Intermediate | Plane |
+|---|---|---|---|---|
+| baseline (LCDM CMB prior, all scales) | -3.147 +- 0.029 | -3.139 +- 0.027 | -3.091 +- 0.019 | -3.039 +- 0.015 |
+| flat amplitude prior at 30 GHz | +0.451 | +0.146 | +0.193 | +0.068 |
+| white CMB prior (in expected sd) | -0.026 (-1.7) | +0.003 (+0.3) | -0.012 (-1.9) | -0.001 (0.0) |
+| flat CMB prior (in expected sd) | +0.106 (+1.9) | +0.017 (+0.3) | +0.074 (+1.9) | +0.001 (0.0) |
+| index from l <= 20 (in expected sd) | +0.004 (+0.2) | -0.028 (-1.0) | -0.047 (-1.4) | +0.011 (+0.3) |
+| K and Ka only (in expected sd) | +0.012 (+0.6) | -0.005 (-0.2) | +0.037 (+2.4) | +0.025 (+2.0) |
+| dust index 1.48 or 1.58 | 0.004 | 0.005 | 0.006 | 0.020 |
+| delta bandpasses | -0.050 | -0.051 | -0.048 | -0.046 |
+
+- **No test rejects one index per region** once the brightest 5 percent and Tau A are masked: 24 comparisons,
+  largest 2.4 expected sd. On the old regions the index from large scales was off by 3 to 10. So the reason the
+  earlier drafts gave for not quoting an index is gone (D036: the paper gives the indices with their
+  sensitivities, "not as a recommended value").
+- **With a free CMB amplitude and flat amplitude priors the High Latitude index has no optimum**: the marginal
+  rises monotonically over the whole allowed range, for 23 and 30 GHz alike (scan, pre-registered; new figure).
+  The profile likelihood of the same model gives -3.04 +- 0.06.
+- **White CMB prior**: by the exact first-order formula its error is 9 to 22 percent too small, while it quotes
+  a smaller error than the LCDM prior.
+- **The chi-square is low**: 0.973 of expectation (2.5 sd) with the LCDM prior, 0.956 (3.4 sd) with a flat CMB
+  prior; simulations give 1.002 +- 0.003. As noise that is 1.3 to 2.2 percent overstated in the released WMAP
+  matrices. Nobody has published that; two papers print V-band values of 0.96 to 0.98 without comment. The
+  deficit is absent along the CMB spectrum (1.008 +- 0.019). Reported, not explained (Q28).
+- Not explained either: the index at High and Intermediate latitude steepens the more tightly the CMB is held
+  (1.7 to 1.95 expected sd per step, Q29).
+- By-product: the three dust-index fits put the polarized dust index at 1.57 +- 0.02.
+- The sandwich error is calibrated in 360 simulations (sd of z 1.02, 1.06, 0.97, 0.98, each +- 0.04). An early
+  1.11 at High Latitude was a fluctuation (pre-registered test).
+- Failed expectations of mine, all recorded: the Spur's reference shift, the block-error ratios, the sign of
+  the Plane's change at large scales, where the dust index matters most.
+
+**Running**
+- Third independent referee read of draft 4 (29 pages).
+- Simulations at nside 16 with the regions of the fit: block-error null, low-pass estimator, zero-mean prior
+  (does the simulated bias reach the 3.6 sd seen on the maps?), chi-square per band. About three hours.
+
+**Next**
+- Answer the referee. If no fatal objection: the stopping criterion of D030 is met and the draft goes to you.
+
+**Needs Trygve**
+- Unchanged: the BeyondPlanck XV region and mask files; reporting the Accelerate fault upstream; wording about
+  the legacy move and Commander3.
+- New, for Paper B: whether to chase the chi-square deficit with the single-year WMAP files (small downloads).
+
 ## 2026-11-11 (Mac mini, 10:11): E044 central fit read. With proper regions and a mask the model fits (chi-square 0.57 to 0.61 against 0.6); the reference frequency still moves the index by 0.07 to 0.48 (5 to 16 sd); the zero-mean prior turns out biased here
 
 **Learned** (E044, pre-registered H1 to H8; F55 to F57)
