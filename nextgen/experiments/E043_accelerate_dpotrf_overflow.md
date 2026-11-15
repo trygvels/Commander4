@@ -208,3 +208,39 @@ What this establishes: F52. What it does not: that the overflow never altered a 
 keep; that other LAPACK routines of this OS build are sound at orders we have not used; that the order
 thresholds are stable under other loads or OS builds. What changes: D033 (the sound triangle, and every
 dense run on this machine under the canary); a paragraph in the paper; a memory note for future sessions.
+
+## Addendum 2026-11-15 10:37: the fault was already public, acknowledged by Apple and fixed in macOS 27.2
+
+Checked online on Trygve's question, four days after the conclusion above. I had not searched when I found
+the fault on 2026-11-11; a search then would have found this in a minute.
+
+- **SciPy issue 26145** (github.com/scipy/scipy/issues/26145), opened 2026-09-10: "Intermittent SIGSEGV in
+  Accelerate-backed positive-definite solves on macOS 27 RC; native DPOTRF reproducer". Apple M4 Pro, macOS 27.0
+  RC build 26A428 (the build that shipped on 2026-09-14). A C program calling `dpotrf_` under
+  `/usr/lib/libgmalloc.dylib` segfaults for the upper triangle at orders 2048 and 3000 and never for the lower
+  triangle. Same routine, same triangle, same size range, same tool as here.
+- Apple's Developer-Ecosystem-Engineering account in that issue (quoted from the GitHub API):
+  2026-09-23, "This looks like FB24671487. We believe we understand what is happening, standby.";
+  2026-10-13, "Please verify this has been resolved in 27.2b3 (26B5101f)."; the reporter the same day,
+  "Confirmed, this is fixed on my end." Closed 2026-10-13.
+- macOS 27.2 was released to the public on 2026-10-26 (27.2.1 on 2026-11-09), per news sites. Apple's release
+  notes for 27.0 and 27.2 have no entry on Accelerate or LAPACK; that 27.2 carries the fix rests on the issue
+  thread and on commit messages of third parties.
+- **SciPy issue 26388**, opened 2026-10-12 and open: `cholesky(lower=True)` with Accelerate leaves the other
+  triangle unzeroed for orders of 33 and above (SciPy 1.18.0 and 1.18.1; still so on macOS 27.2). This is the
+  second thing noted in the diagnosis above. Reference-LAPACK issue 1408 asks the same question of `dpotrf`.
+
+What this changes:
+
+- The fault is not a discovery of this project. It was found here independently, two months after the first
+  public report. It was also not confined to a pre-release build: it was in the public macOS 27.0.
+- What this record has that the public issue does not: the extent of the write (786432 bytes past a
+  524288-byte block at order 1536, 352000 at 4608, none from 6144), the mapping from SciPy's `lower=True` on a
+  C-ordered array to the faulty triangle, and the audit of which of our results were exposed.
+- "Report it to Apple" is no longer a decision for Trygve. A comment on the closed SciPy issue with the byte
+  counts would be optional and is his call.
+- This Mac still runs the pre-release build 26A5388g, which is older than the public 27.0, and the fault
+  reproduces on it today (2026-11-15: orders 1536 and 4608 overflow with the faulty triangle, 6144 does not,
+  the other triangle never). Updating macOS to 27.2 or later should remove it; rerun the canary test after any
+  update. The workaround in `lowres/likelihood.py` costs nothing and stays.
+

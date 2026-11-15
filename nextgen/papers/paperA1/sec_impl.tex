@@ -39,7 +39,11 @@ condition under which the profile score is unbiased when a component carries a p
 Sect.~\ref{sec:profile} (\exref{E039}, independent review).
 
 \paragraph{A numerical hazard.} During this work three processes crashed with corrupted heaps. The
-cause was not in our code. On the machine used (Apple M4, macOS 27.0, a pre-release build) the
+cause was not in our code, and it turned out to be known: crashes in the same routine were reported
+to the SciPy developers in September 2026 (SciPy issue 26145, on the public macOS 27.0), acknowledged
+there by Apple, and reported fixed in macOS 27.2. We found it independently, on a machine that had
+not been updated, and describe it because of what it did to our procedure. On the machine used (Apple
+M4, macOS 27.0, a pre-release build) the
 Cholesky routine of the Accelerate framework, called with the upper-triangle option, writes between
 0.25 and 0.77 MB past an internal buffer for matrix orders of about 1500 to 6000, and SciPy maps
 \texttt{cho\_factor(lower=True)} on a row-ordered array to that option. The factor it returns is
